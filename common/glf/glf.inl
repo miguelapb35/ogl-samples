@@ -659,9 +659,10 @@ namespace glf
 		{
 			glutInitContextProfile(Profile); // GLUT_COMPATIBILITY_PROFILE GLUT_CORE_PROFILE
 #			if NDEBUG
-				glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
+				if(Profile == GLUT_CORE_PROFILE)
+					glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 #			else
-				glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+				glutInitContextFlags((Profile == GLUT_CORE_PROFILE ? GLUT_FORWARD_COMPATIBLE : 0) | GLUT_DEBUG);
 #			endif
 		}
 #endif//__APPLE__
