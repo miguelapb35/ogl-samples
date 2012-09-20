@@ -424,6 +424,48 @@ namespace glf
 		return createShader(Type, std::string(), Source);
 	}
 
+	inline std::string parseArguments
+	(
+		std::string const & Arguments
+	)
+	{
+		//std::string parameters = "a1 10.2 lib_t 50 sv 60 out 'true'";
+
+		std::stringstream Stream(Arguments);
+		std::string Param;
+		int Version;
+		std::string Profile;
+		std::vector<std::string> Defines;
+
+		int libt; //names ending in _t are not allowed
+		short sv;
+		std::string out;
+		while(Stream >> Param)
+		{
+			if(Param == "--version")
+				Stream >> Version;
+			else if (Param == "-v")
+				Stream >> Version;
+			else if (Param == "--profile")
+				Stream >> Profile;
+			else if (Param == "-p")
+				Stream >> Profile;
+			else {
+				std::stringstream err;
+				err << "unknown parameter type: \"" << Param << "\"";
+				glDebugMessageInsertARB(
+					GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, 
+					-1, std::string(std::string("unknown parameter type: \"") << Param << std::string("\"")).c_str());
+			}
+			if(!Stream) 
+			{
+				glDebugMessageInsertARB(
+					GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, 
+					-1, std::string(std::string("error parsing parameter: \"") << Param << std::string("\"")).c_str());
+			}
+		}
+	}
+
 	inline GLuint createShader
 	(
 		GLenum Type,

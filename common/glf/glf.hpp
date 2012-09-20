@@ -42,6 +42,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cstring>
 
@@ -92,7 +93,7 @@ namespace glf
 	GLuint createShader(GLenum Type, std::string const & Arguments, std::string const & Source);
 	bool checkError(const char* Title);
 	bool checkProgram(GLuint ProgramName);
-	bool checkShader(GLuint ShaderName, char const* Source);
+	bool checkShader(GLuint ShaderName, std::string const & File);
 	bool validateProgram(GLuint ProgramName);
 
 	int version(int Major, int Minor);
