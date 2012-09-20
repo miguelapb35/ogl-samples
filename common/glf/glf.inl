@@ -390,7 +390,11 @@ namespace glf
 		return Result == GL_TRUE;
 	}
 
-	inline bool checkShader(GLuint ShaderName, const char* Source)
+	inline bool checkShader
+	(
+		GLuint ShaderName, 
+		std::string const & File
+	)
 	{
 		if(!ShaderName)
 			return false;
@@ -398,7 +402,7 @@ namespace glf
 		GLint Result = GL_FALSE;
 		glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
 
-		fprintf(stdout, "Compiling shader\n%s...\n", Source);
+		fprintf(stdout, "Compiling shader\n%s...\n", File.c_str());
 		int InfoLogLength;
 		glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if(InfoLogLength > 0)
@@ -417,6 +421,16 @@ namespace glf
 		std::string const & Source
 	)
 	{
+		return createShader(Type, std::string(), Source);
+	}
+
+	inline GLuint createShader
+	(
+		GLenum Type,
+		std::string const & Arguments, 
+		std::string const & Source
+	)
+	{
 		bool Validated = true;
 		GLuint Name = 0;
 
@@ -427,7 +441,6 @@ namespace glf
 			Name = glCreateShader(Type);
 			glShaderSource(Name, 1, &SourcePointer, NULL);
 			glCompileShader(Name);
-			Validated = glf::checkShader(Name, SourcePointer);
 		}
 
 		return Name;

@@ -88,6 +88,8 @@ namespace glf
 	};
 
 	std::string loadFile(std::string const & Filename);
+	GLuint createShader(GLenum Type, std::string const & Source);
+	GLuint createShader(GLenum Type, std::string const & Arguments, std::string const & Source);
 	bool checkError(const char* Title);
 	bool checkProgram(GLuint ProgramName);
 	bool checkShader(GLuint ShaderName, char const* Source);

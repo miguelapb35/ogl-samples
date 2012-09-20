@@ -84,18 +84,22 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+
 		ProgramName[program::VERTEX] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName[program::VERTEX], VertShaderName);
 		glLinkProgram(ProgramName[program::VERTEX]);
 		glDeleteShader(VertShaderName);
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
 
 		ProgramName[program::FRAGMENT] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
 		glLinkProgram(ProgramName[program::FRAGMENT]);
 		glDeleteShader(FragShaderName);
+
+		Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAGMENT]);
 	}
 
