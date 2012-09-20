@@ -436,20 +436,28 @@ namespace glf
 		int Version;
 		std::string Profile;
 		std::vector<std::string> Defines;
+        std::vector<std::string> Includes;
 
 		int libt; //names ending in _t are not allowed
 		short sv;
 		std::string out;
 		while(Stream >> Param)
 		{
-			if(Param == "--version")
+            if(Param == "-D")
+            {
+                Param.
+                Defines.push_back(Define);
+            }
+			else if((Param == "--version") || (Param == "-v"))
 				Stream >> Version;
-			else if (Param == "-v")
-				Stream >> Version;
-			else if (Param == "--profile")
+			else if((Param == "--profile") || (Param == "-p"))
 				Stream >> Profile;
-			else if (Param == "-p")
-				Stream >> Profile;
+			else if (Param == "--include" || Param == "-i")
+            {
+                std::string Include;
+				Stream >> Include;
+                Includes.push_back(Include);
+            }
 			else {
 				std::stringstream err;
 				err << "unknown parameter type: \"" << Param << "\"";
