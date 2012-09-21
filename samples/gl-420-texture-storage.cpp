@@ -13,6 +13,7 @@
 //**********************************
 
 #include <glf/glf.hpp>
+#include <glf/compiler.hpp>
 
 namespace
 {
@@ -81,11 +82,18 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
 
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+
+		Validated = Validated && Compiler.check();
+
+		//GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
+		//GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+
+		//Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		//Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
 
 		ProgramName[program::VERTEX] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);

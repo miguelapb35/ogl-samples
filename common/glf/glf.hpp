@@ -40,9 +40,12 @@
 
 // STL
 #include <vector>
+#include <map>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <istream>
+#include <ostream>
 #include <string>
 #include <cstring>
 

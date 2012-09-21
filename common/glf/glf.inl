@@ -436,29 +436,36 @@ namespace glf
 		int Version;
 		std::string Profile;
 		std::vector<std::string> Defines;
-        std::vector<std::string> Includes;
+		std::vector<std::string> Includes;
 
-		int libt; //names ending in _t are not allowed
-		short sv;
-		std::string out;
 		while(Stream >> Param)
 		{
-            if(Param == "-D")
-            {
-                Param.
-                Defines.push_back(Define);
-            }
+			std::size_t Found = Param.find("-D");
+			if(Found != std::string::npos)
+			{
+				std::string Define;
+				Stream >> Define;
+				Defines.push_back(Define.substr(2));
+			}
+			else if(Param == "--define")
+			{
+				std::string Define;
+				Stream >> Define;
+				Defines.push_back(Define);
+			}
 			else if((Param == "--version") || (Param == "-v"))
 				Stream >> Version;
 			else if((Param == "--profile") || (Param == "-p"))
 				Stream >> Profile;
 			else if (Param == "--include" || Param == "-i")
-            {
-                std::string Include;
+			{
+				std::string Include;
 				Stream >> Include;
-                Includes.push_back(Include);
-            }
-			else {
+				Includes.push_back(Include);
+			}
+/*
+			else 
+			{
 				std::stringstream err;
 				err << "unknown parameter type: \"" << Param << "\"";
 				glDebugMessageInsertARB(
@@ -471,6 +478,7 @@ namespace glf
 					GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, 
 					-1, std::string(std::string("error parsing parameter: \"") << Param << std::string("\"")).c_str());
 			}
+*/
 		}
 	}
 
@@ -481,7 +489,6 @@ namespace glf
 		std::string const & Source
 	)
 	{
-		bool Validated = true;
 		GLuint Name = 0;
 
 		if(!Source.empty())
@@ -497,7 +504,7 @@ namespace glf
 	}
 
 	#if !defined(__APPLE__)
-    static void GLAPIENTRY debugOutput
+	static void GLAPIENTRY debugOutput
 	(
 		GLenum source,
 		GLenum type,
