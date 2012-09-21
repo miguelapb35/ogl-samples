@@ -26,10 +26,34 @@ namespace glf
 	{
 		assert(!Filename.empty());
 	
+		commandline CommandLine(Arguments);
+		std::string Header;
+		if(CommandLine.getVersion())
+			Header = format("#version %d %s\n", CommandLine.getVersion(), CommandLine.getProfile().c_str());
+		Header += CommandLine.getDefines();
+		//if(Defines.empty())
+
 		std::string SourceContent = glf::loadFile(Filename);
-		char const * SourcePointer = SourceContent.c_str();
+		std::string::size_type VersionOffset = SourceContent.find("#version");
+		std::string::size_type CommentOffset = 0;
+
+		do
+		{
+
+		}
+		while(VersionOffset < CommentOffset);
+
+		std::size_t const SourceSize(2);
+		char const * SourcePointer[SourceSize];
+		SourcePointer[0] = VersionOffset != std::string::npos ? "" : Header.c_str();
+		SourcePointer[1] = SourceContent.c_str();
+
+		for(std::size_t i = 0; i < SourceSize; ++i)
+			if(SourcePointer[i] != NULL)
+				fprintf(stdout, "%s\n", SourcePointer[i]);
+
 		GLuint Name = glCreateShader(Type);
-		glShaderSource(Name, 1, &SourcePointer, NULL);
+		glShaderSource(Name, SourceSize, SourcePointer, NULL);
 		glCompileShader(Name);
 
 		std::pair<files_map::iterator, bool> ResultFiles = this->ShaderFiles.insert(std::make_pair(Name, Filename));
@@ -79,14 +103,16 @@ namespace glf
 			GLint Result = GL_FALSE;
 			glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
 
-			fprintf(stdout, "Compiling shader\n%s...\n", ShaderIterator->first.c_str());
-			int InfoLogLength;
-			glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
-			if(InfoLogLength > 0)
+			if(Result == GL_TRUE)
 			{
-				std::vector<char> Buffer(InfoLogLength);
-				glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
-				fprintf(stdout, "%s\n", &Buffer[0]);
+				int InfoLogLength;
+				glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
+				if(InfoLogLength > 0)
+				{
+					std::vector<char> Buffer(InfoLogLength);
+					glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
+					fprintf(stdout, "%s\n", &Buffer[0]);
+				}
 			}
 
 			Success = Success && Result == GL_TRUE;
