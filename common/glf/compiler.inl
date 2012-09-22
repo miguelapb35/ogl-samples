@@ -36,13 +36,23 @@ namespace glf
 		std::string SourceContent = glf::loadFile(Filename);
 		std::string::size_type VersionOffset = SourceContent.find("#version");
 		std::string::size_type CommentOffset = 0;
+        std::string::size_type NextOffset = 0;
 
-		do
-		{
+        while(VersionOffset < NextOffset && NextOffset != std::string::npos)
+        {
+            NextOffset = SourceContent.find("//", NextOffset);
+            if(NextOffset < VersionOffset)
+                CommentOffset = NextOffset;
+            else
+                break;
+        }
 
-		}
-		while(VersionOffset < CommentOffset);
-
+        bool IsVersionCommented = false;
+        if(CommentOffset == std::string::npos)
+            IsVersionCommented = true;
+        else if(SourceContent.find("\n", CommentOffset, VersionOffset - CommentOffset) != std::string::npos)
+            IsVersionCommented = true;
+        
 		std::size_t const SourceSize(2);
 		char const * SourcePointer[SourceSize];
 		SourcePointer[0] = VersionOffset != std::string::npos ? "" : Header.c_str();
