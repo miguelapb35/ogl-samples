@@ -27,43 +27,27 @@ namespace glf
 		assert(!Filename.empty());
 	
 		commandline CommandLine(Arguments);
+
 		std::string Header;
+/*
 		if(CommandLine.getVersion())
 			Header = format("#version %d %s\n", CommandLine.getVersion(), CommandLine.getProfile().c_str());
 		Header += CommandLine.getDefines();
+*/
 		//if(Defines.empty())
 
-		std::string SourceContent = glf::loadFile(Filename);
-		std::string::size_type VersionOffset = SourceContent.find("#version");
-		std::string::size_type CommentOffset = 0;
-        std::string::size_type NextOffset = 0;
+		//std::string Line;
+		//std::getline(SourceContent, Line);
 
-        while(VersionOffset < NextOffset && NextOffset != std::string::npos)
-        {
-            NextOffset = SourceContent.find("//", NextOffset);
-            if(NextOffset < VersionOffset)
-                CommentOffset = NextOffset;
-            else
-                break;
-        }
+		std::string ShaderSource = glf::loadFile(Filename);
 
-        bool IsVersionCommented = false;
-        if(CommentOffset == std::string::npos)
-            IsVersionCommented = true;
-        else if(SourceContent.find("\n", CommentOffset, VersionOffset - CommentOffset) != std::string::npos)
-            IsVersionCommented = true;
-        
-		std::size_t const SourceSize(2);
-		char const * SourcePointer[SourceSize];
-		SourcePointer[0] = VersionOffset != std::string::npos ? "" : Header.c_str();
-		SourcePointer[1] = SourceContent.c_str();
+		std::string PreprocessedSource = parser()(CommandLine, ShaderSource);
+		char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
-		for(std::size_t i = 0; i < SourceSize; ++i)
-			if(SourcePointer[i] != NULL)
-				fprintf(stdout, "%s\n", SourcePointer[i]);
+		fprintf(stdout, "%s\n", PreprocessedSource.c_str());
 
 		GLuint Name = glCreateShader(Type);
-		glShaderSource(Name, SourceSize, SourcePointer, NULL);
+		glShaderSource(Name, 1, &PreprocessedSourcePointer, NULL);
 		glCompileShader(Name);
 
 		std::pair<files_map::iterator, bool> ResultFiles = this->ShaderFiles.insert(std::make_pair(Name, Filename));

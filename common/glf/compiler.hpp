@@ -113,6 +113,76 @@ namespace glf
 			std::vector<std::string> Defines;
 		};
 
+		class parser
+		{
+		public:
+			std::string operator() 
+			(
+				commandline const & CommandLine,
+				std::string const & Source
+			)
+			{
+				std::stringstream Stream;
+				Stream << Source;
+
+				std::string Line, Text;
+				if(CommandLine.getVersion() != -1)
+					//Text += "#version " + CommandLine.getVersion() + CommandLine.getProfile();
+					Text += format("#version %d %s\n", CommandLine.getVersion(), CommandLine.getProfile().c_str());
+
+				while(std::getline(Stream, Line))
+				{
+					std::size_t Offset = 0;
+
+					// Version
+					Offset = Line.find("#version");
+					if(Offset != std::string::npos)
+					{
+						std::size_t CommentOffset = Line.find("//");
+						if(CommentOffset != std::string::npos && CommentOffset < Offset)
+							continue;
+
+						// Reorder so that the #version line is always the first of a shader text
+						if(CommandLine.getVersion() == -1)
+							Text = Line + Text;
+						// else skip is version is only mentionned
+						continue;
+					}
+
+					// Include
+					Offset = Line.find("#include");
+					if(Offset != std::string::npos)
+					{
+						std::size_t CommentOffset = Line.find("//");
+						if(CommentOffset != std::string::npos && CommentOffset < Offset)
+							continue;
+
+						Text += parseInclude(Line, Offset);
+						continue;
+					} 
+
+					Text += Line + "\n";
+				}
+
+				return Text;
+			}
+
+		private:
+			std::string parseInclude(std::string const & Line, std::size_t const & Offset)
+			{
+				std::string Result;
+
+				std::string::size_type IncludeFirstQuote = Line.find("\"", Offset);
+				std::string::size_type IncludeSecondQuote = Line.find("\"", IncludeFirstQuote + 1);
+				std::string::size_type IncludeEndl = Line.find("\n", Offset);
+
+				std::string IncludeName = Line.substr(IncludeFirstQuote + 1, IncludeSecondQuote - IncludeFirstQuote - 1);
+				std::string PathName = glf::DATA_DIRECTORY + "gl-420/" + IncludeName;
+
+				return glf::loadFile(PathName);;
+			}
+		};
+
 	public:
 		~compiler();
 

@@ -259,6 +259,30 @@ namespace glf
 		return false;
 	}
 
+	inline std::string loadFile
+	(
+		std::string const & Filename
+	)
+	{
+		std::string Result;
+		
+		std::ifstream Stream(Filename);
+		if(!Stream.is_open())
+			return Result;
+
+		//std::streampos Begin = Steam.tellg();
+		Stream.seekg(0, std::ios::end);
+		Result.reserve(Stream.tellg());
+		Stream.seekg(0, std::ios::beg);
+		
+		Result.assign(
+			(std::istreambuf_iterator<char>(Stream)),
+			std::istreambuf_iterator<char>());
+
+		return Result;
+	}
+
+/*
 	inline std::string loadFile(std::string const & Filename)
 	{
 		std::ifstream stream(Filename.c_str(), std::ios::in);
@@ -276,7 +300,7 @@ namespace glf
 
 		return Text;
 	}
-
+*/
 	inline bool checkError(const char* Title)
 	{
 		int Error;
