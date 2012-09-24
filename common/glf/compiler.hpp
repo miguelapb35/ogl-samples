@@ -12,10 +12,19 @@
 #ifndef GLF_COMPILER_INCLUDED
 #define GLF_COMPILER_INCLUDED
 
-#include "glf.hpp"
+#include "common.hpp"
 
 namespace glf
 {
+	std::string format(const char* msg, ...);
+	std::string loadFile(std::string const & Filename);
+	GLuint createShader(GLenum Type, std::string const & Source);
+	GLuint createShader(GLenum Type, std::string const & Arguments, std::string const & Source);
+	bool checkError(const char* Title);
+	bool checkProgram(GLuint ProgramName);
+	bool checkShader(GLuint ShaderName, std::string const & File);
+	bool validateProgram(GLuint ProgramName);
+
 	class compiler
 	{
 		typedef std::map<std::string, GLuint> names_map;
@@ -128,7 +137,7 @@ namespace glf
 				std::string Line, Text;
 				if(CommandLine.getVersion() != -1)
 					//Text += "#version " + CommandLine.getVersion() + CommandLine.getProfile();
-					Text += format("#version %d %s\n", CommandLine.getVersion(), CommandLine.getProfile().c_str());
+					Text += glf::format("#version %d %s\n", CommandLine.getVersion(), CommandLine.getProfile().c_str());
 
 				while(std::getline(Stream, Line))
 				{
@@ -208,6 +217,7 @@ namespace glf
 		files_map ShaderFiles;
 		names_map PendingChecks;
 	};
+
 }//namespace glf
 
 #include "compiler.inl"
