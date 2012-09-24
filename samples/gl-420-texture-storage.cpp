@@ -84,7 +84,7 @@ bool initProgram()
 	{
 		glf::compiler Compiler;
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, "--version 430", VERT_SHADER_SOURCE);
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, "--version 430 --profile core -DFLAT_COLOR", FRAG_SHADER_SOURCE);
 		//Validated = Validated && Compiler.check();
 
 		ProgramName[program::VERTEX] = glCreateProgram();

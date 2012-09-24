@@ -1,4 +1,4 @@
-//#version 420 core
+#version 420 core
 
 #define POSITION	0
 #define COLOR		3
@@ -16,5 +16,9 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord.st);
+#	ifdef FLAT_COLOR
+		Color = vec4(0.0, 0.5, 1.0, 1.0);
+#	else
+		Color = texture(Diffuse, In.Texcoord.st);
+#	endif//FLAT_COLOR
 }
