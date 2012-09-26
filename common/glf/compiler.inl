@@ -160,7 +160,7 @@ namespace glf
 		}
 		return false;
 	}
-
+/*
 	inline std::string compiler::loadFile
 	(
 		std::string const & Filename
@@ -180,6 +180,28 @@ namespace glf
 		stream.close();
 
 		return Text;
+	}
+*/
+	inline std::string compiler::loadFile
+	(
+		std::string const & Filename
+	)
+	{
+		std::string Result;
+		
+		std::ifstream Stream(Filename);
+		if(!Stream.is_open())
+			return Result;
+
+		Stream.seekg(0, std::ios::end);
+		Result.reserve(Stream.tellg());
+		Stream.seekg(0, std::ios::beg);
+		
+		Result.assign(
+			(std::istreambuf_iterator<char>(Stream)),
+			std::istreambuf_iterator<char>());
+
+		return Result;
 	}
 
 	inline bool validateProgram(GLuint ProgramName)

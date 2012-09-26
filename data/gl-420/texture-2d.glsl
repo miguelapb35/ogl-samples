@@ -4,3 +4,5 @@
 #define FRAG_COLOR	0
 
 #define TRANSFORM0	1
+
+#define DIFFUSE		0

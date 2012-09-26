@@ -1,7 +1,6 @@
-//#version 420 core
+#version 420 core
 
 #include "texture-2d.glsl"
-//#include "texture-2d.frag"
 
 layout(binding = TRANSFORM0) uniform transform
 {
