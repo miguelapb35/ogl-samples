@@ -39,10 +39,18 @@ namespace glf
 			};
 
 		public:
-			commandline(std::string const & Arguments) :
+			commandline
+			(
+				std::string const & Filename,
+				std::string const & Arguments
+			) :
 				Profile("core"),
 				Version(-1)
 			{
+				std::size_t PathOffset = Filename.find_last_of("/");
+				std::string FilePath = Filename.substr(0, PathOffset + 1);
+
+				this->Includes.push_back(FilePath);
 				this->parseArguments(Arguments);
 			}
 
@@ -58,9 +66,13 @@ namespace glf
 				{
 					Stream >> Param;
 
-					std::size_t Found = Param.find("-D");
-					if(Found != std::string::npos)
+					std::size_t FoundDefine = Param.find("-D");
+					std::size_t FoundInclude = Param.find("-I");
+
+					if(FoundDefine != std::string::npos)
 						this->Defines.push_back(Param.substr(2, Param.size() - 2));
+					else if(FoundInclude != std::string::npos)
+						this->Includes.push_back(glf::DATA_DIRECTORY + Param.substr(2, Param.size() - 2));
 					else if(Param == "--define")
 					{
 						std::string Define;
@@ -71,11 +83,11 @@ namespace glf
 						Stream >> Version;
 					else if((Param == "--profile") || (Param == "-p"))
 						Stream >> Profile;
-					else if (Param == "--include" || Param == "-i")
+					else if (Param == "--include")
 					{
 						std::string Include;
 						Stream >> Include;
-						this->Includes.push_back(Include);
+						this->Includes.push_back(glf::DATA_DIRECTORY + Include);
 					}
 		/*
 					else 
@@ -114,6 +126,11 @@ namespace glf
 				return Result;
 			}
 
+			std::vector<std::string> getIncludes() const
+			{
+				return this->Includes;
+			}
+
 		private:
 			std::string Profile;
 			int Version;
@@ -127,9 +144,11 @@ namespace glf
 			std::string operator() 
 			(
 				commandline const & CommandLine,
-				std::string const & Source
+				std::string const & Filename
 			)
 			{
+				std::string Source = glf::loadFile(Filename);
+
 				std::stringstream Stream;
 				Stream << Source;
 				std::string Line, Text;
@@ -168,7 +187,21 @@ namespace glf
 						if(CommentOffset != std::string::npos && CommentOffset < Offset)
 							continue;
 
-						Text += parseInclude(Line, Offset);
+						std::string Include = parseInclude(Line, Offset);
+
+						std::vector<std::string> Includes = CommandLine.getIncludes();
+
+						for(std::size_t i = 0; i < Includes.size(); ++i)
+						{
+							std::string PathName = Includes[i] + Include;
+							std::string Source = glf::loadFile(PathName);
+							if(!Source.empty())
+							{
+								Text += Source;
+								break;
+							}
+						}
+
 						continue;
 					} 
 
@@ -187,18 +220,14 @@ namespace glf
 				std::string::size_type IncludeSecondQuote = Line.find("\"", IncludeFirstQuote + 1);
 				std::string::size_type IncludeEndl = Line.find("\n", Offset);
 
-				std::string IncludeName = Line.substr(IncludeFirstQuote + 1, IncludeSecondQuote - IncludeFirstQuote - 1);
-				std::string PathName = glf::DATA_DIRECTORY + "gl-420/" + IncludeName;
-
-				return glf::loadFile(PathName);;
+				return Line.substr(IncludeFirstQuote + 1, IncludeSecondQuote - IncludeFirstQuote - 1);
 			}
 		};
 
 	public:
 		~compiler();
 
-		GLuint create(GLenum Type, std::string const & Filename);
-		GLuint create(GLenum Type, std::string const & Arguments, std::string const & Filename);
+		GLuint create(GLenum Type, std::string const & Filename, std::string const & Arguments = std::string());
 		bool destroy(GLuint const & Name);
 
 		bool check();

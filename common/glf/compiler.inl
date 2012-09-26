@@ -34,24 +34,14 @@ namespace glf
 
 	inline GLuint compiler::create(
 		GLenum Type, 
-		std::string const & Filename)
-	{
-		return this->create(Type, std::string(), Filename);
-	}
-
-	// TODO: Add Arguments supports
-	inline GLuint compiler::create(
-		GLenum Type, 
-		std::string const & Arguments, 
-		std::string const & Filename)
+		std::string const & Filename,
+		std::string const & Arguments)
 	{
 		assert(!Filename.empty());
 	
-		commandline CommandLine(Arguments);
+		commandline CommandLine(Filename, Arguments);
 
-		std::string ShaderSource = glf::loadFile(Filename);
-
-		std::string PreprocessedSource = parser()(CommandLine, ShaderSource);
+		std::string PreprocessedSource = parser()(CommandLine, Filename);
 		char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
 		fprintf(stdout, "%s\n", PreprocessedSource.c_str());
@@ -160,28 +150,7 @@ namespace glf
 		}
 		return false;
 	}
-/*
-	inline std::string compiler::loadFile
-	(
-		std::string const & Filename
-	)
-	{
-		std::ifstream stream(Filename.c_str(), std::ios::in);
 
-		if(!stream.is_open())
-			return "";
-
-		std::string Line = "";
-		std::string Text = "";
-
-		while(getline(stream, Line))
-			Text += "\n" + Line;
-
-		stream.close();
-
-		return Text;
-	}
-*/
 	inline std::string compiler::loadFile
 	(
 		std::string const & Filename
@@ -282,64 +251,6 @@ namespace glf
 	)
 	{
 		return createShader(Type, std::string(), Source);
-	}
-
-	inline std::string parseArguments
-	(
-		std::string const & Arguments
-	)
-	{
-		//std::string parameters = "a1 10.2 lib_t 50 sv 60 out 'true'";
-
-		std::stringstream Stream(Arguments);
-		std::string Param;
-		int Version;
-		std::string Profile;
-		std::vector<std::string> Defines;
-		std::vector<std::string> Includes;
-
-		while(Stream >> Param)
-		{
-			std::size_t Found = Param.find("-D");
-			if(Found != std::string::npos)
-			{
-				std::string Define;
-				Stream >> Define;
-				Defines.push_back(Define.substr(2));
-			}
-			else if(Param == "--define")
-			{
-				std::string Define;
-				Stream >> Define;
-				Defines.push_back(Define);
-			}
-			else if((Param == "--version") || (Param == "-v"))
-				Stream >> Version;
-			else if((Param == "--profile") || (Param == "-p"))
-				Stream >> Profile;
-			else if (Param == "--include" || Param == "-i")
-			{
-				std::string Include;
-				Stream >> Include;
-				Includes.push_back(Include);
-			}
-/*
-			else 
-			{
-				std::stringstream err;
-				err << "unknown parameter type: \"" << Param << "\"";
-				glDebugMessageInsertARB(
-					GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, 
-					-1, std::string(std::string("unknown parameter type: \"") << Param << std::string("\"")).c_str());
-			}
-			if(!Stream) 
-			{
-				glDebugMessageInsertARB(
-					GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, 
-					-1, std::string(std::string("error parsing parameter: \"") << Param << std::string("\"")).c_str());
-			}
-*/
-		}
 	}
 
 	inline GLuint createShader
