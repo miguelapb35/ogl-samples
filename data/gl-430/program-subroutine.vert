@@ -18,10 +18,17 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 out block
 {
 	vec2 Texcoord;
+	flat int Instance;
 } Out;
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 void main()
 {	
+	Out.Instance = gl_InstanceID;
 	Out.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

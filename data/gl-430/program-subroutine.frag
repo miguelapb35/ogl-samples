@@ -12,15 +12,18 @@
 #define SAMPLING_DXT1	0
 #define SAMPLING_RGB8	1
 
+#define MAX_INSTANCE	2
+
 subroutine vec4 diffuse();
 
-layout(location = 0) subroutine uniform diffuse Diffuse;
+layout(location = 0) subroutine uniform diffuse Diffuse[MAX_INSTANCE];
 layout(binding = SAMPLER_DXT1) uniform sampler2D DiffuseDXT1;
 layout(binding = SAMPLER_RGB8) uniform sampler2D DiffuseRGB8;
 
 in block
 {
 	vec2 Texcoord;
+	flat int Instance;
 } In;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
@@ -39,5 +42,5 @@ vec4 diffuseHQ()
 
 void main()
 {
-	Color = Diffuse();
+	Color = Diffuse[In.Instance]();
 }
