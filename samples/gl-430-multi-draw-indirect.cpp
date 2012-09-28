@@ -346,13 +346,15 @@ bool begin()
 
 bool end()
 {
+	bool Success(true);
+
 	// Delete objects
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return true;
+	return Success;
 }
 
 void display()

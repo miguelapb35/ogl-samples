@@ -267,10 +267,8 @@ namespace glf
 		switch(key) 
 		{
 		case 27:
-			end();
-			exit(0);
+			glutLeaveMainLoop();
 
-			//exit(end());
 			break;
 		}
 	}
@@ -343,11 +341,6 @@ namespace glf
 #endif
 	}
 
-	static void close()
-	{
-		exit(end() ? 0 : 1);
-	}
-
 	static void motion(int x, int y)
 	{
 		Window.MouseCurrent = glm::ivec2(x, y);
@@ -413,12 +406,11 @@ namespace glf
 			glutKeyboardFunc(glf::keyboard);
 			glutIdleFunc(glf::idle);
 #if !defined(__APPLE__)
-			glutCloseFunc(glf::close);
 			glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
 #endif//__APPLE__
 			glutMainLoop();
 
-			return 0;
+			return end() ? 0 : 1;
 		}
 
 		return 1;
