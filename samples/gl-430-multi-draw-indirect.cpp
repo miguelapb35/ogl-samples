@@ -30,23 +30,23 @@ namespace
 	};
 
 	GLsizei const VertexCount(12);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3f);
-	glf::vertex_v3fv3f const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3fv1i);
+	glf::vertex_v3fv3fv1i const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fv3f(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f)),
+		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), 0),
+		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f), 0),
+		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), 0),
+		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), 0),
 
-		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
-		glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1),
+		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1),
+		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1),
+		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 1),
         
-		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f))
+		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f), 2),
+		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f), 2),
+		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f), 2),
+		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f), 2)
 	};
 
 	GLsizei const IndirectBufferCount(3);
@@ -204,12 +204,14 @@ bool initVertexArray()
 	glGenVertexArrays(1, &VertexArrayName);
     glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_INT, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3) * 2));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+		glEnableVertexAttribArray(glf::semantic::attr::DRAW_ID);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]); 
 	glBindVertexArray(0);
@@ -317,7 +319,7 @@ bool begin()
 
 	// Validate OpenGL support
 	Success = Success && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	//Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
+	Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
 
 	// Create and initialize objects
 	if(Success && glf::checkExtension("GL_ARB_debug_output"))
@@ -365,12 +367,12 @@ void display()
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
-/*
+
 	glm::uint Value(0);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
 	glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Value);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-*/
+
 	{
 		// Initialize the atomic counter
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);

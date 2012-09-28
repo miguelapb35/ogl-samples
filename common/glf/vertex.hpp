@@ -50,6 +50,24 @@ namespace glf
 		glm::vec3 Texcoord;
 	};
 
+	struct vertex_v3fv3fv1i
+	{
+		vertex_v3fv3fv1i
+		(
+			glm::vec3 const & Position,
+			glm::vec3 const & Texcoord,
+			int const & DrawID
+		) :
+			Position(Position),
+			Texcoord(Texcoord),
+			DrawID(DrawID)
+		{}
+
+		glm::vec3 Position;
+		glm::vec3 Texcoord;
+		int DrawID;
+	};
+
 	struct vertex_v4fv2f
 	{
 		vertex_v4fv2f

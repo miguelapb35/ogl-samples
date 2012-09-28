@@ -11,7 +11,6 @@
 in block
 {
 	vec2 Texcoord;
-	vec4 Color;
 	flat uint DrawID;
 } In;
 
@@ -21,7 +20,6 @@ layout(binding = 0) uniform sampler2D Diffuse[3];
 
 void main()
 {
-	Color = texture(Diffuse[In.DrawID], In.Texcoord.st);// * In.Color;
-	//Color = In.Color;
+	Color = texture(Diffuse[In.DrawID], In.Texcoord.st);
 }
 
