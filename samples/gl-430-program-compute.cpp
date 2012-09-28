@@ -17,9 +17,9 @@
 namespace
 {
 	std::string const SAMPLE_NAME("OpenGL Compute Program");
-	std::string const VS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.vs");
-	std::string const FS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.fs");
-	std::string const CS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.cs");
+	std::string const VS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.vert");
+	std::string const FS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.frag");
+	std::string const CS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.comp");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
