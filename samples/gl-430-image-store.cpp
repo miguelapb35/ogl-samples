@@ -207,18 +207,12 @@ void display()
 
 	// Read from image
 	{
-		GLint Border(8);
-		glEnable(GL_SCISSOR_TEST);
-		glScissorIndexed(0, Border, Border, Window.Size.x - 2 * Border, Window.Size.y - 2 * Border);
-
 		glDrawBuffer(GL_BACK);
 
 		glBindProgramPipeline(PipelineName[pipeline::READ]);
 		glBindImageTexture(glf::semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
 		glBindVertexArray(VertexArrayName);
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
-
-		glDisable(GL_SCISSOR_TEST);
 	}
 
 	glf::swapBuffers();
