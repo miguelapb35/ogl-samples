@@ -53,6 +53,15 @@ Linux G++ instructions
 - Launch the sample from the build output directory
 
 ================================================================================
+OpenGL Samples Pack 4.3.0.2: 2012-09-29
+--------------------------------------------------------------------------------
+- Added GLSL compiler: -D -I #include 
+- Complexified some OpenGL 4.3 samples
+- Fixed sample exits
+- Fixed multisample position sample
+- Clean up legacy files
+
+================================================================================
 OpenGL Samples Pack 4.3.0.1: 2012-08-30
 --------------------------------------------------------------------------------
 - Added 430-texture-view sample
