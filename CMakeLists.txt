@@ -11,11 +11,6 @@ if(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 endif(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 
 ################################
-# Add common source 
-
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/common")
-
-################################
 # Add GLEXT 
 
 find_package(OpenGL)
@@ -78,6 +73,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 set(GLI_DIRECTORY gli-0.3.1.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
+
+################################
+# Add GLF
+
+set(GLF_DIRECTORY glf)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 
 ################################
 # Add FreeGLUT
