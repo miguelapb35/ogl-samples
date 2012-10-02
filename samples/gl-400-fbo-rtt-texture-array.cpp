@@ -200,7 +200,7 @@ void display()
 		glViewportIndexedfv(0, &Viewport[i][0]);
 		glUniform1i(UniformLayer, i);
 
-		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
 
 	glf::checkError("display");

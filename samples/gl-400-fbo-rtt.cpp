@@ -198,7 +198,7 @@ void display()
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[i]);
 
-		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
 
 	glUseProgram(0);
