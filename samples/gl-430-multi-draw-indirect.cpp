@@ -13,7 +13,7 @@ namespace
 	std::string const SAMPLE_NAME("OpenGL Multi draw indirect");
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY +"gl-430/multi-draw-indirect.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/multi-draw-indirect.frag");
-    std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -42,7 +42,7 @@ namespace
 		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1),
 		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1),
 		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 1),
-        
+
 		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f), 2),
 		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f), 2),
 		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f), 2),
@@ -78,28 +78,28 @@ namespace
 		};
 	}//namespace texture
 
-    struct DrawArraysIndirectCommand
+	struct DrawArraysIndirectCommand
 	{
 		GLuint count;
 		GLuint primCount;
 		GLuint first;
 		GLuint baseInstance;
-    };
+	};
 
-    struct DrawElementsIndirectCommand
+	struct DrawElementsIndirectCommand
 	{
 		GLuint count;
 		GLuint primCount;
 		GLuint firstIndex;
 		GLint  baseVertex;
 		GLuint baseInstance;
-    };
+	};
 
 	GLuint VertexArrayName(0);
 	GLuint PipelineName(0);
 	GLuint ProgramName(0);
 	GLuint BufferName[buffer::MAX];
-    GLuint TextureName[texture::MAX];
+	GLuint TextureName[texture::MAX];
 
 }//namespace
 
@@ -132,16 +132,16 @@ bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);	
 
 	DrawElementsIndirectCommand CommandA[3];
@@ -178,7 +178,7 @@ bool initBuffer()
 	CommandB[1].baseInstance = 0;
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_B]);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandB), CommandB, GL_STATIC_DRAW);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandB), CommandB, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandC[1];
@@ -189,11 +189,11 @@ bool initBuffer()
 	CommandC[0].baseInstance = 0;
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_C]);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandC), CommandC, GL_STATIC_DRAW);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandC), CommandC, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
-    glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-    glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
+	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
+	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
 	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
 	return true;
@@ -202,7 +202,7 @@ bool initBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
