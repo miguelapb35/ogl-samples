@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Programmable trilinear filtering";
+	std::string const SAMPLE_NAME("OpenGL Programmable trilinear filtering");
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/sampler-fetch.vert");
 	std::string const FRAG_SHADER_LIBRARY(glf::DATA_DIRECTORY + "gl-420/sampler-library.frag");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/sampler-fetch.frag");
@@ -127,7 +127,7 @@ bool initProgram()
 		Validated = Validated && glf::checkError("initProgram - stage");
 	}
 
-	return Validated && glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initBuffer()
@@ -135,21 +135,21 @@ bool initBuffer()
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
+	return true;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
 
@@ -179,15 +179,13 @@ bool initTexture2D()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return glf::checkError("initTexture2D");
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -197,23 +195,21 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
 {
-	bool Validated = true;
+	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -223,11 +219,11 @@ bool begin()
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initVertexArray();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -236,11 +232,11 @@ bool end()
 	glDeleteTextures(1, &TextureName);
 	glDeleteSamplers(1, &SamplerName);
 	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteProgram(ProgramName[program::VERT]);
-	glDeleteProgram(ProgramName[program::FRAG]);
+	for(std::size_t i = 0; i < program::MAX; ++i)
+		glDeleteProgram(ProgramName[i]);
 	glDeleteProgramPipelines(1, &PipelineName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void display()
@@ -283,7 +279,6 @@ void display()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0, 0);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
