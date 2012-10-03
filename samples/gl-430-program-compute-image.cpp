@@ -2,8 +2,8 @@
 // OpenGL Samples Pack 
 // ogl-samples.g-truc.net
 //**********************************
-// OpenGL Compute Program
-// 12/08/2012 - 12/08/2012
+// OpenGL Compute Program Image
+// 12/08/2012 - 03/10/2012
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -17,9 +17,9 @@
 namespace
 {
 	std::string const SAMPLE_NAME("OpenGL Compute Program");
-	std::string const VS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.vert");
-	std::string const FS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.frag");
-	std::string const CS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.comp");
+	std::string const VS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute-image.vert");
+	std::string const FS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute-image.frag");
+	std::string const CS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute-image.comp");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -219,19 +219,6 @@ bool initDebugOutput()
 	glf::logImplementationDependentLimit(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, "GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS");
 	glf::logImplementationDependentLimit(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, "GL_MAX_SHADER_STORAGE_BLOCK_SIZE");
 	glf::logImplementationDependentLimit(GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS, "GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS");
-
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_UNIFORM_BLOCKS, "GL_MAX_COMPUTE_UNIFORM_BLOCKS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, "GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_IMAGE_UNIFORMS, "GL_MAX_COMPUTE_IMAGE_UNIFORMS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, "GL_MAX_COMPUTE_SHARED_MEMORY_SIZE");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, "GL_MAX_COMPUTE_UNIFORM_COMPONENTS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS, "GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_ATOMIC_COUNTERS, "GL_MAX_COMPUTE_ATOMIC_COUNTERS");
-	glf::logImplementationDependentLimit(GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS, "GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, "GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS");
-
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_COUNT, "GL_MAX_COMPUTE_WORK_GROUP_COUNT");
-	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_SIZE, "GL_MAX_COMPUTE_WORK_GROUP_SIZE");
 
 	return Validated;
 }

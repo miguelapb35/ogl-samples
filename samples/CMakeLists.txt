@@ -290,6 +290,8 @@ set(GL_SHADER_GTC program-subroutine.vert program-subroutine.geom program-subrou
 glCreateSampleGTC(program-subroutine)
 set(GL_SHADER_GTC program-compute.vert program-compute.frag program-compute.comp)
 glCreateSampleGTC(program-compute)
+set(GL_SHADER_GTC program-compute-image.vert program-compute-image.frag program-compute-image.comp)
+glCreateSampleGTC(program-compute-image)
 set(GL_SHADER_GTC texture-copy.vert texture-copy.frag)
 glCreateSampleGTC(texture-copy)
 set(GL_SHADER_GTC texture-view.vert texture-view.geom texture-view.frag)
