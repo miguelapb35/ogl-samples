@@ -201,7 +201,7 @@ bool initVertexArray()
 	bool Validated(true);
 
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 

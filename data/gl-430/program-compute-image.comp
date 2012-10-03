@@ -9,7 +9,7 @@
 #define TEXCOORD_OUTPUT		4
 #define COLOR_OUTPUT		5
 
-layout (local_size_x = 4) in;
+layout (local_size_x = 8) in;
 
 layout(binding = TRANSFORM0) uniform transform
 {
