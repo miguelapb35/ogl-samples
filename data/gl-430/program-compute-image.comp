@@ -1,11 +1,13 @@
 #version 430 core
-#extension GL_ARB_compute_shader : require
-#extension GL_ARB_shader_storage_buffer_object : require
 
 #define TRANSFORM0		1
 
-#define BUFFER_INPUT	0
-#define BUFFER_OUTPUT	1
+#define POSITION_INPUT		0
+#define TEXCOORD_INPUT		1
+#define COLOR_INPUT			2
+#define POSITION_OUTPUT		3
+#define TEXCOORD_OUTPUT		4
+#define COLOR_OUTPUT		5
 
 layout (local_size_x = 4) in;
 
@@ -14,27 +16,23 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP;
 } Transform;
 
-struct vertex
-{
-	vec4 Position;
-	vec4 Texcoord;
-	vec4 Color;
-};
-
-layout(binding = BUFFER_INPUT) buffer iBuffer
-{
-	vertex Input[];
-} In;
-
-layout(binding = BUFFER_OUTPUT) buffer oBuffer
-{
-	vertex Ouput[];
-} Out;
+layout(binding = POSITION_INPUT, rgba32f) readonly uniform imageBuffer PositionInput;
+layout(binding = TEXCOORD_INPUT, rgba32f) readonly uniform imageBuffer TexcoordInput;
+layout(binding = COLOR_INPUT, rgba32f) readonly uniform imageBuffer ColorInput;
+layout(binding = POSITION_OUTPUT, rgba32f) writeonly uniform imageBuffer PositionOutput;
+layout(binding = TEXCOORD_OUTPUT, rgba32f) writeonly uniform imageBuffer TexcoordOutput;
+layout(binding = COLOR_OUTPUT, rgba32f) writeonly uniform imageBuffer ColorOutput;
 
 void main()
-{	
-	Out.Ouput[gl_LocalInvocationIndex].Position = In.Input[gl_LocalInvocationIndex].Position;
-	//Out.Ouput[gl_LocalInvocationIndex].Position = Transform.MVP * In.Input[gl_LocalInvocationIndex].Position;
-	Out.Ouput[gl_LocalInvocationIndex].Texcoord = In.Input[gl_LocalInvocationIndex].Texcoord;
-	Out.Ouput[gl_LocalInvocationIndex].Color = In.Input[gl_LocalInvocationIndex].Color;
+{
+	int VertexID = int(gl_LocalInvocationIndex);
+
+	vec4 Position = Transform.MVP * imageLoad(PositionInput, VertexID);
+	vec4 Texcoord = imageLoad(TexcoordInput, VertexID);
+	vec4 Color = imageLoad(ColorInput, VertexID);
+
+	imageStore(PositionOutput, VertexID, Position);
+	imageStore(TexcoordOutput, VertexID, Texcoord);
+	imageStore(ColorOutput, VertexID, Color);
 }
+

@@ -5,7 +5,9 @@
 #define TEXCOORD	4
 #define FRAG_COLOR	0
 
-layout(binding = 0) uniform sampler2D Diffuse;
+#define SAMPLER_DIFFUSE		0 
+
+layout(binding = SAMPLER_DIFFUSE) uniform sampler2D Diffuse;
 
 in block
 {

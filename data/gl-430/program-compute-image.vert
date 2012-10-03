@@ -1,5 +1,4 @@
 #version 420 core
-#extension GL_ARB_shader_storage_buffer_object : require
 
 #define POSITION	0
 #define COLOR		3
@@ -9,22 +8,22 @@
 #define VERTEX		0
 #define TRANSFORM0		1
 
-struct vertex
-{
-	vec4 Position;
-	vec4 Texcoord;
-	vec4 Color;
-};
+#define SAMPLER_DIFFUSE				0 
+#define SAMPLER_POSITION_INPUT		8 
+#define SAMPLER_TEXCOORD_INPUT		9 
+#define SAMPLER_COLOR_INPUT			10 
+#define SAMPLER_POSITION_OUTPUT		11 
+#define SAMPLER_TEXCOORD_OUTPUT		12 
+#define SAMPLER_COLOR_OUTPUT		13 
 
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-layout(binding = VERTEX) buffer mesh
-{
-	vertex Vertex[];
-} Mesh;
+layout(binding = SAMPLER_POSITION_INPUT) uniform samplerBuffer Position;
+layout(binding = SAMPLER_TEXCOORD_INPUT) uniform samplerBuffer Texcoord;
+layout(binding = SAMPLER_COLOR_INPUT) uniform samplerBuffer Color;
 
 out gl_PerVertex
 {
@@ -39,10 +38,10 @@ out block
 
 void main()
 {	
-	Out.Texcoord = Mesh.Vertex[gl_VertexID].Texcoord;
+	Out.Texcoord = texelFetch(Texcoord, gl_VertexID);
 	if(gl_VertexID % 2 != 0)
 		Out.Color = vec4(1.0);
 	else
-		Out.Color = Mesh.Vertex[gl_VertexID].Color;
-	gl_Position = Transform.MVP * Mesh.Vertex[gl_VertexID].Position;
+		Out.Color = texelFetch(Texcoord, gl_VertexID);
+	gl_Position = texelFetch(Position, gl_VertexID);
 }

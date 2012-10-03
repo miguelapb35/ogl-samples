@@ -23,7 +23,7 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const PositionData[VertexCount] = 
 	{
@@ -109,9 +109,9 @@ bool initProgram()
 bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
-    
+
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glm::vec4 Position[5] = 
@@ -123,8 +123,8 @@ bool initBuffer()
 		glm::vec4( 0.1f,-0.3f, 1.0f, 1.0f)
 	};
 
-    glBindBuffer(GL_TEXTURE_BUFFER, BufferName[buffer::DISPLACEMENT]);
-    glBufferData(GL_TEXTURE_BUFFER, sizeof(Position), Position, GL_STATIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, BufferName[buffer::DISPLACEMENT]);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(Position), Position, GL_STATIC_DRAW);
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
 	glm::u8vec4 Diffuse[5] = 
@@ -136,12 +136,12 @@ bool initBuffer()
 		glm::u8vec4(  0,   0, 255, 255)
 	};	
 
-    GLint MaxTextureBufferSize(0);
-    glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &MaxTextureBufferSize);
+	GLint MaxTextureBufferSize(0);
+	glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &MaxTextureBufferSize);
 
-    glBindBuffer(GL_TEXTURE_BUFFER, BufferName[buffer::DIFFUSE]);
+	glBindBuffer(GL_TEXTURE_BUFFER, BufferName[buffer::DIFFUSE]);
 	glBufferData(GL_TEXTURE_BUFFER, 500000, NULL, GL_STATIC_DRAW);
-    //glBufferData(GL_TEXTURE_BUFFER, sizeof(Diffuse), Diffuse, GL_STATIC_DRAW);
+	//glBufferData(GL_TEXTURE_BUFFER, sizeof(Diffuse), Diffuse, GL_STATIC_DRAW);
 	glBufferSubData(GL_TEXTURE_BUFFER, 0, sizeof(Diffuse), Diffuse);
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
@@ -166,7 +166,7 @@ bool initTexture()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -240,7 +240,7 @@ void display()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_BUFFER, DiffuseTextureName);
 
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 
 	glf::checkError("display");

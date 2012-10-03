@@ -40,7 +40,45 @@ namespace
 		glf::vertex_v4fv4fv4f(glm::vec4( 1.0f,-1.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, glm::vec2(0.0f)), glm::vec4(1.0f, 1.0f, 0.5f, 1.0f)),
 		glf::vertex_v4fv4fv4f(glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, glm::vec2(0.0f)), glm::vec4(0.5f, 1.0f, 0.0f, 1.0f)),
 		glf::vertex_v4fv4fv4f(glm::vec4(-1.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, glm::vec2(0.0f)), glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)),
+	};
 
+	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec4);
+	glm::vec4 const PositionData[VertexCount] = 
+	{
+		glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f),
+		glm::vec4( 1.0f,-1.0f, 0.0f, 1.0f),
+		glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(-1.0f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f),
+		glm::vec4( 1.0f,-1.0f, 0.0f, 1.0f),
+		glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(-1.0f, 1.0f, 0.0f, 1.0f)
+	};
+
+	GLsizeiptr const TexcoordSize = VertexCount * sizeof(glm::vec4);
+	glm::vec4 const TexcoordData[VertexCount] = 
+	{
+		glm::vec4(0.0f, 1.0f, glm::vec2(0.0f)),
+		glm::vec4(1.0f, 1.0f, glm::vec2(0.0f)),
+		glm::vec4(1.0f, 0.0f, glm::vec2(0.0f)),
+		glm::vec4(0.0f, 0.0f, glm::vec2(0.0f)),
+		glm::vec4(0.0f, 1.0f, glm::vec2(0.0f)),
+		glm::vec4(1.0f, 1.0f, glm::vec2(0.0f)),
+		glm::vec4(1.0f, 0.0f, glm::vec2(0.0f)),
+		glm::vec4(0.0f, 0.0f, glm::vec2(0.0f))
+	};
+
+	GLsizeiptr const ColorSize = VertexCount * sizeof(glm::vec4);
+	glm::vec4 const ColorData[VertexCount] = 
+	{
+		glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),
+		glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),
+		glm::vec4(1.0f, 0.5f, 0.5f, 1.0f),
+		glm::vec4(1.0f, 1.0f, 0.5f, 1.0f),
+		glm::vec4(0.5f, 1.0f, 0.0f, 1.0f),
+		glm::vec4(0.5f, 0.5f, 1.0f, 1.0f)
 	};
 
 	GLsizei const ElementCount(6);
@@ -66,12 +104,44 @@ namespace
 		enum type
 		{
 			ELEMENT,
-			INPUT,
-			OUTPUT,
 			TRANSFORM,
+			POSITION_INPUT,
+			TEXCOORD_INPUT,
+			COLOR_INPUT,
+			POSITION_OUTPUT,
+			TEXCOORD_OUTPUT,
+			COLOR_OUTPUT,
 			MAX
 		};
 	}//namespace buffer
+
+	namespace texture
+	{
+		enum type
+		{
+			DIFFUSE,
+			POSITION_INPUT,
+			TEXCOORD_INPUT,
+			COLOR_INPUT,
+			POSITION_OUTPUT,
+			TEXCOORD_OUTPUT,
+			COLOR_OUTPUT,
+			MAX
+		};
+	}//namespace texture
+
+	namespace image
+	{
+		enum type
+		{
+			POSITION_INPUT		= 0,
+			TEXCOORD_INPUT		= 1,
+			COLOR_INPUT			= 2,
+			POSITION_OUTPUT		= 3,
+			TEXCOORD_OUTPUT		= 4,
+			COLOR_OUTPUT		= 5
+		};
+	}//namespace image
 
 	namespace semantics
 	{
@@ -85,8 +155,8 @@ namespace
 	GLuint PipelineName[program::MAX] = {0, 0};
 	GLuint ProgramName[program::MAX] = {0, 0};
 	GLuint VertexArrayName(0);
-	GLuint BufferName[buffer::MAX] = {0, 0, 0, 0};
-	GLuint TextureName(0);
+	GLuint BufferName[buffer::MAX] = {0, 0, 0, 0, 0, 0, 0};
+	GLuint TextureName[texture::MAX];
 }//namespace
 
 bool initProgram()
@@ -132,16 +202,32 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::INPUT]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_INPUT]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::OUTPUT]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_INPUT]);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_INPUT]);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_OUTPUT]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_OUTPUT]);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_OUTPUT]);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -163,13 +249,14 @@ bool initTexture()
 {
 	bool Validated(true);
 
+	glGenTextures(texture::MAX, TextureName);
+
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	glGenTextures(1, &TextureName);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
@@ -192,6 +279,20 @@ bool initTexture()
 	}
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_INPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_INPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_INPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_INPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_INPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_INPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_OUTPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_OUTPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_OUTPUT]);
+	glBindTexture(GL_TEXTURE_BUFFER, 0);
 
 	return Validated;
 }
@@ -235,9 +336,9 @@ bool begin()
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
-		Validated = initVertexArray();
-	if(Validated)
 		Validated = initTexture();
+	if(Validated)
+		Validated = initVertexArray();
 
 	return Validated;
 }
@@ -250,7 +351,7 @@ bool end()
 	glDeleteProgram(ProgramName[program::GRAPHICS]);
 	glDeleteProgram(ProgramName[program::COMPUTE]);
 	glDeleteBuffers(buffer::MAX, BufferName);
-	glDeleteTextures(1, &TextureName);
+	glDeleteTextures(texture::MAX, TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
 	return Validated;
@@ -279,8 +380,13 @@ void display()
 	}
 
 	glBindProgramPipeline(PipelineName[program::COMPUTE]);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::INPUT, BufferName[buffer::INPUT]);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::OUTPUT, BufferName[buffer::OUTPUT]);
+	glBindImageTexture(image::POSITION_INPUT, TextureName[texture::POSITION_INPUT], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+	glBindImageTexture(image::TEXCOORD_INPUT, TextureName[texture::TEXCOORD_INPUT], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+	glBindImageTexture(image::COLOR_INPUT, TextureName[texture::COLOR_INPUT], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+	glBindImageTexture(image::POSITION_OUTPUT, TextureName[texture::POSITION_OUTPUT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+	glBindImageTexture(image::TEXCOORD_OUTPUT, TextureName[texture::TEXCOORD_OUTPUT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+	glBindImageTexture(image::COLOR_OUTPUT, TextureName[texture::COLOR_OUTPUT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glDispatchCompute(GLuint(VertexCount), 1, 1);
 
@@ -288,11 +394,17 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glBindProgramPipeline(PipelineName[program::GRAPHICS]);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_DIFFUSE);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_POSITION);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_TEXCOORD);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_COLOR);
+	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
+
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::INPUT, BufferName[buffer::OUTPUT]);
 
 	glDrawElementsInstancedBaseVertexBaseInstance(
 		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, GLF_BUFFER_OFFSET(0), 1, 0, 0);

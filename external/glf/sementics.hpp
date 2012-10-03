@@ -14,6 +14,17 @@ namespace semantic
 		};
 	};
 
+	namespace sampling
+	{
+		enum type
+		{
+			SAMPLER_DIFFUSE		= 0,
+			SAMPLER_POSITION	= 8,
+			SAMPLER_TEXCOORD	= 9,
+			SAMPLER_COLOR		= 10
+		};
+	}//namespace sampling
+
 	namespace image
 	{
 		enum type
