@@ -33,6 +33,6 @@ void main()
 
 	imageStore(PositionOutput, VertexID, Position);
 	imageStore(TexcoordOutput, VertexID, Texcoord);
-	imageStore(ColorOutput, VertexID, Color);
+	imageStore(ColorOutput, VertexID, Color * 2.0);
 }
 

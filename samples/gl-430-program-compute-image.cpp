@@ -143,6 +143,17 @@ namespace
 		};
 	}//namespace image
 
+	namespace sampling
+	{
+		enum type
+		{
+			SAMPLER_DIFFUSE		= 0,
+			SAMPLER_POSITION	= 4,
+			SAMPLER_TEXCOORD	= 5,
+			SAMPLER_COLOR		= 6
+		};
+	}//namespace sampling
+
 	namespace semantics
 	{
 		enum type
@@ -207,35 +218,34 @@ bool initBuffer()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_INPUT]);
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize * 2, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, PositionSize, PositionData);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_INPUT]);
-	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_INPUT]);
-	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_OUTPUT]);
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize * 2, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_OUTPUT]);
-	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_OUTPUT]);
-	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
-
 	glGetIntegerv(
 		GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
 		&UniformBufferOffset);
-
 	GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -280,18 +290,24 @@ bool initTexture()
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
+	GLint TextureBufferOffset(0);
+	glGetIntegerv(
+		GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT,
+		&TextureBufferOffset);
+	GLint TextureBufferRange = glm::max(GLint(PositionSize), TextureBufferOffset);
+
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_INPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_INPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_INPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_INPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_INPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_INPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_INPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_INPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_INPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_OUTPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::POSITION_OUTPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_OUTPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::TEXCOORD_OUTPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_OUTPUT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_OUTPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
 
 	return Validated;
@@ -402,11 +418,11 @@ void display()
 	glBindProgramPipeline(PipelineName[program::GRAPHICS]);
 	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_DIFFUSE);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_POSITION);
+	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_POSITION);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
-	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_TEXCOORD);
+	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_TEXCOORD);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
-	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_COLOR);
+	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_COLOR);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
 
 	glBindVertexArray(VertexArrayName);
