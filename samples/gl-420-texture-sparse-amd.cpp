@@ -2,8 +2,8 @@
 // OpenGL Samples Pack 
 // ogl-samples.g-truc.net
 //**********************************
-// OpenGL Immutable Texture 2D
-// 27/06/2011 - 15/08/2011
+// OpenGL Sparse Texture
+// 04/10/2012 - 04/10/2012
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -17,9 +17,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Immutable Texture 2D");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.frag");
+	std::string const SAMPLE_NAME("OpenGL Sparse Texture");
+	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-sparse.vert");
+	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-sparse.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -72,6 +72,25 @@ namespace
 	GLuint VertexArrayName(0);
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	GLuint TextureName(0);
+
+	#define GL_TEXTURE_STORAGE_SPARSE_BIT_AMD 0x00000001
+
+	#define GL_VIRTUAL_PAGE_SIZE_X_AMD 0x9195
+	#define GL_VIRTUAL_PAGE_SIZE_Y_AMD 0x9196
+	#define GL_VIRTUAL_PAGE_SIZE_Z_AMD 0x9197
+
+	#define GL_MAX_SPARSE_TEXTURE_SIZE_AMD 0x9198
+	#define GL_MAX_SPARSE_3D_TEXTURE_SIZE_AMD 0x9199
+	#define GL_MAX_SPARSE_ARRAY_TEXTURE_LAYERS_AMD 0x919A
+
+	#define GL_MIN_SPARSE_LEVEL_AMD 0x919B
+	#define GL_MIN_LOD_WARNING_AMD 0x919C
+
+	typedef void (GLAPIENTRY * PFNGLTEXSTORAGESPARSEAMDPROC) (GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
+	typedef void (GLAPIENTRY * PFNGLTEXTURESTORAGESPARSEAMDPROC) (GLuint texture, GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
+
+	PFNGLTEXSTORAGESPARSEAMDPROC glTexStorageSparseAMD = 0;
+	PFNGLTEXTURESTORAGESPARSEAMDPROC glTextureStorageSparseAMD = 0;
 }//namespace
 
 bool initProgram()
@@ -151,6 +170,8 @@ bool initTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+	GLsizei const Size(4096);
+
 	glGenTextures(1, &TextureName);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
@@ -159,24 +180,45 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
 
-	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+	glTextureStorageSparseAMD(TextureName, GL_TEXTURE_2D, GL_RGBA8, Size, Size, GLsizei(1), GLsizei(1), GL_TEXTURE_STORAGE_SPARSE_BIT_AMD);
 
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	GLint PageSizeX(0);
+	GLint PageSizeY(0);
+	GLint PageSizeZ(0);
+	glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_AMD, 1, &PageSizeX);
+	glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_AMD, 1, &PageSizeY);
+	glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_AMD, 1, &PageSizeZ);
+
+	for(std::size_t Level = 0; Level < GLint(glm::log2(256.f)); ++Level)
 	{
-		glTexSubImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			0, 0, 
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			GL_BGR, GL_UNSIGNED_BYTE, 
-			Texture[Level].data());
+		GLsizei const Width = (Size >> Level) / Texture[0].dimensions().x;
+		GLsizei const Height = (Size >> Level) / Texture[0].dimensions().y;
+
+		for(GLsizei j = 0; j < Height; ++j)
+		for(GLsizei i = 0; i < Width; ++i)
+		{
+			if(i % 2 && j % 2)
+				continue;
+
+			glTexSubImage2D(
+				GL_TEXTURE_2D, 
+				GLint(Level), 
+				i * GLsizei(Texture[0].dimensions().x), 
+				j * GLsizei(Texture[0].dimensions().y), 
+				GLsizei(Texture[0].dimensions().x), 
+				GLsizei(Texture[0].dimensions().y), 
+				GL_BGR, GL_UNSIGNED_BYTE, 
+				Texture[0].data());
+		}
 	}
-	
+
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 	return Validated;
@@ -217,6 +259,10 @@ bool begin()
 {
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	Validated = Validated && glf::checkExtension("GL_AMD_sparse_texture");
+
+	glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)glutGetProcAddress("glTexStorageSparseAMD");
+	glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)glutGetProcAddress("glTextureStorageSparseAMD");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -255,8 +301,7 @@ void display()
 			GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-		glm::mat4 Projection = glm::perspectiveFov(45.f, 640.f, 480.f, 0.1f, 100.0f);
-		//glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.001f, 100.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
