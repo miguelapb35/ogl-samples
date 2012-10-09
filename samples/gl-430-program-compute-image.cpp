@@ -223,11 +223,11 @@ bool initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_INPUT]);
-	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize * 2, TexcoordData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_INPUT]);
-	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize * 2, ColorData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_OUTPUT]);
@@ -235,11 +235,11 @@ bool initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_OUTPUT]);
-	glBufferData(GL_ARRAY_BUFFER, TexcoordSize, NULL, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, TexcoordSize * 2, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_OUTPUT]);
-	glBufferData(GL_ARRAY_BUFFER, ColorSize, NULL, GL_STATIC_COPY);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize * 2, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
