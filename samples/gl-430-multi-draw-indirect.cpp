@@ -21,32 +21,42 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const ElementCount(6);
+	GLsizei const ElementCount(15);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
 	glm::uint32 const ElementData[ElementCount] =
 	{
 		0, 1, 2,
+		0, 2, 3,
+		0, 1, 2,
+		0, 1, 2,
 		0, 2, 3
 	};
 
-	GLsizei const VertexCount(12);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3fv1i);
-	glf::vertex_v3fv3fv1i const VertexData[VertexCount] =
+	GLsizei const VertexCount(11);
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3f);
+	glf::vertex_v3fv3f const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), 0),
+		glf::vertex_v3fv3f(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)),
+		glf::vertex_v3fv3f(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f)),
 
-		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 1),
+		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
+		//glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
 
-		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f), 2)
+		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f)),
+		glf::vertex_v3fv3f(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f)),
+		glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f))
+	};
+
+	GLsizei const DrawDataCount(3);
+	GLsizeiptr const DrawSize = DrawDataCount * sizeof(glm::uint);
+	glm::uint const DrawIDData[DrawDataCount] =
+	{
+		0, 1, 2
 	};
 
 	GLsizei const IndirectBufferCount(3);
@@ -58,6 +68,7 @@ namespace
 		{
 			VERTEX,
 			ELEMENT,
+			DRAW_ID,
 			TRANSFORM,
 			INDIRECT_A,
 			INDIRECT_B,
@@ -136,6 +147,10 @@ bool initBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
+	glBufferData(GL_ARRAY_BUFFER, DrawSize, DrawIDData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -150,19 +165,19 @@ bool initBuffer()
 	CommandA[0].firstIndex = 0;
 	CommandA[0].baseVertex = 0;
 	CommandA[0].baseInstance = 0;
-	CommandA[1].count = ElementCount;
+	CommandA[1].count = ElementCount >> 1;
 	CommandA[1].primCount = 1;
-	CommandA[1].firstIndex = 0;
+	CommandA[1].firstIndex = 6;
 	CommandA[1].baseVertex = 4;
-	CommandA[1].baseInstance = 0;
+	CommandA[1].baseInstance = 1;
 	CommandA[2].count = ElementCount;
 	CommandA[2].primCount = 1;
-	CommandA[2].firstIndex = 0;
-	CommandA[2].baseVertex = 8;
-	CommandA[2].baseInstance = 0;
+	CommandA[2].firstIndex = 9;
+	CommandA[2].baseVertex = 7;
+	CommandA[2].baseInstance = 2;
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_A]);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandA), CommandA, GL_STATIC_DRAW);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandA), CommandA, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandB[2];
@@ -173,7 +188,7 @@ bool initBuffer()
 	CommandB[0].baseInstance = 0;
 	CommandB[1].count = ElementCount;
 	CommandB[1].primCount = 1;
-	CommandB[1].firstIndex = 0;
+	CommandB[1].firstIndex = 6;
 	CommandB[1].baseVertex = 4;
 	CommandB[1].baseInstance = 0;
 
@@ -204,9 +219,11 @@ bool initVertexArray()
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
-		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_INT, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3) * 2));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
+		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), GLF_BUFFER_OFFSET(0));
+		glVertexAttribDivisor(glf::semantic::attr::DRAW_ID, 1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
