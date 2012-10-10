@@ -403,8 +403,6 @@ void display()
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 	}
 
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
 	{
 		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
