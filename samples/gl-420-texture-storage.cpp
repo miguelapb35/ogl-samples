@@ -148,6 +148,7 @@ bool initTexture()
 	bool Validated(true);
 
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -165,8 +166,11 @@ bool initTexture()
 
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
+		if(Level > 0)
+			printf("Level %d, Offset: %d\n", Level, Texture[Level].data<glm::uint8>() - Texture[Level - 1].data<glm::uint8>());
+
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
