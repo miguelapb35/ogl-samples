@@ -92,8 +92,8 @@ bool initProgram()
 bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");
@@ -116,8 +116,6 @@ bool begin()
 {
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -164,7 +162,7 @@ void display()
 
 	glUseProgram(ProgramName);
 
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 
 	glf::checkError("display");

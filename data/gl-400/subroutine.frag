@@ -32,5 +32,5 @@ vec4 diffuseHQ()
 
 void main()
 {
-	Color = Diffuse();
+	Color = diffuse();
 }

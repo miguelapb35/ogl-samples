@@ -155,7 +155,7 @@ bool initTexture2D()
 
 bool initFramebuffer()
 {
-    glGenTextures(1, &ColorbufferName);
+	glGenTextures(1, &ColorbufferName);
 	glBindTexture(GL_TEXTURE_2D, ColorbufferName);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glGenerateMipmap(GL_TEXTURE_2D);
