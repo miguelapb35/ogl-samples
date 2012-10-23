@@ -278,6 +278,8 @@ set(GL_VERSION_GTC 430)
 
 set(GL_SHADER_GTC atomic-counter.vert atomic-counter.frag)
 glCreateSampleGTC(atomic-counter)
+set(GL_SHADER_GTC debug.vert debug.frag debug.glsl)
+glCreateSampleGTC(debug)
 set(GL_SHADER_GTC dsa-pass1.frag dsa-pass1.vert dsa-pass2-msaa-box.frag dsa-pass2-msaa-near.frag)
 glCreateSampleGTC(direct-state-access-ext)
 set(GL_SHADER_GTC draw-without-vertex-attrib.vert draw-without-vertex-attrib.frag)
