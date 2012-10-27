@@ -205,7 +205,7 @@ set(GL_VERSION_GTC 420)
 
 set(GL_SHADER_GTC atomic-counter.vert atomic-counter.frag)
 glCreateSampleGTC(atomic-counter)
-set(GL_SHADER_GTC blend-op-amd.vert blend-op-amd.frag texture-2d.vert texture-2d.frag)
+set(GL_SHADER_GTC blend-op-amd.vert blend-op-amd.frag blend-texture-2d.vert blend-texture-2d.frag)
 glCreateSampleGTC(blend-op-amd)
 set(GL_SHADER_GTC buffer-barrier.vert buffer-barrier.frag)
 glCreateSampleGTC(buffer-barrier-gtc)

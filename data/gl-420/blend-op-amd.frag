@@ -10,7 +10,11 @@
 #define FRAG_BLUE		2
 #define FRAG_ALPHA		3
 
-uniform sampler2D Diffuse;
+#define TRANSFORM0		1
+
+#define DIFFUSE			0
+
+layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
 in vert
 {

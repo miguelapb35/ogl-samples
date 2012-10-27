@@ -68,7 +68,7 @@ namespace
 	}//namespace buffer
 	 
 	GLuint PipelineName(0);
-	GLuint ProgramName[program::MAX] = {0, 0};
+	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	GLuint TextureName(0);
@@ -89,27 +89,19 @@ bool initProgram()
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
-		ProgramName[program::VERTEX] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::VERTEX], VertShaderName);
-		glLinkProgram(ProgramName[program::VERTEX]);
+		ProgramName = glCreateProgram();
+		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
+		glLinkProgram(ProgramName);
 		glDeleteShader(VertShaderName);
-
-		ProgramName[program::FRAGMENT] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
-		glLinkProgram(ProgramName[program::FRAGMENT]);
 		glDeleteShader(FragShaderName);
 
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAGMENT]);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
-	{
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
-		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
-	}
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
 	return Validated;
 }
@@ -237,8 +229,7 @@ bool end()
 	bool Validated(true);
 
 	glDeleteProgramPipelines(1, &PipelineName);
-	glDeleteProgram(ProgramName[program::FRAGMENT]);
-	glDeleteProgram(ProgramName[program::VERTEX]);
+	glDeleteProgram(ProgramName);
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
