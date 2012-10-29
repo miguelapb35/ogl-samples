@@ -75,6 +75,7 @@ namespace
 	GLint UniformMVP = 0;
 	GLint UniformDiffuseA = 0;
 	GLint UniformDiffuseB = 0;
+	GLint UniformColor = 0;
 
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
@@ -112,8 +113,9 @@ bool initProgram()
 	if(Validated)
 	{
 		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuseA = glGetUniformLocation(ProgramName, "DiffuseA");
-		UniformDiffuseB = glGetUniformLocation(ProgramName, "DiffuseB");
+		UniformDiffuseA = glGetUniformLocation(ProgramName, "Material.Diffuse[0]");
+		UniformDiffuseB = glGetUniformLocation(ProgramName, "Material.Diffuse[1]");
+		UniformColor = glGetUniformLocation(ProgramName, "Material.Color");
 	}
 
 	return glf::checkError("initProgram");
@@ -123,8 +125,8 @@ bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");;
@@ -261,6 +263,7 @@ void display()
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 	glUniform1i(UniformDiffuseA, 0);
 	glUniform1i(UniformDiffuseB, 1);
+	glUniform4f(UniformColor, 0.0f, 0.5f, 1.0f, 1.0f);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
