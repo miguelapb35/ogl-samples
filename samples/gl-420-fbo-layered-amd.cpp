@@ -120,8 +120,8 @@ bool initBuffer()
 {
 	glGenBuffers(BUFFER_MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");
@@ -200,7 +200,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 	glBindVertexArray(0);
 
-    glBindVertexArray(VertexArrayName[LAYERING]);
+	glBindVertexArray(VertexArrayName[LAYERING]);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");

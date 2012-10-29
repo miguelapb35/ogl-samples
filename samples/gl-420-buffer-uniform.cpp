@@ -71,7 +71,6 @@ bool initProgram()
 	bool Validated(true);
 	
 	glGenProgramPipelines(1, &PipelineName);
-	glBindProgramPipeline(PipelineName);
 
 	if(Validated)
 	{
@@ -96,8 +95,6 @@ bool initProgram()
 
 	if(Validated)
 		UniformInstance = glGetUniformLocation(ProgramName, "Instance");
-
-	glBindProgramPipeline(0);
 
 	return Validated;
 }
