@@ -18,11 +18,11 @@ layout(location = TEXCOORD) out vec2 VertTexcoord;
 
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 void main()
-{	
+{
 	VertTexcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }
