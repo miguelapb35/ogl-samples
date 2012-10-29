@@ -13,7 +13,6 @@
 //**********************************
 
 #include <glf/glf.hpp>
-#include <glf/compiler.hpp>
 
 namespace
 {

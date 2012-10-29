@@ -14,15 +14,19 @@ layout(binding = TRANSFORM0) uniform transform
 
 layout(location = POSITION) in vec2 Position;
 layout(location = TEXCOORD) in vec2 Texcoord;
-layout(location = TEXCOORD) out vec2 VertTexcoord;
 
 out gl_PerVertex
 {
 	vec4 gl_Position;
 };
 
+out block
+{
+	vec2 Texcoord;
+} Out;
+
 void main()
 {
-	VertTexcoord = Texcoord;
+	Out.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }
