@@ -7,6 +7,8 @@
 
 layout(binding = 0) uniform sampler2D Diffuse;
 
+layout(origin_upper_left) in vec4 gl_FragCoord;
+
 in block
 {
 	vec2 Texcoord;

@@ -16,7 +16,7 @@ namespace
 	std::string const SAMPLE_NAME = "OpenGL Framebuffer sRGB decode";	
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-srgb-decode.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-srgb-decode.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
+	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-dxt1.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -30,12 +30,12 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace buffer
@@ -154,28 +154,38 @@ bool initSampler()
 
 bool initTexture()
 {
+	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
+	if(Texture.empty())
+		return false;
+
 	glGenTextures(1, &TextureName);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+		GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGB8, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+		glCompressedTexSubImage2D(
+			GL_TEXTURE_2D,
+			GLint(Level),
+			0, 0,
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+			GLsizei(Texture[Level].capacity()), 
+			Texture[Level].data());
 	}
-	glGenerateMipmap(GL_TEXTURE_2D);
 
-	return glf::checkError("initTexture");
+	return true;
 }
 
 bool initFramebuffer()
@@ -238,7 +248,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -251,7 +261,7 @@ bool end()
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteSamplers(1, &SamplerName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void renderScene(glm::vec4 const & ClearColor, glm::mat4 const & MVP, GLuint const & TextureName)
@@ -264,8 +274,6 @@ void renderScene(glm::vec4 const & ClearColor, glm::mat4 const & MVP, GLuint con
 
 	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-
-	glf::checkError("renderScene");
 }
 
 void display()
@@ -316,7 +324,6 @@ void display()
 	}
 
 	glf::swapBuffers();
-	glf::checkError("display");
 }
 
 int main(int argc, char* argv[])

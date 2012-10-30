@@ -253,7 +253,7 @@ namespace glf
 				strcpy(debSev, "low");
 
 			 fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
-			 assert(!Error);
+			 //assert(!Error);
 			 //fclose(f);
 		}
 	}
