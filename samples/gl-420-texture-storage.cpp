@@ -136,8 +136,6 @@ bool initBuffer()
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
 	assert(!Texture.empty());
 
@@ -170,7 +168,7 @@ bool initTexture()
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
