@@ -129,29 +129,33 @@ bool initProgram()
 	
 	glGenProgramPipelines(program::MAX, PipelineName);
 
-	for(std::size_t i = 0; (i < program::MAX) && Validated; ++i)
-	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderNameNorm = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::NORM]);
-		GLuint FragShaderNameUint = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::UINT]);
+	glf::compiler Compiler;
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		"--version 420 --profile core");
+	GLuint FragShaderNameNorm = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::NORM],
+		"--version 420 --profile core");
+	GLuint FragShaderNameUint = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::UINT],
+		"--version 420 --profile core");
+	Validated = Validated && Compiler.check();
 
+	if(Validated)
+	{
 		ProgramName[program::NORM] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::NORM], GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName[program::NORM], VertShaderName);
 		glAttachShader(ProgramName[program::NORM], FragShaderNameNorm);
 		glLinkProgram(ProgramName[program::NORM]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::NORM]);
+	}
 
+	if(Validated)
+	{
 		ProgramName[program::UINT] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::UINT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName[program::UINT], VertShaderName);
 		glAttachShader(ProgramName[program::UINT], FragShaderNameUint);
 		glLinkProgram(ProgramName[program::UINT]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::UINT]);
-
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderNameNorm);
-		glDeleteShader(FragShaderNameUint);
 	}
 
 	if(Validated)
@@ -169,12 +173,12 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -195,6 +199,7 @@ bool initBuffer()
 bool initTexture()
 {
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -232,7 +237,7 @@ bool initTexture()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -274,6 +279,7 @@ bool end()
 		glDeleteProgram(ProgramName[i]);
 	glDeleteTextures(texture::MAX, TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
+	glDeleteProgramPipelines(program::MAX, PipelineName);
 
 	return Validated;
 }

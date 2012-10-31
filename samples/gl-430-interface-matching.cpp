@@ -66,23 +66,19 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -97,7 +93,7 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -108,11 +104,13 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER);
-		GLuint ContShaderName = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER);
-		GLuint EvalShaderName = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER, "--version 420 --profile core");
+		GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER, "--version 420 --profile core");
+		GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER, "--version 420 --profile core");
+		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER, "--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER, "--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName[program::VERT] = glCreateProgram();
 		ProgramName[program::FRAG] = glCreateProgram();
@@ -128,12 +126,6 @@ bool initProgram()
 		glAttachShader(ProgramName[program::FRAG], FragShaderName);
 		glLinkProgram(ProgramName[program::FRAG]);
 
-		glDeleteShader(VertShaderName);
-		glDeleteShader(ContShaderName);
-		glDeleteShader(EvalShaderName);
-		glDeleteShader(GeomShaderName);
-		glDeleteShader(FragShaderName);
-
 		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
 	}
@@ -144,13 +136,13 @@ bool initProgram()
 		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
 	}
 
-	return Validated && glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION + 0, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::POSITION + 1, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(0));
@@ -164,14 +156,14 @@ bool initVertexArray()
 	glBindVertexArray(0);
 
 	std::vector<glf::vertexattrib> Valid(16); 
-    Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
-    Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+	Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+	Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
 	Valid[glf::semantic::attr::COLOR] = glf::vertexattrib(GL_TRUE, 4, sizeof(glf::vertex_v2fc4d), GL_DOUBLE, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 
 	// TODO
 	//glf::validateVAO(VertexArrayName, Valid);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool initMax()
@@ -220,7 +212,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -229,8 +221,9 @@ bool end()
 	glDeleteBuffers(buffer::MAX, BufferName);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
+	glDeleteProgramPipelines(1, &PipelineName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 bool validate(GLuint const & ProgramName)
@@ -403,7 +396,7 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
 
-	//assert(!validate(ProgramName[program::VERT]));
+	assert(!validate(ProgramName[program::VERT]));
 	glDrawArraysInstancedBaseInstance(GL_PATCHES, 0, VertexCount, 1, 0);
 
 	glf::swapBuffers();

@@ -116,27 +116,28 @@ namespace
 
 bool initProgram()
 {
-	bool Success(true);
+	bool Validated(true);
 	
 	glGenProgramPipelines(1, &PipelineName);
-	glBindProgramPipeline(PipelineName);
-	glBindProgramPipeline(0);
 
-	GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-	GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+	glf::compiler Compiler;
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		"--version 420 --profile core");
+	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		"--version 420 --profile core");
+	Validated = Validated && Compiler.check();
 
 	ProgramName = glCreateProgram();
 	glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	glAttachShader(ProgramName, VertShaderName);
 	glAttachShader(ProgramName, FragShaderName);
-	glDeleteShader(VertShaderName);
-	glDeleteShader(FragShaderName);
 	glLinkProgram(ProgramName);
-	Success = glf::checkProgram(ProgramName);
+	Validated = Validated && glf::checkProgram(ProgramName);
 
-	glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	if(Validated)
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	return Success;
+	return Validated;
 }
 
 bool initBuffer()
@@ -241,6 +242,7 @@ bool initTexture()
 	bool Validated(true);
 
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -363,15 +365,12 @@ bool begin()
 
 bool end()
 {
-	bool Success(true);
-
-	// Delete objects
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Success;
+	return true;
 }
 
 void display()
@@ -432,8 +431,6 @@ void display()
 	// Draw
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_A] + GLuint(IndirectBufferIndex));
 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, DrawCount[IndirectBufferIndex], sizeof(DrawElementsIndirectCommand));
-
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	// Swap framebuffers
 	glf::swapBuffers();

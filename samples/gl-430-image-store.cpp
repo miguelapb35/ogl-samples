@@ -28,16 +28,6 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	namespace program
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace program
-
 	namespace pipeline
 	{
 		enum type
@@ -52,7 +42,7 @@ namespace
 
 	GLuint VertexArrayName(0);
 	GLuint PipelineName[pipeline::MAX] = {0, 0};
-	GLuint ProgramName[program::MAX] = {0, 0};
+	GLuint ProgramName[pipeline::MAX] = {0, 0};
 	GLuint TextureName(0);
 }//namespace
 
@@ -60,63 +50,53 @@ bool initProgram()
 {
 	bool Validated(true);
 
+	glf::compiler Compiler;
+
 	glGenProgramPipelines(pipeline::MAX, PipelineName);
 
-	glBindProgramPipeline(PipelineName[pipeline::READ]);
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE_READ);
-		char const * VertexSourcePointer = VertexSourceContent.c_str();
-		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_READ, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_READ,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
+
+		ProgramName[pipeline::READ] = glCreateProgram();
+		glProgramParameteri(ProgramName[pipeline::READ], GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName[pipeline::READ], VertShaderName);
+		glAttachShader(ProgramName[pipeline::READ], FragShaderName);
+		glLinkProgram(ProgramName[pipeline::READ]);
+		Validated = Validated && glf::checkProgram(ProgramName[pipeline::READ]);
 	}
 
 	if(Validated)
-	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE_READ);
-		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
-		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
-	}
+		glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::READ]);
 
 	if(Validated)
 	{
-		glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-		glUseProgramStages(PipelineName[pipeline::READ], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-		Validated = Validated && glf::checkError("initProgram - stage");
-	}
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SAVE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SAVE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
-	glBindProgramPipeline(PipelineName[pipeline::SAVE]);
-	if(Validated)
-	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE_SAVE);
-		char const * VertexSourcePointer = VertexSourceContent.c_str();
-		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
-	}
-
-	if(Validated)
-	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE_SAVE);
-		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
-		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+		ProgramName[pipeline::SAVE] = glCreateProgram();
+		glProgramParameteri(ProgramName[pipeline::SAVE], GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName[pipeline::SAVE], VertShaderName);
+		glAttachShader(ProgramName[pipeline::SAVE], FragShaderName);
+		glLinkProgram(ProgramName[pipeline::SAVE]);
+		Validated = Validated && glf::checkProgram(ProgramName[pipeline::SAVE]);
 	}
 
 	if(Validated)
-	{
-		glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-		glUseProgramStages(PipelineName[pipeline::SAVE], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-		Validated = Validated && glf::checkError("initProgram - stage");
-	}
+		glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::SAVE]);
 
 	return Validated;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	glGenTextures(1, &TextureName);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
@@ -130,24 +110,20 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
@@ -155,7 +131,7 @@ bool initDebugOutput()
 	glf::logImplementationDependentLimit(GL_MAX_TEXTURE_UNITS, "GL_MAX_TEXTURE_UNITS");
 	glf::logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -182,8 +158,8 @@ bool end()
 
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteProgram(ProgramName[program::VERT]);
-	glDeleteProgram(ProgramName[program::FRAG]);
+	glDeleteProgram(ProgramName[pipeline::READ]);
+	glDeleteProgram(ProgramName[pipeline::SAVE]);
 	glDeleteProgramPipelines(pipeline::MAX, PipelineName);
 
 	return Validated;

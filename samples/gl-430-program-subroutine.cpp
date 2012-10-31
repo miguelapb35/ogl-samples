@@ -129,26 +129,20 @@ bool initProgram()
 		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
 		Validated = Validated && Compiler.check();
 
-	// Create program
-		if(!Validated)
-			return false;
-
-		ProgramName = glCreateProgram();
-		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, GeomShaderName);
-		glAttachShader(ProgramName, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(GeomShaderName);
-		glDeleteShader(FragShaderName);
-		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		if(Validated)
+		{
+			ProgramName = glCreateProgram();
+			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, GeomShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			glLinkProgram(ProgramName);
+			Validated = Validated && glf::checkProgram(ProgramName);
+		}
 	}
 
 	if(Validated)
-	{
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_GEOMETRY_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
-	}
 
 	return Validated;
 }
@@ -177,7 +171,7 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_COPY);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return glf::checkError("initBuffer");
+	return true;
 }
 
 bool initVertexArray()
@@ -195,7 +189,7 @@ bool initVertexArray()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool initTexture()
@@ -204,6 +198,7 @@ bool initTexture()
 
 	{
 		gli::texture2D Image = gli::load(TEXTURE_DIFFUSE_RGB8);
+		assert(!Image.empty());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
@@ -230,6 +225,7 @@ bool initTexture()
 
 	{
 		gli::texture2D Image = gli::load(TEXTURE_DIFFUSE_DXT1);
+		assert(!Image.empty());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
@@ -253,7 +249,7 @@ bool initTexture()
 		}
 	}
 
-	return glf::checkError("initTexture");
+	return true;
 }
 
 bool begin()
@@ -275,7 +271,7 @@ bool begin()
 	if(Validated)
 		Validated = initTexture();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -286,7 +282,7 @@ bool end()
 	glDeleteProgram(ProgramName);
 	glDeleteProgramPipelines(1, &PipelineName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void display()
@@ -333,7 +329,6 @@ void display()
 	glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(Index.size()), &Index[0]);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 2, 0);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
