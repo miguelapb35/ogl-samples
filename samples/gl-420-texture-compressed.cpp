@@ -121,12 +121,12 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -136,7 +136,7 @@ bool initBuffer()
 	return Validated;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	bool Validated(true);
 
@@ -145,6 +145,7 @@ bool initTexture2D()
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BPTC);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::BPTC]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -171,6 +172,7 @@ bool initTexture2D()
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::DXT5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -197,6 +199,7 @@ bool initTexture2D()
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGTC);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGTC]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -223,6 +226,7 @@ bool initTexture2D()
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGB8);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGB8]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -255,8 +259,6 @@ bool initTexture2D()
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -268,7 +270,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true
 }
 
 bool initSampler()
@@ -321,7 +323,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initSampler();
 
@@ -358,6 +360,9 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		*Pointer = Projection * View * Model;
+
+		// Make sure the uniform buffer is uploaded
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 
 	// Clear the color buffer
@@ -369,9 +374,6 @@ void display()
 	glBindSampler(0, SamplerName);
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-
-	// Make sure the uniform buffer is uploaded
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 	// Draw each texture in different viewports
 	for(std::size_t Index = 0; Index < texture::MAX; ++Index)
@@ -393,6 +395,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

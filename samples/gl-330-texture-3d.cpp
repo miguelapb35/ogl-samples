@@ -127,11 +127,11 @@ bool initTexture()
 	glTexImage3D(
 		GL_TEXTURE_3D, 
 		0, 
-		GL_R32F, 
+		GL_R8, //GL_R32F, 
 		GLsizei(Size), 
 		GLsizei(Size), 
 		GLsizei(Size), 
-		0,  
+		0,
 		GL_RED, 
 		GL_FLOAT, 
 		&Data[0]);
