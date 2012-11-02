@@ -16,8 +16,8 @@
 namespace
 {
 	std::string const SAMPLE_NAME("OpenGL Image Space Rendering");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-image-space-rendering.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-image-space-rendering.frag");
+	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/draw-image-space-rendering.vert");
+	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/draw-image-space-rendering.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -70,14 +70,13 @@ namespace
 	{
 		enum type
 		{
-			TEXTURE,
 			SPLASH,
 			MAX
 		};
 	}//namespace pipeline
 
 	GLuint FramebufferName(0);
-	GLuint ProgramName[pipeline::MAX] = {0, 0};
+	GLuint ProgramName[pipeline::MAX] = {0};
 	GLuint VertexArrayName(0);
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	std::vector<GLuint> TextureName(texture::MAX);
@@ -93,32 +92,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_TEXTURE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_TEXTURE,
-			"--version 420 --profile core");
-		Validated = Validated && Compiler.check();
-
-		ProgramName[pipeline::TEXTURE] = glCreateProgram();
-		glProgramParameteri(ProgramName[pipeline::TEXTURE], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[pipeline::TEXTURE], VertShaderName);
-		glAttachShader(ProgramName[pipeline::TEXTURE], FragShaderName);
-		glLinkProgram(ProgramName[pipeline::TEXTURE]);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
-		Validated = Validated && glf::checkProgram(ProgramName[pipeline::TEXTURE]);
-	}
-
-	if(Validated)
-		glUseProgramStages(PipelineName[pipeline::TEXTURE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::TEXTURE]);
-
-	if(Validated)
-	{
-		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SPLASH, 
-			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SPLASH,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -141,8 +117,6 @@ bool initProgram()
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -165,13 +139,11 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
 	assert(!Texture.empty());
 
@@ -221,13 +193,11 @@ bool initTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -241,13 +211,11 @@ bool initVertexArray()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initFramebuffer()
 {
-	bool Validated(true);
-
 	glGenFramebuffers(1, &FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
@@ -263,13 +231,11 @@ bool initFramebuffer()
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -299,7 +265,6 @@ bool end()
 
 	glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 	glDeleteProgram(ProgramName[pipeline::SPLASH]);
-	glDeleteProgram(ProgramName[pipeline::TEXTURE]);
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
@@ -329,34 +294,11 @@ void display()
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	glViewportIndexedf(0, 0, 0, GLfloat(Window.Size.x), GLfloat(Window.Size.y));
-
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	float Depth(1.0f);
-	int StencilRef(0);
-	glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-
-	// Bind rendering objects
-	glBindProgramPipeline(PipelineName[pipeline::TEXTURE]);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glBindVertexArray(VertexArrayName);
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-
-	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0, 0);
-
-	glDisable(GL_DEPTH_TEST);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VertexArrayName);
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 
 	glDrawElementsInstancedBaseVertexBaseInstance(
 		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
