@@ -73,7 +73,6 @@ namespace
 			INDIRECT_A,
 			INDIRECT_B,
 			INDIRECT_C,
-			ATOMIC_COUNTER,
 			MAX
 		};
 	}//namespace buffer
@@ -207,10 +206,6 @@ bool initBuffer()
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_C]);
 	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandC), CommandC, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
 	return true;
 }
@@ -386,22 +381,6 @@ void display()
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
-	glm::uint Value(0);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-	glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Value);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-
-	{
-		// Initialize the atomic counter
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glm::uint* Pointer = (glm::uint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(glm::uint), 
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-		*Pointer = 0;
-		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-	}
-
 	{
 		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -425,8 +404,6 @@ void display()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_B]);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_C]);
-
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, BufferName[buffer::ATOMIC_COUNTER]);
 
 	// Draw
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_A] + GLuint(IndirectBufferIndex));

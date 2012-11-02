@@ -34,6 +34,4 @@ void main()
 	Out.DrawID = DrawID;
 	Out.Texcoord = Texcoord.st;
 	gl_Position = Transform.MVP * vec4(Position, 1.0);
-
-	memoryBarrier();
 }

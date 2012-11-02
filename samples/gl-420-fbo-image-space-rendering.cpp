@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Framebuffer Object
-// 22/10/2012 - 22/10/2012
+// OpenGL Image Space Rendering
+// 01/11/2012 - 01/11/2012
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -15,11 +15,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Framebuffer Object");
-	std::string const VERT_SHADER_SOURCE_TEXTURE(glf::DATA_DIRECTORY + "gl-420/fbo-texture-2d.vert");
-	std::string const FRAG_SHADER_SOURCE_TEXTURE(glf::DATA_DIRECTORY + "gl-420/fbo-texture-2d.frag");
-	std::string const VERT_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/fbo-splash.vert");
-	std::string const FRAG_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/fbo-splash.frag");
+	std::string const SAMPLE_NAME("OpenGL Image Space Rendering");
+	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-image-space-rendering.vert");
+	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-image-space-rendering.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -143,6 +141,8 @@ bool initProgram()
 
 bool initBuffer()
 {
+	bool Validated(true);
+
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -165,7 +165,7 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return true;
+	return Validated;
 }
 
 bool initTexture()
@@ -226,6 +226,8 @@ bool initTexture()
 
 bool initVertexArray()
 {
+	bool Validated(true);
+
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -239,7 +241,7 @@ bool initVertexArray()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return true;
+	return Validated;
 }
 
 bool initFramebuffer()

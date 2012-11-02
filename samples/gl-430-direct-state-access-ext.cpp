@@ -146,6 +146,7 @@ bool initBuffer()
 bool initTexture()
 {
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glGenTextures(texture::MAX, TextureName);
 
@@ -171,7 +172,7 @@ bool initTexture()
 	glTextureStorage2DMultisampleEXT(TextureName[texture::MULTISAMPLE], GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
 	glTextureStorage2DMultisampleEXT(TextureName[texture::DEPTH], GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
 
-	return glf::checkError("initTexture");
+	return true;
 }
 
 bool initFramebuffer()
@@ -183,7 +184,7 @@ bool initFramebuffer()
 	glNamedFramebufferTextureEXT(FramebufferName, GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE], 0);
 	Validated = Validated && (glCheckNamedFramebufferStatusEXT(FramebufferName, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
-	return glf::checkError("initFramebuffer");
+	return Validated;
 }
 
 bool initVertexArray()
@@ -194,26 +195,24 @@ bool initVertexArray()
 	glVertexArrayBindVertexBufferEXT(VertexArrayName, Bindingindex, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 	glVertexArrayVertexAttribBindingEXT(VertexArrayName, glf::semantic::attr::POSITION, Bindingindex);
-    glVertexArrayVertexAttribFormatEXT(VertexArrayName, glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayVertexAttribFormatEXT(VertexArrayName, glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
 
 	glVertexArrayVertexAttribBindingEXT(VertexArrayName, glf::semantic::attr::TEXCOORD, Bindingindex);
-    glVertexArrayVertexAttribFormatEXT(VertexArrayName, glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+	glVertexArrayVertexAttribFormatEXT(VertexArrayName, glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
 	glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::POSITION);
 	glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::TEXCOORD);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -239,7 +238,7 @@ bool begin()
 	if(Validated)
 		Validated = initFramebuffer();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -253,7 +252,7 @@ bool end()
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void renderFBO()
@@ -294,8 +293,6 @@ void renderFBO()
 
 	glDisable(GL_MULTISAMPLE);
 	glDisable(GL_DEPTH_TEST);
-
-	glf::checkError("renderFBO");
 }
 
 void resolveMultisampling()
@@ -341,8 +338,6 @@ void resolveMultisampling()
 	}
 
 	glDisable(GL_SCISSOR_TEST);
-
-	glf::checkError("renderFB");
 }
 
 void display()
@@ -357,7 +352,6 @@ void display()
 	// Pass 2: Resolved and render the colorbuffer from the multisampled framebuffer
 	resolveMultisampling();
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
