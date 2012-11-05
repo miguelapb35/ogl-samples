@@ -252,4 +252,4 @@ endfunction(createSampleWGL)
 ################################
 # Add subdirectory
 
-add_subdirectory(samples)
+add_subdirectory(insights)
