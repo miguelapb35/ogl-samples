@@ -12,14 +12,14 @@ in gl_PerVertex
 	vec4 gl_Position;
 } gl_in[];
 
-in vec4 ContColor[];
+layout(location = COLOR) in vec4 Color[];
 
 out gl_PerVertex
 {
 	vec4 gl_Position;
 };
 
-out vec4 EvalColor;
+layout(location = COLOR) out vec4 EvalColor;
 
 vec4 interpolate(in vec4 v0, in vec4 v1, in vec4 v2, in vec4 v3)
 {
@@ -31,5 +31,5 @@ vec4 interpolate(in vec4 v0, in vec4 v1, in vec4 v2, in vec4 v3)
 void main()
 {	
 	gl_Position = interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
-	EvalColor = interpolate(ContColor[0], ContColor[1], ContColor[2], ContColor[3]);
+	EvalColor = interpolate(Color[0], Color[1], Color[2], Color[3]);
 }

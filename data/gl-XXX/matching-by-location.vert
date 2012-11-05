@@ -13,17 +13,17 @@ layout(binding = TRANSFORM0) uniform transform
 } Transform;
 
 layout(location = POSITION) in vec2 Position;
-layout(location = COLOR) in vec4 AttribColor;
+layout(location = COLOR) in vec4 Color;
 
 out gl_PerVertex
 {
 	vec4 gl_Position;
 };
 
-out vec4 VertColor;
+layout(location = COLOR) out vec4 VertColor;
 
 void main()
 {	
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
-	VertColor = AttribColor;
+	VertColor = Color;
 }

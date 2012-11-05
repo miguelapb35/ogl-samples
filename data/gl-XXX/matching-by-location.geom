@@ -13,21 +13,21 @@ in gl_PerVertex
 	vec4 gl_Position;
 } gl_in[];
 
-in vec4 EvalColor[];
+layout(location = COLOR) in vec4 Color[];
 
 out gl_PerVertex
 {
 	vec4 gl_Position;
 };
 
-out vec4 GeomColor;
+layout(location = COLOR) out vec4 GeomColor;
 
 void main()
 {	
 	for(int i = 0; i < gl_in.length(); ++i)
 	{
 		gl_Position = gl_in[i].gl_Position;
-		GeomColor = EvalColor[i];
+		GeomColor = Color[i];
 		EmitVertex();
 	}
 	EndPrimitive();

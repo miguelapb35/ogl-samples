@@ -1,5 +1,5 @@
 //**********************************
-// OpenGL OpenGL Matching by variable
+// OpenGL OpenGL Matching by name
 // 05/11/2012 - 05/11/2012
 //**********************************
 // Christophe Riccio
@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Matching by variable");
+	std::string const SAMPLE_NAME("OpenGL Matching by name");
 	std::string const SAMPLE_VERT_SHADER(glf::DATA_DIRECTORY + "gl-XXX/matching-by-variable.vert");
 	std::string const SAMPLE_CONT_SHADER(glf::DATA_DIRECTORY + "gl-XXX/matching-by-variable.cont");
 	std::string const SAMPLE_EVAL_SHADER(glf::DATA_DIRECTORY + "gl-XXX/matching-by-variable.eval");
