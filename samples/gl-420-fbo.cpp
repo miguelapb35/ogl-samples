@@ -27,6 +27,7 @@ namespace
 	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	//glf::window Window(glm::ivec2(256, 256));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -203,21 +204,57 @@ bool initTexture()
 	
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+/*
+	glTexImage2D(
+		GL_TEXTURE_2D, 
+		GLint(0), 
+		GL_RGBA8, 
+		GLsizei(512), 
+		GLsizei(512), 
+		0,
+		GL_BGR, 
+		GL_UNSIGNED_BYTE, 
+		NULL);
+	glTexImage2D(
+		GL_TEXTURE_2D, 
+		GLint(2), 
+		GL_RGBA8, 
+		GLsizei(256), 
+		GLsizei(256), 
+		0,
+		GL_BGR, 
+		GL_UNSIGNED_BYTE, 
+		NULL);
+*/
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH24_STENCIL8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+
+/*
+	glTexImage2D(
+		GL_TEXTURE_2D, 
+		GLint(2), 
+		GL_DEPTH24_STENCIL8, 
+		GLsizei(Window.Size.x), 
+		GLsizei(Window.Size.y), 
+		0,  
+		GL_BGR, 
+		GL_UNSIGNED_BYTE, 
+		NULL);
+
+*/
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -261,13 +298,11 @@ bool initFramebuffer()
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()

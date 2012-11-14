@@ -123,6 +123,57 @@ bool initProgram()
 		glUseProgramStages(PipelineName[program::COMPUTE], GL_COMPUTE_SHADER_BIT, ProgramName[program::COMPUTE]);
 	}
 
+	if(Validated)
+	{
+		GLint ActiveUniforms(0);
+		glGetProgramInterfaceiv(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &ActiveUniforms);
+
+		for(GLint Index = 0; Index < ActiveUniforms; ++Index)
+		{
+			GLenum Props = GL_LOCATION;
+			GLint Binding = -1;
+			GLsizei Length = 0;
+			std::vector<char> Name;
+			Name.resize(64, '\0');
+
+			glGetProgramResourceName(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, Index, 64, &Length, &Name[0]);
+			glGetProgramResourceiv(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, Index, 1, &Props, sizeof(GLint), &Length, &Binding);
+
+			continue;
+			//assert(Binding == 0);
+		}
+	}
+
+	if(Validated)
+	{
+		GLint ActiveUniforms(0);
+		glGetProgramInterfaceiv(ProgramName[program::GRAPHICS], GL_UNIFORM, GL_ACTIVE_RESOURCES, &ActiveUniforms);
+
+		for(GLint Index = 0; Index < ActiveUniforms; ++Index)
+		{
+			GLenum Props[2] = {GL_BUFFER_BINDING, GL_LOCATION};
+
+			struct results
+			{
+				GLint Binding;
+				GLint Location;
+			};
+
+			results Results = {0, 0};
+
+			GLsizei NameLength = 0;
+			GLsizei Length = 0;
+			std::vector<char> Name;
+			Name.resize(64, '\0');
+
+			glGetProgramResourceName(ProgramName[program::GRAPHICS], GL_UNIFORM, Index, 64, &NameLength, &Name[0]);
+			glGetProgramResourceiv(ProgramName[program::GRAPHICS], GL_UNIFORM, Index, 2, Props, sizeof(Props), &Length, (GLint*)&Results);
+
+			continue;
+			//assert(Binding == 0);
+		}
+	}
+
 	return Validated;
 }
 
@@ -248,8 +299,6 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
 	glDeleteProgramPipelines(program::MAX, PipelineName);
 	glDeleteProgram(ProgramName[program::GRAPHICS]);
 	glDeleteProgram(ProgramName[program::COMPUTE]);
@@ -257,7 +306,7 @@ bool end()
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Validated;
+	return true;
 }
 
 void display()
