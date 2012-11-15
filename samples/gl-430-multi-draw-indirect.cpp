@@ -1,9 +1,12 @@
 //**********************************
-// Usage:
-// - Right click to rotate
-// - Left click to zoom
-// - Press space to change the used 
-// indirect buffer.
+// OpenGL Multi Draw Indirect
+// 25/07/2012 - 15/11/2012
+//**********************************
+// Christophe Riccio
+// ogl-samples@g-truc.net
+//**********************************
+// G-Truc Creation
+// www.g-truc.net
 //**********************************
 
 #include <glf/glf.hpp>
@@ -418,6 +421,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

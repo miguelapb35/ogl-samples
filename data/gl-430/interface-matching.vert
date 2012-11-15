@@ -32,6 +32,7 @@ layout(location = 0) out vertex st_Out[2];
 out block
 {
 	vec4 Color;
+	float Lumimance[64];
 } bl_Out; 
 
 void main()
@@ -40,4 +41,7 @@ void main()
 	st_Out[0].Color = vec4(Color) * 0.25;
 	st_Out[1].Color = vec4(Color) * 0.50;
 	bl_Out.Color = vec4(Color) * 0.25;
+
+	for(int i = 0; i < 64; ++i)
+		bl_Out.Lumimance[i] = 1.0 / 64.0;
 }

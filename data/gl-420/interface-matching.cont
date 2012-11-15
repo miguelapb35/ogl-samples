@@ -20,9 +20,12 @@ in gl_PerVertex
 
 layout(location = 0) in vertex st_In[];
 
+#define COUNT 2
+
 in block
 {
 	vec4 Color;
+	float Lumimance[COUNT];
 } bl_In[]; 
 
 out gl_PerVertex
@@ -40,7 +43,11 @@ out block
 } bl_Out[]; 
 
 void main()
-{	
+{
+	float Luminance = 0.0;
+	for(int i = 0; i < COUNT; ++i)
+		Luminance += bl_In[gl_InvocationID].Lumimance[i];
+
 	gl_TessLevelInner[0] = 16.0;
 	gl_TessLevelInner[1] = 16.0;
 	gl_TessLevelOuter[0] = 8.0;
@@ -50,5 +57,6 @@ void main()
 	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 	st_Out[gl_InvocationID].Color = st_In[gl_InvocationID].Color;
 	bl_Out[gl_InvocationID].Color = bl_In[gl_InvocationID].Color;
+	bl_Out[gl_InvocationID].Color = bl_In[gl_InvocationID].Color * Luminance;
 }
 
