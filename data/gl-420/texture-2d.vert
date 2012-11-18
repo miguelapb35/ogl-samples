@@ -30,10 +30,11 @@ out block
 
 void main()
 {
-	mediump int Value = mediump int(0);
-	highp int HighValue = highp int(Value);
+	mediump int A = mediump int(0);
+	lowp float B = lowp float(A);
+	highp int C = highp int(B);
 
-	for(int i = int(HighValue); i < int(COUNT); ++i)
+	for(int i = C; i < int(COUNT); ++i)
 		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);
 
 	Out.Texcoord = Texcoord;
