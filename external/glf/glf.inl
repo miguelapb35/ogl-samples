@@ -162,7 +162,7 @@ namespace glf
 	{
 		std::string Result;
 		
-		std::ifstream Stream(Filename);
+		std::ifstream Stream(Filename.c_str());
 		if(!Stream.is_open())
 			return Result;
 
