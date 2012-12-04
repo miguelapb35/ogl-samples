@@ -122,7 +122,7 @@ bool initProgram()
 		glUseProgramStages(PipelineName[program::GRAPHICS], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::GRAPHICS]);
 		glUseProgramStages(PipelineName[program::COMPUTE], GL_COMPUTE_SHADER_BIT, ProgramName[program::COMPUTE]);
 	}
-
+/*
 	if(Validated)
 	{
 		GLint ActiveUniforms(0);
@@ -173,7 +173,7 @@ bool initProgram()
 			//assert(Binding == 0);
 		}
 	}
-
+*/
 	return Validated;
 }
 

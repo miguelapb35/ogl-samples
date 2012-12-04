@@ -242,6 +242,7 @@ bool end()
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgram(ProgramName);
+	glDeleteTextures(texture::MAX, TextureName);
 
 	return glf::checkError("end");
 }
