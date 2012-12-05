@@ -1,11 +1,7 @@
 #version 420 core
 
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define FRAG_COLOR	0
-#define TRANSFORM0	1
-#define DIFFUSE		0
+#include "texture-2d.glsl"
+#line 5
 
 #define COUNT 24
 
@@ -30,9 +26,9 @@ out block
 
 void main()
 {
-	mediump int A = mediump int(0);
-	lowp float B = lowp float(A);
-	highp int C = highp int(B);
+	mediump int A = int(0);
+	lowp float B = float(A);
+	highp int C = int(B);
 
 	for(int i = C; i < int(COUNT); ++i)
 		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);
