@@ -35,6 +35,21 @@ namespace glf
 		glm::vec2 Texcoord;
 	};
 
+	struct vertex_v2fv3f
+	{
+		vertex_v2fv3f
+		(
+			glm::vec2 const & Position,
+			glm::vec3 const & Texcoord
+		) :
+			Position(Position),
+			Texcoord(Texcoord)
+		{}
+
+		glm::vec2 Position;
+		glm::vec3 Texcoord;
+	};
+
 	struct vertex_v3fv3f
 	{
 		vertex_v3fv3f

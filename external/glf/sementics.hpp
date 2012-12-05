@@ -10,7 +10,8 @@ namespace semantic
 		{
 			MATERIAL = 0,
 			TRANSFORM0 = 1,
-			TRANSFORM1 = 2
+			TRANSFORM1 = 2,
+			INDIRECTION = 3
 		};
 	};
 

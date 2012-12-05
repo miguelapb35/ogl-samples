@@ -7,11 +7,19 @@
 
 #define FRAG_COLOR		0
 
-#define TRANSFORM0	1
+#define TRANSFORM0		1
+#define INDIRECTION		3
+
+#define MAX_DRAW		3
+
+layout(binding = INDIRECTION) uniform indirection
+{
+	int Transform[MAX_DRAW];
+} Indirection;
 
 layout(binding = TRANSFORM0) uniform transform
 {
-	mat4 MVP;
+	mat4 MVP[MAX_DRAW];
 } Transform;
 
 layout(location = POSITION) in vec3 Position;
@@ -33,5 +41,5 @@ void main()
 {
 	Out.DrawID = DrawID;
 	Out.Texcoord = Texcoord.st;
-	gl_Position = Transform.MVP * vec4(Position, 1.0);
+	gl_Position = Transform.MVP[Indirection.Transform[DrawID]] * vec4(Position, 1.0);
 }

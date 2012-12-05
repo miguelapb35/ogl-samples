@@ -36,23 +36,22 @@ namespace
 	};
 
 	GLsizei const VertexCount(11);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3f);
-	glf::vertex_v3fv3f const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv3f);
+	glf::vertex_v2fv3f const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fv3f(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f)),
-		glf::vertex_v3fv3f(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-1.0f,-1.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
 
-		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
-		//glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.5f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 0.5f, 1.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
 
-		glf::vertex_v3fv3f(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f)),
-		glf::vertex_v3fv3f(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f))
+		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 0.5f,-1.0f), glm::vec3(1.0f, 1.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.5f, 1.0f), glm::vec3(1.0f, 0.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-1.5f, 1.0f), glm::vec3(0.0f, 0.0f, 2.0f))
 	};
 
 	GLsizei const DrawDataCount(3);
@@ -76,6 +75,7 @@ namespace
 			INDIRECT_A,
 			INDIRECT_B,
 			INDIRECT_C,
+			VERTEX_INDIRECTION,
 			MAX
 		};
 	}//namespace buffer
@@ -158,9 +158,14 @@ bool initBuffer()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	int VertexIndirection[3] = {0, 1, 2};
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::VERTEX_INDIRECTION]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * 3, VertexIndirection, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);	
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 3, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandA[3];
 	CommandA[0].count = ElementCount;
@@ -218,8 +223,8 @@ bool initVertexArray()
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
 		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), GLF_BUFFER_OFFSET(0));
 		glVertexAttribDivisor(glf::semantic::attr::DRAW_ID, 1);
@@ -356,6 +361,7 @@ bool begin()
 	glBindProgramPipeline(PipelineName);
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 	glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
 	return Success;
@@ -387,7 +393,7 @@ void display()
 	{
 		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
+		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3, 
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -395,9 +401,10 @@ void display()
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y + 45.0f, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 45.0f, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
 
-		*Pointer = MVP;
+		*(Pointer + 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
+		*(Pointer + 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		*(Pointer + 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f,-0.5f));
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 	
