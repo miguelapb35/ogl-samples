@@ -210,28 +210,6 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
-/*
-	glTexImage2D(
-		GL_TEXTURE_2D, 
-		GLint(0), 
-		GL_RGBA8, 
-		GLsizei(512), 
-		GLsizei(512), 
-		0,
-		GL_BGR, 
-		GL_UNSIGNED_BYTE, 
-		NULL);
-	glTexImage2D(
-		GL_TEXTURE_2D, 
-		GLint(2), 
-		GL_RGBA8, 
-		GLsizei(256), 
-		GLsizei(256), 
-		0,
-		GL_BGR, 
-		GL_UNSIGNED_BYTE, 
-		NULL);
-*/
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -241,20 +219,6 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH24_STENCIL8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
-
-/*
-	glTexImage2D(
-		GL_TEXTURE_2D, 
-		GLint(2), 
-		GL_DEPTH24_STENCIL8, 
-		GLsizei(Window.Size.x), 
-		GLsizei(Window.Size.y), 
-		0,  
-		GL_BGR, 
-		GL_UNSIGNED_BYTE, 
-		NULL);
-
-*/
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
