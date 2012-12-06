@@ -289,6 +289,7 @@ bool initFramebuffer()
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
+	assert(!glf::checkFramebuffer(FramebufferName));
 	if(glf::checkFramebuffer(FramebufferName))
 		return false;
 
