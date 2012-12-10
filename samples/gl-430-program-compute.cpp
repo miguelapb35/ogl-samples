@@ -122,7 +122,58 @@ bool initProgram()
 		glUseProgramStages(PipelineName[program::GRAPHICS], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::GRAPHICS]);
 		glUseProgramStages(PipelineName[program::COMPUTE], GL_COMPUTE_SHADER_BIT, ProgramName[program::COMPUTE]);
 	}
+/*
+	if(Validated)
+	{
+		GLint ActiveUniforms(0);
+		glGetProgramInterfaceiv(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &ActiveUniforms);
 
+		for(GLint Index = 0; Index < ActiveUniforms; ++Index)
+		{
+			GLenum Props = GL_LOCATION;
+			GLint Binding = -1;
+			GLsizei Length = 0;
+			std::vector<char> Name;
+			Name.resize(64, '\0');
+
+			glGetProgramResourceName(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, Index, 64, &Length, &Name[0]);
+			glGetProgramResourceiv(ProgramName[program::GRAPHICS], GL_PROGRAM_INPUT, Index, 1, &Props, sizeof(GLint), &Length, &Binding);
+
+			continue;
+			//assert(Binding == 0);
+		}
+	}
+
+	if(Validated)
+	{
+		GLint ActiveUniforms(0);
+		glGetProgramInterfaceiv(ProgramName[program::GRAPHICS], GL_UNIFORM, GL_ACTIVE_RESOURCES, &ActiveUniforms);
+
+		for(GLint Index = 0; Index < ActiveUniforms; ++Index)
+		{
+			GLenum Props[2] = {GL_BUFFER_BINDING, GL_LOCATION};
+
+			struct results
+			{
+				GLint Binding;
+				GLint Location;
+			};
+
+			results Results = {0, 0};
+
+			GLsizei NameLength = 0;
+			GLsizei Length = 0;
+			std::vector<char> Name;
+			Name.resize(64, '\0');
+
+			glGetProgramResourceName(ProgramName[program::GRAPHICS], GL_UNIFORM, Index, 64, &NameLength, &Name[0]);
+			glGetProgramResourceiv(ProgramName[program::GRAPHICS], GL_UNIFORM, Index, 2, Props, sizeof(Props), &Length, (GLint*)&Results);
+
+			continue;
+			//assert(Binding == 0);
+		}
+	}
+*/
 	return Validated;
 }
 
@@ -132,16 +183,16 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::INPUT]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::INPUT]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::OUTPUT]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_COPY);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::OUTPUT]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -161,9 +212,8 @@ bool initBuffer()
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -179,7 +229,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -193,25 +243,21 @@ bool initTexture()
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
@@ -229,7 +275,7 @@ bool initDebugOutput()
 	//glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_COUNT, "GL_MAX_COMPUTE_WORK_GROUP_COUNT");
 	//glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_SIZE, "GL_MAX_COMPUTE_WORK_GROUP_SIZE");
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -253,8 +299,6 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
 	glDeleteProgramPipelines(program::MAX, PipelineName);
 	glDeleteProgram(ProgramName[program::GRAPHICS]);
 	glDeleteProgram(ProgramName[program::COMPUTE]);
@@ -262,7 +306,7 @@ bool end()
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Validated;
+	return true;
 }
 
 void display()

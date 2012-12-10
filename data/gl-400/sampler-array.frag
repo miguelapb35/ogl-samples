@@ -17,7 +17,12 @@ in block
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
+vec4 sampling(in sampler2D Sampler[2], in vec2 Texcoord)
+{
+	return texture(Sampler[DiffuseIndex], Texcoord);
+}
+
 void main()
 {
-	Color = texture(Diffuse[DiffuseIndex], In.Texcoord);
+	Color = sampling(Diffuse, In.Texcoord);
 }

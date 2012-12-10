@@ -16,7 +16,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Debug Output";
+	std::string const SAMPLE_NAME("OpenGL Debug Output");
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/debug-output.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/debug-output.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -75,17 +75,19 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
 		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		glLinkProgram(ProgramName);
+
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
@@ -124,11 +126,11 @@ bool initBuffer()
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBlockSize(0);
@@ -178,23 +180,23 @@ bool initDebugOutput()
 		GL_DEBUG_SOURCE_APPLICATION_ARB, 
 		GL_DEBUG_TYPE_OTHER_ARB, 1, 
 		GL_DEBUG_SEVERITY_MEDIUM_ARB,
-        GLsizei(Message1.size()), Message1.c_str());
+		GLsizei(Message1.size()), Message1.c_str());
 	std::string Message2("Message 2");
 	glDebugMessageInsertARB(
 		GL_DEBUG_SOURCE_THIRD_PARTY_ARB, 
 		GL_DEBUG_TYPE_OTHER_ARB, 2, 
 		GL_DEBUG_SEVERITY_MEDIUM_ARB,
-        GLsizei(Message2.size()), Message2.c_str());
+		GLsizei(Message2.size()), Message2.c_str());
 	glDebugMessageInsertARB(
 		GL_DEBUG_SOURCE_APPLICATION_ARB, 
 		GL_DEBUG_TYPE_OTHER_ARB, 2, 
 		GL_DEBUG_SEVERITY_MEDIUM_ARB,
-        -1, "Message 3");
+		-1, "Message 3");
 	glDebugMessageInsertARB(
 		GL_DEBUG_SOURCE_APPLICATION_ARB, 
 		GL_DEBUG_TYPE_OTHER_ARB, MessageId, 
 		GL_DEBUG_SEVERITY_MEDIUM_ARB,
-        -1, "Message 4");
+		-1, "Message 4");
 
 	return Validated;
 }

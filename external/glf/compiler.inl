@@ -241,7 +241,7 @@ namespace glf
 			GLint Result = GL_FALSE;
 			glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
 
-			if(Result == GL_TRUE)
+			if(Result == GL_FALSE)
 			{
 				int InfoLogLength;
 				glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
@@ -302,7 +302,7 @@ namespace glf
 	{
 		std::string Result;
 		
-		std::ifstream Stream(Filename);
+		std::ifstream Stream(Filename.c_str());
 		if(!Stream.is_open())
 			return Result;
 

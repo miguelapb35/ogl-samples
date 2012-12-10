@@ -159,7 +159,7 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
@@ -168,7 +168,7 @@ bool initTexture()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
@@ -182,7 +182,7 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
@@ -191,18 +191,18 @@ bool initTexture()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));

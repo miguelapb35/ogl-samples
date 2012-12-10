@@ -89,12 +89,15 @@ bool initProgram()
 	bool Validated(true);
 	
 	glGenProgramPipelines(1, &PipelineName);
-	glBindProgramPipeline(PipelineName);
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
 		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -104,39 +107,35 @@ bool initProgram()
 		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
-
-	glBindProgramPipeline(0);
 
 	return Validated;
 }
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	bool Validated(true);
 
@@ -145,6 +144,7 @@ bool initTexture2D()
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BPTC);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::BPTC]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -155,7 +155,7 @@ bool initTexture2D()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGBA_BPTC_UNORM_ARB, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexSubImage2D(
 				GL_TEXTURE_2D,
@@ -164,13 +164,14 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				GL_COMPRESSED_RGBA_BPTC_UNORM_ARB, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::DXT5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -181,7 +182,7 @@ bool initTexture2D()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexSubImage2D(
 				GL_TEXTURE_2D,
@@ -190,13 +191,14 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGTC);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGTC]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -207,7 +209,7 @@ bool initTexture2D()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RED_RGTC1, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexSubImage2D(
 				GL_TEXTURE_2D,
@@ -216,13 +218,14 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				GL_COMPRESSED_RED_RGTC1, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
 
 	{
 		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGB8);
+		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGB8]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -233,7 +236,7 @@ bool initTexture2D()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGB8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(
 				GL_TEXTURE_2D, 
@@ -255,10 +258,8 @@ bool initTexture2D()
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -266,15 +267,15 @@ bool initVertexArray()
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initSampler()
 {
-	bool Validated(true);
-
 	glGenSamplers(1, &SamplerName);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -288,18 +289,16 @@ bool initSampler()
 	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -321,7 +320,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initSampler();
 
@@ -358,6 +357,9 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		*Pointer = Projection * View * Model;
+
+		// Make sure the uniform buffer is uploaded
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 
 	// Clear the color buffer
@@ -368,10 +370,6 @@ void display()
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindSampler(0, SamplerName);
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-
-	// Make sure the uniform buffer is uploaded
-	glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 	// Draw each texture in different viewports
 	for(std::size_t Index = 0; Index < texture::MAX; ++Index)
@@ -393,6 +391,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

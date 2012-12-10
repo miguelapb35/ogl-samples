@@ -1,4 +1,4 @@
-#version 400 core
+#version 420 core
 
 #define POSITION		0
 #define COLOR			3
@@ -32,5 +32,5 @@ vec4 diffuseHQ()
 
 void main()
 {
-	Color = Diffuse();
+	Color = Diffuse();// * 0.5 + Diffuse() * 0.5;
 }

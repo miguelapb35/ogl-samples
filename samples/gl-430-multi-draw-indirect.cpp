@@ -1,9 +1,12 @@
 //**********************************
-// Usage:
-// - Right click to rotate
-// - Left click to zoom
-// - Press space to change the used 
-// indirect buffer.
+// OpenGL Multi Draw Indirect
+// 25/07/2012 - 15/11/2012
+//**********************************
+// Christophe Riccio
+// ogl-samples@g-truc.net
+//**********************************
+// G-Truc Creation
+// www.g-truc.net
 //**********************************
 
 #include <glf/glf.hpp>
@@ -21,32 +24,41 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const ElementCount(6);
+	GLsizei const ElementCount(15);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
 	glm::uint32 const ElementData[ElementCount] =
 	{
 		0, 1, 2,
+		0, 2, 3,
+		0, 1, 2,
+		0, 1, 2,
 		0, 2, 3
 	};
 
-	GLsizei const VertexCount(12);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv3fv1i);
-	glf::vertex_v3fv3fv1i const VertexData[VertexCount] =
+	GLsizei const VertexCount(11);
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv3f);
+	glf::vertex_v2fv3f const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f,-1.0f, 0.5f), glm::vec3(0.0f, 1.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f,-1.0f, 0.5f), glm::vec3(1.0f, 1.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.0f, 1.0f, 0.5f), glm::vec3(1.0f, 0.0f, 0.0f), 0),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), 0),
+		glf::vertex_v2fv3f(glm::vec2(-1.0f,-1.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
 
-		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f,-1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f, 1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), 1),
+		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.5f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 0.5f, 1.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
 
-		glf::vertex_v3fv3fv1i(glm::vec3(-0.5f,-1.0f,-0.5f), glm::vec3(0.0f, 1.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3( 0.5f,-1.0f,-0.5f), glm::vec3(1.0f, 1.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3( 1.5f, 1.0f,-0.5f), glm::vec3(1.0f, 0.0f, 2.0f), 2),
-		glf::vertex_v3fv3fv1i(glm::vec3(-1.5f, 1.0f,-0.5f), glm::vec3(0.0f, 0.0f, 2.0f), 2)
+		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 0.5f,-1.0f), glm::vec3(1.0f, 1.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2( 1.5f, 1.0f), glm::vec3(1.0f, 0.0f, 2.0f)),
+		glf::vertex_v2fv3f(glm::vec2(-1.5f, 1.0f), glm::vec3(0.0f, 0.0f, 2.0f))
+	};
+
+	GLsizei const DrawDataCount(3);
+	GLsizeiptr const DrawSize = DrawDataCount * sizeof(glm::uint);
+	glm::uint const DrawIDData[DrawDataCount] =
+	{
+		0, 1, 2
 	};
 
 	GLsizei const IndirectBufferCount(3);
@@ -58,11 +70,12 @@ namespace
 		{
 			VERTEX,
 			ELEMENT,
+			DRAW_ID,
 			TRANSFORM,
 			INDIRECT_A,
 			INDIRECT_B,
 			INDIRECT_C,
-			ATOMIC_COUNTER,
+			VERTEX_INDIRECTION,
 			MAX
 		};
 	}//namespace buffer
@@ -105,27 +118,28 @@ namespace
 
 bool initProgram()
 {
-	bool Success(true);
+	bool Validated(true);
 	
 	glGenProgramPipelines(1, &PipelineName);
-	glBindProgramPipeline(PipelineName);
-	glBindProgramPipeline(0);
 
-	GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-	GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+	glf::compiler Compiler;
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		"--version 420 --profile core");
+	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		"--version 420 --profile core");
+	Validated = Validated && Compiler.check();
 
 	ProgramName = glCreateProgram();
 	glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	glAttachShader(ProgramName, VertShaderName);
 	glAttachShader(ProgramName, FragShaderName);
-	glDeleteShader(VertShaderName);
-	glDeleteShader(FragShaderName);
 	glLinkProgram(ProgramName);
-	Success = glf::checkProgram(ProgramName);
+	Validated = Validated && glf::checkProgram(ProgramName);
 
-	glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	if(Validated)
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	return Success;
+	return Validated;
 }
 
 bool initBuffer()
@@ -136,13 +150,22 @@ bool initBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
+	glBufferData(GL_ARRAY_BUFFER, DrawSize, DrawIDData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+	int VertexIndirection[3] = {0, 1, 2};
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::VERTEX_INDIRECTION]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * 3, VertexIndirection, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);	
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 3, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandA[3];
 	CommandA[0].count = ElementCount;
@@ -150,19 +173,19 @@ bool initBuffer()
 	CommandA[0].firstIndex = 0;
 	CommandA[0].baseVertex = 0;
 	CommandA[0].baseInstance = 0;
-	CommandA[1].count = ElementCount;
+	CommandA[1].count = ElementCount >> 1;
 	CommandA[1].primCount = 1;
-	CommandA[1].firstIndex = 0;
+	CommandA[1].firstIndex = 6;
 	CommandA[1].baseVertex = 4;
-	CommandA[1].baseInstance = 0;
+	CommandA[1].baseInstance = 1;
 	CommandA[2].count = ElementCount;
 	CommandA[2].primCount = 1;
-	CommandA[2].firstIndex = 0;
-	CommandA[2].baseVertex = 8;
-	CommandA[2].baseInstance = 0;
+	CommandA[2].firstIndex = 9;
+	CommandA[2].baseVertex = 7;
+	CommandA[2].baseInstance = 2;
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_A]);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandA), CommandA, GL_STATIC_DRAW);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandA), CommandA, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandB[2];
@@ -173,7 +196,7 @@ bool initBuffer()
 	CommandB[0].baseInstance = 0;
 	CommandB[1].count = ElementCount;
 	CommandB[1].primCount = 1;
-	CommandB[1].firstIndex = 0;
+	CommandB[1].firstIndex = 6;
 	CommandB[1].baseVertex = 4;
 	CommandB[1].baseInstance = 0;
 
@@ -192,10 +215,6 @@ bool initBuffer()
 	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(CommandC), CommandC, GL_STATIC_DRAW);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-	glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-
 	return true;
 }
 
@@ -204,9 +223,11 @@ bool initVertexArray()
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
-		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_INT, sizeof(glf::vertex_v3fv3fv1i), GLF_BUFFER_OFFSET(sizeof(glm::vec3) * 2));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
+		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), GLF_BUFFER_OFFSET(0));
+		glVertexAttribDivisor(glf::semantic::attr::DRAW_ID, 1);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
@@ -224,6 +245,7 @@ bool initTexture()
 	bool Validated(true);
 
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -239,7 +261,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -263,7 +285,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -287,7 +309,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -339,6 +361,7 @@ bool begin()
 	glBindProgramPipeline(PipelineName);
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 	glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
 	return Success;
@@ -346,15 +369,12 @@ bool begin()
 
 bool end()
 {
-	bool Success(true);
-
-	// Delete objects
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Success;
+	return true;
 }
 
 void display()
@@ -370,28 +390,10 @@ void display()
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
-	glm::uint Value(0);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-	glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Value);
-	glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-
-	{
-		// Initialize the atomic counter
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glm::uint* Pointer = (glm::uint*)glMapBufferRange(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(glm::uint), 
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-		*Pointer = 0;
-		glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
-	}
-
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
 	{
 		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), 
+		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3, 
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -399,9 +401,10 @@ void display()
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y + 45.0f, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 45.0f, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
 
-		*Pointer = MVP;
+		*(Pointer + 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
+		*(Pointer + 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		*(Pointer + 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f,-0.5f));
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 	
@@ -412,13 +415,9 @@ void display()
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_C]);
 
-	glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, BufferName[buffer::ATOMIC_COUNTER]);
-
 	// Draw
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT_A] + GLuint(IndirectBufferIndex));
 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, DrawCount[IndirectBufferIndex], sizeof(DrawElementsIndirectCommand));
-
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 	// Swap framebuffers
 	glf::swapBuffers();
@@ -429,6 +428,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

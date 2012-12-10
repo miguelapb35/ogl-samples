@@ -75,6 +75,7 @@ namespace
 	GLint UniformMVP = 0;
 	GLint UniformDiffuseA = 0;
 	GLint UniformDiffuseB = 0;
+	GLint UniformColor = 0;
 
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
@@ -112,22 +113,23 @@ bool initProgram()
 	if(Validated)
 	{
 		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuseA = glGetUniformLocation(ProgramName, "DiffuseA");
-		UniformDiffuseB = glGetUniformLocation(ProgramName, "DiffuseB");
+		UniformDiffuseA = glGetUniformLocation(ProgramName, "Material.Diffuse[0]");
+		UniformDiffuseB = glGetUniformLocation(ProgramName, "Material.Diffuse[1]");
+		UniformColor = glGetUniformLocation(ProgramName, "Material.Color");
 	}
 
 	return glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
+	return glf::checkError("initBuffer");;
 }
 
 bool initSampler()
@@ -161,7 +163,7 @@ bool initSampler()
 	return glf::checkError("initSampler");
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
 
@@ -185,20 +187,20 @@ bool initTexture2D()
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			0, 
-			GLsizei(Texture[Level].capacity()), 
+			GLsizei(Texture[Level].size()), 
 			Texture[Level].data());
 	}
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -220,9 +222,9 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initSampler();
 	if(Validated)
@@ -261,6 +263,7 @@ void display()
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 	glUniform1i(UniformDiffuseA, 0);
 	glUniform1i(UniformDiffuseB, 1);
+	glUniform4f(UniformColor, 0.0f, 0.5f, 1.0f, 1.0f);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);

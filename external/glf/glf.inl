@@ -24,6 +24,31 @@ void display();
 	PFNGLVERTEXARRAYBINDVERTEXATTRIBLFORMATEXTPROC glVertexArrayVertexAttribLFormatEXT(0);
 	PFNGLVERTEXARRAYBINDVERTEXATTRIBBINDINGEXTPROC glVertexArrayVertexAttribBindingEXT(0);
 	PFNGLVERTEXARRAYBINDVERTEXBINDINGDIVISOREXTPROC glVertexArrayVertexBindingDivisorEXT(0);
+
+	// GL_AMD_sparse_texture
+	#define GL_TEXTURE_STORAGE_SPARSE_BIT_AMD 0x00000001
+
+	#define GL_VIRTUAL_PAGE_SIZE_X_AMD 0x9195
+	#define GL_VIRTUAL_PAGE_SIZE_Y_AMD 0x9196
+	#define GL_VIRTUAL_PAGE_SIZE_Z_AMD 0x9197
+
+	#define GL_MAX_SPARSE_TEXTURE_SIZE_AMD 0x9198
+	#define GL_MAX_SPARSE_3D_TEXTURE_SIZE_AMD 0x9199
+	#define GL_MAX_SPARSE_ARRAY_TEXTURE_LAYERS_AMD 0x919A
+
+	#define GL_MIN_SPARSE_LEVEL_AMD 0x919B
+	#define GL_MIN_LOD_WARNING_AMD 0x919C
+
+	typedef void (GLAPIENTRY * PFNGLTEXSTORAGESPARSEAMDPROC) (GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
+	typedef void (GLAPIENTRY * PFNGLTEXTURESTORAGESPARSEAMDPROC) (GLuint texture, GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
+
+	PFNGLTEXSTORAGESPARSEAMDPROC glTexStorageSparseAMD = 0;
+	PFNGLTEXTURESTORAGESPARSEAMDPROC glTextureStorageSparseAMD = 0;
+
+	// GL_KHR_debug
+	typedef void (GLAPIENTRY * PFNGLPOPDEBUGGROUPPROC) (GLvoid);
+
+	PFNGLPOPDEBUGGROUPPROC glPopDebugGroup = 0;
 #endif // WIN32
 
 namespace glf
@@ -79,7 +104,12 @@ namespace glf
 		glVertexArrayVertexAttribLFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBLFORMATEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribLFormatEXT");
 		glVertexArrayVertexAttribBindingEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBBINDINGEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribBindingEXT");
 		glVertexArrayVertexBindingDivisorEXT = (PFNGLVERTEXARRAYBINDVERTEXBINDINGDIVISOREXTPROC)glutGetProcAddress("glVertexArrayVertexBindingDivisorEXT");
-#endif
+
+		glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)glutGetProcAddress("glTexStorageSparseAMD");
+		glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)glutGetProcAddress("glTextureStorageSparseAMD");
+
+		glPopDebugGroup = (PFNGLPOPDEBUGGROUPPROC)glutGetProcAddress("glPopDebugGroup");
+#endif//WIN32
 	}
 
 	inline bool saveBinary
@@ -132,7 +162,7 @@ namespace glf
 	{
 		std::string Result;
 		
-		std::ifstream Stream(Filename);
+		std::ifstream Stream(Filename.c_str());
 		if(!Stream.is_open())
 			return Result;
 
@@ -223,7 +253,7 @@ namespace glf
 				strcpy(debSev, "low");
 
 			 fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
-			 assert(!Error);
+			 //assert(!Error);
 			 //fclose(f);
 		}
 	}

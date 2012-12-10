@@ -59,17 +59,15 @@ bool initDebugOutput()
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return glf::checkError("initDebugOutput");
+	return true;
 }
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -84,7 +82,7 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -96,30 +94,32 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
 		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
-	glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	if(Validated)
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	return Validated && glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -136,8 +136,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -151,21 +150,21 @@ bool initTexture()
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glBindVertexArray(0);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool begin()
 {
-	bool Validated = true;
+	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -179,7 +178,7 @@ bool begin()
 	if(Validated)
 		Validated = initTexture();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -189,7 +188,7 @@ bool end()
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void display()
@@ -225,7 +224,6 @@ void display()
 	glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
 
 	glf::swapBuffers();
-	glf::checkError("display");
 }
 
 int main(int argc, char* argv[])

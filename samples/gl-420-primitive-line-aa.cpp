@@ -136,8 +136,6 @@ bool initProgram()
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	std::size_t const Count(360);
 	float const Step(360.f / float(Count));
 
@@ -147,8 +145,8 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec2), &VertexData[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec2), &VertexData[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -163,16 +161,14 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(pipeline::MAX, VertexArrayName);
 
-    glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
+	glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -183,7 +179,7 @@ bool initVertexArray()
 	glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initFramebuffer()
@@ -202,13 +198,11 @@ bool initFramebuffer()
 		return false;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	return glf::checkError("initFramebuffer");
+	return true;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	glGenTextures(texture::MAX, TextureName);
 
 	{
@@ -227,18 +221,23 @@ bool initTexture()
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
-	return Validated;
+	return true;
+}
+
+bool initState()
+{
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -248,6 +247,8 @@ bool begin()
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
+	if(Validated)
+		Validated = initState();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -264,8 +265,6 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
 	glDeleteBuffers(texture::MAX, TextureName);
 	glDeleteProgramPipelines(pipeline::MAX, PipelineName);
 	glDeleteProgram(ProgramName[pipeline::MULTISAMPLE]);
@@ -273,7 +272,7 @@ bool end()
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteVertexArrays(pipeline::MAX, VertexArrayName);
 
-	return Validated;
+	return true;
 }
 
 void display()

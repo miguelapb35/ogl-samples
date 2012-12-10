@@ -64,25 +64,27 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool initProgram()
 {
-	bool Validated = true;
+	bool Validated(true);
 	
 	glGenProgramPipelines(1, &PipelineName);
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
 		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -91,23 +93,22 @@ bool initProgram()
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
-	{
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
-	}
 
-	return Validated &&glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -122,13 +123,12 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return glf::checkError("initBuffer");;
+	return true;
 }
 
 bool initSampler()
 {
 	glGenSamplers(1, &SamplerName);
-
 	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -142,7 +142,7 @@ bool initSampler()
 	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 
-	return glf::checkError("initSampler");
+	return true;
 }
 
 bool initTexture()
@@ -152,6 +152,7 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
 	gli::textureCube Texture = gli::loadTextureCubeDDS9(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture[gli::POSITIVE_X][0].dimensions().x), GLsizei(Texture[gli::POSITIVE_X][0].dimensions().y));
 
@@ -169,13 +170,13 @@ bool initTexture()
 			Texture[gli::textureCube::face_type(Face)][Level].data());
 	}
 
-	return glf::checkError("initTexture");
+	return true;
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -183,7 +184,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool begin()
@@ -203,7 +204,7 @@ bool begin()
 	if(Validated)
 		Validated = initSampler();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -214,7 +215,7 @@ bool end()
 	glDeleteSamplers(1, &SamplerName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void display()
@@ -256,7 +257,6 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -265,6 +265,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

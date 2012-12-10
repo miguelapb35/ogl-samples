@@ -7,10 +7,14 @@
 
 layout(binding = 0) uniform sampler2D Diffuse;
 
-layout(location = TEXCOORD) in vec2 Texcoord;
+in block
+{
+	vec2 Texcoord;
+} In;
+
 layout(location = FRAG_COLOR, index = 0) out vec4 FragColor;
 
 void main()
 {
-	FragColor = texture(Diffuse, interpolateAtSample(Texcoord, gl_SampleID));
+	FragColor = texture(Diffuse, interpolateAtSample(In.Texcoord, gl_SampleID));
 }

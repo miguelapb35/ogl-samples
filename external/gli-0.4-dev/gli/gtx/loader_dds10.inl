@@ -446,6 +446,8 @@ namespace dds10
 	)
 	{
 		std::ifstream FileIn(Filename.c_str(), std::ios::in | std::ios::binary);
+		assert(!FileIn.fail());
+
 		if(FileIn.fail())
 			return texture2D();
 
@@ -489,8 +491,8 @@ namespace dds10
 
 		gli::format const Format = Loader.Format;
 
-		Loader.BlockSize = glm::uint32(detail::getFormatInfo(Format).BlockSize);
-		Loader.BPP = glm::uint32(detail::getFormatInfo(Format).BBP);
+		Loader.BlockSize = glm::uint32(gli::block_size(Format));
+		Loader.BPP = glm::uint32(gli::bits_per_pixel(Format));
 
 		std::streamoff Curr = FileIn.tellg();
 		FileIn.seekg(0, std::ios_base::end);
@@ -517,16 +519,16 @@ namespace dds10
 		texture2D::size_type const MipMapCount = (HeaderDesc.flags & detail::dds9::GLI_DDSD_MIPMAPCOUNT) ? 
 			HeaderDesc.mipMapLevels : 1;
 
-		texture2D Texture2D(
+		texture2D Texture(
 			MipMapCount, 
 			Format, 
 			texture2D::dimensions_type(
 				HeaderDesc.width, 
 				HeaderDesc.height));
 
-		FileIn.read((char*)Texture2D.data(), std::size_t(End - Curr));
+		FileIn.read((char*)Texture.data(), std::size_t(End - Curr));
 
-		return Texture2D;
+		return Texture;
 	}
 
 	inline void saveDDS10
@@ -555,7 +557,7 @@ namespace dds10
 		HeaderDesc.format.size = sizeof(detail::dds9::ddsPixelFormat);
 		HeaderDesc.format.flags = detail::dds9::GLI_DDPF_FOURCC;
 		HeaderDesc.format.fourCC = detail::dds9::GLI_FOURCC_DX10;
-		HeaderDesc.format.bpp = glm::uint32(detail::getFormatInfo(Texture.format()).BBP);
+		HeaderDesc.format.bpp = glm::uint32(gli::bits_per_pixel(Texture.format()));
 		HeaderDesc.format.redMask = 0;
 		HeaderDesc.format.greenMask = 0;
 		HeaderDesc.format.blueMask = 0;

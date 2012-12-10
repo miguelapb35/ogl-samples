@@ -46,16 +46,6 @@ namespace
 		2, 3, 0
 	};
 
-	namespace program
-	{
-		enum type
-		{
-			VERTEX,
-			FRAGMENT,
-			MAX
-		};
-	}//namespace program
-
 	namespace buffer
 	{
 		enum type
@@ -68,29 +58,10 @@ namespace
 	}//namespace buffer
 	 
 	GLuint PipelineName(0);
-	GLuint ProgramName[program::MAX] = {0, 0};
+	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	GLuint TextureName(0);
-
-	#define GL_TEXTURE_STORAGE_SPARSE_BIT_AMD 0x00000001
-
-	#define GL_VIRTUAL_PAGE_SIZE_X_AMD 0x9195
-	#define GL_VIRTUAL_PAGE_SIZE_Y_AMD 0x9196
-	#define GL_VIRTUAL_PAGE_SIZE_Z_AMD 0x9197
-
-	#define GL_MAX_SPARSE_TEXTURE_SIZE_AMD 0x9198
-	#define GL_MAX_SPARSE_3D_TEXTURE_SIZE_AMD 0x9199
-	#define GL_MAX_SPARSE_ARRAY_TEXTURE_LAYERS_AMD 0x919A
-
-	#define GL_MIN_SPARSE_LEVEL_AMD 0x919B
-	#define GL_MIN_LOD_WARNING_AMD 0x919C
-
-	typedef void (GLAPIENTRY * PFNGLTEXSTORAGESPARSEAMDPROC) (GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
-	typedef void (GLAPIENTRY * PFNGLTEXTURESTORAGESPARSEAMDPROC) (GLuint texture, GLenum target, GLenum internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLsizei layers, GLbitfield flags);
-
-	PFNGLTEXSTORAGESPARSEAMDPROC glTexStorageSparseAMD = 0;
-	PFNGLTEXTURESTORAGESPARSEAMDPROC glTextureStorageSparseAMD = 0;
 }//namespace
 
 bool initProgram()
@@ -105,38 +76,26 @@ bool initProgram()
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
 		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
-			"--version 430 --profile core");
+			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
-		ProgramName[program::VERTEX] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::VERTEX], VertShaderName);
-		glLinkProgram(ProgramName[program::VERTEX]);
-		glDeleteShader(VertShaderName);
+		ProgramName = glCreateProgram();
+		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
+		glLinkProgram(ProgramName);
 
-		ProgramName[program::FRAGMENT] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
-		glLinkProgram(ProgramName[program::FRAGMENT]);
-		glDeleteShader(FragShaderName);
-
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAGMENT]);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
-	{
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
-		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
-	}
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
 	return Validated;
 }
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -159,14 +118,13 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -221,13 +179,11 @@ bool initTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -241,18 +197,16 @@ bool initVertexArray()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -260,9 +214,6 @@ bool begin()
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_AMD_sparse_texture");
-
-	glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)glutGetProcAddress("glTexStorageSparseAMD");
-	glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)glutGetProcAddress("glTextureStorageSparseAMD");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -283,8 +234,7 @@ bool end()
 	bool Validated(true);
 
 	glDeleteProgramPipelines(1, &PipelineName);
-	glDeleteProgram(ProgramName[program::FRAGMENT]);
-	glDeleteProgram(ProgramName[program::VERTEX]);
+	glDeleteProgram(ProgramName);
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);

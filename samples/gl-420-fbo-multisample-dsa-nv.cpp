@@ -14,8 +14,8 @@
 namespace
 {
 	std::string const SAMPLE_NAME = "OpenGL Framebuffer Multisample";
-	std::string const SHADER_VERT_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.vert");
-	std::string const SHADER_FRAG_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.frag");
+	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.vert");
+	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-2d.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -54,87 +54,66 @@ namespace
 		};
 	}//namespace buffer
 
-	namespace program
+	namespace texture
 	{
 		enum type
 		{
-			VERTEX,
-			FRAGMENT,
+			DIFFUSE,
+			MULTISAMPLE,
+			COLORBUFFER,
 			MAX
 		};
-	}//namespace program
+	}//namespace texture
 
 	GLuint VertexArrayName(0);
 	GLuint PipelineName(0);
-	GLuint ProgramName[program::MAX] = {0, 0};
+	GLuint ProgramName(0);
 
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
-	GLuint TextureName(0);
+	GLuint TextureName[texture::MAX] = {0, 0, 0};
 	GLuint SamplerName(0);
-
-	GLuint MultisampleTextureName(0);
-	GLuint ColorTextureName(0);
 
 	GLuint FramebufferRenderName(0);
 	GLuint FramebufferResolveName(0);
-
-	GLuint UniformDiffuse(0);	
-
 }//namespace
 
 bool initProgram()
 {
-	bool Validated = true;
+	bool Validated(true);
 
 	glGenProgramPipelines(1, &PipelineName);
 
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+			"--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+			"--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
-		ProgramName[program::VERTEX] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::VERTEX], VertShader);
-		glDeleteShader(VertShader);
-		glLinkProgram(ProgramName[program::VERTEX]);
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
+		ProgramName = glCreateProgram();
+		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
+		glLinkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
-	{
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
-		Validated = Validated && glf::checkError("initProgram - stage");
-	}
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	if(Validated)
-	{
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG_SOURCE);
-
-		ProgramName[program::FRAGMENT] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::FRAGMENT], FragShader);
-		glDeleteShader(FragShader);
-		glLinkProgram(ProgramName[program::FRAGMENT]);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAGMENT]);
-	}
-
-	if(Validated)
-	{
-		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
-		Validated = Validated && glf::checkError("initProgram - stage");
-	}
-
-	return glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
-    glNamedBufferDataEXT(BufferName[buffer::ELEMENT], ElementSize, ElementData, GL_STATIC_DRAW);
-    glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
+	glNamedBufferDataEXT(BufferName[buffer::ELEMENT], ElementSize, ElementData, GL_STATIC_DRAW);
+	glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
 	glNamedBufferDataEXT(BufferName[buffer::TRANSFORM], VertexSize, VertexData, GL_DYNAMIC_DRAW);
 
-	return glf::checkError("initBuffer");;
+	return true;
 }
 
 bool initSampler()
@@ -154,60 +133,63 @@ bool initSampler()
 
 	glBindSampler(0, SamplerName);
 
-	return glf::checkError("initSampler");
+	return true;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
-	glGenTextures(1, &TextureName);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTextureParameteriEXT(TextureName, GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+	glGenTextures(texture::MAX, TextureName);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	glTextureImage2DMultisampleNV(TextureName[texture::MULTISAMPLE], GL_TEXTURE_2D_MULTISAMPLE, 
+		4, GL_RGBA, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+
+	glTextureImage2DEXT(TextureName[texture::COLORBUFFER], GL_TEXTURE_2D, 
+		0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTextureParameteriEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+
+	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
+
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTextureImage2DEXT(
-			TextureName,
+			TextureName[texture::DIFFUSE],
 			GL_TEXTURE_2D,
 			GLint(Level),
 			GL_RGB8,
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			0, 
 			GL_BGR,
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
-	if(Image.levels() == 1)
-		glGenerateTextureMipmapEXT(TextureName, GL_TEXTURE_2D);
+	if(Texture.levels() == 1)
+		glGenerateTextureMipmapEXT(TextureName[texture::DIFFUSE], GL_TEXTURE_2D);
 
-	return glf::checkError("initTexture2D");
+	return true;
 }
 
 bool initFramebuffer()
 {
-	glGenTextures(1, &MultisampleTextureName);
-	glTextureImage2DMultisampleNV(MultisampleTextureName, GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
-
 	glGenFramebuffers(1, &FramebufferRenderName);
-	glNamedFramebufferTextureEXT(FramebufferRenderName, GL_COLOR_ATTACHMENT0, MultisampleTextureName, 0);
+	glNamedFramebufferTextureEXT(FramebufferRenderName, GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE], 0);
 	if(glCheckNamedFramebufferStatusEXT(FramebufferRenderName, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 
-    glGenTextures(1, &ColorTextureName);
-	glTextureImage2DEXT(ColorTextureName, GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
 	glGenFramebuffers(1, &FramebufferResolveName);
-	glNamedFramebufferTextureEXT(FramebufferResolveName, GL_COLOR_ATTACHMENT0, ColorTextureName, 0);
+	glNamedFramebufferTextureEXT(FramebufferResolveName, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 	if(glCheckNamedFramebufferStatusEXT(FramebufferResolveName, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 
-	return glf::checkError("initFramebuffer");
+	return true;
 }
 
 bool initVertexArray()
@@ -218,7 +200,18 @@ bool initVertexArray()
 	glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::POSITION);
 	glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::TEXCOORD);
 
-	return glf::checkError("initVertexArray");
+	return true;
+}
+
+bool initDebugOutput()
+{
+	bool Validated(true);
+
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+
+	return Validated;
 }
 
 bool begin()
@@ -227,6 +220,8 @@ bool begin()
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_NV_texture_multisample");
 	
+	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
+		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -236,31 +231,28 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initFramebuffer();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
 {
 	glDeleteBuffers(buffer::MAX, BufferName);
-	glDeleteProgram(ProgramName[program::VERTEX]);
-	glDeleteProgram(ProgramName[program::FRAGMENT]);
-	glDeleteTextures(1, &TextureName);
-	glDeleteTextures(1, &ColorTextureName);
-	glDeleteTextures(1, &MultisampleTextureName);
+	glDeleteProgram(ProgramName);
+	glDeleteTextures(texture::MAX, TextureName);
 	glDeleteFramebuffers(1, &FramebufferRenderName);
 	glDeleteFramebuffers(1, &FramebufferResolveName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteSamplers(1, &SamplerName);
 	glDeleteProgramPipelines(1, &PipelineName);
 
-	return glf::checkError("end");
+	return true;
 }
 
-void renderFBO(GLuint Framebuffer)
+void renderFBO()
 {
 	{
 		glm::mat4 Perspective = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
@@ -277,20 +269,18 @@ void renderFBO(GLuint Framebuffer)
 	}
 
 	glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
-	glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
-	glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName);
+	glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
-
-	glf::checkError("renderFBO");
 }
 
-void renderFB(GLuint TextureName)
+void renderFB()
 {
 	{
 		glm::mat4 Perspective = glm::perspective(45.0f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
@@ -306,22 +296,18 @@ void renderFB(GLuint TextureName)
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 
-	//glProgramUniformMatrix4fv(ProgramName[program::VERTEX], UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-
 	glViewportIndexedfv(0, &glm::vec4(0, 0, Window.Size.x, Window.Size.y)[0]);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-	glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName);
+	glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindSampler(0, SamplerName);
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
-
-	glf::checkError("renderFB");
 }
 
 void display()
@@ -334,7 +320,7 @@ void display()
 
 	// Step 1: Render the scene in a multisampled framebuffer
 	glEnable(GL_MULTISAMPLE);
-	renderFBO(FramebufferRenderName);
+	renderFBO();
 	glDisable(GL_MULTISAMPLE);
 
 	// Step 2: Resolved multisampling
@@ -346,12 +332,11 @@ void display()
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	// Step 3: Generated mipmaps
-	glGenerateTextureMipmapEXT(ColorTextureName, GL_TEXTURE_2D);
+	glGenerateTextureMipmapEXT(TextureName[texture::COLORBUFFER], GL_TEXTURE_2D);
 
 	// Step 4: Render the colorbuffer from the multisampled framebuffer
-	renderFB(ColorTextureName);
+	renderFB();
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 

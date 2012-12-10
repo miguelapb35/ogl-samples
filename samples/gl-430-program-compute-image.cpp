@@ -178,23 +178,30 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VS_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FS_SOURCE);
-		GLuint ComputeShaderName = glf::createShader(GL_COMPUTE_SHADER, CS_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VS_SOURCE, "--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FS_SOURCE, "--version 420 --profile core");
+		GLuint CompShaderName = Compiler.create(GL_COMPUTE_SHADER, CS_SOURCE, "--version 420 --profile core");
+		Validated = Validated && Compiler.check();
 
-		ProgramName[program::GRAPHICS] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::GRAPHICS], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::GRAPHICS], VertShaderName);
-		glAttachShader(ProgramName[program::GRAPHICS], FragShaderName);
-		glLinkProgram(ProgramName[program::GRAPHICS]);
-		glDeleteShader(VertShaderName);
+		if(Validated)
+		{
+			ProgramName[program::GRAPHICS] = glCreateProgram();
+			glProgramParameteri(ProgramName[program::GRAPHICS], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName[program::GRAPHICS], VertShaderName);
+			glAttachShader(ProgramName[program::GRAPHICS], FragShaderName);
+			glLinkProgram(ProgramName[program::GRAPHICS]);
+		}
+
+		if(Validated)
+		{
+			ProgramName[program::COMPUTE] = glCreateProgram();
+			glProgramParameteri(ProgramName[program::COMPUTE], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName[program::COMPUTE], CompShaderName);
+			glLinkProgram(ProgramName[program::COMPUTE]);
+		}
+
 		Validated = Validated && glf::checkProgram(ProgramName[program::GRAPHICS]);
-
-		ProgramName[program::COMPUTE] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::COMPUTE], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glAttachShader(ProgramName[program::COMPUTE], ComputeShaderName);
-		glLinkProgram(ProgramName[program::COMPUTE]);
-		glDeleteShader(ComputeShaderName);
 		Validated = Validated && glf::checkProgram(ProgramName[program::COMPUTE]);
 	}
 
@@ -209,8 +216,6 @@ bool initProgram()
 
 bool initBuffer()
 {
-	bool Validated(true);
-
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -252,16 +257,15 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initTexture()
 {
-	bool Validated(true);
-
 	glGenTextures(texture::MAX, TextureName);
 
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -276,7 +280,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
-	for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
 			GL_TEXTURE_2D, 
@@ -310,25 +314,21 @@ bool initTexture()
 	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGBA32F, BufferName[buffer::COLOR_OUTPUT], 0, TextureBufferRange);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-	return Validated;
+	return true;
 }
 
 bool initVertexArray()
 {
-	bool Validated(true);
-
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return Validated;
+	return true;
 }
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
@@ -343,7 +343,7 @@ bool initDebugOutput()
 	glf::logImplementationDependentLimit(GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS, "GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS");
 	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, "GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS");
 
-	return Validated;
+	return true;
 }
 
 bool begin()
@@ -367,8 +367,6 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
 	glDeleteProgramPipelines(program::MAX, PipelineName);
 	glDeleteProgram(ProgramName[program::GRAPHICS]);
 	glDeleteProgram(ProgramName[program::COMPUTE]);
@@ -376,7 +374,7 @@ bool end()
 	glDeleteTextures(texture::MAX, TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Validated;
+	return true;
 }
 
 void display()

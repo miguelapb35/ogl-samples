@@ -4,16 +4,21 @@
 #define COLOR			3
 #define TEXCOORD		4
 #define INSTANCE		7
-#define FRAG_COLOR		0
-#define FRAG_RED		0
-#define FRAG_GREEN		1
-#define FRAG_BLUE		2
-#define FRAG_ALPHA		3
 
-uniform mat4 MVP;
+#define TRANSFORM0		1
+
+layout(binding = TRANSFORM0) uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 layout(location = POSITION) in vec2 Position;
 layout(location = TEXCOORD) in vec2 Texcoord;
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 out vert
 {
@@ -23,5 +28,5 @@ out vert
 void main()
 {	
 	Out.Texcoord = Texcoord;
-	gl_Position = MVP * vec4(Position, 0.0, 1.0);
+	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

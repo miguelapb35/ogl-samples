@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Layered rendering";
+	std::string const SAMPLE_NAME("OpenGL Layered rendering");
 	std::string const VERT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.vert");
 	std::string const GEOM_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.geom");
 	std::string const FRAG_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.frag");

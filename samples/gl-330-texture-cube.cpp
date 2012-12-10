@@ -146,7 +146,7 @@ bool initTexture()
 			Texture[gli::textureCube::face_type(Face)][Level].data());
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()

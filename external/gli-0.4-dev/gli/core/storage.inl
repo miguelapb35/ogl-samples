@@ -10,27 +10,30 @@
 namespace gli{
 namespace detail
 {
-	inline storage::header::header() :
+	inline storage::desc::desc() :
 		Layers(0),
 		Faces(0),
 		Levels(0),
 		Dimensions(0),
-		BlockSize(0)
+		BlockSize(0),
+		BlockDimensions(0)
 	{}
 	
-	inline storage::header::header
+	inline storage::desc::desc
 	(
 		size_type const & Layers,
-		flag_type const & Faces,
+		size_type const & Faces,
 		size_type const & Levels,
 		glm::uvec3 const & Dimensions,
-		size_type const & BlockSize
+		size_type const & BlockSize,
+		glm::uvec3 const & BlockDimensions
 	) :
 		Layers(Layers),
 		Faces(Faces),
 		Levels(Levels),
 		Dimensions(Dimensions),
-		BlockSize(BlockSize)
+		BlockSize(BlockSize),
+		BlockDimensions(BlockDimensions)
 	{}
 	
 	inline storage::storage()
@@ -39,13 +42,14 @@ namespace detail
 	inline storage::storage
 	(
 		size_type const & Layers, 
-		flag_type const & Faces,
+		size_type const & Faces,
 		size_type const & Levels,
 		dimensions3_type const & Dimensions,
-		size_type const & BlockSize
+		size_type const & BlockSize,
+		glm::uvec3 const & BlockDimensions
 	) : 
-		Header(Layers, Faces, Levels, Dimensions, BlockSize),
-		Data(this->layerSize() * Layers * BlockSize)
+		Desc(Layers, Faces, Levels, Dimensions, BlockSize, BlockDimensions),
+		Data(this->layerSize() * Layers)
 	{}
 
 	inline storage::~storage()
@@ -58,22 +62,27 @@ namespace detail
 
 	inline storage::size_type storage::layers() const
 	{
-		return this->Header.Layers;
+		return this->Desc.Layers;
 	}
 
-	inline storage::flag_type storage::faces() const
+	inline storage::size_type storage::faces() const
 	{
-		return this->Header.Faces;
+		return this->Desc.Faces;
 	}
 
 	inline storage::size_type storage::levels() const
 	{
-		return this->Header.Levels;
+		return this->Desc.Levels;
 	}
 
 	inline storage::size_type storage::blockSize() const
 	{
-		return this->Header.BlockSize;
+		return this->Desc.BlockSize;
+	}
+
+	inline storage::dimensions3_type storage::blockDimensions() const
+	{
+		return this->Desc.BlockDimensions;
 	}
 
 	inline storage::dimensions3_type storage::dimensions
@@ -81,21 +90,23 @@ namespace detail
 		size_type const & Level
 	) const
 	{
-		return glm::max(this->Header.Dimensions >> storage::dimensions3_type(Level), storage::dimensions3_type(1));
+		assert(Level < this->Desc.Levels);
+
+		return glm::max(this->Desc.Dimensions >> storage::dimensions3_type(Level), storage::dimensions3_type(1));
 	}
 
-	inline storage::size_type storage::memorySize() const
+	inline storage::size_type storage::size() const
 	{
 		return this->Data.size();
 	}
 
-	inline storage::data_type* storage::data()
+	inline glm::byte * storage::data()
 	{
 		assert(!this->empty());
 		return &this->Data[0];
 	}
 
-	inline storage::data_type const * const storage::data() const
+	inline glm::byte const * const storage::data() const
 	{
 		assert(!this->empty());
 		return &this->Data[0];
@@ -106,7 +117,11 @@ namespace detail
 		storage::size_type const & Level
 	) const
 	{
-		return glm::compMul(this->dimensions(Level)); 
+		assert(Level < this->Desc.Levels);
+
+		return this->blockSize() * glm::compMul(glm::higherMultiple(
+			this->dimensions(Level), 
+			this->blockDimensions()) / this->blockDimensions()); 
 	}
 
 	inline storage::size_type storage::faceSize() const
@@ -117,7 +132,7 @@ namespace detail
 		for(storage::size_type Level(0); Level < this->levels(); ++Level)
 			FaceSize += this->levelSize(Level);
 
-		return FaceSize;// * TexelSize;    
+		return FaceSize;// * TexelSize;
 	}
 
 	inline storage::size_type storage::layerSize() const
@@ -127,21 +142,14 @@ namespace detail
 		return this->faceSize() * this->faces();
 	}
 
-	inline storage::size_type storage::linearAddressing
-	(
-		size_type const & LayerOffset, 
-		size_type const & FaceOffset, 
-		size_type const & LevelOffset
-	) const
+	inline bool storage::isSubset(detail::view const & View) const
 	{
-		size_type BaseOffset = this->layerSize() * LayerOffset + this->faceSize() * FaceOffset; 
 
-		for(size_type LevelIndex = 0; LevelIndex < LevelOffset; ++LevelIndex)
-			BaseOffset += this->levelSize(LevelIndex);
 
-		return BaseOffset;// * this->blockSize();
+		return false;
 	}
 
+	/*
 	inline storage extractLayers
 	(
 		storage const & Storage, 
@@ -168,7 +176,8 @@ namespace detail
 
 		return SubStorage;
 	}
-
+*/
+/*
 	inline storage extractFace
 	(
 		storage const & Storage, 
@@ -192,7 +201,8 @@ namespace detail
 
 		return SubStorage;
 	}
-
+*/
+/*
 	inline storage extractLevel
 	(
 		storage const & Storage, 
@@ -217,7 +227,8 @@ namespace detail
 
 		return SubStorage;
 	}
-
+*/
+/*
 	inline void copy_layers
 	(
 		storage const & SourceStorage, 
@@ -240,6 +251,6 @@ namespace detail
 			SourceStorage.data() + OffsetSrc * SourceStorage.blockSize(), 
 			SourceStorage.layerSize() * SourceLayerSize * SourceStorage.blockSize());
 	}
-
+*/
 }//namespace detail
 }//namespace gli

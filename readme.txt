@@ -53,6 +53,21 @@ Linux G++ instructions
 - Launch the sample from the build output directory
 
 ================================================================================
+OpenGL Samples Pack 4.3.0.4: 2012-XX-XX
+--------------------------------------------------------------------------------
+- Added 420-draw-image-space-rendering sample
+
+================================================================================
+OpenGL Samples Pack 4.3.0.3: 2012-10-31
+--------------------------------------------------------------------------------
+- Using GLF compiler for all OpenGL 4.2 and 4.3 samples
+- Added 430-program-compute-image sample
+- Added 430-debug sample
+- Added 420-texture-sparse-amd sample
+- Added 420-texture-bindless-nv sample
+- Updated 430-multi-draw-indirect using a DrawID
+
+================================================================================
 OpenGL Samples Pack 4.3.0.2: 2012-09-29
 --------------------------------------------------------------------------------
 - Added GLSL compiler: -D -I #include 

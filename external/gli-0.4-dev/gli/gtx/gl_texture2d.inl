@@ -166,7 +166,7 @@ namespace detail
 
 		if(size(Texture, BIT_PER_PIXEL) == size(Texture, BLOCK_SIZE) << 3)
 		{
-			for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage2D(
 					GL_TEXTURE_2D, 
@@ -182,7 +182,7 @@ namespace detail
 		}
 		else
 		{
-			for(gli::texture2D::level_type Level = 0; Level < Texture.levels(); ++Level)
+			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(
 					GL_TEXTURE_2D,
@@ -191,7 +191,7 @@ namespace detail
 					GLsizei(Texture[Level].dimensions().x), 
 					GLsizei(Texture[Level].dimensions().y), 
 					0, 
-					GLsizei(Texture[Level].capacity()), 
+					GLsizei(Texture[Level].size()), 
 					Texture[Level].data());
 			}
 		}

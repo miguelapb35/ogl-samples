@@ -1,10 +1,11 @@
 #version 420 core
 
 #define FRAG_COLOR	0
+#define DIFFUSE		0
 
 precision highp int;
 
-uniform sampler2DArray Diffuse;
+layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 
 in block
 {
