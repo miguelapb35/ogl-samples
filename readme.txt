@@ -53,8 +53,9 @@ Linux G++ instructions
 - Launch the sample from the build output directory
 
 ================================================================================
-OpenGL Samples Pack 4.3.0.4: 2012-XX-XX
+OpenGL Samples Pack 4.3.1.0: 2012-12-22
 --------------------------------------------------------------------------------
+- Added Intel OpenGL drivers implementation support
 - Added 420-draw-image-space-rendering sample
 
 ================================================================================
