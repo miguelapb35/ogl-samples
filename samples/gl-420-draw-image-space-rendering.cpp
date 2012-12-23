@@ -60,8 +60,6 @@ namespace
 		enum type
 		{
 			DIFFUSE,
-			COLORBUFFER,
-			RENDERBUFFER,
 			MAX
 		};
 	}//namespace texture
@@ -75,9 +73,9 @@ namespace
 		};
 	}//namespace pipeline
 
-	GLuint FramebufferName(0);
 	GLuint ProgramName[pipeline::MAX] = {0};
 	GLuint VertexArrayName(0);
+	GLuint SamplerName(0);
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLuint> PipelineName(pipeline::MAX);
@@ -142,6 +140,24 @@ bool initBuffer()
 	return true;
 }
 
+bool initSampler()
+{
+	glGenSamplers(1, &SamplerName);
+	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glSamplerParameterfv(SamplerName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
+	glSamplerParameterf(SamplerName, GL_TEXTURE_MIN_LOD, -1000.f);
+	glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_LOD, 1000.f);
+	glSamplerParameterf(SamplerName, GL_TEXTURE_LOD_BIAS, 0.0f);
+	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+	return glf::checkError("initSampler");
+}
+
 bool initTexture()
 {
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
@@ -173,24 +189,6 @@ bool initTexture()
 			Texture[Level].data());
 	}
 	
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
-
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH24_STENCIL8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 	return true;
@@ -200,32 +198,8 @@ bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	return true;
-}
-
-bool initFramebuffer()
-{
-	glGenFramebuffers(1, &FramebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
-
-	if(glf::checkFramebuffer(FramebufferName))
-		return false;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return true;
 }
 
@@ -254,7 +228,7 @@ bool begin()
 	if(Validated)
 		Validated = initTexture();
 	if(Validated)
-		Validated = initFramebuffer();
+		Validated = initSampler();
 
 	return Validated;
 }
@@ -266,6 +240,7 @@ bool end()
 	glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 	glDeleteProgram(ProgramName[pipeline::SPLASH]);
 	glDeleteBuffers(buffer::MAX, BufferName);
+	glDeleteSamplers(1, &SamplerName);
 	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
@@ -299,9 +274,9 @@ void display()
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VertexArrayName);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
+	glBindSampler(0, SamplerName);
 
-	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+	glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 
 	glf::swapBuffers();
 }
