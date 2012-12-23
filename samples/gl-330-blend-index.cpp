@@ -79,17 +79,20 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+
+		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
+		glDeleteShader(VertShaderName);
+		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
@@ -158,8 +161,6 @@ bool begin()
 {
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -200,13 +201,12 @@ void display()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
 
-	glProgramUniformMatrix4fv(ProgramName, UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniform1i(ProgramName, UniformDiffuse, 0);
-
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glUseProgram(ProgramName);
+	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+	glUniform1i(UniformDiffuse, 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);

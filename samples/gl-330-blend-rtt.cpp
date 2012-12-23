@@ -92,30 +92,6 @@ bool initDebugOutput()
 	return glf::checkError("initDebugOutput");
 }
 
-GLuint initShader
-(
-	std::string const & Filename, 
-	GLenum Stage
-)
-{
-	bool Validated = true;
-
-	GLuint ShaderName = 0;
-	if(Validated)
-	{
-		std::string Source0 = glf::loadFile(Filename);
-		char const * Source = Source0.c_str();
-		ShaderName = glCreateShader(Stage);
-		glShaderSource(ShaderName, 1, &Source, NULL);
-		glCompileShader(ShaderName);
-		Validated = glf::checkShader(ShaderName, Source);
-	}
-	
-	glf::checkError("initShader");
-
-	return ShaderName;
-}
-
 bool initProgram()
 {
 	bool Validated = true;
@@ -123,17 +99,20 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE1);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE1);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE1);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE1);
+
+		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE1);
 
 		ProgramNameMultiple = glCreateProgram();
-		glAttachShader(ProgramNameMultiple, VertexShaderName);
-		glAttachShader(ProgramNameMultiple, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
+		glAttachShader(ProgramNameMultiple, VertShaderName);
+		glAttachShader(ProgramNameMultiple, FragShaderName);
+		glDeleteShader(VertShaderName);
+		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramNameMultiple);
-		Validated = glf::checkProgram(ProgramNameMultiple);
+		Validated = Validated && glf::checkProgram(ProgramNameMultiple);
 	}
 
 	if(Validated)
@@ -145,17 +124,20 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE2);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE2);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE2);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE2);
+
+		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE2);
 
 		ProgramNameSingle = glCreateProgram();
-		glAttachShader(ProgramNameSingle, VertexShaderName);
-		glAttachShader(ProgramNameSingle, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
+		glAttachShader(ProgramNameSingle, VertShaderName);
+		glAttachShader(ProgramNameSingle, FragShaderName);
+		glDeleteShader(VertShaderName);
+		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramNameSingle);
-		Validated = glf::checkProgram(ProgramNameSingle);
+		Validated = Validated && glf::checkProgram(ProgramNameSingle);
 	}
 
 	if(Validated)
@@ -321,8 +303,6 @@ bool begin()
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -367,14 +347,13 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
-		glProgramUniformMatrix4fv(ProgramNameMultiple, UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
-		glProgramUniform1i(ProgramNameMultiple, UniformDiffuseMultiple, 0);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x >> 1), float(FRAMEBUFFER_SIZE.y >> 1));
+		glViewport(0, 0, FRAMEBUFFER_SIZE.x >> 1, FRAMEBUFFER_SIZE.y >> 1);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glUseProgram(ProgramNameMultiple);
+		glUniformMatrix4fv(UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(UniformDiffuseMultiple, 0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_RGB8]);
@@ -396,13 +375,13 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
-		glProgramUniformMatrix4fv(ProgramNameSingle, UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
-		glProgramUniform1i(ProgramNameSingle, UniformDiffuseSingle, 0);
+		glUniformMatrix4fv(UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(UniformDiffuseSingle, 0);
 	}
 
 	for(std::size_t i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewportIndexedfv(0, &glm::vec4(Viewport[i])[0]);
+		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[i]);
