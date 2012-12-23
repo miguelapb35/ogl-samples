@@ -87,6 +87,9 @@ bool initProgram()
 		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
 		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShaderName);
 		glAttachShader(ProgramName, FragmentShaderName);
@@ -94,7 +97,7 @@ bool initProgram()
 		glDeleteShader(FragmentShaderName);
 
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
@@ -103,7 +106,7 @@ bool initProgram()
 		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initArrayBuffer()
@@ -133,6 +136,8 @@ bool initTexture2D()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Required AMD bug
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Required AMD bug
 
 	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
 	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
@@ -140,7 +145,7 @@ bool initTexture2D()
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGB, 
+			GL_RGB8, 
 			GLsizei(Image[Level].dimensions().x), 
 			GLsizei(Image[Level].dimensions().y), 
 			0,  
@@ -229,17 +234,16 @@ void renderScene
 	GLuint Texture2DName
 )
 {
-	glProgramUniform1i(ProgramName, UniformDiffuse, 0);
-	glProgramUniformMatrix4fv(ProgramName, UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-
 	GLint const Border = 16;
 
 	glEnablei(GL_SCISSOR_TEST, 0);
-	glScissorIndexed(0, Border, Border, Window.Size.x - Border * 2, Window.Size.y - Border * 2);
+	glScissor(Border, Border, Window.Size.x - Border * 2, Window.Size.y - Border * 2);
 	glClearBufferfv(GL_COLOR, 0, &ClearColor[0]);
 
 	// Bind the program for use
 	glUseProgram(ProgramName);
+	glUniform1i(UniformDiffuse, 0);
+	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
@@ -266,7 +270,7 @@ void display()
 		glm::mat4 MVP = Projection * View * Model;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
+		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 		renderScene(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), MVP, Texture2DName);
 	}
 
@@ -275,7 +279,7 @@ void display()
 		glm::mat4 MVP = Projection * View * Model;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+		glViewport(0, 0, Window.Size.x, Window.Size.y);
 		renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, ColorbufferName);
 
 		glActiveTexture(GL_TEXTURE0);

@@ -112,6 +112,9 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[i]);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
+
 		ProgramName[i] = glCreateProgram();
 		glAttachShader(ProgramName[i], VertShaderName);
 		glAttachShader(ProgramName[i], FragShaderName);
@@ -312,12 +315,7 @@ void resolveMultisampling()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Perspective * View * Model;
 
-	glProgramUniform1i(ProgramName[program::RESOLVE_BOX], UniformDiffuse[program::RESOLVE_BOX], 0);
-	glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_BOX], UniformMVP[program::RESOLVE_BOX], 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniform1i(ProgramName[program::RESOLVE_NEAR], UniformDiffuse[program::RESOLVE_NEAR], 0);
-	glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_NEAR], UniformMVP[program::RESOLVE_NEAR], 1, GL_FALSE, &MVP[0][0]);
-
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -330,15 +328,23 @@ void resolveMultisampling()
 
 	// Box
 	{
-		glScissorIndexed(0, 1, 1, Window.Size.x  / 2 - 2, Window.Size.y - 2);
+		glScissor(1, 1, Window.Size.x  / 2 - 2, Window.Size.y - 2);
+
 		glUseProgram(ProgramName[program::RESOLVE_BOX]);
+		glUniform1i(UniformDiffuse[program::RESOLVE_BOX], 0);
+		glUniformMatrix4fv(UniformMVP[program::RESOLVE_BOX], 1, GL_FALSE, &MVP[0][0]);
+
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 	}
 
 	// Near
 	{
-		glScissorIndexed(0, Window.Size.x / 2 + 1, 1, Window.Size.x / 2 - 2, Window.Size.y - 2);
+		glScissor(Window.Size.x / 2 + 1, 1, Window.Size.x / 2 - 2, Window.Size.y - 2);
+
 		glUseProgram(ProgramName[program::RESOLVE_NEAR]);
+		glUniform1i(UniformDiffuse[program::RESOLVE_NEAR], 0);
+		glUniformMatrix4fv(UniformMVP[program::RESOLVE_NEAR], 1, GL_FALSE, &MVP[0][0]);
+
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 	}
 
