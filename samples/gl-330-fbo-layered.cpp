@@ -95,6 +95,10 @@ bool initProgram()
 		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE1);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE1);
+
 		ProgramName[LAYERING] = glCreateProgram();
 		glAttachShader(ProgramName[LAYERING], VertShaderName);
 		glAttachShader(ProgramName[LAYERING], GeomShaderName);
@@ -110,6 +114,9 @@ bool initProgram()
 	{
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2);
+
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE2);
 
 		ProgramName[IMAGE_2D] = glCreateProgram();
 		glAttachShader(ProgramName[IMAGE_2D], VertShaderName);
@@ -163,7 +170,7 @@ bool initTexture()
 	glTexImage3D(
 		GL_TEXTURE_2D_ARRAY, 
 		0, 
-		GL_RGB, 
+		GL_RGB8, 
 		GLsizei(FRAMEBUFFER_SIZE.x), 
 		GLsizei(FRAMEBUFFER_SIZE.y), 
 		GLsizei(4), //depth
@@ -241,8 +248,6 @@ bool begin()
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -282,17 +287,14 @@ void display()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
 
-	glProgramUniformMatrix4fv(ProgramName[LAYERING], UniformMVP[LAYERING], 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniformMatrix4fv(ProgramName[IMAGE_2D], UniformMVP[IMAGE_2D], 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniform1i(ProgramName[IMAGE_2D], UniformDiffuse, 0);
-
 	// Pass 1
 	{
 		glBindSampler(0, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
+		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 
 		glUseProgram(ProgramName[LAYERING]);
+		glUniformMatrix4fv(UniformMVP[LAYERING], 1, GL_FALSE, &MVP[0][0]);
 
 		glBindVertexArray(VertexArrayName[LAYERING]);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
@@ -304,6 +306,8 @@ void display()
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		glUseProgram(ProgramName[IMAGE_2D]);
+		glUniformMatrix4fv(UniformMVP[IMAGE_2D], 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(UniformDiffuse, 0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureColorbufferName);
@@ -314,8 +318,8 @@ void display()
 
 		for(int i = 0; i < 4; ++i)
 		{
-			glProgramUniform1i(ProgramName[IMAGE_2D], UniformLayer, i);
-			glViewportIndexedfv(0, &glm::vec4(Viewport[i])[0]);
+			glUniform1i(UniformLayer, i);
+			glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 		}
 	}
