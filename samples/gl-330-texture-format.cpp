@@ -133,6 +133,9 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[i]);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
+
 		ProgramName[i] = glCreateProgram();
 		glAttachShader(ProgramName[i], VertShaderName);
 		glAttachShader(ProgramName[i], FragShaderName);
@@ -148,7 +151,7 @@ bool initProgram()
 		Validated = Validated && (UniformDiffuse[i] != -1);
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initBuffer()

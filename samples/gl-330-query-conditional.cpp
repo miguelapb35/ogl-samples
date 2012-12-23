@@ -70,6 +70,9 @@ bool initProgram()
 		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
 		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShaderName);
 		glAttachShader(ProgramName, FragmentShaderName);
@@ -97,10 +100,10 @@ bool initArrayBuffer()
 	glGenBuffers(1, &BufferName);
 
 	// Bind the buffer for use
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 
 	// Reserve buffer memory but and copy the values
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
 
 	// Unbind the buffer
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -111,7 +114,7 @@ bool initArrayBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		// Bind vertex attribute
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
@@ -161,21 +164,18 @@ void display()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
 
-	// Set the value of MVP uniform.
-	glProgramUniformMatrix4fv(ProgramName, UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	// Set uniform value
-	glProgramUniform4fv(ProgramName, UniformColor, 1, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
-	// Set uniform value
-	glProgramUniform4fv(ProgramName, UniformColor, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-
 	// Set the display viewport
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 
 	// Clear color buffer with black
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 	// Bind program
 	glUseProgram(ProgramName);
+	// Set the value of MVP uniform.
+	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+	// Set uniform value
+	glUniform4fv(UniformColor, 1, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 	glBindVertexArray(VertexArrayName);
 	
@@ -192,6 +192,9 @@ void display()
 	// The second blue quad is written in the framebuffer only if a sample pass the occlusion query.
 	glColorMaski(0, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	
+	// Set uniform value
+	glUniform4fv(UniformColor, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+
 	// Draw only if one sample went through the tests, 
 	// we don't need to get the query result which prevent the rendering pipeline to stall.
 	glBeginConditionalRender(QueryName, GL_QUERY_WAIT);
@@ -207,6 +210,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

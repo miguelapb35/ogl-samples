@@ -56,6 +56,9 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
@@ -63,7 +66,7 @@ bool initProgram()
 		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	// Get variables locations
@@ -83,12 +86,12 @@ bool initBuffer()
 	glGenBuffers(1, &BufferName);
 
 	// Bind the buffer for use
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 
 	// Reserve buffer memory but don't copy the values
-    glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(VertexCount * sizeof(glf::vertex_v4fc4f)), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(VertexCount * sizeof(glf::vertex_v4fc4f)), NULL, GL_STATIC_DRAW);
 
-    glf::vertex_v4fc4f* Data = (glf::vertex_v4fc4f*)glMapBufferRange(
+	glf::vertex_v4fc4f* Data = (glf::vertex_v4fc4f*)glMapBufferRange(
 		GL_ARRAY_BUFFER, 
 		0,				// Offset
 		GLsizeiptr(VertexCount * sizeof(glf::vertex_v4fc4f)),	// Size,
@@ -117,7 +120,7 @@ bool initBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec4)));
@@ -134,7 +137,6 @@ bool begin()
 {
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -174,17 +176,16 @@ void display()
 	glm::mat4 MVP = Projection * View * Model;
 	glm::mat4 MV = View * Model;
 
-	glProgramUniformMatrix4fv(ProgramName, UniformMV, 1, GL_FALSE, &MV[0][0]);
-	glProgramUniformMatrix4fv(ProgramName, UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-
 	float Depth(1.0f);
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 
 	glDisable(GL_SCISSOR_TEST);
 
 	glUseProgram(ProgramName);
+	glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
+	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 	glBindVertexArray(VertexArrayName);
 

@@ -79,9 +79,10 @@ bool initProgram()
 	if(Validated)
 	{
 		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE1);
-		glf::checkError("VertShader");
 		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1);
-		glf::checkError("FragShader");
+
+		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE1);
 
 		ProgramName[0] = glCreateProgram();
 		glAttachShader(ProgramName[0], VertShader);
@@ -90,7 +91,7 @@ bool initProgram()
 		glDeleteShader(FragShader);
 
 		glLinkProgram(ProgramName[0]);
-		Validated = glf::checkProgram(ProgramName[0]);
+		Validated = Validated && glf::checkProgram(ProgramName[0]);
 	}
 
 	// Get variables locations
@@ -104,11 +105,12 @@ bool initProgram()
 	if(Validated)
 	{
 		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2);
-		glf::checkError("VertShader");
 		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE2);
-		glf::checkError("GeomShader");
 		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2);
-		glf::checkError("FragShader");
+
+		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(GeomShader, GEOM_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE2);
 
 		ProgramName[1] = glCreateProgram();
 		glAttachShader(ProgramName[1], VertShader);
@@ -119,7 +121,7 @@ bool initProgram()
 		glDeleteShader(FragShader);
 
 		glLinkProgram(ProgramName[1]);
-		Validated = glf::checkProgram(ProgramName[1]);
+		Validated = Validated && glf::checkProgram(ProgramName[1]);
 	}
 
 	// Get variables locations
@@ -136,7 +138,7 @@ bool initVertexArray()
 {
 	// Build a vertex array object
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -152,13 +154,13 @@ bool initArrayBuffer()
 {
 	// Generate a buffer object
 	glGenBuffers(1, &ElementBufferName);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &ArrayBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");
@@ -200,12 +202,9 @@ void display()
 	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
-	
-	glProgramUniformMatrix4fv(ProgramName[0], UniformMVP[0], 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniformMatrix4fv(ProgramName[1], UniformMVP[1], 1, GL_FALSE, &MVP[0][0]);
 
 	// Set the display viewport
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 
 	// Clear color buffer with black
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
@@ -215,13 +214,19 @@ void display()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 
 	// Left side
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x / 2), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x / 2, Window.Size.y);
+
 	glUseProgram(ProgramName[0]);
+	glUniformMatrix4fv(UniformMVP[0], 1, GL_FALSE, &MVP[0][0]);
+
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 	
 	// Right side
-	glViewportIndexedf(0, float(Window.Size.x / 2), 0, float(Window.Size.x / 2), float(Window.Size.y));
+	glViewport(Window.Size.x / 2, 0,Window.Size.x / 2, Window.Size.y);
+	
 	glUseProgram(ProgramName[1]);
+	glUniformMatrix4fv(UniformMVP[1], 1, GL_FALSE, &MVP[0][0]);
+
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 	
 	glf::checkError("display");

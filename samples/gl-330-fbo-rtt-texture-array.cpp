@@ -147,8 +147,8 @@ bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");
@@ -256,8 +256,6 @@ bool begin()
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -301,13 +299,12 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
-		glProgramUniformMatrix4fv(ProgramNameMultiple, UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
+		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramNameMultiple);
+		glUniformMatrix4fv(UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
 
 		glBindVertexArray(VertexArrayMultipleName);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
@@ -320,14 +317,13 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
-		glProgramUniformMatrix4fv(ProgramNameSingle, UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
-		glProgramUniform1i(ProgramNameSingle, UniformDiffuseSingle, 0);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+		glViewport(0, 0, Window.Size.x, Window.Size.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramNameSingle);
+		glUniformMatrix4fv(UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(UniformDiffuseSingle, 0);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -337,8 +333,8 @@ void display()
 
 	for(std::size_t i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewportIndexedfv(0, &glm::vec4(Viewport[i])[0]);
-		glProgramUniform1i(ProgramNameSingle, UniformLayer, GLint(i));
+		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
+		glUniform1i(UniformLayer, GLint(i));
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}

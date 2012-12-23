@@ -15,10 +15,10 @@
 namespace
 {
 	std::string const SAMPLE_NAME = "OpenGL Texture 2D Compressed";
-	std::string const SHADER_VERT_SOURCE(glf::DATA_DIRECTORY + "gl-330/image-2d.vert");
-	std::string const SHADER_FRAG_SOURCE(glf::DATA_DIRECTORY + "gl-330/image-2d.frag");
-	std::string const TEXTURE_DIFFUSE_BC1(glf::DATA_DIRECTORY + "kueken2-bc1.dds");
-	std::string const TEXTURE_DIFFUSE_BC3(glf::DATA_DIRECTORY + "kueken2-bc3.dds");
+	std::string const SHADER_VERT_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.vert");
+	std::string const SHADER_FRAG_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.frag");
+	std::string const TEXTURE_DIFFUSE_BC1(glf::DATA_DIRECTORY + "kueken2-dxt1.dds");
+	std::string const TEXTURE_DIFFUSE_BC3(glf::DATA_DIRECTORY + "kueken2-dxt5.dds");
 	std::string const TEXTURE_DIFFUSE_BC4(glf::DATA_DIRECTORY + "kueken2-bc4.dds");
 	std::string const TEXTURE_DIFFUSE_BC5(glf::DATA_DIRECTORY + "kueken2-bc5.dds");
 
@@ -98,6 +98,9 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertShaderName, SHADER_VERT_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, SHADER_FRAG_SOURCE);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
@@ -105,7 +108,7 @@ bool initProgram()
 		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
@@ -114,15 +117,15 @@ bool initProgram()
 		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");;
@@ -135,15 +138,16 @@ bool initTexture2D()
 
 	// Set image
 	{
+		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC1);
+
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC1);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -159,15 +163,16 @@ bool initTexture2D()
 	}
 
 	{
+		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC3);
+
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC3]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC3);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -183,15 +188,16 @@ bool initTexture2D()
 	}
 
 	{
+		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC4);
+
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC4);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -207,15 +213,16 @@ bool initTexture2D()
 	}
 
 	{
+		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC5);
+
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC5);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -239,7 +246,7 @@ bool initTexture2D()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));

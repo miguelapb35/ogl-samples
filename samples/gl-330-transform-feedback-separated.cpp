@@ -69,6 +69,7 @@ bool initProgram()
 	if(Validated)
 	{
 		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_TRANSFORM);
+		Validated = Validated && glf::checkShader(VertexShaderName, VERT_SHADER_SOURCE_TRANSFORM);
 
 		TransformProgramName = glCreateProgram();
 		glAttachShader(TransformProgramName, VertexShaderName);
@@ -118,6 +119,9 @@ bool initProgram()
 		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_FEEDBACK);
 		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_FEEDBACK);
 
+		Validated = Validated && glf::checkShader(VertexShaderName, VERT_SHADER_SOURCE_FEEDBACK);
+		Validated = Validated && glf::checkShader(FragmentShaderName, FRAG_SHADER_SOURCE_FEEDBACK);
+
 		FeedbackProgramName = glCreateProgram();
 		glAttachShader(FeedbackProgramName, VertexShaderName);
 		glAttachShader(FeedbackProgramName, FragmentShaderName);
@@ -137,7 +141,7 @@ bool initVertexArray()
 
 	// Build a vertex array object
 	glGenVertexArrays(1, &TransformVertexArrayName);
-    glBindVertexArray(TransformVertexArrayName);
+	glBindVertexArray(TransformVertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, TransformArrayBufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -149,7 +153,7 @@ bool initVertexArray()
 
 	// Build a vertex array object
 	glGenVertexArrays(1, &FeedbackVertexArrayName);
-    glBindVertexArray(FeedbackVertexArrayName);
+	glBindVertexArray(FeedbackVertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferPositionName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferColorName);
@@ -167,17 +171,17 @@ bool initArrayBuffer()
 {
 	// Generate a buffer object
 	glGenBuffers(1, &TransformArrayBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, TransformArrayBufferName);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, TransformArrayBufferName);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &FeedbackArrayBufferPositionName);
-    glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferPositionName);
+	glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferPositionName);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * VertexCount, NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &FeedbackArrayBufferColorName);
-    glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferColorName);
+	glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferColorName);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * VertexCount, NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -188,8 +192,6 @@ bool begin()
 {
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_viewport_array");
-	Validated = Validated && glf::checkExtension("GL_ARB_separate_shader_objects");
 
 	glGenQueries(1, &Query);
 

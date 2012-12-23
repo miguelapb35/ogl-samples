@@ -24,5 +24,5 @@ void main()
 
 	Out.Color = Color;
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
-	gl_PointSize = 256.f / -(MV * vec4(Position, 0.0, 1.0)).z;
+	gl_PointSize = 256.0 / -(MV * vec4(Position, 0.0, 1.0)).z;
 }

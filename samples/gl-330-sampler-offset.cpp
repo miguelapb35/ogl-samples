@@ -97,6 +97,9 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG[i]);
 
+		Validated = Validated && glf::checkShader(VertShaderName, SHADER_VERT);
+		Validated = Validated && glf::checkShader(FragShaderName, SHADER_FRAG[i]);
+
 		ProgramName[i] = glCreateProgram();
 		glAttachShader(ProgramName[i], VertShaderName);
 		glAttachShader(ProgramName[i], FragShaderName);
@@ -119,11 +122,11 @@ bool initVertexBuffer()
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");
@@ -162,7 +165,7 @@ bool initTexture2D()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -238,7 +241,7 @@ void display()
 		glUniformMatrix4fv(UniformMVP[i], 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(UniformDiffuse[i], 0);
 
-		glViewportIndexedfv(0, &glm::vec4(Viewport[i])[0]);
+		glViewport(GLint(Viewport[i].x), GLint(Viewport[i].y), GLsizei(Viewport[i].z), GLsizei(Viewport[i].w));
 
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 1, 0);
 	}

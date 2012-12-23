@@ -98,13 +98,16 @@ bool initProgram()
 		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE1);
 		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE1);
 
+		Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE1);
+
 		ProgramNameMultiple = glCreateProgram();
 		glAttachShader(ProgramNameMultiple, VertexShader);
 		glAttachShader(ProgramNameMultiple, FragmentShader);
 		glDeleteShader(VertexShader);
 		glDeleteShader(FragmentShader);
 		glLinkProgram(ProgramNameMultiple);
-		Validated = glf::checkProgram(ProgramNameMultiple);
+		Validated = Validated && glf::checkProgram(ProgramNameMultiple);
 	}
 
 	if(Validated)
@@ -118,13 +121,16 @@ bool initProgram()
 		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE2);
 		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE2);
 
+		Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE2);
+
 		ProgramNameSingle = glCreateProgram();
 		glAttachShader(ProgramNameSingle, VertexShader);
 		glAttachShader(ProgramNameSingle, FragmentShader);
 		glDeleteShader(VertexShader);
 		glDeleteShader(FragmentShader);
 		glLinkProgram(ProgramNameSingle);
-		Validated = glf::checkProgram(ProgramNameSingle);
+		Validated = Validated && glf::checkProgram(ProgramNameSingle);
 	}
 
 	if(Validated)
@@ -133,7 +139,7 @@ bool initProgram()
 		UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initVertexBuffer()
@@ -266,7 +272,7 @@ bool initFramebuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -354,14 +360,13 @@ void display()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
 
-	glProgramUniformMatrix4fv(ProgramNameMultiple, UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniform1i(ProgramNameMultiple, UniformDiffuseMultiple, 0);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x >> 1), float(FRAMEBUFFER_SIZE.y >> 1));
+	glViewport(0, 0, FRAMEBUFFER_SIZE.x >> 1, FRAMEBUFFER_SIZE.y >> 1);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glUseProgram(ProgramNameMultiple);
+	glUniformMatrix4fv(UniformMVPMultiple, 1, GL_FALSE, &MVP[0][0]);
+	glUniform1i(UniformDiffuseMultiple, 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_RGB8]);
@@ -375,19 +380,19 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glUseProgram(ProgramNameSingle);
+	glUniform1i(UniformDiffuseSingle, 0);
 
 	{
 		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, 1.0f,-1.0f, -1.0f, 1.0f);
 		glm::mat4 View = glm::mat4(1.0f);
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
-		glProgramUniformMatrix4fv(ProgramNameSingle, UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(UniformMVPSingle, 1, GL_FALSE, &MVP[0][0]);
 	}
-	glProgramUniform1i(ProgramNameSingle, UniformDiffuseSingle, 0);
 
 	for(std::size_t i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewportIndexedfv(0, &glm::vec4(Viewport[i])[0]);
+		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[i]);
