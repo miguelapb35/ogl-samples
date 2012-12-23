@@ -83,15 +83,16 @@ bool initProgram()
 	if(Validated)
 	{
 		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER1);
-		glf::checkError("VertShader");
 		GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER1);
-		glf::checkError("ContShader");
 		GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER1);
-		glf::checkError("EvalShader");
 		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER1);
-		glf::checkError("GeomShader");
 		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER1);
-		glf::checkError("FragShader");
+
+		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
+		Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
+		Validated = Validated && glf::checkShader(EvalShader, SAMPLE_EVAL_SHADER1);
+		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER1);
+		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER1);
 
 		ProgramName[0] = glCreateProgram();
 		glAttachShader(ProgramName[0], VertShader);
@@ -106,7 +107,7 @@ bool initProgram()
 		glDeleteShader(FragShader);
 
 		glLinkProgram(ProgramName[0]);
-		Validated = glf::checkProgram(ProgramName[0]);
+		Validated = Validated && glf::checkProgram(ProgramName[0]);
 	}
 
 	// Get variables locations
@@ -119,11 +120,12 @@ bool initProgram()
 	if(Validated)
 	{
 		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER2);
-		glf::checkError("VertShader");
 		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER2);
-		glf::checkError("GeomShader");
 		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER2);
-		glf::checkError("FragShader");
+
+		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
+		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
+		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
 
 		ProgramName[1] = glCreateProgram();
 		glAttachShader(ProgramName[1], VertShader);
@@ -134,7 +136,7 @@ bool initProgram()
 		glDeleteShader(FragShader);
 
 		glLinkProgram(ProgramName[1]);
-		Validated = glf::checkProgram(ProgramName[1]);
+		Validated = Validated && glf::checkProgram(ProgramName[1]);
 	}
 
 	// Get variables locations
@@ -150,7 +152,7 @@ bool initVertexArray()
 {
 	// Build a vertex array object
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -162,20 +164,20 @@ bool initVertexArray()
 	return glf::checkError("initVertexArray");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	// Generate a buffer object
 	glGenBuffers(1, &ElementBufferName);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &ArrayBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool begin()
@@ -187,7 +189,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 

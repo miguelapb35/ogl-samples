@@ -65,13 +65,16 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
@@ -80,7 +83,7 @@ bool initProgram()
 		UniformLayer = glGetUniformLocation(ProgramName, "Layer");
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initTexture()
@@ -197,7 +200,7 @@ void display()
 
 	for(GLint i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewportIndexedfv(0, &Viewport[i][0]);
+		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
 		glUniform1i(UniformLayer, i);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);

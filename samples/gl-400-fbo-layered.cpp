@@ -95,6 +95,10 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE1);
 		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE1);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1);
+		
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE1);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE1);
 
 		ProgramName[LAYERING] = glCreateProgram();
 		glAttachShader(ProgramName[LAYERING], VertShaderName);
@@ -104,7 +108,7 @@ bool initProgram()
 		glDeleteShader(GeomShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName[LAYERING]);
-		Validated = glf::checkProgram(ProgramName[LAYERING]);
+		Validated = Validated && glf::checkProgram(ProgramName[LAYERING]);
 	}
 
 	if(Validated)
@@ -112,13 +116,16 @@ bool initProgram()
 		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2);
 		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2);
 
+		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE2);
+		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE2);
+
 		ProgramName[IMAGE_2D] = glCreateProgram();
 		glAttachShader(ProgramName[IMAGE_2D], VertShaderName);
 		glAttachShader(ProgramName[IMAGE_2D], FragShaderName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName[IMAGE_2D]);
-		Validated = glf::checkProgram(ProgramName[IMAGE_2D]);
+		Validated = Validated && glf::checkProgram(ProgramName[IMAGE_2D]);
 	}
 
 	if(Validated)
@@ -130,7 +137,7 @@ bool initProgram()
 		UniformLayer = glGetUniformLocation(ProgramName[IMAGE_2D], "Layer");
 	}
 
-	return glf::checkError("initProgram");
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initBuffer()
@@ -138,11 +145,11 @@ bool initBuffer()
 	glGenBuffers(BUFFER_MAX, BufferName);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");
@@ -193,7 +200,7 @@ bool initVertexArray()
 {
 	glGenVertexArrays(PROGRAM_MAX, VertexArrayName);
 
-    glBindVertexArray(VertexArrayName[IMAGE_2D]);
+	glBindVertexArray(VertexArrayName[IMAGE_2D]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -205,7 +212,7 @@ bool initVertexArray()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 	glBindVertexArray(0);
 
-    glBindVertexArray(VertexArrayName[LAYERING]);
+	glBindVertexArray(VertexArrayName[LAYERING]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -66,6 +66,12 @@ bool initProgram()
 		GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOMETRY_SHADER);
 		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAGMENT_SHADER);
 
+		Validated = Validated && glf::checkShader(VertexShader, SAMPLE_VERTEX_SHADER);
+		Validated = Validated && glf::checkShader(ControlShader, SAMPLE_CONTROL_SHADER);
+		Validated = Validated && glf::checkShader(EvaluationShader, SAMPLE_EVALUATION_SHADER);
+		Validated = Validated && glf::checkShader(GeometryShader, SAMPLE_GEOMETRY_SHADER);
+		Validated = Validated && glf::checkShader(FragmentShader, SAMPLE_FRAGMENT_SHADER);
+
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShader);
 		glAttachShader(ProgramName, ControlShader);
@@ -78,7 +84,7 @@ bool initProgram()
 		glDeleteShader(GeometryShader);
 		glDeleteShader(FragmentShader);
 		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	// Get variables locations
@@ -94,7 +100,7 @@ bool initVertexArray()
 {
 	// Build a vertex array object
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -110,8 +116,8 @@ bool initVertexArray()
 bool initArrayBuffer()
 {
 	glGenBuffers(1, &ArrayBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");

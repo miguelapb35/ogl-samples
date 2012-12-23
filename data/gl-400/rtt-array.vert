@@ -2,9 +2,9 @@
 
 const int VertexCount = 3;
 const vec2 Position[VertexCount] = vec2[](
-	vec2(-1.0f,-1.0f),
-	vec2( 3.0f,-1.0f),
-	vec2(-1.0f, 3.0f));
+	vec2(-1.0,-1.0),
+	vec2( 3.0,-1.0),
+	vec2(-1.0, 3.0));
 
 void main()
 {	
