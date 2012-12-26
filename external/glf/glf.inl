@@ -58,7 +58,9 @@ namespace glf
 		GLint Result(0);
 		glGetIntegerv(Value, &Result);
 		std::string Message(glf::format("%s: %d", String.c_str(), Result));
-		glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
+#       if(!defined(__APPLE__))
+            glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
+#       endif
 	}
 
 	inline void swapBuffers()
@@ -297,8 +299,9 @@ namespace glf
 		switch(key) 
 		{
 		case 27:
-			glutLeaveMainLoop();
-
+#if         !defined(__APPLE__)
+                glutLeaveMainLoop();
+#endif
 			break;
 		}
 	}
@@ -449,11 +452,11 @@ namespace glf
 	bool validateVAO(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
-
+#if !defined(__APPLE__)
 		GLint MaxVertexAttrib(0);
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttrib);
 
-		glBindVertexArray(VertexArrayName);
+        glBindVertexArray(VertexArrayName);
 		for(GLuint AttribLocation = 0; AttribLocation < glm::min(GLuint(MaxVertexAttrib), GLuint(Expected.size())); ++AttribLocation)
 		{
 			glf::vertexattrib VertexAttrib;
@@ -471,7 +474,7 @@ namespace glf
 			assert(Success);
 		}
 		glBindVertexArray(0);
-
+#endif//!defined(__APPLE__)
 		return Success;
 	}
 

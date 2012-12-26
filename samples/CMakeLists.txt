@@ -16,7 +16,7 @@ function(glCreateSampleGTC NAME)
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
-	add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
+	#add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
 if(MSVC)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
 else(MSVC)

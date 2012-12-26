@@ -20,7 +20,8 @@
 #	include <GL/gl.h>
 #	include <GL/glext.h>
 #elif defined(__APPLE__)
-#	include <OpenGL/gl.h>
+#	include <OpenGL/gl3.h>
+#   include <GLUT/glut.h>
 #else
 #	error "Unsupported platform"
 #endif

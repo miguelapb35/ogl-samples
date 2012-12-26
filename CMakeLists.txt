@@ -42,27 +42,6 @@ elseif(UNIX)
 endif(WIN32)
 
 ################################
-# Add OpenCL
-
-set(CL_DIRECTORY cl-1.2)
-
-if(MSVC AND NOT CMAKE_CL_64)
-	set(CL_LIBRARY_DIRECTORY "x86")
-	set(CL_BINARY_DIRECTORY "x86/OpenCL.dll")
-endif(MSVC AND NOT CMAKE_CL_64)
-
-if(MSVC AND CMAKE_CL_64)
-	set(CL_LIBRARY_DIRECTORY "x86_64")
-	set(CL_BINARY_DIRECTORY "x86_64/OpenCL.dll")
-endif(MSVC AND CMAKE_CL_64)
-
-set(CL_BINARY ${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY}/bin/${CL_BINARY_DIRECTORY}) 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY}/lib/${CL_LIBRARY_DIRECTORY})
-
-set(CL_LIBRARY OpenCL)
-
-################################
 # Add GLM 
 
 set(GLM_DIRECTORY glm-0.9.4.1)
@@ -99,6 +78,9 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEGLUT_DIRECTORY}/lib/
 
 if(WIN32)
 	set(FREEGLUT_LIBRARY freeglut_static)
+elseif(APPLE)
+	find_package(GLUT)
+	set(FREEGLUT_LIBRARY glut)
 elseif(UNIX)
 	find_package(GLUT)
 	set(FREEGLUT_LIBRARY glut)
@@ -224,7 +206,7 @@ function(createSample NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
-	target_link_libraries(${NAME} ${GL_LIBRARY} ${CL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
+	target_link_libraries(${NAME} ${GL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
 endfunction(createSample)
 
 function(createSampleWGL NAME)
