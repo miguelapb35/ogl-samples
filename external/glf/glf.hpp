@@ -1,18 +1,13 @@
-#ifndef GLF_WINDOW_INCLUDED
-#define GLF_WINDOW_INCLUDED
+#ifndef GLF_INCLUDED
+#define GLF_INCLUDED
 
 //#pragma warning(disable : once)
 
-// OpenGL
 #ifdef WIN32
 #	define WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <GL/glew.h>
 #	include <GL/wglew.h>
-#	include <cl/cl.h>
-#	include <cl/cl_ext.h>
-#	include <cl/cl_gl.h>
-#	include <cl/cl_gl_ext.h>
 //#	include <GL/glext.h>
 #elif defined(linux) || defined(__linux)
 #	include <GL/glew.h>
@@ -24,12 +19,14 @@
 #else
 #	error "Unsupported platform"
 #endif
+#include <GL/glfw3.h>
 
 #include "common.hpp"
 #include "vertex.hpp"
 #include "compiler.hpp"
 #include "sementics.hpp"
 #include "error.hpp"
+//#include "window.hpp"
 
 namespace glf
 {
@@ -65,6 +62,7 @@ namespace glf
 		glm::vec2 RotationCurrent;
 		int MouseButtonFlags;
 		std::size_t KeyPressed[256];
+		GLFWwindow Handle;
 	};
 
 	int version(int Major, int Minor);

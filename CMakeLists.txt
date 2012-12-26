@@ -14,9 +14,34 @@ endif(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 # Add GLEXT 
 
 find_package(OpenGL)
+if(WIN32)
+	set(GL_LIBRARY OpenGL32.lib)
+elseif(APPLE)
+elseif(UNIX)
+	set(GL_LIBRARY GL)
+endif(WIN32)
+
 if(NOT OPENGL_FOUND)
 	message("ERROR: OpenGL not found")
 endif(NOT OPENGL_FOUND)
+
+################################
+# Add GLFW
+
+set(GLFW_DIRECTORY glfw-3.0.0)
+
+if(MSVC AND NOT CMAKE_CL_64)
+	set(GLFW_BINARY_DIRECTORY "win32-vc")
+endif(MSVC AND NOT CMAKE_CL_64)
+
+if(MSVC AND CMAKE_CL_64)
+	set(GLFW_BINARY_DIRECTORY "win64-vc")
+endif(MSVC AND CMAKE_CL_64)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/lib/${GLFW_BINARY_DIRECTORY})
+
+set(GLFW_LIBRARY glfw3)
 
 ################################
 # Add GLEW
@@ -42,27 +67,6 @@ elseif(UNIX)
 endif(WIN32)
 
 ################################
-# Add OpenCL
-
-set(CL_DIRECTORY cl-1.2)
-
-if(MSVC AND NOT CMAKE_CL_64)
-	set(CL_LIBRARY_DIRECTORY "x86")
-	set(CL_BINARY_DIRECTORY "x86/OpenCL.dll")
-endif(MSVC AND NOT CMAKE_CL_64)
-
-if(MSVC AND CMAKE_CL_64)
-	set(CL_LIBRARY_DIRECTORY "x86_64")
-	set(CL_BINARY_DIRECTORY "x86_64/OpenCL.dll")
-endif(MSVC AND CMAKE_CL_64)
-
-set(CL_BINARY ${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY}/bin/${CL_BINARY_DIRECTORY}) 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CL_DIRECTORY}/lib/${CL_LIBRARY_DIRECTORY})
-
-set(CL_LIBRARY OpenCL)
-
-################################
 # Add GLM 
 
 set(GLM_DIRECTORY glm-0.9.4.1)
@@ -79,30 +83,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
 
 set(GLF_DIRECTORY glf)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/)
-
-################################
-# Add FreeGLUT
-
-set(FREEGLUT_DIRECTORY freeglut-2.8.0)
-
-if(MSVC AND NOT CMAKE_CL_64)
-	set(FREEGLUT_BINARY_DIRECTORY "win32-vc")
-endif(MSVC AND NOT CMAKE_CL_64)
-
-if(MSVC AND CMAKE_CL_64)
-	set(FREEGLUT_BINARY_DIRECTORY "win64-vc")
-endif(MSVC AND CMAKE_CL_64)
-
-add_definitions(-DFREEGLUT_STATIC)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEGLUT_DIRECTORY})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEGLUT_DIRECTORY}/lib/${FREEGLUT_BINARY_DIRECTORY})
-
-if(WIN32)
-	set(FREEGLUT_LIBRARY freeglut_static)
-elseif(UNIX)
-	find_package(GLUT)
-	set(FREEGLUT_LIBRARY glut)
-endif(WIN32)
 
 ################################
 # Add OpenGL ES
@@ -145,9 +125,8 @@ set(EGL_LIBRARY libEGL)
 
 set(BINARY_FILES 
 	${GL_LIBRARY} 
-	${CL_LIBRARY}
-	${FREEGLUT_LIBRARY} 
 	${GLEW_LIBRARY}
+	${GLFW_LIBRARY}
 	${GLM_LIBRARY} 
 	${GLI_LIBRARY})
 
@@ -224,7 +203,7 @@ function(createSample NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
-	target_link_libraries(${NAME} ${GL_LIBRARY} ${CL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
+	target_link_libraries(${NAME} ${BINARY_FILES})
 endfunction(createSample)
 
 function(createSampleWGL NAME)
@@ -246,7 +225,7 @@ function(createSampleWGL NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
-	target_link_libraries(${NAME} ${GL_LIBRARY} ${CL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
+	target_link_libraries(${NAME} ${BINARY_FILES})
 endfunction(createSampleWGL)
 
 ################################

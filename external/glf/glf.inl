@@ -1,8 +1,4 @@
-#if defined(__APPLE__)
-#include <GLUT/glut.h>
-#else
-#include <GL/freeglut.h>
-#endif
+#include <GL/glfw3.h>
 
 bool check();
 bool begin();
@@ -63,8 +59,8 @@ namespace glf
 
 	inline void swapBuffers()
 	{
-		glutSwapBuffers();
-		glGetError(); // 'glutSwapBuffers' generates an here with OpenGL 3 > core profile ... :/
+		glfwSwapBuffers(Window.Handle);
+		assert(glGetError() == GL_NO_ERROR); // 'glutSwapBuffers' generates an here with OpenGL 3 > core profile ... :/
 	}
 
 	inline bool checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire)
@@ -97,18 +93,21 @@ namespace glf
 #if (defined(WIN32))
 		glewInit();
 		glGetError();
-		
-		glVertexArrayBindVertexBufferEXT = (PFNGLVERTEXARRAYBINDVERTEXBUFFEREXTPROC)glutGetProcAddress("glVertexArrayBindVertexBufferEXT");
-		glVertexArrayVertexAttribFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBFORMATEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribFormatEXT");
-		glVertexArrayVertexAttribIFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBIFORMATEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribIFormatEXT");
-		glVertexArrayVertexAttribLFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBLFORMATEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribLFormatEXT");
-		glVertexArrayVertexAttribBindingEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBBINDINGEXTPROC)glutGetProcAddress("glVertexArrayVertexAttribBindingEXT");
-		glVertexArrayVertexBindingDivisorEXT = (PFNGLVERTEXARRAYBINDVERTEXBINDINGDIVISOREXTPROC)glutGetProcAddress("glVertexArrayVertexBindingDivisorEXT");
 
-		glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)glutGetProcAddress("glTexStorageSparseAMD");
-		glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)glutGetProcAddress("glTextureStorageSparseAMD");
+		glDebugMessageControlARB = (PFNGLDEBUGMESSAGECONTROLPROC)glfwGetProcAddress("glDebugMessageControlARB");
+		glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKPROC)glfwGetProcAddress("glDebugMessageCallbackARB");
 
-		glPopDebugGroup = (PFNGLPOPDEBUGGROUPPROC)glutGetProcAddress("glPopDebugGroup");
+		glVertexArrayBindVertexBufferEXT = (PFNGLVERTEXARRAYBINDVERTEXBUFFEREXTPROC)glfwGetProcAddress("glVertexArrayBindVertexBufferEXT");
+		glVertexArrayVertexAttribFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBFORMATEXTPROC)glfwGetProcAddress("glVertexArrayVertexAttribFormatEXT");
+		glVertexArrayVertexAttribIFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBIFORMATEXTPROC)glfwGetProcAddress("glVertexArrayVertexAttribIFormatEXT");
+		glVertexArrayVertexAttribLFormatEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBLFORMATEXTPROC)glfwGetProcAddress("glVertexArrayVertexAttribLFormatEXT");
+		glVertexArrayVertexAttribBindingEXT = (PFNGLVERTEXARRAYBINDVERTEXATTRIBBINDINGEXTPROC)glfwGetProcAddress("glVertexArrayVertexAttribBindingEXT");
+		glVertexArrayVertexBindingDivisorEXT = (PFNGLVERTEXARRAYBINDVERTEXBINDINGDIVISOREXTPROC)glfwGetProcAddress("glVertexArrayVertexBindingDivisorEXT");
+
+		glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)glfwGetProcAddress("glTexStorageSparseAMD");
+		glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)glfwGetProcAddress("glTextureStorageSparseAMD");
+
+		glPopDebugGroup = (PFNGLPOPDEBUGGROUPPROC)glfwGetProcAddress("glPopDebugGroup");
 #endif//WIN32
 	}
 
@@ -177,26 +176,6 @@ namespace glf
 		return Result;
 	}
 
-/*
-	inline std::string loadFile(std::string const & Filename)
-	{
-		std::ifstream stream(Filename.c_str(), std::ios::in);
-
-		if(!stream.is_open())
-			return "";
-
-		std::string Line = "";
-		std::string Text = "";
-
-		while(getline(stream, Line))
-			Text += "\n" + Line;
-
-		stream.close();
-
-		return Text;
-	}
-*/
-
 	#if !defined(__APPLE__)
 	static void GLAPIENTRY debugOutput
 	(
@@ -260,70 +239,64 @@ namespace glf
 /*
 	void checkDebugOutput()
 	{
-		   unsigned int count = 10; // max. num. of messages that will be read from the log
-		   int bufsize = 2048;
+			unsigned int count = 10; // max. num. of messages that will be read from the log
+			int bufsize = 2048;
 	 
-		   unsigned int* sources      = new unsigned int[count];
-		   unsigned int* types        = new unsigned int[count];
-		   unsigned int* ids   = new unsigned int[count];
-		   unsigned int* severities = new unsigned int[count];
-		   int* lengths = new int[count];
+			unsigned int* sources      = new unsigned int[count];
+			unsigned int* types        = new unsigned int[count];
+			unsigned int* ids   = new unsigned int[count];
+			unsigned int* severities = new unsigned int[count];
+			int* lengths = new int[count];
 	 
-		   char* messageLog = new char[bufsize];
+			char* messageLog = new char[bufsize];
 	 
-		   unsigned int retVal = glGetDebugMessageLogARB(count, bufsize, sources, types, ids, severities, lengths, messageLog);
-		   if(retVal > 0)
-		   {
-				 unsigned int pos = 0;
-				 for(unsigned int i=0; i<retVal; i++)
-				 {
+			unsigned int retVal = glGetDebugMessageLogARB(count, bufsize, sources, types, ids, severities, lengths, messageLog);
+			if(retVal > 0)
+			{
+					unsigned int pos = 0;
+					for(unsigned int i=0; i<retVal; i++)
+					{
 						debugOutput(sources[i], types[i], ids[i], severities[i], NULL, &messageLog[pos], NULL);
 						pos += lengths[i];
-				  }
-		   }
-		   delete [] sources;
-		   delete [] types;
-		   delete [] ids;
-		   delete [] severities;
-		   delete [] lengths;
-		   delete [] messageLog;
+					}
+			}
+			delete [] sources;
+			delete [] types;
+			delete [] ids;
+			delete [] severities;
+			delete [] lengths;
+			delete [] messageLog;
 	}
 */
 #endif
-	static void keyboard(unsigned char key, int x, int y)
+	static void cursor_position_callback(GLFWwindow window, int x, int y)
 	{
-		++Window.KeyPressed[32];
-
-		switch(key) 
-		{
-		case 27:
-			glutLeaveMainLoop();
-
-			break;
-		}
+		Window.MouseCurrent = glm::ivec2(x, y);
+		Window.TranlationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_LEFT ? Window.TranlationOrigin + (Window.MouseCurrent - Window.MouseOrigin) / 10.f : Window.TranlationOrigin;
+		Window.RotationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_RIGHT ? Window.RotationOrigin + (Window.MouseCurrent - Window.MouseOrigin) : Window.RotationOrigin;
 	}
 
-	static void mouse(int Button, int State, int x, int y)
+	static void mouse_button_callback(GLFWwindow window, int Button, int Action)
 	{
-		switch(State)
+		switch(Action)
 		{
-			case GLUT_DOWN:
+			case GLFW_PRESS:
 			{
-				Window.MouseOrigin = Window.MouseCurrent = glm::ivec2(x, y);
+				Window.MouseOrigin = Window.MouseCurrent;
 				switch(Button)
 				{
-					case GLUT_LEFT_BUTTON:
+					case GLFW_MOUSE_BUTTON_LEFT:
 					{
 						Window.MouseButtonFlags |= glf::MOUSE_BUTTON_LEFT;
 						Window.TranlationOrigin = Window.TranlationCurrent;
 					}
 					break;
-					case GLUT_MIDDLE_BUTTON:
+					case GLFW_MOUSE_BUTTON_MIDDLE:
 					{
 						Window.MouseButtonFlags |= glf::MOUSE_BUTTON_MIDDLE;
 					}
 					break;
-					case GLUT_RIGHT_BUTTON:
+					case GLFW_MOUSE_BUTTON_RIGHT:
 					{
 						Window.MouseButtonFlags |= glf::MOUSE_BUTTON_RIGHT;
 						Window.RotationOrigin = Window.RotationCurrent;
@@ -332,22 +305,22 @@ namespace glf
 				}
 			}
 			break;
-			case GLUT_UP:
+			case GLFW_RELEASE:
 			{
 				switch(Button)
 				{
-					case GLUT_LEFT_BUTTON:
+					case GLFW_MOUSE_BUTTON_LEFT:
 					{
 						Window.TranlationOrigin += (Window.MouseCurrent - Window.MouseOrigin) / 10.f;
 						Window.MouseButtonFlags &= ~glf::MOUSE_BUTTON_LEFT;
 					}
 					break;
-					case GLUT_MIDDLE_BUTTON:
+					case GLFW_MOUSE_BUTTON_MIDDLE:
 					{
 						Window.MouseButtonFlags &= ~glf::MOUSE_BUTTON_MIDDLE;
 					}
 					break;
-					case GLUT_RIGHT_BUTTON:
+					case GLFW_MOUSE_BUTTON_RIGHT:
 					{
 						Window.RotationOrigin += Window.MouseCurrent - Window.MouseOrigin;
 						Window.MouseButtonFlags &= ~glf::MOUSE_BUTTON_RIGHT;
@@ -357,25 +330,6 @@ namespace glf
 			}
 			break;
 		}
-	}
-
-	static void reshape(int w, int h)
-	{
-		Window.Size = glm::ivec2(w, h);
-	}
-
-	static void idle()
-	{
-#if defined(WIN32)
-		glutPostRedisplay();
-#endif
-	}
-
-	static void motion(int x, int y)
-	{
-		Window.MouseCurrent = glm::ivec2(x, y);
-		Window.TranlationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_LEFT ? Window.TranlationOrigin + (Window.MouseCurrent - Window.MouseOrigin) / 10.f : Window.TranlationOrigin;
-		Window.RotationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_RIGHT ? Window.RotationOrigin + (Window.MouseCurrent - Window.MouseOrigin) : Window.RotationOrigin;
 	}
 
 	static void displayProxy()
@@ -397,53 +351,52 @@ namespace glf
 		int Major, int Minor
 	)
 	{
-		glutInitWindowSize(Size.x, Size.y);
-		glutInitWindowPosition(64, 64);
-		glutInit(&argc, argv);
-		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);// | GLUT_MULTISAMPLE);
+		glfwInit();
+		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+		glfwWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
+		glfwWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
+		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#		if NDEBUG
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+#		else
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#		endif
+		Window.Handle = glfwCreateWindow(Size.x, Size.y, GLFW_WINDOWED, argv[0], NULL);
 
-		int WindowHandle = glutCreateWindow(argv[0]);
+		glfwMakeContextCurrent(Window.Handle);
+		glfwSwapInterval(1);
+		glfwSetInputMode(Window.Handle, GLFW_STICKY_KEYS, GL_TRUE);
+		glfwSetMouseButtonCallback(Window.Handle, mouse_button_callback);
+		glfwSetCursorPosCallback(Window.Handle, cursor_position_callback);
+
 #if !defined(__APPLE__)
 		glewInit();
+		glGetError();
 #endif//__APPLE__
-		glutDestroyWindow(WindowHandle);
 
-#if !defined(__APPLE__)
-		glutInitContextVersion(Major, Minor);
-		if(Profile == WGL_CONTEXT_ES2_PROFILE_BIT_EXT)
-			glutInitContextProfile(GLUT_ES_PROFILE);
-		else if(glf::version(Major, Minor) >= 320)
-		{
-			glutInitContextProfile(Profile); // GLUT_COMPATIBILITY_PROFILE GLUT_CORE_PROFILE
-#			if NDEBUG
-				if(Profile == GLUT_CORE_PROFILE)
-					glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
-#			else
-				glutInitContextFlags((Profile == GLUT_CORE_PROFILE ? GLUT_FORWARD_COMPATIBLE : 0) | GLUT_DEBUG);
-#			endif
-		}
-#endif//__APPLE__
-		
-		glutCreateWindow(argv[0]);
 		init();
 
-		if(begin())
-		{
-			glutDisplayFunc(displayProxy); 
-			glutReshapeFunc(glf::reshape);
-			glutMouseFunc(glf::mouse);
-			glutMotionFunc(glf::motion);
-			glutKeyboardFunc(glf::keyboard);
-			glutIdleFunc(glf::idle);
-#if !defined(__APPLE__)
-			glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
-#endif//__APPLE__
-			glutMainLoop();
+		begin();
 
-			return end() ? 0 : 1;
+		bool Exit(false);
+		while(!Exit)
+		{
+			display();
+			glfwPollEvents();
+
+			if (glfwGetKey(Window.Handle, GLFW_KEY_ESCAPE))
+				Exit = true;
+			if (glfwGetWindowParam(Window.Handle, GLFW_CLOSE_REQUESTED))
+				Exit = true;
 		}
 
-		return 1;
+		bool End = end();
+
+		glfwTerminate();
+
+		return End ? 0 : 1;
 	}
 
 	bool validateVAO(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
