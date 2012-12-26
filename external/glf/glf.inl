@@ -1,4 +1,4 @@
-#include <GL/glfw3.h>
+#include <GL/glfw.h>
 
 bool check();
 bool begin();
@@ -61,7 +61,7 @@ namespace glf
 
 	inline void swapBuffers()
 	{
-		glfwSwapBuffers(Window.Handle);
+		glfwSwapBuffers();
 		assert(glGetError() == GL_NO_ERROR); // 'glutSwapBuffers' generates an here with OpenGL 3 > core profile ... :/
 	}
 
@@ -271,14 +271,14 @@ namespace glf
 	}
 */
 #endif
-	static void cursor_position_callback(GLFWwindow window, int x, int y)
+	static void cursor_position_callback(int x, int y)
 	{
 		Window.MouseCurrent = glm::ivec2(x, y);
 		Window.TranlationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_LEFT ? Window.TranlationOrigin + (Window.MouseCurrent - Window.MouseOrigin) / 10.f : Window.TranlationOrigin;
 		Window.RotationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_RIGHT ? Window.RotationOrigin + (Window.MouseCurrent - Window.MouseOrigin) : Window.RotationOrigin;
 	}
 
-	static void mouse_button_callback(GLFWwindow window, int Button, int Action)
+	static void mouse_button_callback(int Button, int Action)
 	{
 		switch(Action)
 		{
@@ -354,24 +354,24 @@ namespace glf
 	)
 	{
 		glfwInit();
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-		glfwWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
-		glfwWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
-		//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+		glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
+		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
+		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
+		glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#		if NDEBUG
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-#		else
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#		endif
-		Window.Handle = glfwCreateWindow(Size.x, Size.y, GLFW_WINDOWED, argv[0], NULL);
+//#		if NDEBUG
+//			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+//#		else
+//			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+//#		endif
+		glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
 
-		glfwMakeContextCurrent(Window.Handle);
-		glfwSwapInterval(1);
-		glfwSetInputMode(Window.Handle, GLFW_STICKY_KEYS, GL_TRUE);
-		glfwSetMouseButtonCallback(Window.Handle, mouse_button_callback);
-		glfwSetCursorPosCallback(Window.Handle, cursor_position_callback);
+		//glfwMakeContextCurrent(Window.Handle);
+		//glfwSwapInterval(1);
+		//glfwSetInputMode(GLFW_STICKY_KEYS, GL_TRUE);
+		glfwSetMouseButtonCallback(mouse_button_callback);
+		//glfwSetCursorPosCallback(cursor_position_callback);
 
 #if !defined(__APPLE__)
 		glewInit();
@@ -388,10 +388,10 @@ namespace glf
 			display();
 			glfwPollEvents();
 
-			if (glfwGetKey(Window.Handle, GLFW_KEY_ESCAPE))
-				Exit = true;
-			if (glfwGetWindowParam(Window.Handle, GLFW_CLOSE_REQUESTED))
-				Exit = true;
+			//if (glfwGetKey(GLFW_KEY_ESCAPE))
+			//	Exit = true;
+			//if (glfwGetWindowParam(GLFW_CLOSE_REQUESTED))
+			//	Exit = true;
 		}
 
 		bool End = end();

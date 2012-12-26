@@ -17,11 +17,7 @@ function(glCreateSampleGTC NAME)
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
 	#add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
-if(MSVC)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
-else(MSVC)
-	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES} GLEW glut)
-endif(MSVC)
 endfunction(glCreateSampleGTC)
 
 #add_subdirectory(gl-alpha-to-coverage)

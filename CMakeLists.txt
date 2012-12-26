@@ -17,6 +17,7 @@ find_package(OpenGL)
 if(WIN32)
 	set(GL_LIBRARY OpenGL32.lib)
 elseif(APPLE)
+	set(GL_LIBRARY ${OPENGL_LIBRARY})
 elseif(UNIX)
 	set(GL_LIBRARY GL)
 endif(WIN32)
@@ -28,20 +29,14 @@ endif(NOT OPENGL_FOUND)
 ################################
 # Add GLFW
 
-set(GLFW_DIRECTORY glfw-3.0.0)
+find_library(GLFW_LIBRARY glfw)
 
-if(MSVC AND NOT CMAKE_CL_64)
-	set(GLFW_BINARY_DIRECTORY "win32-vc")
-endif(MSVC AND NOT CMAKE_CL_64)
-
-if(MSVC AND CMAKE_CL_64)
-	set(GLFW_BINARY_DIRECTORY "win64-vc")
-endif(MSVC AND CMAKE_CL_64)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/lib/${GLFW_BINARY_DIRECTORY})
-
-set(GLFW_LIBRARY glfw3)
+################################
+# Add Cocoa
+if(APPLE)
+	find_library(COCOA_LIBRARY cocoa)
+	find_library(IOKIT_LIBRARY iokit)
+endif()
 
 ################################
 # Add GLEW
@@ -62,9 +57,11 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/lib/${GL
 
 if(WIN32)
 	set(GLEW_LIBRARY glew32s)
-elseif(UNIX)
-	set(GLEW_LIBRARY GLEW)
-endif(WIN32)
+elseif(APPLE)
+	set(GLEW_LIBRARY )
+else()
+	set(GLEW_LIBRARY )
+endif()
 
 ################################
 # Add GLM 
@@ -128,7 +125,11 @@ set(BINARY_FILES
 	${GLEW_LIBRARY}
 	${GLFW_LIBRARY}
 	${GLM_LIBRARY} 
-	${GLI_LIBRARY})
+	${GLI_LIBRARY}
+	${COCOA_LIBRARY}
+	${IOKIT_LIBRARY})
+
+message(STATUS ${BINARY_FILES})
 
 ################################
 # Add output directory
@@ -203,11 +204,7 @@ function(createSample NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
-<<<<<<< HEAD
 	target_link_libraries(${NAME} ${BINARY_FILES})
-=======
-	target_link_libraries(${NAME} ${GL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
->>>>>>> 4.3.1
 endfunction(createSample)
 
 function(createSampleWGL NAME)

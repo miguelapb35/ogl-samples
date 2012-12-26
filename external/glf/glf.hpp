@@ -20,7 +20,8 @@
 #else
 #	error "Unsupported platform"
 #endif
-#include <GL/glfw3.h>
+#define GLFW_DLL
+#include <GL/glfw.h>
 
 #include "common.hpp"
 #include "vertex.hpp"
@@ -63,7 +64,6 @@ namespace glf
 		glm::vec2 RotationCurrent;
 		int MouseButtonFlags;
 		std::size_t KeyPressed[256];
-		GLFWwindow Handle;
 	};
 
 	int version(int Major, int Minor);
