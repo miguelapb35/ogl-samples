@@ -203,7 +203,11 @@ function(createSample NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
+<<<<<<< HEAD
 	target_link_libraries(${NAME} ${BINARY_FILES})
+=======
+	target_link_libraries(${NAME} ${GL_LIBRARY} ${GLEW_LIBRARY} ${FREEGLUT_LIBRARY} ${ASSIMP_LIBRARY})
+>>>>>>> 4.3.1
 endfunction(createSample)
 
 function(createSampleWGL NAME)
