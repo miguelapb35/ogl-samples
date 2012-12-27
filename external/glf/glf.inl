@@ -374,15 +374,19 @@ namespace glf
 		glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
-		//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#       if defined(__APPLE__)
+            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#       else
+            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#       endif
 		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#		if NDEBUG
+#		if defined(NDEBUG)
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 #		else
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #		endif
-		glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
+		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
+        assert(Result == GL_TRUE);
 
 		//glfwMakeContextCurrent(Window.Handle);
 		//glfwSwapInterval(1);
