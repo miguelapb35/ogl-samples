@@ -54,15 +54,15 @@ namespace glf
 		GLint Result(0);
 		glGetIntegerv(Value, &Result);
 		std::string Message(glf::format("%s: %d", String.c_str(), Result));
-#       if(!defined(__APPLE__))
-            glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
-#       endif
+#		if(!defined(__APPLE__))
+			glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
+#		endif
 	}
 
 	inline void swapBuffers()
 	{
 		glfwSwapBuffers();
-		assert(glGetError() == GL_NO_ERROR); // 'glutSwapBuffers' generates an here with OpenGL 3 > core profile ... :/
+		//assert(glGetError() == GL_NO_ERROR); // 'glutSwapBuffers' generates an here with OpenGL 3 > core profile ... :/
 	}
 
 	inline bool checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire)
@@ -334,6 +334,23 @@ namespace glf
 		}
 	}
 
+	static void GLFWCALL key_callback(int key, int action)
+	{
+		switch(action)
+		{
+			case GLFW_PRESS:
+			{
+				Window.KeyPressed[key] = 1;
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				Window.KeyPressed[key] = 0;
+				break;
+			}
+		}
+	}
+
 	static void displayProxy()
 	{
 		static int FrameID = 0;
@@ -357,21 +374,22 @@ namespace glf
 		glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
-		glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+		//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+		glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//#		if NDEBUG
-//			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-//#		else
-//			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-//#		endif
+#		if NDEBUG
+			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+#		else
+			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#		endif
 		glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
 
 		//glfwMakeContextCurrent(Window.Handle);
 		//glfwSwapInterval(1);
 		//glfwSetInputMode(GLFW_STICKY_KEYS, GL_TRUE);
 		glfwSetMouseButtonCallback(mouse_button_callback);
-		//glfwSetCursorPosCallback(cursor_position_callback);
+		glfwSetMousePosCallback(cursor_position_callback);
+		glfwSetKeyCallback(key_callback);
 
 #if !defined(__APPLE__)
 		glewInit();
@@ -382,8 +400,7 @@ namespace glf
 
 		begin();
 
-		bool Exit(false);
-		while(!Exit)
+		while(Window.KeyPressed[GLFW_KEY_ESC] != 1)
 		{
 			display();
 			glfwPollEvents();
@@ -408,7 +425,7 @@ namespace glf
 		GLint MaxVertexAttrib(0);
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttrib);
 
-        glBindVertexArray(VertexArrayName);
+		glBindVertexArray(VertexArrayName);
 		for(GLuint AttribLocation = 0; AttribLocation < glm::min(GLuint(MaxVertexAttrib), GLuint(Expected.size())); ++AttribLocation)
 		{
 			glf::vertexattrib VertexAttrib;

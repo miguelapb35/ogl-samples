@@ -20,7 +20,6 @@
 #else
 #	error "Unsupported platform"
 #endif
-#define GLFW_DLL
 #include <GL/glfw.h>
 
 #include "common.hpp"
