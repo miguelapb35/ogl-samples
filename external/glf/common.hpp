@@ -28,7 +28,7 @@
 
 namespace glf
 {
-#	ifdef WIN32
+#	if (defined(WIN32))// || defined(__APPLE__))
 		static std::string const DATA_DIRECTORY("../data/");
 #	else
 		static std::string const DATA_DIRECTORY("../../data/");
