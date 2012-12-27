@@ -398,9 +398,9 @@ namespace glf
 
 		init();
 
-		begin();
+		bool Result = begin();
 
-		while(Window.KeyPressed[GLFW_KEY_ESC] != 1)
+		while(Window.KeyPressed[GLFW_KEY_ESC] != 1 && Result)
 		{
 			display();
 			glfwPollEvents();
@@ -411,7 +411,7 @@ namespace glf
 			//	Exit = true;
 		}
 
-		bool End = end();
+		bool End = end() || Result;
 
 		glfwTerminate();
 
