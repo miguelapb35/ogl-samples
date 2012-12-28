@@ -374,11 +374,11 @@ namespace glf
 		glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
-#       if defined(__APPLE__)
-            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#       else
-            glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-#       endif
+#		if defined(__APPLE__)
+			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#		else
+			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#		endif
 		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #		if defined(NDEBUG)
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
@@ -386,7 +386,7 @@ namespace glf
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #		endif
 		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
-        assert(Result == GL_TRUE);
+		assert(Result == GL_TRUE);
 
 		//glfwMakeContextCurrent(Window.Handle);
 		//glfwSwapInterval(1);
@@ -402,9 +402,9 @@ namespace glf
 
 		init();
 
-		bool Result = begin();
+		bool Begin = begin();
 
-		while(Window.KeyPressed[GLFW_KEY_ESC] != 1 && Result)
+		while(Window.KeyPressed[GLFW_KEY_ESC] != 1 && Begin)
 		{
 			display();
 			glfwPollEvents();
@@ -415,7 +415,7 @@ namespace glf
 			//	Exit = true;
 		}
 
-		bool End = end() || Result;
+		bool End = end() && Begin;
 
 		glfwTerminate();
 

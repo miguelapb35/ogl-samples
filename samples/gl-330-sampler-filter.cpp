@@ -270,7 +270,7 @@ void display()
 
 	for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 	{
-		glUniform1i(UniformDiffuse, Index);
+		glUniform1i(UniformDiffuse, GLint(Index));
 		glScissor(Viewport[Index].x, Viewport[Index].y, Viewport[Index].z, Viewport[Index].w);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}

@@ -48,7 +48,7 @@ else()
 	message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 	message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
 
-	set(GLFW_LIBRARY )
+	set(GLFW_LIBRARY GLFW)
 endif()
 
 ################################

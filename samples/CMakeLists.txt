@@ -16,7 +16,9 @@ function(glCreateSampleGTC NAME)
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
-	#add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
+	if(WIN32)
+		add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
+	endif(WIN32)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
 endfunction(glCreateSampleGTC)
 
@@ -36,6 +38,20 @@ set(GL_VERSION_GTC 300)
 set(GL_SHADER_GTC image-2d.vert image-2d.frag)
 glCreateSampleGTC(fbo-multisample)
 glCreateSampleGTC(test-alpha)
+
+# OpenGL 3.2 samples
+set(GL_VERSION_GTC 320)
+
+set(GL_SHADER_GTC draw-instanced.vert draw-instanced.frag)
+glCreateSampleGTC(draw-instanced)
+set(GL_SHADER_GTC buffer-uniform.vert buffer-uniform.frag)
+glCreateSampleGTC(buffer-uniform)
+set(GL_SHADER_GTC fbo.vert fbo.frag texture-2d.vert texture-2d.frag)
+glCreateSampleGTC(fbo)
+set(GL_SHADER_GTC primitive-shading.vert primitive-shading.geom primitive-shading.frag)
+glCreateSampleGTC(primitive-shading)
+set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
+glCreateSampleGTC(texture-2d)
 
 # OpenGL 3.3 samples
 set(GL_VERSION_GTC 330)
