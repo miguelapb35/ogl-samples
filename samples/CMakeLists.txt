@@ -42,6 +42,8 @@ glCreateSampleGTC(test-alpha)
 # OpenGL 3.2 samples
 set(GL_VERSION_GTC 320)
 
+set(GL_SHADER_GTC draw-image-space.vert draw-image-space.frag)
+glCreateSampleGTC(draw-image-space)
 set(GL_SHADER_GTC draw-instanced.vert draw-instanced.frag)
 glCreateSampleGTC(draw-instanced)
 set(GL_SHADER_GTC draw-without-vertex-attrib.vert draw-without-vertex-attrib.frag)

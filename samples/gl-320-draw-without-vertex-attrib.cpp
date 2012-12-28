@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Draw Without Vertex Data";
+	std::string const SAMPLE_NAME = "OpenGL Draw Without Vertex Attribute";
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/draw-without-vertex-attrib.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/draw-without-vertex-attrib.frag");
 	int const SAMPLE_SIZE_WIDTH(640);

@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Draw Without Vertex Attrib");
+	std::string const SAMPLE_NAME("OpenGL Draw Without Vertex Attribute");
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/draw-without-vertex-attrib.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/draw-without-vertex-attrib.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
