@@ -44,8 +44,6 @@ set(GL_VERSION_GTC 320)
 
 set(GL_SHADER_GTC draw-instanced.vert draw-instanced.frag)
 glCreateSampleGTC(draw-instanced)
-set(GL_SHADER_GTC buffer-uniform.vert buffer-uniform.frag)
-glCreateSampleGTC(buffer-uniform)
 set(GL_SHADER_GTC fbo.vert fbo.frag texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(fbo)
 set(GL_SHADER_GTC primitive-shading.vert primitive-shading.geom primitive-shading.frag)

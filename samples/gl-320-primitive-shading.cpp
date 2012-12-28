@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Primitive smooth shading
-// 26/08/2009 - 19/10/2010
+// OpenGL Primitive Shading
+// 28/12/2012 - 28/12/2012
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,23 +13,18 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Primitive smooth shading";	
-	std::string const SAMPLE_VERT_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.vert");
-	std::string const SAMPLE_CONT_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.cont");
-	std::string const SAMPLE_EVAL_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.eval");
-	std::string const SAMPLE_GEOM_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.geom");
-	std::string const SAMPLE_FRAG_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.frag");
-	std::string const SAMPLE_VERT_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.vert");
-	std::string const SAMPLE_GEOM_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.geom");
-	std::string const SAMPLE_FRAG_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.frag");
+	char const * SAMPLE_NAME("OpenGL Primitive Shading");	
+	char const * SAMPLE_VERT_SHADER2("gl-320/primitive-shading.vert");
+	char const * SAMPLE_GEOM_SHADER2("gl-320/primitive-shading.geom");
+	char const * SAMPLE_FRAG_SHADER2("gl-320/primitive-shading.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(0);
+	int const SAMPLE_MAJOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 4;
+	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4ub);
 	glf::vertex_v2fc4ub const VertexData[VertexCount] =
 	{
@@ -37,17 +32,9 @@ namespace
 		glf::vertex_v2fc4ub(glm::vec2( 1.0f,-1.0f), glm::u8vec4(255, 255, 255, 255)),
 		glf::vertex_v2fc4ub(glm::vec2( 1.0f, 1.0f), glm::u8vec4(  0, 255,   0, 255)),
 		glf::vertex_v2fc4ub(glm::vec2(-1.0f, 1.0f), glm::u8vec4(  0,   0, 255, 255))
-		//glf::vertex_v2fc4ub(glm::vec2(-1.0f,-1.0f), glm::u8vec4(255, 148,  17, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2( 1.0f,-1.0f), glm::u8vec4( 17, 255,  58, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2( 1.0f, 1.0f), glm::u8vec4( 17, 219, 255, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2(-1.0f, 1.0f), glm::u8vec4(255,  17, 232, 255))
-		//glf::vertex_v2fc4ub(glm::vec2(-1.0f,-1.0f), glm::u8vec4(242, 136,   0, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2( 1.0f,-1.0f), glm::u8vec4(  0, 202,  36, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2( 1.0f, 1.0f), glm::u8vec4(  0, 147, 175, 255)),
-		//glf::vertex_v2fc4ub(glm::vec2(-1.0f, 1.0f), glm::u8vec4(185,   0, 166, 255))
 	};
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
@@ -55,13 +42,21 @@ namespace
 		2, 3, 0
 	};
 
-	GLuint ProgramName[2] = {0, 0};
-	GLuint ElementBufferName = 0;
-	GLuint ArrayBufferName = 0;
-	GLuint VertexArrayName = 0;
-	GLint UniformMVP[2] = {0, 0};
-	GLint UniformDiffuse[2] = {0, 0};
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			ELEMENT,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
 
+	GLuint ProgramName(0);
+	GLuint VertexArrayName(0);
+	std::vector<GLuint> BufferName(buffer::MAX);
+	GLint UniformTransform(-1);
 }//namespace
 
 bool initDebugOutput()
@@ -82,67 +77,33 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER1);
-		GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER1);
-		GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER1);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER1);
-
-		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
-		Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
-		Validated = Validated && glf::checkShader(EvalShader, SAMPLE_EVAL_SHADER1);
-		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER1);
-		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER1);
-
-		ProgramName[0] = glCreateProgram();
-		glAttachShader(ProgramName[0], VertShader);
-		glAttachShader(ProgramName[0], GeomShader);
-		glAttachShader(ProgramName[0], ContShader);
-		glAttachShader(ProgramName[0], EvalShader);
-		glAttachShader(ProgramName[0], FragShader);
-		glDeleteShader(VertShader);
-		glDeleteShader(GeomShader);
-		glDeleteShader(ContShader);
-		glDeleteShader(EvalShader);
-		glDeleteShader(FragShader);
-
-		glLinkProgram(ProgramName[0]);
-		Validated = Validated && glf::checkProgram(ProgramName[0]);
-	}
-
-	// Get variables locations
-	if(Validated)
-	{
-		UniformMVP[0] = glGetUniformLocation(ProgramName[0], "MVP");
-	}
-
-	// Create program
-	if(Validated)
-	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER2);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER2);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER2);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER2);
 
 		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
 		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
 		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
 
-		ProgramName[1] = glCreateProgram();
-		glAttachShader(ProgramName[1], VertShader);
-		glAttachShader(ProgramName[1], GeomShader);
-		glAttachShader(ProgramName[1], FragShader);
+		ProgramName = glCreateProgram();
+		glAttachShader(ProgramName, VertShader);
+		glAttachShader(ProgramName, GeomShader);
+		glAttachShader(ProgramName, FragShader);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShader);
 		glDeleteShader(GeomShader);
 		glDeleteShader(FragShader);
 
-		glLinkProgram(ProgramName[1]);
-		Validated = Validated && glf::checkProgram(ProgramName[1]);
+		glLinkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	// Get variables locations
 	if(Validated)
 	{
-		UniformMVP[1] = glGetUniformLocation(ProgramName[1], "MVP");
+		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
 	}
 
 	return Validated && glf::checkError("initProgram");
@@ -150,15 +111,16 @@ bool initProgram()
 
 bool initVertexArray()
 {
-	// Build a vertex array object
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");
@@ -166,16 +128,27 @@ bool initVertexArray()
 
 bool initBuffer()
 {
-	// Generate a buffer object
-	glGenBuffers(1, &ElementBufferName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glGenBuffers(1, &ArrayBufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	GLint UniformBufferOffset(0);
+
+	glGetIntegerv(
+		GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
+		&UniformBufferOffset);
+
+	GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	return glf::checkError("initBuffer");
 }
@@ -198,42 +171,45 @@ bool begin()
 
 bool end()
 {
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteBuffers(1, &ArrayBufferName);
-	glDeleteBuffers(1, &ElementBufferName);
-	glDeleteProgram(ProgramName[0]);
-	glDeleteProgram(ProgramName[1]);
+	glDeleteProgram(ProgramName);
 
 	return glf::checkError("end");
 }
 
 void display()
 {
-	glm::mat4 Projection = glm::perspective(45.0f, float(Window.Size.x / 2) / float(Window.Size.y), 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+	// Update of the uniform buffer
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
+			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 1,
+			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+		//glm::mat4 Projection = glm::perspectiveFov(45.f, 640.f, 480.f, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
+		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 Model = glm::mat4(1.0f);
+		
+		*Pointer = Projection * View * Model;
+
+		// Make sure the uniform buffer is uploaded
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+	}
 	
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
+	glUseProgram(ProgramName);
+	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
+
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-	glViewport(0, 0, Window.Size.x / 2, Window.Size.y);
-	glUseProgram(ProgramName[0]);
-	glUniformMatrix4fv(UniformMVP[0], 1, GL_FALSE, &MVP[0][0]);
-
-	glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
-	glDrawArraysInstanced(GL_PATCHES, 0, VertexCount, 1);
-	
-	glViewport(Window.Size.x / 2, 0, Window.Size.x / 2, Window.Size.y);
-	glUseProgram(ProgramName[1]);
-	glUniformMatrix4fv(UniformMVP[1], 1, GL_FALSE, &MVP[0][0]);
-
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
+	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 	
 	glf::checkError("display");
 	glf::swapBuffers();

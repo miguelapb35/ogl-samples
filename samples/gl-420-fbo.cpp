@@ -80,9 +80,9 @@ namespace
 	}//namespace pipeline
 
 	GLuint FramebufferName(0);
-	GLuint ProgramName[pipeline::MAX] = {0, 0};
-	GLuint VertexArrayName(0);
-	GLuint BufferName[buffer::MAX] = {0, 0, 0};
+	std::vector<GLuint> ProgramName(pipeline::MAX);
+	std::vector<GLuint> VertexArrayName(pipeline::MAX);
+	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
@@ -144,7 +144,7 @@ bool initProgram()
 
 bool initBuffer()
 {
-	glGenBuffers(buffer::MAX, BufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
@@ -183,6 +183,8 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
@@ -205,20 +207,12 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH24_STENCIL8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH_COMPONENT24, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -227,8 +221,8 @@ bool initTexture()
 
 bool initVertexArray()
 {
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+	glGenVertexArrays(pipeline::MAX, &VertexArrayName[0]);
+	glBindVertexArray(VertexArrayName[pipeline::TEXTURE]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -238,6 +232,9 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBindVertexArray(0);
+
+	glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
 	glBindVertexArray(0);
 
 	return true;
@@ -251,7 +248,6 @@ bool initFramebuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
 	if(glf::checkFramebuffer(FramebufferName))
 		return false;
@@ -297,9 +293,10 @@ bool end()
 	glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 	glDeleteProgram(ProgramName[pipeline::SPLASH]);
 	glDeleteProgram(ProgramName[pipeline::TEXTURE]);
-	glDeleteBuffers(buffer::MAX, BufferName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
+	glDeleteFramebuffers(1, &FramebufferName);
 	glDeleteTextures(texture::MAX, &TextureName[0]);
-	glDeleteVertexArrays(1, &VertexArrayName);
+	glDeleteVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
 	return Validated;
 }
@@ -333,15 +330,14 @@ void display()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	float Depth(1.0f);
-	int StencilRef(0);
-	glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
+	glClearBufferfv(GL_DEPTH , 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	// Bind rendering objects
 	glBindProgramPipeline(PipelineName[pipeline::TEXTURE]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName[pipeline::TEXTURE]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 	glDrawElementsInstancedBaseVertexBaseInstance(
@@ -350,13 +346,13 @@ void display()
 	glDisable(GL_DEPTH_TEST);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
 	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
-	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
 	glf::swapBuffers();
 }

@@ -1,20 +1,18 @@
-#version 330 core
-
-#define FRAG_COLOR		0
+#version 150 core
 
 precision highp float;
 precision highp int;
 
-uniform vec4 Diffuse;
+const vec4 Diffuse[2] = vec4[2](vec4(1.0, 0.5, 0.0, 1.0), vec4(0.0, 0.5, 1.0, 1.0));
 
 in block
 {
-	float Instance;
+	flat int Instance;
 } In;
 
-layout(location = FRAG_COLOR, index = 0) out vec4 Color;
+out vec4 Color;
 
 void main()
 {
-	Color = Diffuse * In.Instance * 0.25;
+	Color = Diffuse[In.Instance];
 }

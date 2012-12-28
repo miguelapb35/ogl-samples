@@ -84,6 +84,7 @@ namespace
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
+	GLint UniformTransform(0);
 }//namespace
 
 bool initProgram()
@@ -104,13 +105,16 @@ bool initProgram()
 		glAttachShader(ProgramName[program::TEXTURE], FragShaderName);
 		glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::TEXCOORD, "Texcoord");
-		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "FragColor");
+		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::TEXTURE]);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::TEXTURE]);
 	}
+
+	if(Validated)
+		UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
 
 	if(Validated)
 	{
@@ -124,7 +128,7 @@ bool initProgram()
 		ProgramName[program::SPLASH] = glCreateProgram();
 		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
 		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
-		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "FragColor");
+		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::SPLASH]);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
@@ -173,45 +177,39 @@ bool initTexture()
 
 	glGenTextures(texture::MAX, &TextureName[0]);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glCompressedTexSubImage2D(
+		glCompressedTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
-			0, 0,
+			GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+			0, 
 			GLsizei(Texture[Level].capacity()), 
 			Texture[Level].data());
 	}
 	
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+	glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH24_STENCIL8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+	glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(Window.Size.x), GLsizei(Window.Size.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -289,6 +287,7 @@ bool end()
 {
 	bool Validated(true);
 
+	glDeleteFramebuffers(1, &FramebufferName);
 	glDeleteProgram(ProgramName[program::SPLASH]);
 	glDeleteProgram(ProgramName[program::TEXTURE]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
@@ -327,11 +326,13 @@ void display()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	float Depth(1.0f);
-	glClearBufferfv(GL_DEPTH, 0, &Depth);
+	glClearBufferfv(GL_DEPTH , 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	// Bind rendering objects
 	glUseProgram(ProgramName[program::TEXTURE]);
+	glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, glf::semantic::uniform::TRANSFORM0);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glBindVertexArray(VertexArrayName[program::TEXTURE]);
@@ -343,11 +344,12 @@ void display()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(ProgramName[program::SPLASH]);
+
 	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(VertexArrayName[program::TEXTURE]);
+	glBindVertexArray(VertexArrayName[program::SPLASH]);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
 	glf::swapBuffers();
 }

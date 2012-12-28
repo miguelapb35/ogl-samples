@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Texture 2D");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-320/texture-2d.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-320/texture-2d.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	char const * SAMPLE_NAME("OpenGL Texture 2D");
+	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -80,8 +80,8 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
@@ -91,6 +91,7 @@ bool initProgram()
 		glAttachShader(ProgramName, FragShaderName);
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -136,7 +137,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture = gli::load(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE);
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -147,17 +148,12 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_2D, TextureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-/*
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-*/
-	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D,
@@ -170,7 +166,9 @@ bool initTexture()
 			GL_UNSIGNED_BYTE,
 			Texture[Level].data());
 	}
-	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	if(Texture.levels() == 1)
+		glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 

@@ -7,9 +7,9 @@ in block
 	vec2 Texcoord;
 } In;
 
-out vec4 FragColor;
+out vec4 Color;
 
 void main()
 {
-	FragColor = texture(Diffuse, In.Texcoord);
+	Color = texture(Diffuse, In.Texcoord);
 }

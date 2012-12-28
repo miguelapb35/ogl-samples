@@ -1,21 +1,34 @@
-#version 330 core
+#version 150 core
 
-#define ATTR_POSITION	0
-#define ATTR_COLOR		3
-#define ATTR_TEXCOORD	4
-#define FRAG_COLOR		0
-
+layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-in vec4 VertColor[];
-out vec4 GeomColor;
+in gl_PerVertex
+{
+	vec4 gl_Position;
+} gl_in[];
+
+in block
+{
+	vec4 Color;
+} In[];
+
+out gl_PerVertex 
+{
+	vec4 gl_Position;
+};
+
+out block
+{
+	vec4 Color;
+} Out;
 
 void main()
 {
 	for(int i = 0; i < gl_in.length(); ++i)
 	{
 		gl_Position = gl_in[i].gl_Position;
-		GeomColor = VertColor[i];
+		Out.Color = In[i].Color;
 		EmitVertex();
 	}
 	EndPrimitive();

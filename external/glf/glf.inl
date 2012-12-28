@@ -351,6 +351,12 @@ namespace glf
 		}
 	}
 
+	static int GLFWCALL close_callback()
+	{
+		Window.KeyPressed[GLFW_KEY_ESC] = 1;
+		return GL_FALSE;
+	}
+
 	static void displayProxy()
 	{
 		static int FrameID = 0;
@@ -388,11 +394,10 @@ namespace glf
 		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
 		assert(Result == GL_TRUE);
 
-		//glfwMakeContextCurrent(Window.Handle);
-		//glfwSwapInterval(1);
-		//glfwSetInputMode(GLFW_STICKY_KEYS, GL_TRUE);
+		glfwSetWindowTitle(argv[0]);
 		glfwSetMouseButtonCallback(mouse_button_callback);
 		glfwSetMousePosCallback(cursor_position_callback);
+		glfwSetWindowCloseCallback(close_callback);
 		glfwSetKeyCallback(key_callback);
 
 #if !defined(__APPLE__)
@@ -402,24 +407,23 @@ namespace glf
 
 		init();
 
-		bool Begin = begin();
+		bool Run = begin();
 
-		while(Window.KeyPressed[GLFW_KEY_ESC] != 1 && Begin)
+		if(Run)
 		{
-			display();
-			glfwPollEvents();
+			do
+			{
+				display();
+			}
+			while(Window.KeyPressed[GLFW_KEY_ESC] != 1);
 
-			//if (glfwGetKey(GLFW_KEY_ESCAPE))
-			//	Exit = true;
-			//if (glfwGetWindowParam(GLFW_CLOSE_REQUESTED))
-			//	Exit = true;
+			Run = end();
+			glfwCloseWindow();
 		}
-
-		bool End = end() && Begin;
 
 		glfwTerminate();
 
-		return End ? 0 : 1;
+		return Run ? 0 : 1;
 	}
 
 	bool validateVAO(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
