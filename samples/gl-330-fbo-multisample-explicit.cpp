@@ -187,7 +187,7 @@ bool initFramebuffer()
 		return false;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glGenTextures(1, &ColorTextureName);
+	glGenTextures(1, &ColorTextureName);
 	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 

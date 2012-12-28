@@ -182,7 +182,7 @@ bool initFramebuffer()
 		return glf::checkError("initFramebuffer");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glGenTextures(1, &ColorTextureName);
+	glGenTextures(1, &ColorTextureName);
 	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -201,7 +201,7 @@ bool initFramebuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -312,7 +312,7 @@ void display()
 	GLint const Border = 2;
 	int const Tile = 4;
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferRenderName);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferResolveName);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferResolveName);
 
 	for(int j = 0; j < Tile; ++j)
 	for(int i = 0; i < Tile; ++i)

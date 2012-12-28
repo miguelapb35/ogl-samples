@@ -134,17 +134,17 @@ bool initBuffer()
 	glGenBuffers(BUFFER_MAX, BufferName);
 
 	// Allocate and copy buffers memory
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F16]);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F16]);
 	glBufferData(GL_ARRAY_BUFFER, PositionSizeF16, PositionDataF16, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F32]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSizeF32, PositionDataF32, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F32]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSizeF32, PositionDataF32, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I8]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSizeI8, PositionDataI8, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I8]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSizeI8, PositionDataI8, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I32]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSizeI32, PositionDataI32, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I32]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSizeI32, PositionDataI32, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -155,7 +155,7 @@ bool initVertexArray()
 {
 	glGenVertexArrays(BUFFER_MAX, VertexArrayName);
 
-    glBindVertexArray(VertexArrayName[BUFFER_F16]);
+	glBindVertexArray(VertexArrayName[BUFFER_F16]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F16]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -163,7 +163,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-    glBindVertexArray(VertexArrayName[BUFFER_F32]);
+	glBindVertexArray(VertexArrayName[BUFFER_F32]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F32]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -171,7 +171,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-    glBindVertexArray(VertexArrayName[BUFFER_I8]);
+	glBindVertexArray(VertexArrayName[BUFFER_I8]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I8]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, sizeof(glm::u8vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -179,7 +179,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-    glBindVertexArray(VertexArrayName[BUFFER_I32]);
+	glBindVertexArray(VertexArrayName[BUFFER_I32]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I32]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_INT, GL_FALSE, sizeof(glm::i32vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -225,7 +225,7 @@ bool end()
 void display()
 {
 	// Compute the MVP (Model View Projection matrix)
-    glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 	glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
 	glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
 
