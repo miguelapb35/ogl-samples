@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Draw Without Vertex Data
-// 01/07/2011 - 01/07/2011
+// 01/07/2011 - 28/12/2012
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -19,7 +19,7 @@ namespace
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -54,6 +54,7 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
