@@ -104,23 +104,34 @@ bool initProgram()
 	{
 		TransformUniformMVP = glGetUniformLocation(TransformProgramName, "MVP");
 
+		GLint ActiveUniforms(0);
+		glGetProgramiv(TransformProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniforms);
+
 		char Name[64];
 		memset(Name, 0, 64);
 		GLsizei Length(0);
 		GLsizei Size(0);
 		GLenum Type(0);
 
-		glGetActiveUniform(
-			TransformProgramName,
- 			TransformUniformMVP,
- 			64,
-			&Length,
-			&Size,
-			&Type,
-			Name);
+		for(GLint i = 0; i < ActiveUniforms; ++i)
+		{
+			glGetActiveUniform(
+				TransformProgramName,
+				i,
+				64,
+				&Length,
+				&Size,
+				&Type,
+				Name);
 
-		Validated = Validated && (Size == 1) && (Type == GL_FLOAT_MAT4);
-		Validated = Validated && (TransformUniformMVP >= 0);
+			GLint Location = glGetUniformLocation(TransformProgramName, Name);
+
+			if(TransformUniformMVP == Location)
+			{
+				Validated = Validated && (Size == 1) && (Type == GL_FLOAT_MAT4);
+				Validated = Validated && (TransformUniformMVP >= 0);
+			}
+		}
 	}
 
 	// Create program
