@@ -16,7 +16,7 @@ namespace
 	std::string const SAMPLE_NAME("OpenGL Cube map");
 	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-cube.vert");
 	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-cube.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "cube.dds");
+	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "cube.dds");//compressed
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -151,23 +151,23 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture = gli::loadTextureCubeDDS9(TEXTURE_DIFFUSE);
+	gli::textureCube Texture(gli::loadStorageDDS9(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
-	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture[gli::POSITIVE_X][0].dimensions().x), GLsizei(Texture[gli::POSITIVE_X][0].dimensions().y));
+	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 
-	for(std::size_t Face = 0; Face < 6; ++Face)
+	for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexSubImage2D(
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
 			GLint(Level),
 			0, 0,
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].dimensions().x), 
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].dimensions().y), 
+			GLsizei(Texture[Face][Level].dimensions().x), 
+			GLsizei(Texture[Face][Level].dimensions().y), 
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].capacity()), 
-			Texture[gli::textureCube::face_type(Face)][Level].data());
+			GLsizei(Texture[Face][Level].size()), 
+			Texture[Face][Level].data());
 	}
 
 	return true;

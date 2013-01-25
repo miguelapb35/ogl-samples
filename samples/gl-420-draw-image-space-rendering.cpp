@@ -174,7 +174,11 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+	glTexStorage2D(GL_TEXTURE_2D, 
+		GLint(Texture.levels()), 
+		GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+		GLsizei(Texture.dimensions().x), 
+		GLsizei(Texture.dimensions().y));
 
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
@@ -185,7 +189,7 @@ bool initTexture()
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
-			GLsizei(Texture[Level].capacity()), 
+			GLsizei(Texture[Level].size()), 
 			Texture[Level].data());
 	}
 	

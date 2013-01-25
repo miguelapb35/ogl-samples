@@ -161,7 +161,7 @@ bool initTexture()
 
 		GLsizei LevelWidth(Texture[Level].dimensions().x / 2);
 		GLsizei LevelHeight(Texture[Level].dimensions().y / 2);
-		GLsizei LevelSize(glm::max(GLsizei(Texture[Level].capacity() / 4), DXT1BlockSize));
+		GLsizei LevelSize(glm::max(GLsizei(Texture[Level].size() / 4), DXT1BlockSize));
 		//GLsizei(DXT1BlockSize * GLsizei(glm::ceil(Texture[Level].dimensions().x / DXT1BlockWidth)) * GLsizei(glm::ceil(Texture[Level].dimensions().y / DXT1BlockHeight))),
 
 		if(LevelWidth < DXT1BlockWidth)
