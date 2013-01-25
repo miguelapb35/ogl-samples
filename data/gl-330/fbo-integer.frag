@@ -16,5 +16,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord) / 255.0 / 255.0;
+	Color = texture(Diffuse, In.Texcoord) / 255.0;
 }

@@ -1,7 +1,7 @@
 #version 330 core
 #define FRAG_COLOR		0
 
-uniform sampler2DMS Diffuse;
+uniform usampler2DMS Diffuse;
 
 in block
 {
@@ -15,5 +15,5 @@ void main()
 	// integer UV coordinates, needed for fetching multisampled texture
 	ivec2 Texcoord = ivec2(textureSize(Diffuse) * In.Texcoord);
 
-	Color = texelFetch(Diffuse, Texcoord, 0);
+	Color = texelFetch(Diffuse, Texcoord, 0) / 255.0;
 }

@@ -1,7 +1,7 @@
 #version 330 core
 #define FRAG_COLOR		0
 
-uniform sampler2DMS Diffuse;
+uniform usampler2DMS Diffuse;
 
 in block
 {
@@ -19,7 +19,7 @@ void main()
 	
 	// For each of the 4 samples
 	for(int i = 0; i < 4; ++i)
-		Temp += texelFetch(Diffuse, Texcoord, i);
+		Temp += texelFetch(Diffuse, Texcoord, i) / 255.0;
 
 	Color = Temp * 0.25;
 }

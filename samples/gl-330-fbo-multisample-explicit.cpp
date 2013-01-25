@@ -172,7 +172,7 @@ bool initFramebuffer()
 {
 	glGenTextures(1, &MultisampleTextureName);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, MultisampleTextureName);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
 
 	glGenTextures(1, &DepthTextureName);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, DepthTextureName);
@@ -187,9 +187,9 @@ bool initFramebuffer()
 		return false;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glGenTextures(1, &ColorTextureName);
+	glGenTextures(1, &ColorTextureName);
 	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
 
 	glGenFramebuffers(1, &FramebufferResolveName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferResolveName);
