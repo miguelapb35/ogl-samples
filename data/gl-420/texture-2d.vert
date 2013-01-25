@@ -26,11 +26,12 @@ out block
 
 void main()
 {
+/*
 	mediump int A = int(0);
 	lowp float B = float(A);
 	highp int C = int(B);
-
-	for(int i = C; i < int(COUNT); ++i)
+*/
+	for(int i = 0; i < int(COUNT); ++i)
 		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);
 
 	Out.Texcoord = Texcoord;
