@@ -130,7 +130,6 @@ bool initTexture()
 
 	// Set image
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
-	Texture = gli::generateMipmaps(Texture, 0);
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(

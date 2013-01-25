@@ -178,7 +178,7 @@ bool initTexture()
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			0, 
-			GLsizei(Texture[Level].capacity()), 
+			GLsizei(Texture[Level].size()), 
 			Texture[Level].data());
 	}
 

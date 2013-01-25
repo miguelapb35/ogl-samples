@@ -133,20 +133,20 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture = gli::loadTextureCubeDDS9(TEXTURE_DIFFUSE);
+	gli::textureCube Texture(gli::loadStorageDDS9(TEXTURE_DIFFUSE));
 
 	for(std::size_t Face = 0; Face < 6; ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glCompressedTexImage2D(
-			GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face,
+		glCompressedTexSubImage2D(
+			GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
 			GLint(Level),
-			GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].dimensions().x), 
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].dimensions().y), 
-			0, 
-			GLsizei(Texture[gli::textureCube::face_type(Face)][Level].capacity()), 
-			Texture[gli::textureCube::face_type(Face)][Level].data());
+			0, 0,
+			GLsizei(Texture[Face][Level].dimensions().x), 
+			GLsizei(Texture[Face][Level].dimensions().y), 
+			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+			GLsizei(Texture[Face][Level].size()), 
+			Texture[Face][Level].data());
 	}
 
 	return glf::checkError("initTexture2D");

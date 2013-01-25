@@ -198,7 +198,7 @@ bool initTexture()
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
-			GLsizei(Texture[Level].capacity()), 
+			GLsizei(Texture[Level].size()), 
 			Texture[Level].data());
 	}
 	

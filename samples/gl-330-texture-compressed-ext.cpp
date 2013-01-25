@@ -157,7 +157,7 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
@@ -182,7 +182,7 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
@@ -207,7 +207,7 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
@@ -232,7 +232,7 @@ bool initTexture2D()
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].capacity()), 
+				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}

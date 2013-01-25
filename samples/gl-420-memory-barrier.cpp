@@ -140,7 +140,7 @@ bool initTexture2D()
 	bool Validated(true);
 
 	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
-	FRAMEBUFFER_SIZE = Texture[0].dimensions();
+	FRAMEBUFFER_SIZE = Texture.dimensions();
 
 	glActiveTexture(GL_TEXTURE0);
 	if(!TextureName[texture::DIFFUSE])
@@ -165,7 +165,7 @@ bool initTexture2D()
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
-			GLsizei(Texture[Level].capacity()), 
+			GLsizei(Texture[Level].size()), 
 			Texture[Level].data());
 	}
 
