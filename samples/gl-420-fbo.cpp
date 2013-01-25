@@ -209,7 +209,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+	glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8_SNORM, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
