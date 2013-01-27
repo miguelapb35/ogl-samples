@@ -155,7 +155,7 @@ bool initTexture()
 {
 	glGenTextures(texture::MAX, TextureName);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
@@ -169,7 +169,7 @@ bool initTexture()
 			GL_RGB8, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			0,  
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
 			Texture[Level].data());

@@ -196,7 +196,9 @@ void display()
 
 	for(std::size_t i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
+		glViewport(
+			GLint(Viewport[i].x), GLint(Viewport[i].y), 
+			GLsizei(Viewport[i].z), GLsizei(Viewport[i].w));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[i]);

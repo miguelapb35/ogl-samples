@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Image Array 2D";
+	std::string const SAMPLE_NAME = "OpenGL Texture Array 2D";
 	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.vert");
 	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
@@ -115,7 +115,7 @@ bool initArrayBuffer()
 	return glf::checkError("initArrayBuffer");
 }
 
-bool initTextureArray2D()
+bool initTextureArray()
 {
 	GLint MaxTextureArrayLayers(0);
 	glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &MaxTextureArrayLayers);
@@ -128,18 +128,18 @@ bool initTextureArray2D()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DArrayName);
 
 	// Set image
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage3D(
 			GL_TEXTURE_2D_ARRAY, 
 			GLint(Level), 
 			GL_RGBA8, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			GLsizei(2), //depth
-			0,  
+			0,
 			GL_RGB, 
 			GL_UNSIGNED_BYTE, 
 			NULL);
@@ -150,12 +150,12 @@ bool initTextureArray2D()
 			0, // offset x 
 			0, // offset y 
 			0, // offset z
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			GLsizei(1), //depth
 			GL_RGB, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 
 		glTexSubImage3D(
 			GL_TEXTURE_2D_ARRAY, 
@@ -163,17 +163,17 @@ bool initTextureArray2D()
 			0, // offset x 
 			0, // offset y 
 			1, // offset z
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			GLsizei(1), //depth
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return glf::checkError("initTextureArray2D");
+	return glf::checkError("initTextureArray");
 }
 
 bool initVertexArray()
@@ -218,7 +218,7 @@ bool begin()
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
-		Validated = initTextureArray2D();
+		Validated = initTextureArray();
 	if(Validated)
 		Validated = initArrayBuffer();
 	if(Validated)

@@ -153,7 +153,7 @@ bool initSampler()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	glGenTextures(1, &TextureName);
 

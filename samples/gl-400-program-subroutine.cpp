@@ -167,53 +167,53 @@ bool initTexture()
 	glGenTextures(texture::MAX, TextureName);
 
 	{
-		gli::texture2D Image = gli::load(TEXTURE_DIFFUSE_RGB8);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_RGB8));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Image.levels()));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(
 				GL_TEXTURE_2D, 
 				GLint(Level), 
 				GL_RGB8, 
-				GLsizei(Image[Level].dimensions().x), 
-				GLsizei(Image[Level].dimensions().y), 
-				0,  
+				GLsizei(Texture[Level].dimensions().x), 
+				GLsizei(Texture[Level].dimensions().y), 
+				0,
 				GL_BGR, 
 				GL_UNSIGNED_BYTE, 
-				Image[Level].data());
+				Texture[Level].data());
 		}
 	}
 
 	{
-		gli::texture2D Image = gli::load(TEXTURE_DIFFUSE_DXT1);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT1));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Image.levels()));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-				GLsizei(Image[Level].dimensions().x), 
-				GLsizei(Image[Level].dimensions().y), 
+				GLsizei(Texture[Level].dimensions().x), 
+				GLsizei(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Image[Level].size()), 
-				Image[Level].data());
+				GLsizei(Texture[Level].size()), 
+				Texture[Level].data());
 		}
 	}
 

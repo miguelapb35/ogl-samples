@@ -143,7 +143,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, Texture2DName);
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BPTC);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BPTC));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::BPTC]);
@@ -170,7 +170,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::DXT5]);
@@ -197,7 +197,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGTC);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_RGTC));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGTC]);
@@ -224,7 +224,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_RGB8);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_RGB8));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGB8]);
@@ -277,7 +277,7 @@ bool initVertexArray()
 bool initSampler()
 {
 	glGenSamplers(1, &SamplerName);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

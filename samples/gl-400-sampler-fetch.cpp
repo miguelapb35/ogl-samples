@@ -132,21 +132,21 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE_DXT5);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
 			GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			0, 
-			GLsizei(Image[Level].size()), 
-			Image[Level].data());
+			GLsizei(Texture[Level].size()), 
+			Texture[Level].data());
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()

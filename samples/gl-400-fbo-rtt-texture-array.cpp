@@ -200,7 +200,9 @@ void display()
 
 	for(GLint i = 0; i < TEXTURE_MAX; ++i)
 	{
-		glViewport(Viewport[i].x, Viewport[i].y, Viewport[i].z, Viewport[i].w);
+		glViewport(
+			GLint(Viewport[i].x), GLint(Viewport[i].y), 
+			GLsizei(Viewport[i].z), GLsizei(Viewport[i].w));
 		glUniform1i(UniformLayer, i);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);

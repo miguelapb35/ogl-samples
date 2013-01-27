@@ -183,24 +183,24 @@ bool initTexture()
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(TEXTURE_MAX, Texture2DName);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	// Load image
 	glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_RGB8]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
 			GL_RGB8,
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
 	glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_R]);
@@ -226,11 +226,11 @@ bool initTexture()
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[i]);
 		glTexImage2D(
 			GL_TEXTURE_2D, 
-			0, 
-			GL_RED,
-			GLsizei(Image[0].dimensions().x), 
-			GLsizei(Image[0].dimensions().y), 
-			0,  
+			0,
+			GL_R8,
+			GLsizei(Texture.dimensions().x), 
+			GLsizei(Texture.dimensions().y), 
+			0,
 			GL_RGB, 
 			GL_UNSIGNED_BYTE, 
 			0);
@@ -263,7 +263,7 @@ bool initFramebuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));

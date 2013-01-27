@@ -133,7 +133,7 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture(gli::loadStorageDDS9(TEXTURE_DIFFUSE));
+	gli::textureCube Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	for(std::size_t Face = 0; Face < 6; ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -149,13 +149,13 @@ bool initTexture()
 			Texture[Face][Level].data());
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -158,7 +158,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -174,7 +174,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
@@ -187,7 +187,7 @@ bool initTexture()
 			GL_BGRA, GL_UNSIGNED_BYTE, 
 			Texture[Level].data());
 	}
-	ImageSize = glm::uvec2(Texture[0].dimensions());
+	ImageSize = glm::uvec2(Texture.dimensions());
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 

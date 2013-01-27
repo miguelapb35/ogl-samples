@@ -140,7 +140,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

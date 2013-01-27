@@ -166,7 +166,7 @@ namespace detail
 
 	inline GLuint createTexture2D(std::string const & Filename)
 	{
-		gli::texture2D Texture = gli::load(Filename);
+		gli::texture2D Texture(gli::loadStorageDDS(Filename));
 		if(Texture.empty())
 			return 0;
 
@@ -221,5 +221,6 @@ namespace detail
 
 		return Name;
 	}
+
 
 }//namespace gli

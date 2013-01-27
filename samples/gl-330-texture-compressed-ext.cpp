@@ -138,7 +138,7 @@ bool initTexture2D()
 
 	// Set image
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC1);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC1));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -163,7 +163,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC3);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC3));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC3]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -188,7 +188,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC4);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC4));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -213,7 +213,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC5);
+		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC5));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -231,7 +231,7 @@ bool initTexture2D()
 				GL_COMPRESSED_RG_RGTC2,
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
-				0, 
+				0,
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}

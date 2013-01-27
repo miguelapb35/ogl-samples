@@ -137,7 +137,7 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Image2DName);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(

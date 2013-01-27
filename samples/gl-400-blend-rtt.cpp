@@ -162,7 +162,7 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(TEXTURE_MAX, TextureName);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	// Load image
 	glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_RGB8]);
@@ -175,18 +175,18 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
 			GL_RGB8,
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_R]);
@@ -235,9 +235,9 @@ bool initTexture2D()
 			GL_TEXTURE_2D, 
 			0, 
 			GL_RED,
-			GLsizei(Image[0].dimensions().x), 
-			GLsizei(Image[0].dimensions().y), 
-			0,  
+			GLsizei(Texture.dimensions().x), 
+			GLsizei(Texture.dimensions().y), 
+			0,
 			GL_RGB, 
 			GL_UNSIGNED_BYTE, 
 			0);
