@@ -111,13 +111,13 @@ bool initBuffer()
 	bool Validated(true);
 
 	glGenBuffers(1, &BufferName[buffer::ELEMENT]);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &BufferName[buffer::VERTEX]);
-    glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, BufferName[buffer::VERTEX]);
-    glBufferData(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, VertexSize, VertexData, GL_STREAM_COPY);
+	glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, BufferName[buffer::VERTEX]);
+	glBufferData(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, VertexSize, VertexData, GL_STREAM_COPY);
 	glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
 	glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
 
@@ -128,7 +128,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -168,7 +168,7 @@ bool initVertexArray()
 	bool Validated(true);
 
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));

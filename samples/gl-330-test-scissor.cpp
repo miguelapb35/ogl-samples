@@ -123,22 +123,22 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
 			GL_RGB8,
-			GLsizei(Image[Level].dimensions().x),
-			GLsizei(Image[Level].dimensions().y),
+			GLsizei(Texture[Level].dimensions().x),
+			GLsizei(Texture[Level].dimensions().y),
 			0,
 			GL_BGR,
 			GL_UNSIGNED_BYTE,
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()

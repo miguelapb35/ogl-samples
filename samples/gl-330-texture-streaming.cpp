@@ -129,16 +129,16 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Set image
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGB, 
+			GL_RGB8, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			0,  
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
 			NULL);
@@ -154,7 +154,7 @@ bool initTexture2D()
 	memcpy(Pointer, Texture[0].data(), TextureSize);
 	glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), GL_BGR, GL_UNSIGNED_BYTE, NULL);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GL_BGR, GL_UNSIGNED_BYTE, NULL);
 	glDeleteBuffers(1, &PixelBuffer);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);

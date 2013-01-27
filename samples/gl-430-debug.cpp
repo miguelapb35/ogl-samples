@@ -161,7 +161,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

@@ -135,7 +135,7 @@ bool initTexture()
 	glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_DEPTH, DXT1BlockDepth);
 	glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_SIZE, DXT1BlockSize);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_BC1);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC1));
 	assert(!Texture.empty());
 
 	glGenTextures(1, &TextureName);

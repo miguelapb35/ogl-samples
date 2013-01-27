@@ -180,7 +180,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glGenTextures(texture::MAX, TextureName);

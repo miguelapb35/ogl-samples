@@ -140,19 +140,19 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Set image
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
 			GL_RGBA8, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
 			GL_BGRA, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);

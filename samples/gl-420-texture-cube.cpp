@@ -151,7 +151,7 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture(gli::loadStorageDDS9(TEXTURE_DIFFUSE));
+	gli::textureCube Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));

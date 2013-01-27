@@ -128,24 +128,24 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Set image
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, Image[Level].dimensions().x);
-		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Image[Level].dimensions().x) / 4);
-		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Image[Level].dimensions().y) / 4);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture[Level].dimensions().x);
+		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture[Level].dimensions().x) / 4);
+		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture[Level].dimensions().y) / 4);
 
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGBA8, 
-			GLsizei(Image[Level].dimensions().x) / 2, 
-			GLsizei(Image[Level].dimensions().y) / 2, 
-			0,  
+			GL_RGBA8,
+			GLsizei(Texture[Level].dimensions().x) / 2, 
+			GLsizei(Texture[Level].dimensions().y) / 2, 
+			0,
 			GL_BGRA, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -153,13 +153,13 @@ bool initTexture2D()
 	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));

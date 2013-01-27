@@ -154,7 +154,7 @@ bool initSampler()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 	if(Texture.empty())
 		return false;

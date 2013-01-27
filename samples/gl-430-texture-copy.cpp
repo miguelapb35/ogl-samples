@@ -116,7 +116,7 @@ bool initTexture()
 
 	glGenTextures(texture::MAX, TextureName);
 
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glActiveTexture(GL_TEXTURE0);

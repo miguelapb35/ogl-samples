@@ -150,19 +150,19 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
 			GL_RGB8, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 	glGenerateMipmap(GL_TEXTURE_2D); // Allocate all mipmaps memory
 

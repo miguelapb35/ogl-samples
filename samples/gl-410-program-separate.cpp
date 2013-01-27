@@ -156,7 +156,7 @@ bool initSeparateProgram()
 
 bool initTexture()
 {
-	gli::texture2D Texture = gli::load(TEXTURE_DIFFUSE_DXT5);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
 
 	glGenTextures(1, &TextureName);
 

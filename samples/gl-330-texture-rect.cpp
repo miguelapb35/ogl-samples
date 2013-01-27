@@ -129,30 +129,30 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Set image
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		assert(
-			Image[Level].dimensions().x <= std::size_t(TextureSize) && 
-			Image[Level].dimensions().y <= std::size_t(TextureSize));
+			Texture[Level].dimensions().x <= std::size_t(TextureSize) && 
+			Texture[Level].dimensions().y <= std::size_t(TextureSize));
 
 		glTexImage2D(
 			GL_TEXTURE_RECTANGLE, 
 			GLint(Level), 
 			GL_RGB8, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
 			//GLsizei(1), //depth
-			0,  
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()

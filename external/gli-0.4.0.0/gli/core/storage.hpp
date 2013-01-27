@@ -64,29 +64,7 @@ namespace gli
 		typedef glm::vec3 texcoord3_type;
 		typedef glm::vec4 texcoord4_type;
 		typedef std::size_t size_type;
-		typedef gli::format format_type;
-
-	private:
-		struct desc
-		{
-			desc();
-			desc(
-				size_type const & Layers,
-				size_type const & Faces,
-				size_type const & Levels,
-				format_type const & Format,
-				dimensions_type const & Dimensions, 
-				size_type const & BlockSize,
-				dimensions_type const & BlockDimensions);
-
-			size_type const Layers; 
-			size_type const Faces;
-			size_type const Levels;
-			format_type const Format;
-			dimensions_type const Dimensions;
-			size_type const BlockSize;
-			dimensions_type const BlockDimensions;
-		};
+		typedef format format_type;
 
 	public:
 		storage();
@@ -125,12 +103,30 @@ namespace gli
 		size_type layerSize() const;
 
 	private:
-		// storage is non copyable
-		storage(storage const &);
-		storage& operator=(storage const &);
+		struct impl
+		{
+			impl();
 
-		desc const Desc;
-		std::vector<glm::byte> Data;
+			explicit impl(
+				size_type const & Layers, 
+				size_type const & Faces,
+				size_type const & Levels,
+				format_type const & Format,
+				dimensions_type const & Dimensions,
+				size_type const & BlockSize,
+				dimensions_type const & BlockDimensions);
+
+			size_type const Layers; 
+			size_type const Faces;
+			size_type const Levels;
+			format_type const Format;
+			dimensions_type const Dimensions;
+			size_type const BlockSize;
+			dimensions_type const BlockDimensions;
+			std::vector<glm::byte> Data;
+		};
+
+		shared_ptr<impl> Impl;
 	};
 
 /*
@@ -184,6 +180,9 @@ namespace gli
 	std::size_t bits_per_pixel(format const & Format);
 	std::size_t component_count(format const & Format);
 	bool is_compressed(format const & Format);
+	internalFormat internal_format(format const & Format);
+	externalFormat external_format(format const & Format);
+	typeFormat type_format(format const & Format);
 }//namespace gli
 
 #include "storage.inl"

@@ -115,7 +115,7 @@ bool initArrayBuffer()
 	return glf::checkError("initArrayBuffer");;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	glGenTextures(1, &Texture2DName);
 
@@ -123,28 +123,28 @@ bool initTexture2D()
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
 
 	// Set image
-	gli::texture2D Image = gli::load(TEXTURE_DIFFUSE);
-	for(std::size_t Level = 0; Level < Image.levels(); ++Level)
+	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGB, 
-			GLsizei(Image[Level].dimensions().x), 
-			GLsizei(Image[Level].dimensions().y), 
-			0,  
+			GL_RGB8, 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
 			GL_BGR, 
 			GL_UNSIGNED_BYTE, 
-			Image[Level].data());
+			Texture[Level].data());
 	}
 
-	return glf::checkError("initTexture2D");
+	return glf::checkError("initTexture");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -171,7 +171,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 
 	return Validated && glf::checkError("begin");
 }
