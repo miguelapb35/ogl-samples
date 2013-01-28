@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Buffer Texture RGB
-// 04/06/2010 - 16/06/2010
+// OpenGL Texture Buffer
+// 28/01/2013 - 28/01/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,17 +13,17 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Buffer Texture RGB";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/texture-buffer.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/texture-buffer.frag");
-	int const SAMPLE_SIZE_WIDTH = 640;
-	int const SAMPLE_SIZE_HEIGHT = 480;
-	int const SAMPLE_MAJOR_VERSION = 4;
-	int const SAMPLE_MINOR_VERSION = 0;
+	std::string const SAMPLE_NAME("OpenGL Buffer Texture");
+	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/texture-buffer.vert");
+	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/texture-buffer.frag");
+	int const SAMPLE_SIZE_WIDTH(640);
+	int const SAMPLE_SIZE_HEIGHT(480);
+	int const SAMPLE_MAJOR_VERSION(4);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 4;
+	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const VertexData[VertexCount] = 
 	{
@@ -33,7 +33,7 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] = 
 	{
@@ -90,8 +90,6 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	glf::checkError("initProgram 0");
-
 	// Create program
 	if(Validated)
 	{
@@ -107,8 +105,6 @@ bool initProgram()
 		Validated = glf::checkProgram(ProgramName);
 	}
 
-	glf::checkError("initProgram 5");
-
 	// Get variables locations
 	if(Validated)
 	{
@@ -117,21 +113,11 @@ bool initProgram()
 		UniformDisplacement = glGetUniformLocation(ProgramName, "Displacement");
 	}
 
-	return Validated && glf::checkError("initProgram");
+	return Validated;
 }
 
 bool initBuffer()
 {
-	glGenBuffers(BUFFER_MAX, BufferName);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 	glm::vec3 Displacement[5] = 
 	{
 		glm::vec3( 0.1f, 0.3f,-1.0f), 
@@ -140,10 +126,6 @@ bool initBuffer()
 		glm::vec3( 0.3f, 0.2f, 0.5f),
 		glm::vec3( 0.1f,-0.3f, 1.0f)
 	};
-
-    glBindBuffer(GL_TEXTURE_BUFFER, BufferName[BUFFER_DISPLACEMENT]);
-    glBufferData(GL_TEXTURE_BUFFER, sizeof(Displacement), Displacement, GL_STATIC_DRAW);
-	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
 	glm::vec3 Diffuse[5] = 
 	{
@@ -154,39 +136,72 @@ bool initBuffer()
 		glm::vec3(0.0f, 0.0f, 1.0f)
 	};	
 
-    glBindBuffer(GL_TEXTURE_BUFFER, BufferName[BUFFER_DIFFUSE]);
-    glBufferData(GL_TEXTURE_BUFFER, sizeof(Diffuse), Diffuse, GL_STATIC_DRAW);
+	GLint TextureBufferOffsetAlignment(0);
+	glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &TextureBufferOffsetAlignment);
+
+	int DisplacementSize = sizeof(Displacement);
+	int DiffuseSize = sizeof(Diffuse);
+	int DisplacementMultiple = glm::higherMultiple(int(sizeof(Displacement)), int(TextureBufferOffsetAlignment));
+	int DiffuseMultiple = glm::higherMultiple(int(sizeof(Diffuse)), int(TextureBufferOffsetAlignment));
+
+	glGenBuffers(BUFFER_MAX, BufferName);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindBuffer(GL_TEXTURE_BUFFER, BufferName[BUFFER_DISPLACEMENT]);
+	glBufferData(GL_TEXTURE_BUFFER, TextureBufferOffsetAlignment + DisplacementMultiple, 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_TEXTURE_BUFFER, TextureBufferOffsetAlignment, sizeof(Displacement), Displacement);
+/*
+	void * PointerDisplacement = glMapBufferRange(GL_TEXTURE_BUFFER,
+		0, sizeof(Displacement), GL_MAP_WRITE_BIT );
+	memcpy(PointerDisplacement, &Displacement[0], sizeof(Displacement));
+	glUnmapBuffer(GL_TEXTURE_BUFFER);
+*/
 	glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
-	return glf::checkError("initBuffer");
+	glBindBuffer(GL_TEXTURE_BUFFER, BufferName[BUFFER_DIFFUSE]);
+	glBufferData(GL_TEXTURE_BUFFER, TextureBufferOffsetAlignment + DiffuseMultiple, 0, GL_STATIC_DRAW);
+	glBufferSubData(GL_TEXTURE_BUFFER, TextureBufferOffsetAlignment, sizeof(Diffuse), Diffuse);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+	return true;
 }
 
 bool initTexture()
 {
+	GLint TextureBufferOffsetAlignment(0);
+	glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &TextureBufferOffsetAlignment);
+
 	glGenTextures(TEXTURE_MAX, TextureName);
 
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DISPLACEMENT]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DISPLACEMENT]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DISPLACEMENT], TextureBufferOffsetAlignment, sizeof(glm::vec3) * 5);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);
 
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
-	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE]);
+	glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE], TextureBufferOffsetAlignment, sizeof(glm::vec3) * 5);
 	glBindTexture(GL_TEXTURE_BUFFER, 0);	
 
-	return glf::checkError("initTextureBuffer");
+	return true;
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-	return glf::checkError("initVertexArray");
+	return true;
 }
 
 bool begin()
@@ -206,7 +221,7 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 
-	return Validated && glf::checkError("begin");
+	return Validated;
 }
 
 bool end()
@@ -216,7 +231,7 @@ bool end()
 	glDeleteProgram(ProgramName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
-	return glf::checkError("end");
+	return true;
 }
 
 void display()
@@ -246,11 +261,10 @@ void display()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
 
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 5, 0);
 	
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
