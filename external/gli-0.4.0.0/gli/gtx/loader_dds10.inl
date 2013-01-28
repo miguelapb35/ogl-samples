@@ -26,11 +26,8 @@
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "loader_dds9.hpp"
-
 namespace gli{
-namespace detail{
-namespace dds10
+namespace detail
 {
 	// DDS Documentation
 	/*
@@ -38,116 +35,68 @@ namespace dds10
 		http://msdn.microsoft.com/en-us/library/bb943992.aspx
 	*/
 
-	#define GLI_MAKEFOURCC(ch0, ch1, ch2, ch3) \
-	  (glm::uint32)( \
-		(((glm::uint32)(glm::uint8)(ch3) << 24) & 0xFF000000) | \
-		(((glm::uint32)(glm::uint8)(ch2) << 16) & 0x00FF0000) | \
-		(((glm::uint32)(glm::uint8)(ch1) <<  8) & 0x0000FF00) | \
-		 ((glm::uint32)(glm::uint8)(ch0)        & 0x000000FF) )
-
-	enum DXGI_FORMAT 
+	enum ddsCubemapflag
 	{
-		DXGI_FORMAT_UNKNOWN                      = 0,
-		DXGI_FORMAT_R32G32B32A32_TYPELESS        = 1,
-		DXGI_FORMAT_R32G32B32A32_FLOAT           = 2,
-		DXGI_FORMAT_R32G32B32A32_UINT            = 3,
-		DXGI_FORMAT_R32G32B32A32_SINT            = 4,
-		DXGI_FORMAT_R32G32B32_TYPELESS           = 5,
-		DXGI_FORMAT_R32G32B32_FLOAT              = 6,
-		DXGI_FORMAT_R32G32B32_UINT               = 7,
-		DXGI_FORMAT_R32G32B32_SINT               = 8,
-		DXGI_FORMAT_R16G16B16A16_TYPELESS        = 9,
-		DXGI_FORMAT_R16G16B16A16_FLOAT           = 10,
-		DXGI_FORMAT_R16G16B16A16_UNORM           = 11,
-		DXGI_FORMAT_R16G16B16A16_UINT            = 12,
-		DXGI_FORMAT_R16G16B16A16_SNORM           = 13,
-		DXGI_FORMAT_R16G16B16A16_SINT            = 14,
-		DXGI_FORMAT_R32G32_TYPELESS              = 15,
-		DXGI_FORMAT_R32G32_FLOAT                 = 16,
-		DXGI_FORMAT_R32G32_UINT                  = 17,
-		DXGI_FORMAT_R32G32_SINT                  = 18,
-		DXGI_FORMAT_R32G8X24_TYPELESS            = 19,
-		DXGI_FORMAT_D32_FLOAT_S8X24_UINT         = 20,
-		DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS     = 21,
-		DXGI_FORMAT_X32_TYPELESS_G8X24_UINT      = 22,
-		DXGI_FORMAT_R10G10B10A2_TYPELESS         = 23,
-		DXGI_FORMAT_R10G10B10A2_UNORM            = 24,
-		DXGI_FORMAT_R10G10B10A2_UINT             = 25,
-		DXGI_FORMAT_R11G11B10_FLOAT              = 26,
-		DXGI_FORMAT_R8G8B8A8_TYPELESS            = 27,
-		DXGI_FORMAT_R8G8B8A8_UNORM               = 28,
-		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB          = 29,
-		DXGI_FORMAT_R8G8B8A8_UINT                = 30,
-		DXGI_FORMAT_R8G8B8A8_SNORM               = 31,
-		DXGI_FORMAT_R8G8B8A8_SINT                = 32,
-		DXGI_FORMAT_R16G16_TYPELESS              = 33,
-		DXGI_FORMAT_R16G16_FLOAT                 = 34,
-		DXGI_FORMAT_R16G16_UNORM                 = 35,
-		DXGI_FORMAT_R16G16_UINT                  = 36,
-		DXGI_FORMAT_R16G16_SNORM                 = 37,
-		DXGI_FORMAT_R16G16_SINT                  = 38,
-		DXGI_FORMAT_R32_TYPELESS                 = 39,
-		DXGI_FORMAT_D32_FLOAT                    = 40,
-		DXGI_FORMAT_R32_FLOAT                    = 41,
-		DXGI_FORMAT_R32_UINT                     = 42,
-		DXGI_FORMAT_R32_SINT                     = 43,
-		DXGI_FORMAT_R24G8_TYPELESS               = 44,
-		DXGI_FORMAT_D24_UNORM_S8_UINT            = 45,
-		DXGI_FORMAT_R24_UNORM_X8_TYPELESS        = 46,
-		DXGI_FORMAT_X24_TYPELESS_G8_UINT         = 47,
-		DXGI_FORMAT_R8G8_TYPELESS                = 48,
-		DXGI_FORMAT_R8G8_UNORM                   = 49,
-		DXGI_FORMAT_R8G8_UINT                    = 50,
-		DXGI_FORMAT_R8G8_SNORM                   = 51,
-		DXGI_FORMAT_R8G8_SINT                    = 52,
-		DXGI_FORMAT_R16_TYPELESS                 = 53,
-		DXGI_FORMAT_R16_FLOAT                    = 54,
-		DXGI_FORMAT_D16_UNORM                    = 55,
-		DXGI_FORMAT_R16_UNORM                    = 56,
-		DXGI_FORMAT_R16_UINT                     = 57,
-		DXGI_FORMAT_R16_SNORM                    = 58,
-		DXGI_FORMAT_R16_SINT                     = 59,
-		DXGI_FORMAT_R8_TYPELESS                  = 60,
-		DXGI_FORMAT_R8_UNORM                     = 61,
-		DXGI_FORMAT_R8_UINT                      = 62,
-		DXGI_FORMAT_R8_SNORM                     = 63,
-		DXGI_FORMAT_R8_SINT                      = 64,
-		DXGI_FORMAT_A8_UNORM                     = 65,
-		DXGI_FORMAT_R1_UNORM                     = 66,
-		DXGI_FORMAT_R9G9B9E5_SHAREDEXP           = 67,
-		DXGI_FORMAT_R8G8_B8G8_UNORM              = 68,
-		DXGI_FORMAT_G8R8_G8B8_UNORM              = 69,
-		DXGI_FORMAT_BC1_TYPELESS                 = 70,
-		DXGI_FORMAT_BC1_UNORM                    = 71,
-		DXGI_FORMAT_BC1_UNORM_SRGB               = 72,
-		DXGI_FORMAT_BC2_TYPELESS                 = 73,
-		DXGI_FORMAT_BC2_UNORM                    = 74,
-		DXGI_FORMAT_BC2_UNORM_SRGB               = 75,
-		DXGI_FORMAT_BC3_TYPELESS                 = 76,
-		DXGI_FORMAT_BC3_UNORM                    = 77,
-		DXGI_FORMAT_BC3_UNORM_SRGB               = 78,
-		DXGI_FORMAT_BC4_TYPELESS                 = 79,
-		DXGI_FORMAT_BC4_UNORM                    = 80,
-		DXGI_FORMAT_BC4_SNORM                    = 81,
-		DXGI_FORMAT_BC5_TYPELESS                 = 82,
-		DXGI_FORMAT_BC5_UNORM                    = 83,
-		DXGI_FORMAT_BC5_SNORM                    = 84,
-		DXGI_FORMAT_B5G6R5_UNORM                 = 85,
-		DXGI_FORMAT_B5G5R5A1_UNORM               = 86,
-		DXGI_FORMAT_B8G8R8A8_UNORM               = 87,
-		DXGI_FORMAT_B8G8R8X8_UNORM               = 88,
-		DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM   = 89,
-		DXGI_FORMAT_B8G8R8A8_TYPELESS            = 90,
-		DXGI_FORMAT_B8G8R8A8_UNORM_SRGB          = 91,
-		DXGI_FORMAT_B8G8R8X8_TYPELESS            = 92,
-		DXGI_FORMAT_B8G8R8X8_UNORM_SRGB          = 93,
-		DXGI_FORMAT_BC6H_TYPELESS                = 94,
-		DXGI_FORMAT_BC6H_UF16                    = 95,
-		DXGI_FORMAT_BC6H_SF16                    = 96,
-		DXGI_FORMAT_BC7_TYPELESS                 = 97,
-		DXGI_FORMAT_BC7_UNORM                    = 98,
-		DXGI_FORMAT_BC7_UNORM_SRGB               = 99,
-		DXGI_FORMAT_FORCE_UINT                   = 0xffffffffUL 
+		DDSCAPS2_CUBEMAP				= 0x00000200,
+		DDSCAPS2_CUBEMAP_POSITIVEX		= 0x00000400,
+		DDSCAPS2_CUBEMAP_NEGATIVEX		= 0x00000800,
+		DDSCAPS2_CUBEMAP_POSITIVEY		= 0x00001000,
+		DDSCAPS2_CUBEMAP_NEGATIVEY		= 0x00002000,
+		DDSCAPS2_CUBEMAP_POSITIVEZ		= 0x00004000,
+		DDSCAPS2_CUBEMAP_NEGATIVEZ		= 0x00008000,
+		DDSCAPS2_VOLUME					= 0x00200000
+	};
+
+	glm::uint32 const DDSCAPS2_CUBEMAP_ALLFACES = (
+		DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX |
+		DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY |
+		DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ);
+
+	enum ddsFlag
+	{
+		DDSD_CAPS			= 0x00000001,
+		DDSD_HEIGHT			= 0x00000002,
+		DDSD_WIDTH			= 0x00000004,
+		DDSD_PITCH			= 0x00000008,
+		DDSD_PIXELFORMAT	= 0x00001000,
+		DDSD_MIPMAPCOUNT	= 0x00020000,
+		DDSD_LINEARSIZE		= 0x00080000,
+		DDSD_DEPTH			= 0x00800000
+	};
+
+	enum ddsSurfaceflag
+	{
+		DDSCAPS_COMPLEX				= 0x00000008,
+		DDSCAPS_MIPMAP				= 0x00400000,
+		DDSCAPS_TEXTURE				= 0x00001000
+	};
+
+	struct ddsPixelFormat
+	{
+		glm::uint32 size; // 32
+		glm::uint32 flags;
+		glm::uint32 fourCC;
+		glm::uint32 bpp;
+		glm::uint32 redMask;
+		glm::uint32 greenMask;
+		glm::uint32 blueMask;
+		glm::uint32 alphaMask;
+	};
+
+	struct ddsHeader
+	{
+		glm::uint32 size;
+		glm::uint32 flags;
+		glm::uint32 height;
+		glm::uint32 width;
+		glm::uint32 pitch;
+		glm::uint32 depth;
+		glm::uint32 mipMapLevels;
+		glm::uint32 reserved1[11];
+		ddsPixelFormat format;
+		glm::uint32 surfaceFlags;
+		glm::uint32 cubemapFlags;
+		glm::uint32 reserved2[3];
 	};
 
 	enum D3D10_RESOURCE_DIMENSION 
@@ -166,46 +115,6 @@ namespace dds10
 		D3D10_RESOURCE_MISC_TEXTURECUBE         = 0x4L,
 		D3D10_RESOURCE_MISC_SHARED_KEYEDMUTEX   = 0x10L,
 		D3D10_RESOURCE_MISC_GDI_COMPATIBLE      = 0x20L 
-	};
-
-	enum dds_format
-	{
-		GLI_D3DFMT_R8G8B8               = 20,
-		GLI_D3DFMT_A8R8G8B8             = 21,
-		GLI_D3DFMT_X8R8G8B8             = 22,
-		GLI_D3DFMT_A8                   = 28,
-		GLI_D3DFMT_A2B10G10R10          = 31,
-		GLI_D3DFMT_A8B8G8R8             = 32,
-		GLI_D3DFMT_X8B8G8R8             = 33,
-		GLI_D3DFMT_G16R16               = 34,
-		GLI_D3DFMT_A2R10G10B10          = 35,
-		GLI_D3DFMT_A16B16G16R16         = 36,
-
-		GLI_D3DFMT_L8                   = 50,
-		GLI_D3DFMT_A8L8                 = 51,
-
-		GLI_D3DFMT_DXT1                 = GLI_MAKEFOURCC('D', 'X', 'T', '1'),
-		GLI_D3DFMT_DXT2                 = GLI_MAKEFOURCC('D', 'X', 'T', '2'),
-		GLI_D3DFMT_DXT3                 = GLI_MAKEFOURCC('D', 'X', 'T', '3'),
-		GLI_D3DFMT_DXT4                 = GLI_MAKEFOURCC('D', 'X', 'T', '4'),
-		GLI_D3DFMT_DXT5                 = GLI_MAKEFOURCC('D', 'X', 'T', '5'),
-		GLI_D3DFMT_DX10                 = GLI_MAKEFOURCC('D', 'X', '1', '0'),
-
-		GLI_D3DFMT_D32                  = 71,
-		GLI_D3DFMT_D24S8                = 75,
-		GLI_D3DFMT_D24X8                = 77,
-		GLI_D3DFMT_D16                  = 80,
-		GLI_D3DFMT_L16                  = 81,
-		GLI_D3DFMT_D32F_LOCKABLE        = 82,
-		GLI_D3DFMT_D24FS8               = 83,
-
-		GLI_D3DFMT_R16F                 = 111,
-		GLI_D3DFMT_G16R16F              = 112,
-		GLI_D3DFMT_A16B16G16R16F        = 113,
-
-		GLI_D3DFMT_R32F                 = 114,
-		GLI_D3DFMT_G32R32F              = 115,
-		GLI_D3DFMT_A32B32G32R32F        = 116
 	};
 
 	struct ddsHeader10
@@ -229,45 +138,44 @@ namespace dds10
 	{
 		switch(FourCC)
 		{
-		case GLI_FOURCC_DXT1:
+		case D3DFMT_DXT1:
 			return RGBA_DXT1;
-		case GLI_FOURCC_DXT2:
-		case GLI_FOURCC_DXT3:
+		case D3DFMT_DXT2:
+		case D3DFMT_DXT3:
 			return RGBA_DXT3;
-		case GLI_FOURCC_DXT4:
-		case GLI_FOURCC_DXT5:
+		case D3DFMT_DXT4:
+		case D3DFMT_DXT5:
 			return RGBA_DXT5;
-		case GLI_FOURCC_R16F:
+		case D3DFMT_R16F:
 			return R16F;
-		case GLI_FOURCC_G16R16F:
+		case D3DFMT_G16R16F:
 			return RG16F;
-		case GLI_FOURCC_A16B16G16R16F:
+		case D3DFMT_A16B16G16R16F:
 			return RGBA16F;
-		case GLI_FOURCC_R32F:
+		case D3DFMT_R32F:
 			return R32F;
-		case GLI_FOURCC_G32R32F:
+		case D3DFMT_G32R32F:
 			return RG32F;
-		case GLI_FOURCC_A32B32G32R32F:
+		case D3DFMT_A32B32G32R32F:
 			return RGBA32F;
-
-		case GLI_D3DFMT_R8G8B8:
+		case D3DFMT_R8G8B8:
 			return RGB8U;
-		case GLI_D3DFMT_A8R8G8B8:
-		case GLI_D3DFMT_X8R8G8B8:
-		case GLI_D3DFMT_A8B8G8R8:
-		case GLI_D3DFMT_X8B8G8R8:
+		case D3DFMT_A8R8G8B8:
+		case D3DFMT_X8R8G8B8:
+		case D3DFMT_A8B8G8R8:
+		case D3DFMT_X8B8G8R8:
 			return RGBA8U;
-		case GLI_D3DFMT_R5G6B5:
+		case D3DFMT_R5G6B5:
 			return R5G6B5;
-		case GLI_D3DFMT_A4R4G4B4:
-		case GLI_D3DFMT_X4R4G4B4:
+		case D3DFMT_A4R4G4B4:
+		case D3DFMT_X4R4G4B4:
 			return RGBA4;
-		case GLI_D3DFMT_G16R16:
+		case D3DFMT_G16R16:
 			return RG16U;
-		case GLI_D3DFMT_A16B16G16R16:
+		case D3DFMT_A16B16G16R16:
 			return RGBA16U;
-		case GLI_D3DFMT_A2R10G10B10:
-		case GLI_D3DFMT_A2B10G10R10:
+		case D3DFMT_A2R10G10B10:
+		case D3DFMT_A2B10G10R10:
 			return RGB10A2;
 		default:
 			assert(0);
@@ -384,7 +292,6 @@ namespace dds10
 
 		return Cast[Format];
 	}
-}//namespace dds10
 }//namespace detail
 
 	inline storage loadStorageDDS
@@ -399,7 +306,7 @@ namespace dds10
 			return storage();
 
 		detail::ddsHeader HeaderDesc;
-		detail::dds10::ddsHeader10 HeaderDesc10;
+		detail::ddsHeader10 HeaderDesc10;
 		char Magic[4]; 
 
 		//* Read magic number and check if valid .dds file 
@@ -409,54 +316,49 @@ namespace dds10
 
 		// Get the surface descriptor 
 		FileIn.read((char*)&HeaderDesc, sizeof(HeaderDesc));
-		if(HeaderDesc.format.flags & detail::GLI_DDPF_FOURCC && HeaderDesc.format.fourCC == detail::GLI_FOURCC_DX10)
+		if(HeaderDesc.format.flags & detail::DDPF_FOURCC && HeaderDesc.format.fourCC == detail::D3DFMT_DX10)
 			FileIn.read((char*)&HeaderDesc10, sizeof(HeaderDesc10));
 
-		detail::DDLoader Loader;
-		if(HeaderDesc.format.fourCC == detail::GLI_FOURCC_DX10)
-			Loader.Format = detail::dds10::format_dds2gli_cast(HeaderDesc10.dxgiFormat);
-		else if(HeaderDesc.format.flags & detail::GLI_DDPF_FOURCC)
-			Loader.Format = detail::dds10::format_fourcc2gli_cast(HeaderDesc.format.fourCC);
-		else if(HeaderDesc.format.flags & detail::GLI_DDPF_RGB)
+		gli::format Format(gli::FORMAT_NULL);
+		if(HeaderDesc.format.fourCC == detail::D3DFMT_DX10)
+			Format = detail::format_dds2gli_cast(HeaderDesc10.dxgiFormat);
+		else if(HeaderDesc.format.flags & detail::DDPF_FOURCC)
+			Format = detail::format_fourcc2gli_cast(HeaderDesc.format.fourCC);
+		else if(HeaderDesc.format.flags & detail::DDPF_RGB)
 		{
 			switch(HeaderDesc.format.bpp)
 			{
 			case 8:
-				Loader.Format = R8_UNORM;
+				Format = R8_UNORM;
 				break;
 			case 16:
-				Loader.Format = RG8_UNORM;
+				Format = RG8_UNORM;
 				break;
 			case 24:
-				Loader.Format = RGB8_UNORM;
+				Format = RGB8_UNORM;
 				break;
 			case 32:
-				Loader.Format = RGBA8_UNORM;
+				Format = RGBA8_UNORM;
 				break;
 			}
 		}
 		else
 			assert(0);
 
-		gli::format const Format = Loader.Format;
-
-		Loader.BlockSize = glm::uint32(gli::block_size(Format));
-		Loader.BPP = glm::uint32(gli::bits_per_pixel(Format));
-
 		std::streamoff Curr = FileIn.tellg();
 		FileIn.seekg(0, std::ios_base::end);
 		std::streamoff End = FileIn.tellg();
 		FileIn.seekg(Curr, std::ios_base::beg);
 
-		texture2D::size_type const MipMapCount = (HeaderDesc.flags & detail::GLI_DDSD_MIPMAPCOUNT) ? 
+		storage::size_type const MipMapCount = (HeaderDesc.flags & detail::DDSD_MIPMAPCOUNT) ? 
 			HeaderDesc.mipMapLevels : 1;
 
-		texture2D::size_type FaceCount(1);
-		if(HeaderDesc.flags & detail::GLI_DDSCAPS2_CUBEMAP)
-			FaceCount = int(glm::bitCount(HeaderDesc.flags & detail::GLI_DDSCAPS2_CUBEMAP_ALLFACES));
+		storage::size_type FaceCount(1);
+		if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_CUBEMAP)
+			FaceCount = int(glm::bitCount(HeaderDesc.cubemapFlags & detail::DDSCAPS2_CUBEMAP_ALLFACES));
 
-		texture2D::size_type DepthCount = 1;
-		if(HeaderDesc.cubemapFlags & detail::GLI_DDSCAPS2_VOLUME)
+		storage::size_type DepthCount = 1;
+		if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_VOLUME)
 				DepthCount = HeaderDesc.depth;
 
 		storage Storage(
@@ -471,6 +373,88 @@ namespace dds10
 		return Storage;
 	}
 
+	inline void saveStorageDDS
+	(
+		storage const & Storage, 
+		std::string const & Filename
+	)
+	{
+		if(Storage.empty())
+			return;
+
+		std::ofstream File(Filename.c_str(), std::ios::out | std::ios::binary);
+		if (!File)
+			return;
+
+		detail::format_desc const & Desc = detail::getFormatInfo(Storage.format());
+
+		char const * Magic = "DDS ";
+		File.write((char*)Magic, sizeof(char) * 4);
+
+		glm::uint32 Caps = detail::DDSD_CAPS | detail::DDSD_WIDTH | detail::DDSD_PIXELFORMAT | detail::DDSD_MIPMAPCOUNT;
+		Caps |= Storage.dimensions(0).y > 1 ? detail::DDSD_HEIGHT : 0;
+		Caps |= Storage.dimensions(0).z > 1 ? detail::DDSD_DEPTH : 0;
+		//Caps |= Storage.levels() > 1 ? detail::DDSD_MIPMAPCOUNT : 0;
+		Caps |= Desc.Compressed ? detail::DDSD_LINEARSIZE : detail::DDSD_PITCH;
+
+		detail::ddsHeader HeaderDesc;
+		memset(HeaderDesc.reserved1, 0, sizeof(HeaderDesc.reserved1));
+		memset(HeaderDesc.reserved2, 0, sizeof(HeaderDesc.reserved2));
+		HeaderDesc.size = sizeof(detail::ddsHeader);
+		HeaderDesc.flags = Caps;
+		HeaderDesc.width = Storage.dimensions(0).x;
+		HeaderDesc.height = Storage.dimensions(0).y;
+		HeaderDesc.pitch = glm::uint32(Desc.Compressed ? Storage.size() : 32);
+		HeaderDesc.depth = Storage.dimensions(0).z > 1 ? Storage.dimensions(0).z : 0;
+		HeaderDesc.mipMapLevels = glm::uint32(Storage.levels());
+		HeaderDesc.format.size = sizeof(detail::ddsPixelFormat);
+		HeaderDesc.format.flags = Storage.layers() > 1 ? detail::DDPF_FOURCC : Desc.Flags;
+		HeaderDesc.format.fourCC = Storage.layers() > 1 ? detail::DDPF_FOURCC : Desc.FourCC;
+		HeaderDesc.format.bpp = glm::uint32(Desc.BBP);
+		HeaderDesc.format.redMask = 0x000000ff;
+		HeaderDesc.format.greenMask = 0x0000ff00;
+		HeaderDesc.format.blueMask = 0x00ff0000;
+		HeaderDesc.format.alphaMask = 0xff000000;
+		//HeaderDesc.surfaceFlags = detail::DDSCAPS_TEXTURE | (Storage.levels() > 1 ? detail::DDSCAPS_MIPMAP : 0);
+		HeaderDesc.surfaceFlags = detail::DDSCAPS_TEXTURE | detail::DDSCAPS_MIPMAP;
+		HeaderDesc.cubemapFlags = 0;
+
+		// Cubemap
+		if(Storage.faces() > 1)
+		{
+			assert(Storage.faces() == 6);
+			HeaderDesc.cubemapFlags |= detail::DDSCAPS2_CUBEMAP_ALLFACES;
+		}
+
+		// Texture3D
+		if(Storage.dimensions(0).z > 1)
+			HeaderDesc.cubemapFlags |= detail::DDSCAPS2_VOLUME;
+
+
+		storage::size_type DepthCount = 1;
+		if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_VOLUME)
+				DepthCount = HeaderDesc.depth;
+
+		File.write((char*)&HeaderDesc, sizeof(HeaderDesc));
+
+		if(HeaderDesc.format.fourCC == detail::D3DFMT_DX10)
+		{
+			detail::ddsHeader10 HeaderDesc10;
+			HeaderDesc10.arraySize = glm::uint32(Storage.layers());
+			HeaderDesc10.resourceDimension = detail::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+			HeaderDesc10.miscFlag = 0;//Storage.levels() > 0 ? detail::D3D10_RESOURCE_MISC_GENERATE_MIPS : 0;
+			HeaderDesc10.dxgiFormat = detail::DXGI_FORMAT(Desc.Format);
+			HeaderDesc10.reserved = 0;
+			File.write((char*)&HeaderDesc10, sizeof(HeaderDesc10));
+		}
+
+		std::size_t Size = Storage.size();
+		File.write((char*)(Storage.data()), Size);
+
+		assert(!File.fail() && !File.bad());
+	}
+
+/*
 	inline void saveDDS
 	(
 		gli::texture2D const & Texture, 
@@ -508,11 +492,11 @@ namespace dds10
 		HeaderDesc.cubemapFlags = 0;
 		FileOut.write((char*)&HeaderDesc, sizeof(HeaderDesc));
 
-		detail::dds10::ddsHeader10 HeaderDesc10;
+		detail::ddsHeader10 HeaderDesc10;
 		HeaderDesc10.arraySize = glm::uint32(Texture.layers());
-		HeaderDesc10.resourceDimension = detail::dds10::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+		HeaderDesc10.resourceDimension = detail::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
 		HeaderDesc10.miscFlag = 0;//Image.levels() > 0 ? detail::D3D10_RESOURCE_MISC_GENERATE_MIPS : 0;
-		HeaderDesc10.dxgiFormat = detail::dds10::DXGI_FORMAT(Desc.FormatDDS);
+		HeaderDesc10.dxgiFormat = detail::DXGI_FORMAT(Desc.Format);
 		HeaderDesc10.reserved = 0;
 
 		FileOut.write((char*)&HeaderDesc10, sizeof(HeaderDesc10));
@@ -523,5 +507,5 @@ namespace dds10
 
 		FileOut.close ();
 	}
-
+*/
 }//namespace gli

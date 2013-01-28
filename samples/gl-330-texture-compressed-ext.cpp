@@ -153,7 +153,7 @@ bool initTexture2D()
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+				GLenum(gli::internal_format(Texture.format())),
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
@@ -178,7 +178,7 @@ bool initTexture2D()
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
+				GLenum(gli::internal_format(Texture.format())),
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
@@ -203,7 +203,7 @@ bool initTexture2D()
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GL_COMPRESSED_RED_RGTC1,
+				GLenum(gli::internal_format(Texture.format())),
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0, 
@@ -228,7 +228,7 @@ bool initTexture2D()
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GL_COMPRESSED_RG_RGTC2,
+				GLenum(gli::internal_format(Texture.format())),
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
 				0,

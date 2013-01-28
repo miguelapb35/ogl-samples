@@ -41,11 +41,15 @@ namespace gli
 		dimensions_type const & Dimensions
 	) :
 		Storage(
-			Layers, 1, Levels,
-			storage::dimensions_type(Dimensions, 1),
-			block_size(Format),
-			block_dimensions(Format)),
-		View(0, Layers - 1, 0, 0, 0, Levels - 1),
+			Layers,
+			1,
+			Levels,
+			Format,
+			storage::dimensions_type(Dimensions, 1)),
+		View(
+			0, Layers - 1,
+			0, 0,
+			0, Levels - 1),
 		Format(Format)
 	{}
 
@@ -68,6 +72,11 @@ namespace gli
 		View(View),
 		Format(Format)
 	{}
+
+	inline texture2DArray::operator storage() const
+	{
+		return this->Storage;
+	}
 
 	inline texture2D texture2DArray::operator[] 
 	(

@@ -40,11 +40,15 @@ namespace gli
 		dimensions_type const & Dimensions
 	) :
 		Storage(
-			1, 1, Levels,
-			storage::dimensions_type(Dimensions),
-			block_size(Format),
-			block_dimensions(Format)),
-		View(0, 0, 0, 0, 0, Levels - 1),
+			1,
+			1,
+			Levels,
+			Format,
+			storage::dimensions_type(Dimensions)),
+		View(
+			0, 0,
+			0, 0,
+			0, Levels - 1),
 		Format(Format)
 	{}
 
@@ -68,6 +72,11 @@ namespace gli
 		Format(Format)
 	{}
  
+	inline texture3D::operator storage() const
+	{
+		return this->Storage;
+	}
+
 	inline image texture3D::operator[]
 	(
 		texture3D::size_type const & Level
