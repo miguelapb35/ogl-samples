@@ -153,17 +153,20 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGBA_BPTC_UNORM_ARB, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, 
+			GLint(Texture.levels()), 
+			GLenum(gli::internal_format(Texture.format())), 
+			GLsizei(Texture.dimensions().x), 
+			GLsizei(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexSubImage2D(
-				GL_TEXTURE_2D,
+			glCompressedTexSubImage2D(GL_TEXTURE_2D,
 				GLint(Level),
 				0, 0,
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
-				GL_COMPRESSED_RGBA_BPTC_UNORM_ARB, 
+				GLenum(gli::internal_format(Texture.format())), 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
@@ -180,7 +183,11 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, 
+			GLint(Texture.levels()), 
+			GLenum(gli::internal_format(Texture.format())), 
+			GLsizei(Texture.dimensions().x), 
+			GLsizei(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -190,7 +197,7 @@ bool initTexture()
 				0, 0,
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 
+				GLenum(gli::internal_format(Texture.format())), 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
@@ -207,7 +214,11 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RED_RGTC1, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, 
+			GLint(Texture.levels()), 
+			GLenum(gli::internal_format(Texture.format())),
+			GLsizei(Texture.dimensions().x),
+			GLsizei(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -217,7 +228,7 @@ bool initTexture()
 				0, 0,
 				GLsizei(Texture[Level].dimensions().x), 
 				GLsizei(Texture[Level].dimensions().y), 
-				GL_COMPRESSED_RED_RGTC1, 
+				GLenum(gli::internal_format(Texture.format())), 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
 		}
@@ -234,18 +245,22 @@ bool initTexture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGB8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D,
+			GLint(Texture.levels()),
+			GLenum(gli::internal_format(Texture.format())),
+			GLsizei(Texture.dimensions().x), 
+			GLsizei(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
+				GL_TEXTURE_2D,
+				GLint(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				GL_BGRA, 
-				GL_UNSIGNED_BYTE, 
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
+				GLenum(gli::external_format(Texture.format())), 
+				GLenum(gli::type_format(Texture.format())),
 				Texture[Level].data());
 		}
 	}

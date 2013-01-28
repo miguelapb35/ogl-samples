@@ -82,58 +82,6 @@ namespace detail
 	//	GLI_D3DFMT_A32B32G32R32F        = 116
 	//};
 
-	enum ddsCubemapflag
-	{
-		GLI_DDSCAPS2_CUBEMAP				= 0x00000200,
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEX		= 0x00000400,
-		GLI_DDSCAPS2_CUBEMAP_NEGATIVEX		= 0x00000800,
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEY		= 0x00001000,
-		GLI_DDSCAPS2_CUBEMAP_NEGATIVEY		= 0x00002000,
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEZ		= 0x00004000,
-		GLI_DDSCAPS2_CUBEMAP_NEGATIVEZ		= 0x00008000,
-		GLI_DDSCAPS2_VOLUME					= 0x00200000
-	};
-
-	glm::uint32 const GLI_DDSCAPS2_CUBEMAP_ALLFACES = (
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEX | GLI_DDSCAPS2_CUBEMAP_NEGATIVEX |
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEY | GLI_DDSCAPS2_CUBEMAP_NEGATIVEY |
-		GLI_DDSCAPS2_CUBEMAP_POSITIVEZ | GLI_DDSCAPS2_CUBEMAP_NEGATIVEZ);
-
-	enum ddsSurfaceflag
-	{
-		GLI_DDSCAPS_COMPLEX				= 0x00000008,
-		GLI_DDSCAPS_MIPMAP				= 0x00400000,
-		GLI_DDSCAPS_TEXTURE				= 0x00001000
-	};
-
-	struct ddsPixelFormat
-	{
-		glm::uint32 size; // 32
-		glm::uint32 flags;
-		glm::uint32 fourCC;
-		glm::uint32 bpp;
-		glm::uint32 redMask;
-		glm::uint32 greenMask;
-		glm::uint32 blueMask;
-		glm::uint32 alphaMask;
-	};
-
-	struct ddsHeader
-	{
-		glm::uint32 size;
-		glm::uint32 flags;
-		glm::uint32 height;
-		glm::uint32 width;
-		glm::uint32 pitch;
-		glm::uint32 depth;
-		glm::uint32 mipMapLevels;
-		glm::uint32 reserved1[11];
-		ddsPixelFormat format;
-		glm::uint32 surfaceFlags;
-		glm::uint32 cubemapFlags;
-		glm::uint32 reserved2[3];
-	};
-
 	glm::uint32 const GLI_D3DFMT_R8G8B8  = 20;
 	glm::uint32 const GLI_D3DFMT_A8R8G8B8 = 21;
 	glm::uint32 const GLI_D3DFMT_X8R8G8B8 = 22;
@@ -186,15 +134,6 @@ namespace detail
 	//glm::uint32 const GLI_DDPF_BUMPLUMINANCE                        = 0x00040000; // Use this flag for luminance-only or luminance+alpha surfaces, the bit depth is then ddpf.dwLuminanceBitCount.
 	//glm::uint32 const GLI_DDPF_BUMPDUDV                             = 0x00080000; // Bump map dUdV data in the pixel format is valid.
 
-	glm::uint32 const GLI_DDSD_CAPS				= 0x00000001;
-	glm::uint32 const GLI_DDSD_HEIGHT			= 0x00000002;
-	glm::uint32 const GLI_DDSD_WIDTH			= 0x00000004;
-	glm::uint32 const GLI_DDSD_PITCH			= 0x00000008;
-	glm::uint32 const GLI_DDSD_PIXELFORMAT		= 0x00001000;
-	glm::uint32 const GLI_DDSD_MIPMAPCOUNT		= 0x00020000;
-	glm::uint32 const GLI_DDSD_LINEARSIZE		= 0x00080000;
-	glm::uint32 const GLI_DDSD_DEPTH			= 0x00800000;
-
 	struct DDLoader
 	{
 		glm::uint32 BlockSize;
@@ -209,26 +148,19 @@ namespace detail
 		FORMAT_FOURCC
 	};
 
-	inline glm::uint32 getFormatFourCC(gli::texture2D const & Image)
+	inline glm::uint32 getFormatFourCC(format const & Format)
 	{
-		switch(Image.format())
+		switch(Format)
 		{
 		default:
-			return 0;
+			return GLI_FOURCC_DX10;
+		case RGB_DXT1:
 		case RGBA_DXT1:
 			return GLI_FOURCC_DXT1;
 		case RGBA_DXT3:
 			return GLI_FOURCC_DXT3;
 		case RGBA_DXT5:
 			return GLI_FOURCC_DXT5;
-		case R_ATI1N_UNORM:
-		case R_ATI1N_SNORM:
-		case RG_ATI2N_UNORM:
-		case RG_ATI2N_SNORM:
-		case RGB_BP_UNSIGNED_FLOAT:
-		case RGB_BP_SIGNED_FLOAT:
-		case RGB_BP_UNORM:
-			return GLI_FOURCC_DX10;
 		case R16F:
 			return GLI_FOURCC_R16F;
 		case RG16F:
@@ -241,14 +173,15 @@ namespace detail
 			return GLI_FOURCC_G32R32F;
 		case RGBA32F:
 			return GLI_FOURCC_A32B32G32R32F;
+			return GLI_FOURCC_A32B32G32R32F;
 		}
 	}
 
-	inline glm::uint32 getFormatFlags(gli::texture2D const & Image)
+	inline glm::uint32 getFormatFlags(format const & Format)
 	{
 		glm::uint32 Result = 0;
 
-		switch(Image.format())
+		switch(Format)
 		{
 		default: 
 			break;
@@ -313,7 +246,7 @@ namespace detail
 		return Result;
 	}
 }//namespace detail
-
+/*
 	inline void saveDDS9
 	(
 		texture2D const & Texture, 
@@ -340,8 +273,8 @@ namespace detail
 		HeaderDesc.depth = 0;
 		HeaderDesc.mipMapLevels = glm::uint32(Texture.levels());
 		HeaderDesc.format.size = sizeof(detail::ddsPixelFormat);
-		HeaderDesc.format.flags = detail::getFormatFlags(Texture);
-		HeaderDesc.format.fourCC = detail::getFormatFourCC(Texture);
+		HeaderDesc.format.flags = detail::getFormatFlags(Texture.format());
+		HeaderDesc.format.fourCC = detail::getFormatFourCC(Texture.format());
 		HeaderDesc.format.bpp = glm::uint32(Desc.BBP);
 		HeaderDesc.format.redMask = 0;
 		HeaderDesc.format.greenMask = 0;
@@ -363,6 +296,7 @@ namespace detail
 
 		FileOut.close ();
 	}
+*/
 /*
 	inline void saveTextureCubeDDS9
 	(
