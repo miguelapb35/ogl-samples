@@ -5,6 +5,7 @@
 #define TEXCOORD		4
 #define FRAG_COLOR		0
 
+//equal_spacing fractional_even_spacing fractional_odd_spacing
 layout(quads, equal_spacing, ccw) in;
 
 in block

@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Framebuffer Multisample
-// 01/09/2009 - 27/06/2010
+// 28/01/2013 - 28/01/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Framebuffer Multisample";	
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/fbo-mipmaps.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/fbo-mipmaps.frag");
+	std::string const SAMPLE_NAME("OpenGL Framebuffer Multisample");	
+	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/fbo-integer-render.vert");
+	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/fbo-integer-render.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -26,7 +26,7 @@ namespace
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
@@ -38,8 +38,20 @@ namespace
 		glf::vertex_v2fv2f(glm::vec2(-4.0f,-3.0f), glm::vec2(0.0f, 1.0f))
 	};
 
+	namespace program
+	{
+		enum type
+		{
+			RENDER,
+			SPLASH,
+			MAX
+		};
+	}//namespace buffer
+
 	GLuint VertexArrayName = 0;
-	GLuint ProgramName = 0;
+	std::vector<GLuint> ProgramName(program::MAX);
+	std::vector<GLuint> UniformMVP(program::MAX);
+	std::vector<GLuint> UniformDiffuse(program::MAX);
 
 	GLuint BufferName = 0;
 	GLuint Texture2DName = 0;
@@ -50,10 +62,6 @@ namespace
 	
 	GLuint FramebufferRenderName = 0;
 	GLuint FramebufferResolveName = 0;
-
-	GLint UniformMVP = 0;
-	GLint UniformDiffuse = 0;	
-
 }//namespace
 
 bool initDebugOutput()
@@ -100,20 +108,45 @@ bool initProgram()
 		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
+		ProgramName[program::RENDER] = glCreateProgram();
+		glAttachShader(ProgramName[program::RENDER], VertexShaderName);
+		glAttachShader(ProgramName[program::RENDER], FragmentShaderName);
 		glDeleteShader(VertexShaderName);
 		glDeleteShader(FragmentShaderName);
 
-		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+		glLinkProgram(ProgramName[program::RENDER]);
+		Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
 	}
 
 	if(Validated)
 	{
-		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		UniformMVP[program::RENDER] = glGetUniformLocation(ProgramName[program::RENDER], "MVP");
+		UniformDiffuse[program::RENDER] = glGetUniformLocation(ProgramName[program::RENDER], "Diffuse");
+	}
+
+	// Create program
+	if(Validated)
+	{
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+
+		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+
+		ProgramName[program::SPLASH] = glCreateProgram();
+		glAttachShader(ProgramName[program::SPLASH], VertexShaderName);
+		glAttachShader(ProgramName[program::SPLASH], FragmentShaderName);
+		glDeleteShader(VertexShaderName);
+		glDeleteShader(FragmentShaderName);
+
+		glLinkProgram(ProgramName[program::SPLASH]);
+		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
+	}
+
+	if(Validated)
+	{
+		UniformMVP[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "MVP");
+		UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
 	}
 
 	return Validated && glf::checkError("initProgram");
@@ -135,8 +168,6 @@ bool initTexture2D()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Required AMD bug
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Required AMD bug
 
 	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -158,11 +189,21 @@ bool initTexture2D()
 
 bool initFramebuffer()
 {
+	GLint MaxSampleMaskWords(0);
+	GLint MaxColorTextureSamples(0);
+	GLint MaxDepthTextureSamples(0);
+	GLint MaxIntegerSamples(0);
+
+	glGetIntegerv(GL_MAX_SAMPLE_MASK_WORDS, &MaxSampleMaskWords); 
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &MaxColorTextureSamples); 
+	glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
+	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
+
 	glGenTextures(1, &MultisampleTextureName);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, MultisampleTextureName);
 
 	// The second parameter is the number of samples.
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, MaxIntegerSamples, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
 
 	glGenFramebuffers(1, &FramebufferRenderName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
@@ -174,7 +215,7 @@ bool initFramebuffer()
 
 	glGenTextures(1, &ColorTextureName);
 	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
 
 	glGenFramebuffers(1, &FramebufferResolveName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferResolveName);
@@ -229,7 +270,8 @@ bool begin()
 bool end()
 {
 	glDeleteBuffers(1, &BufferName);
-	glDeleteProgram(ProgramName);
+	glDeleteProgram(ProgramName[program::RENDER]);
+	glDeleteProgram(ProgramName[program::SPLASH]);
 	glDeleteSamplers(1, &SamplerName);
 	glDeleteTextures(1, &Texture2DName);
 	glDeleteTextures(1, &ColorTextureName);
@@ -249,7 +291,10 @@ void renderFBO(GLuint Framebuffer)
 	glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Perspective * View * Model;
-	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+
+	glUseProgram(ProgramName[program::RENDER]);
+	glUniform1i(UniformDiffuse[program::RENDER], 0);
+	glUniformMatrix4fv(UniformMVP[program::RENDER], 1, GL_FALSE, &MVP[0][0]);
 
 	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
@@ -274,7 +319,9 @@ void renderFB(GLuint Texture2DName)
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Perspective * View * Model;
 
-	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+	glUseProgram(ProgramName[program::SPLASH]);
+	glUniform1i(UniformDiffuse[program::SPLASH], 0);
+	glUniformMatrix4fv(UniformMVP[program::SPLASH], 1, GL_FALSE, &MVP[0][0]);
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -294,9 +341,6 @@ void display()
 	// Clear the framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-
-	glUseProgram(ProgramName);
-	glUniform1i(UniformDiffuse, 0);
 
 	// Pass 1
 	// Render the scene in a multisampled framebuffer

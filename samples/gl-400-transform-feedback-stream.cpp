@@ -13,7 +13,7 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Transform Feedback Stream";
+	std::string const SAMPLE_NAME("OpenGL Transform Feedback Stream");
 	std::string const VERT_SHADER_SOURCE_TRANSFORM(glf::DATA_DIRECTORY + "gl-400/transform-stream.vert");
 	std::string const GEOM_SHADER_SOURCE_TRANSFORM(glf::DATA_DIRECTORY + "gl-400/transform-stream.geom");
 	std::string const VERT_SHADER_SOURCE_FEEDBACK(glf::DATA_DIRECTORY + "gl-400/feedback-stream.vert");
