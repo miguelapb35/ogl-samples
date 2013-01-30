@@ -382,10 +382,12 @@ namespace glf
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
 #		if defined(__APPLE__)
 			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#		elif defined(__INTEL__)
+			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #		else
 			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, Profile == WGL_CONTEXT_CORE_PROFILE_BIT_ARB ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
 #		endif
-		//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+			glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #		if defined(NDEBUG)
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 #		else
