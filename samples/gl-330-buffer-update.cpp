@@ -183,8 +183,8 @@ bool initArrayBuffer()
 
 	glCopyBufferSubData(
 		GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-        0, 0,
-        PositionSize);
+		0, 0,
+		PositionSize);
 
 	glBindBuffer(GL_COPY_READ_BUFFER, 0);
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
@@ -195,7 +195,7 @@ bool initArrayBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -16,7 +16,8 @@ namespace
 	std::string const SAMPLE_NAME = "OpenGL Texture Array 2D";
 	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.vert");
 	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	//std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "array.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -128,47 +129,34 @@ bool initTextureArray()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DArrayName);
 
 	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2DArray Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
-	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+	//gli::texture2D Texture2D = Texture[0];
+	//glm::u8vec4 Color = *Texture2D.data<glm::u8vec4>();
+
+	glTexStorage3D(
+		GL_TEXTURE_2D_ARRAY,
+		GLsizei(Texture.levels()),
+		gli::internal_format(Texture.format()), 
+		GLsizei(Texture.dimensions().x), 
+		GLsizei(Texture.dimensions().y), 
+		GLsizei(Texture.layers())); //depth
+
+	for(gli::texture2DArray::size_type Array = 0; Array < Texture.layers(); ++Array)
+	for(gli::texture2DArray::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glTexImage3D(
-			GL_TEXTURE_2D_ARRAY, 
-			GLint(Level), 
-			GL_RGBA8, 
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			GLsizei(2), //depth
-			0,
-			GL_RGB, 
-			GL_UNSIGNED_BYTE, 
-			NULL);
-
 		glTexSubImage3D(
 			GL_TEXTURE_2D_ARRAY, 
 			GLint(Level), 
 			0, // offset x 
 			0, // offset y 
-			0, // offset z
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
+			GLint(Array), // offset z
+			GLsizei(Texture[Array][Level].dimensions().x), 
+			GLsizei(Texture[Array][Level].dimensions().y), 
 			GLsizei(1), //depth
-			GL_RGB, 
-			GL_UNSIGNED_BYTE, 
-			Texture[Level].data());
-
-		glTexSubImage3D(
-			GL_TEXTURE_2D_ARRAY, 
-			GLint(Level), 
-			0, // offset x 
-			0, // offset y 
-			1, // offset z
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			GLsizei(1), //depth
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
-			Texture[Level].data());
+			gli::external_format(Texture.format()), 
+			gli::type_format(Texture.format()), 
+			Texture[Array][Level].data());
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -276,6 +264,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		//WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

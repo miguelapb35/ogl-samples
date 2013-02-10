@@ -144,9 +144,9 @@ bool initProgram()
 bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");;
 }
@@ -211,7 +211,7 @@ bool initFramebuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
@@ -280,14 +280,13 @@ void renderFBO()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Perspective * View * Model;
 
-	glProgramUniform1i(ProgramName[program::THROUGH], UniformDiffuse[program::THROUGH], 0);
-	glProgramUniformMatrix4fv(ProgramName[program::THROUGH], UniformMVP[program::THROUGH], 1, GL_FALSE, &MVP[0][0]);
-
 	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(ProgramName[program::THROUGH]);
+	glUniform1i(UniformDiffuse[program::THROUGH], 0);
+	glUniformMatrix4fv(UniformMVP[program::THROUGH], 1, GL_FALSE, &MVP[0][0]);
 
-	glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
+	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	float Depth(1.0f);
@@ -323,12 +322,7 @@ void resolveMultisampling()
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Perspective * View * Model;
 
-	glProgramUniform1i(ProgramName[program::RESOLVE_BOX], UniformDiffuse[program::RESOLVE_BOX], 0);
-	glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_BOX], UniformMVP[program::RESOLVE_BOX], 1, GL_FALSE, &MVP[0][0]);
-	glProgramUniform1i(ProgramName[program::RESOLVE_NEAR], UniformDiffuse[program::RESOLVE_NEAR], 0);
-	glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_NEAR], UniformMVP[program::RESOLVE_NEAR], 1, GL_FALSE, &MVP[0][0]);
-
-	glViewportIndexedf(0, 0, 0, float(Window.Size.x), float(Window.Size.y));
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -341,15 +335,19 @@ void resolveMultisampling()
 
 	// Box
 	{
-		glScissorIndexed(0, 1, 1, Window.Size.x  / 2 - 2, Window.Size.y - 2);
+		glScissor(1, 1, Window.Size.x  / 2 - 2, Window.Size.y - 2);
 		glUseProgram(ProgramName[program::RESOLVE_BOX]);
+		glUniform1i(UniformDiffuse[program::RESOLVE_BOX], 0);
+		glUniformMatrix4fv(UniformMVP[program::RESOLVE_BOX], 1, GL_FALSE, &MVP[0][0]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 	}
 
 	// Near
 	{
-		glScissorIndexed(0, Window.Size.x / 2 + 1, 1, Window.Size.x / 2 - 2, Window.Size.y - 2);
+		glScissor(Window.Size.x / 2 + 1, 1, Window.Size.x / 2 - 2, Window.Size.y - 2);
 		glUseProgram(ProgramName[program::RESOLVE_NEAR]);
+		glUniform1i(UniformDiffuse[program::RESOLVE_NEAR], 0);
+		glUniformMatrix4fv(UniformMVP[program::RESOLVE_NEAR], 1, GL_FALSE, &MVP[0][0]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 	}
 

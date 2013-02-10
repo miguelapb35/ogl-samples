@@ -22,6 +22,9 @@ elseif(UNIX)
 	set(GL_LIBRARY GL)
 endif(WIN32)
 
+set(GL_DIRECTORY gl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GL_DIRECTORY}/)
+
 if(NOT OPENGL_FOUND)
 	message("ERROR: OpenGL not found")
 endif(NOT OPENGL_FOUND)
@@ -56,31 +59,6 @@ endif()
 if(APPLE)
 	find_library(COCOA_LIBRARY cocoa)
 	find_library(IOKIT_LIBRARY iokit)
-endif()
-
-################################
-# Add GLEW
-
-set(GLEW_DIRECTORY glew-1.9.0)
-
-if(MSVC AND NOT CMAKE_CL_64)
-	set(GLEW_BINARY_DIRECTORY "win32-vc")
-endif(MSVC AND NOT CMAKE_CL_64)
-
-if(MSVC AND CMAKE_CL_64)
-	set(GLEW_BINARY_DIRECTORY "win64-vc")
-endif(MSVC AND CMAKE_CL_64)
-
-add_definitions(-DGLEW_STATIC)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/lib/${GLEW_BINARY_DIRECTORY})
-
-if(WIN32)
-	set(GLEW_LIBRARY glew32s)
-elseif(APPLE)
-	set(GLEW_LIBRARY )
-else()
-	set(GLEW_LIBRARY )
 endif()
 
 ################################

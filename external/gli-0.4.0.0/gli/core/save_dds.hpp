@@ -21,25 +21,24 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/gtx/gl_texture2d.hpp
-/// @date 2010-09-27 / 2013-01-13
+/// @file gli/core/save_dds10.hpp
+/// @date 2013-01-28 / 2013-01-28
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_GTX_GL_TEXTURE2D_INCLUDED
-#define GLI_GTX_GL_TEXTURE2D_INCLUDED
+#ifndef GLI_GTX_SAVE_DDS_INCLUDED
+#define GLI_GTX_SAVE_DDS_INCLUDED
 
-#include "../gli.hpp"
-
-#ifndef GL_VERSION_1_1
-#	error "ERROR: OpenGL must be included before GLI_GTX_gl_texture2d"
-#endif//GL_VERSION_1_1
+#include "load_dds.hpp"
 
 namespace gli
 {
-	GLuint createTexture2D(std::string const & Filename);
+	void saveStorageDDS(
+		storage const & Storage, 
+		std::string const & Filename);
+
 }//namespace gli
 
-#include "gl_texture2d.inl"
+#include "save_dds.inl"
 
-#endif//GLI_GTX_GL_TEXTURE2D_INCLUDED
+#endif//GLI_GTX_SAVE_DDS_INCLUDED
