@@ -33,21 +33,18 @@
 #ifndef GLI_INCLUDED
 #define GLI_INCLUDED
 
-#define GLI_VERSION					40
+#define GLI_VERSION					50
 #define GLI_VERSION_MAJOR			0
-#define GLI_VERSION_MINOR			4
+#define GLI_VERSION_MINOR			5
 #define GLI_VERSION_PATCH			0
 #define GLI_VERSION_REVISION		0
 
 #include "./core/storage.hpp"
-#include "./core/texture1d.hpp"
-#include "./core/texture1d_array.hpp"
-#include "./core/texture2d.hpp"
-#include "./core/texture2d_array.hpp"
-#include "./core/texture3d.hpp"
-#include "./core/texture_cube.hpp"
-#include "./core/texture_cube_array.hpp"
-#include "./core/clone.hpp"
+#include "./core/texture.hpp"
+#include "./core/clear.hpp"
+#include "./core/comparison.hpp"
+#include "./core/copy.hpp"
 #include "./core/load_dds.hpp"
+#include "./core/view.hpp"
 
 #endif//GLI_INCLUDED

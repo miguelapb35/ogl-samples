@@ -29,7 +29,12 @@
 namespace gli
 {
 	inline texture2D::texture2D() :
-		View(0, 0, 0, 0, 0, 0),
+		BaseLayer(0),
+		MaxLayer(0),
+		BaseFace(0),
+		MaxFace(0),
+		BaseLevel(0),
+		MaxLevel(0),
 		Format(FORMAT_NULL)
 	{}
 
@@ -45,10 +50,32 @@ namespace gli
 			Levels,
 			Format,
 			storage::dimensions_type(Dimensions, 1)),
-		View(
-			0, 0,
-			0, 0,
-			0, Levels - 1),
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(0), 
+		BaseLevel(0), 
+		MaxLevel(Levels - 1),
+		Format(Format)
+	{}
+
+	inline texture2D::texture2D
+	(
+		format_type const & Format,
+		dimensions_type const & Dimensions
+	) :
+		Storage(
+			1,
+			1,
+			size_type(glm::log2(int(glm::max(Dimensions.x, Dimensions.y))) + 1),
+			Format,
+			storage::dimensions_type(Dimensions, 1)),
+		BaseLayer(0),
+		MaxLayer(0),
+		BaseFace(0),
+		MaxFace(0),
+		BaseLevel(0),
+		MaxLevel(glm::log2(int(glm::max(Dimensions.x, Dimensions.y)))),
 		Format(Format)
 	{}
 
@@ -57,21 +84,104 @@ namespace gli
 		storage const & Storage
 	) :
 		Storage(Storage),
-		View(0, 0, 0, 0, 0, Storage.levels() - 1),
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(0), 
+		BaseLevel(0), 
+		MaxLevel(Storage.levels() - 1),
 		Format(Storage.format())
 	{}
 
 	inline texture2D::texture2D
 	(
-		format_type const & Format,
 		storage const & Storage,
-		detail::view const & View
+		format_type const & Format,
+		size_type BaseLayer,
+		size_type MaxLayer,
+		size_type BaseFace,
+		size_type MaxFace,
+		size_type BaseLevel,
+		size_type MaxLevel
 	) :
 		Storage(Storage),
-		View(View),
+		BaseLayer(BaseLayer),
+		MaxLayer(MaxLayer),
+		BaseFace(BaseFace),
+		MaxFace(MaxFace),
+		BaseLevel(BaseLevel),
+		MaxLevel(MaxLevel),
 		Format(Format)
 	{}
 	
+	inline texture2D::texture2D
+	(
+		texture2D const & Texture,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture.Storage),
+		BaseLayer(Texture.baseLayer()),
+		MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace()),
+		MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
+	inline texture2D::texture2D
+	(
+		texture2DArray const & Texture,
+		size_type const & BaseLayer,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture),
+		BaseLayer(Texture.baseLayer() + BaseLayer),
+		MaxLayer(Texture.baseLayer() + BaseLayer),
+		BaseFace(Texture.baseFace()),
+		MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
+	inline texture2D::texture2D
+	(
+		textureCube const & Texture,
+		size_type const & BaseFace,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture),
+		BaseLayer(Texture.baseLayer()),
+		MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace() + BaseFace),
+		MaxFace(Texture.baseFace() + BaseFace),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
+	inline texture2D::texture2D
+	(
+		textureCubeArray const & Texture,
+		size_type const & BaseLayer,
+		size_type const & BaseFace,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture),
+		BaseLayer(Texture.baseLayer() + BaseLayer),
+		MaxLayer(Texture.baseLayer() + BaseLayer),
+		BaseFace(Texture.baseFace() + BaseFace),
+		MaxFace(Texture.baseFace() + BaseFace),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
 	inline texture2D::operator storage() const
 	{
 		return this->Storage;
@@ -86,13 +196,12 @@ namespace gli
 
 		return image(
 			this->Storage,
-			detail::view(
-				this->View.BaseLayer, 
-				this->View.MaxLayer, 
-				this->View.BaseFace,
-				this->View.MaxFace,
-				Level,
-				Level));
+			this->baseLayer(),
+			this->maxLayer(),
+			this->baseFace(),
+			this->maxFace(),
+			this->baseLevel() + Level,
+			this->baseLevel() + Level);
 	}
 
 	inline bool texture2D::empty() const
@@ -100,26 +209,11 @@ namespace gli
 		return this->Storage.empty();
 	}
 
-	inline texture2D::size_type texture2D::size() const
-	{
-		assert(!this->empty());
-
-		return this->Storage.faceSize();
-	}
-
-	template <typename genType>
-	inline texture2D::size_type texture2D::size() const
-	{
-		assert(sizeof(genType) <= this->Storage.blockSize());
-
-		return this->size() / sizeof(genType);
-	}
-
 	inline texture2D::dimensions_type texture2D::dimensions() const
 	{
 		assert(!this->empty());
 
-		return texture2D::dimensions_type(this->Storage.dimensions(this->View.BaseLevel));
+		return texture2D::dimensions_type(this->Storage.dimensions(this->baseLevel()));
 	}
 
 	inline texture2D::format_type texture2D::format() const
@@ -139,15 +233,22 @@ namespace gli
 
 	inline texture2D::size_type texture2D::levels() const
 	{
-		return this->View.MaxLevel - this->View.BaseLevel + 1;
+		return this->maxLevel() - this->baseLevel() + 1;
+	}
+
+	inline texture2D::size_type texture2D::size() const
+	{
+		assert(!this->empty());
+
+		return this->Storage.faceSize(this->baseLevel(), this->maxLevel());
 	}
 
 	inline void * texture2D::data()
 	{
 		assert(!this->empty());
 
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->baseLayer(), this->baseFace(), this->baseLevel());
 
 		return this->Storage.data() + offset;
 	}
@@ -156,10 +257,18 @@ namespace gli
 	{
 		assert(!this->empty());
 		
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->baseLayer(), this->baseFace(), this->baseLevel());
 
 		return this->Storage.data() + offset;
+	}
+
+	template <typename genType>
+	inline texture2D::size_type texture2D::size() const
+	{
+		assert(sizeof(genType) <= this->Storage.blockSize());
+
+		return this->size() / sizeof(genType);
 	}
 
 	template <typename genType>
@@ -178,6 +287,50 @@ namespace gli
 		assert(this->Storage.blockSize() >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
+	}
+
+	inline void texture2D::clear()
+	{
+		memset(this->data<glm::byte>(), 0, this->size<glm::byte>());
+	}
+
+	template <typename genType>
+	inline void texture2D::clear(genType const & Texel)
+	{
+		assert(this->Storage.blockSize() == sizeof(genType));
+
+		for(size_type TexelIndex = 0; TexelIndex < this->size<genType>(); ++TexelIndex)
+			*(this->data<genType>() + TexelIndex) = Texel;
+	}
+
+	inline texture2D::size_type texture2D::baseLayer() const
+	{
+		return this->BaseLayer;
+	}
+
+	inline texture2D::size_type texture2D::maxLayer() const
+	{
+		return this->MaxLayer;
+	}
+
+	inline texture2D::size_type texture2D::baseFace() const
+	{
+		return this->BaseFace;
+	}
+
+	inline texture2D::size_type texture2D::maxFace() const
+	{
+		return this->MaxFace;
+	}
+
+	inline texture2D::size_type texture2D::baseLevel() const
+	{
+		return this->BaseLevel;
+	}
+
+	inline texture2D::size_type texture2D::maxLevel() const
+	{
+		return this->MaxLevel;
 	}
 
 /*

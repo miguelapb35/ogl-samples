@@ -143,7 +143,7 @@ namespace glm
 	/// @param top 
 	/// @tparam T Value type used to build the matrix. Currently supported: half (not recommanded), float or double.
 	/// @see gtc_matrix_transform
-    /// @see - glm::ortho(T const & left, T const & right, T const & bottom, T const & top, T const & zNear, T const & zFar)
+	/// @see - glm::ortho(T const & left, T const & right, T const & bottom, T const & top, T const & zNear, T const & zFar)
 	template <typename T> 
 	detail::tmat4x4<T> ortho(
 		T const & left, 
@@ -209,7 +209,7 @@ namespace glm
 	/// @param near 
 	/// @tparam T Value type used to build the matrix. Currently supported: half (not recommanded), float or double.
 	/// @see gtc_matrix_transform
-    template <typename T> 
+	template <typename T> 
 	detail::tmat4x4<T> infinitePerspective(
 		T fovy, T aspect, T near);
 
@@ -220,7 +220,7 @@ namespace glm
 	/// @param near 
 	/// @tparam T Value type used to build the matrix. Currently supported: half (not recommanded), float or double.
 	/// @see gtc_matrix_transform
-    template <typename T> 
+	template <typename T> 
 	detail::tmat4x4<T> tweakedInfinitePerspective(
 		T fovy, T aspect, T near);
 

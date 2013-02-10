@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
+/// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2012 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -20,44 +20,41 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 ///
-/// @ref core
-/// @file gli/core/header.hpp
-/// @date 2012-10-18 / 2012-10-18
+/// @ref gtx_scalar_relational
+/// @file glm/gtx/scalar_relational.hpp
+/// @date 2013-02-04 / 2013-02-04
 /// @author Christophe Riccio
+///
+/// @see core (dependence)
+///
+/// @defgroup gtx_extend GLM_GTX_scalar_relational
+/// @ingroup gtx
+/// 
+/// @brief Extend a position from a source to a position at a defined length.
+/// 
+/// <glm/gtx/scalar_relational.hpp> need to be included to use these functionalities.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_CORE_HEADER_INCLUDED
-#define GLI_CORE_HEADER_INCLUDED
+#ifndef GLM_GTX_scalar_relational
+#define GLM_GTX_scalar_relational GLM_VERSION
 
-#include <cstddef>
+// Dependency:
+#include "../glm.hpp"
 
-namespace gli
+#if(defined(GLM_MESSAGES) && !defined(glm_ext))
+#	pragma message("GLM: GLM_GTX_extend extension included")
+#endif
+
+namespace glm
 {
-/*
-	struct view
-	{
-		typedef std::size_t size_type;
+	/// @addtogroup gtx_scalar_relational
+	/// @{
 
-		view(
-			size_type const & BaseLayer,
-			size_type const & MaxLayer,
-			size_type const & BaseFace,
-			size_type const & MaxFace,
-			size_type const & BaseLevel,
-			size_type const & MaxLevel);
 
-		view & operator=(view const & View);
 
-		size_type BaseLayer; 
-		size_type MaxLayer; 
-		size_type BaseFace;
-		size_type MaxFace;
-		size_type BaseLevel;
-		size_type MaxLevel;
-	};
-*/
-}//namespace gli
+	/// @}
+}//namespace glm
 
-#include "header.inl"
+#include "scalar_relational.inl"
 
-#endif//GLI_CORE_HEADER_INCLUDED
+#endif//GLM_GTX_scalar_relational

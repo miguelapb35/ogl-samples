@@ -353,6 +353,7 @@ bool begin()
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_ARB_compute_shader");
+	Validated = Validated && glf::checkExtension("GL_ARB_texture_buffer_range");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();

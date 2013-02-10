@@ -22,22 +22,28 @@
 ///
 /// @ref core
 /// @file gli/core/clear.hpp
-/// @date 2013-01-12 / 2013-01-12
+/// @date 2013-01-12 / 2013-01-03
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_CORE_CLEAR
-#define GLI_CORE_CLEAR
+#ifndef GLI_CORE_CLEAR_INCLUDED
+#define GLI_CORE_CLEAR_INCLUDED
 
+#include "texture1d.hpp"
+#include "texture1d_array.hpp"
 #include "texture2d.hpp"
+#include "texture2d_array.hpp"
+#include "texture3d.hpp"
+#include "texture_cube.hpp"
+#include "texture_cube_array.hpp"
 
 namespace gli
 {
-	template <typename genType>
-	image2D clear(image2D const & Image, genType const & Texel);
+	template <typename genType, typename texture>
+	void clear(texture const & Texture, genType const & Texel);
 
 }//namespace gli
 
 #include "clear.inl"
 
-#endif//GLI_CORE_CLEAR
+#endif//GLI_CORE_CLEAR_INCLUDED

@@ -29,7 +29,7 @@
 namespace gli{
 namespace detail
 {
-	inline storage::size_type linearAddressing
+	inline storage::size_type imageAddressing
 	(
 		storage const & Storage,
 		storage::size_type const & LayerOffset, 
@@ -41,7 +41,9 @@ namespace detail
 		assert(FaceOffset < Storage.faces());
 		assert(LevelOffset < Storage.levels());
 
-		storage::size_type BaseOffset = Storage.layerSize() * LayerOffset + Storage.faceSize() * FaceOffset; 
+		storage::size_type LayerSize = Storage.layerSize(0, Storage.faces() - 1, 0, Storage.levels() - 1);
+		storage::size_type FaceSize = Storage.faceSize(0, Storage.levels() - 1);
+		storage::size_type BaseOffset = LayerSize * LayerOffset + FaceSize * FaceOffset; 
 
 		for(storage::size_type Level(0); Level < LevelOffset; ++Level)
 			BaseOffset += Storage.levelSize(Level);
@@ -49,14 +51,4 @@ namespace detail
 		return BaseOffset;
 	}
 }//namespace detail
-
-inline storage::size_type linearAddressing::operator() (
-	storage const & Storage,
-	storage::size_type const & LayerOffset, 
-	storage::size_type const & FaceOffset, 
-	storage::size_type const & LevelOffset) const
-{
-	return detail::linearAddressing(Storage, LayerOffset, FaceOffset, LevelOffset);
-}
-
 }//namespace gli

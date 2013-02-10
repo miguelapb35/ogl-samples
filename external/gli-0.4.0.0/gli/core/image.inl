@@ -29,7 +29,13 @@
 namespace gli
 {
 	inline image::image() :
-		View(0, 0, 0, 0, 0, 0)
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(0), 
+		BaseLevel(0), 
+		MaxLevel(0),
+		Addressing(LINEAR)
 	{}
 
 	inline image::image
@@ -41,9 +47,16 @@ namespace gli
 		Storage(
 			1, 1, 1, 
 			storage::dimensions_type(Dimensions), 
+			FORMAT_NULL,
 			BlockSize, 
 			storage::dimensions_type(BlockDimensions)),
-		View(0, 0, 0, 0, 0, 0)
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(0), 
+		BaseLevel(0), 
+		MaxLevel(0),
+		Addressing(LINEAR)
 	{}
 
 	inline image::image
@@ -54,19 +67,42 @@ namespace gli
 		Storage(
 			1, 1, 1, 
 			storage::dimensions_type(Dimensions),
+			Format,
 			block_size(Format),
 			block_dimensions(Format)),
-		View(0, 0, 0, 0, 0, 0)
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(0), 
+		BaseLevel(0), 
+		MaxLevel(0),
+		Addressing(LINEAR)
 	{}
 
 	inline image::image
 	(
 		storage const & Storage,
-		detail::view const & View
+		size_type BaseLayer,
+		size_type MaxLayer,
+		size_type BaseFace,
+		size_type MaxFace,
+		size_type BaseLevel,
+		size_type MaxLevel
 	) :
 		Storage(Storage),
-		View(View)
+		BaseLayer(BaseLayer), 
+		MaxLayer(MaxLayer), 
+		BaseFace(BaseFace), 
+		MaxFace(MaxFace), 
+		BaseLevel(BaseLevel), 
+		MaxLevel(MaxLevel),
+		Addressing(LINEAR)
 	{}
+
+	inline image::operator storage() const
+	{
+		return this->Storage;
+	}
 
 	inline bool image::empty() const
 	{
@@ -77,20 +113,28 @@ namespace gli
 	{
 		assert(!this->empty());
 
-		return this->Storage.levelSize(this->View.BaseLevel);
+		return this->Storage.levelSize(this->BaseLevel);
+	}
+
+	template <typename genType>
+	inline image::size_type image::size() const
+	{
+		assert(sizeof(genType) <= this->Storage.blockSize());
+
+		return this->size() / sizeof(genType);
 	}
 
 	inline image::dimensions_type image::dimensions() const
 	{
-		return image::dimensions_type(this->Storage.dimensions(this->View.BaseLevel));
+		return image::dimensions_type(this->Storage.dimensions(this->BaseLevel));
 	}
 
 	inline void * image::data()
 	{
 		assert(!this->empty());
 
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->BaseLayer, this->BaseFace, this->BaseLevel);
 
 		return this->Storage.data() + offset;
 	}
@@ -99,8 +143,8 @@ namespace gli
 	{
 		assert(!this->empty());
 		
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->BaseLayer, this->BaseFace, this->BaseLevel);
 
 		return this->Storage.data() + offset;
 	}
@@ -123,28 +167,68 @@ namespace gli
 		return reinterpret_cast<genType const *>(this->data());
 	}
 
-	inline bool operator== (image const & ImageA, image const & ImageB)
+	inline void image::clear()
 	{
-		if(!glm::all(glm::equal(ImageA.dimensions(), ImageB.dimensions())))
-			return false;
-
-		if(ImageA.size() != ImageB.size())
-			return false;
-
-		if(ImageA.data() == ImageB.data())
-			return true;
-
-		for(image::size_type i(0); i < ImageA.size(); ++i)
-		{
-			if(*(ImageA.data<glm::byte>() + i) != *(ImageB.data<glm::byte>() + i))
-				return false;
-		}
-
-		return true;
+		memset(this->data<glm::byte>(), 0, this->size<glm::byte>());
 	}
 
-	inline bool operator!= (image const & ImageA, image const & ImageB)
+	template <typename genType>
+	inline void image::clear(genType const & Texel)
 	{
-		return !(ImageA == ImageB);
+		assert(this->Storage.blockSize() == sizeof(genType));
+
+		for(size_type TexelIndex = 0; TexelIndex < this->size<genType>(); ++TexelIndex)
+			*(this->data<genType>() + TexelIndex) = Texel;
+	}
+
+	template <typename genType>
+	inline genType image::fetch(dimensions_type const & TexCoord) const
+	{
+		genType * Pointer(this->data<genType>());
+		size_type Offset(0);
+		switch(Addressing)
+		{
+		default:
+			assert(0);
+			return genType();
+		case LINEAR:
+			Offset = this->dimensions().x * this->dimensions().y * TexCoord.z + this->dimensions().y * TexCoord.y + TexCoord.x;
+			break;
+		case MORTON:
+			Offset = size_type(glm:::bitfieldInterleave(TexCoord.x, TexCoord.y, TexCoord.z));
+			break;
+		}
+
+		return *(Pointer + Offset)
+	}
+
+	inline image::size_type image::baseLayer() const
+	{
+		return this->BaseLayer;
+	}
+
+	inline image::size_type image::maxLayer() const
+	{
+		return this->MaxLayer;
+	}
+
+	inline image::size_type image::baseFace() const
+	{
+		return this->BaseFace;
+	}
+
+	inline image::size_type image::maxFace() const
+	{
+		return this->MaxFace;
+	}
+
+	inline image::size_type image::baseLevel() const
+	{
+		return this->BaseLevel;
+	}
+
+	inline image::size_type image::maxLevel() const
+	{
+		return this->MaxLevel;
 	}
 }//namespace gli

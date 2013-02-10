@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
+/// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2012 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -21,43 +21,30 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/header.hpp
-/// @date 2012-10-18 / 2012-10-18
+/// @file glm/core/intrinsic_integer.hpp
+/// @date 2009-05-11 / 2011-06-15
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_CORE_HEADER_INCLUDED
-#define GLI_CORE_HEADER_INCLUDED
+#ifndef glm_detail_intrinsic_integer
+#define glm_detail_intrinsic_integer
 
-#include <cstddef>
+#include "setup.hpp"
 
-namespace gli
+#if(!(GLM_ARCH & GLM_ARCH_SSE2))
+#	error "SSE2 instructions not supported or enabled"
+#else
+
+namespace glm{
+namespace detail
 {
-/*
-	struct view
-	{
-		typedef std::size_t size_type;
+	__m128i _mm_bit_interleave_si128(__m128i x)
+	__m128i _mm_bit_interleave_si128(__m128i x, __m128i y);
 
-		view(
-			size_type const & BaseLayer,
-			size_type const & MaxLayer,
-			size_type const & BaseFace,
-			size_type const & MaxFace,
-			size_type const & BaseLevel,
-			size_type const & MaxLevel);
+}//namespace detail
+}//namespace glm
 
-		view & operator=(view const & View);
+#include "intrinsic_integer.inl"
 
-		size_type BaseLayer; 
-		size_type MaxLayer; 
-		size_type BaseFace;
-		size_type MaxFace;
-		size_type BaseLevel;
-		size_type MaxLevel;
-	};
-*/
-}//namespace gli
-
-#include "header.inl"
-
-#endif//GLI_CORE_HEADER_INCLUDED
+#endif//GLM_ARCH
+#endif//glm_detail_intrinsic_integer

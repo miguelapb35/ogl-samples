@@ -8,10 +8,10 @@
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-///
+/// 
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-///
+/// 
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,13 +21,13 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/view.hpp
-/// @date 2013-02-07 / 2013-02-07
+/// @file gli/core/comparison.hpp
+/// @date 2013-02-04 / 2013-02-04
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_CORE_VIEW_INCLUDED
-#define GLI_CORE_VIEW_INCLUDED
+#ifndef GLI_CORE_COMPARISON_INCLUDED
+#define GLI_CORE_COMPARISON_INCLUDED
 
 #include "image.hpp"
 #include "texture1d.hpp"
@@ -40,52 +40,15 @@
 
 namespace gli
 {
-	image view(image const & Image);
+	bool operator==(image const & ImageA, image const & ImageB);
+	bool operator!=(image const & ImageA, image const & ImageB);
 
 	template <typename texture>
-	texture view(texture const & Texture);
-
-	texture1D view(
-		texture1D const & Texture,
-		texture1D::size_type const & BaseLevel,
-		texture1D::size_type const & MaxLevel);
-
-	texture2D view(
-		texture2D const & Texture,
-		texture2D::size_type const & BaseLevel,
-		texture2D::size_type const & MaxLevel);
-
-	texture3D view(
-		texture3D const & Texture,
-		texture3D::size_type const & BaseLevel,
-		texture3D::size_type const & MaxLevel);
-
-	// texture can be texture1DArray, texture2DArray
+	bool operator==(texture const & TextureA, texture const & TextureB);
 	template <typename texture>
-	texture view(
-		texture const & Texture,
-		typename texture::size_type const & BaseLayer,
-		typename texture::size_type const & MaxLayer,
-		typename texture::size_type const & BaseLevel,
-		typename texture::size_type const & MaxLevel);
-
-	textureCube view(
-		textureCube const & Texture,
-		textureCube::size_type const & BaseFace,
-		textureCube::size_type const & MaxFace,
-		textureCube::size_type const & BaseLevel,
-		textureCube::size_type const & MaxLevel);
-
-	textureCubeArray view(
-		textureCubeArray const & Texture,
-		textureCubeArray::size_type const & BaseLayer,
-		textureCubeArray::size_type const & MaxLayer,
-		textureCubeArray::size_type const & BaseFace,
-		textureCubeArray::size_type const & MaxFace,
-		textureCubeArray::size_type const & BaseLevel,
-		textureCubeArray::size_type const & MaxLevel);
+	bool operator!=(texture const & TextureA, texture const & TextureB);
 }//namespace gli
 
-#include "view.inl"
+#include "comparison.inl"
 
-#endif//GLI_CORE_VIEW_INCLUDED
+#endif//GLI_CORE_COMPARISON_INCLUDED

@@ -29,7 +29,12 @@
 namespace gli
 {
 	inline textureCube::textureCube() :
-		View(0, 0, 0, 0, 0, 0),
+		BaseLayer(0),
+		MaxLayer(0),
+		BaseFace(0),
+		MaxFace(0),
+		BaseLevel(0),
+		MaxLevel(0),
 		Format(FORMAT_NULL)
 	{}
 
@@ -46,7 +51,33 @@ namespace gli
 			Levels,
 			Format,
 			storage::dimensions_type(Dimensions, 1)),
-		View(0, 0, 0, Faces - 1, 0, Levels - 1),
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(Faces - 1), 
+		BaseLevel(0), 
+		MaxLevel(Levels - 1),
+		Format(Format)
+	{}
+
+	inline textureCube::textureCube
+	(
+		size_type const & Faces,
+		format_type const & Format,
+		dimensions_type const & Dimensions
+	) :
+		Storage(
+			1,
+			Faces,
+			size_type(glm::log2(int(glm::max(Dimensions.x, Dimensions.y))) + 1),
+			Format,
+			storage::dimensions_type(Dimensions, 1)),
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(Faces - 1), 
+		BaseLevel(0), 
+		MaxLevel(glm::log2(int(glm::max(Dimensions.x, Dimensions.y)))),
 		Format(Format)
 	{}
 
@@ -55,19 +86,87 @@ namespace gli
 		storage const & Storage
 	) :
 		Storage(Storage),
-		View(0, 0, 0, Storage.faces() - 1, 0, Storage.levels() - 1),
+		BaseLayer(0), 
+		MaxLayer(0), 
+		BaseFace(0), 
+		MaxFace(Storage.faces() - 1), 
+		BaseLevel(0), 
+		MaxLevel(Storage.levels() - 1),
 		Format(Storage.format())
 	{}
 
 	inline textureCube::textureCube
 	(
-		format_type const & Format,
 		storage const & Storage,
-		detail::view const & View
+		format_type const & Format,
+		size_type BaseLayer,
+		size_type MaxLayer,
+		size_type BaseFace,
+		size_type MaxFace,
+		size_type BaseLevel,
+		size_type MaxLevel
 	) :
 		Storage(Storage),
-		View(View),
+		BaseLayer(BaseLayer),
+		MaxLayer(MaxLayer),
+		BaseFace(BaseFace),
+		MaxFace(MaxFace),
+		BaseLevel(BaseLevel),
+		MaxLevel(MaxLevel),
 		Format(Format)
+	{}
+
+	inline textureCube::textureCube
+	(
+		textureCube const & Texture,
+		size_type const & BaseFace,
+		size_type const & MaxFace,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture.Storage),
+		BaseLayer(Texture.baseLayer()),
+		MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace() + BaseFace),
+		MaxFace(Texture.baseFace() + MaxFace),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
+	inline textureCube::textureCube
+	(
+		textureCubeArray const & Texture,
+		size_type const & BaseLayer,
+		size_type const & BaseFace,
+		size_type const & MaxFace,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture),
+		BaseLayer(Texture.baseLayer() + BaseLayer),
+		MaxLayer(Texture.baseLayer() + BaseLayer),
+		BaseFace(Texture.baseFace() + BaseFace),
+		MaxFace(Texture.baseFace() + MaxFace),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
+	{}
+
+	inline textureCube::textureCube
+	(
+		texture2D const & Texture,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel
+	) :
+		Storage(Texture),
+		BaseLayer(Texture.baseLayer()),
+		MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace()),
+		MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel),
+		MaxLevel(Texture.baseLevel() + MaxLevel),
+		Format(Texture.format())
 	{}
 
 	inline textureCube::operator storage() const
@@ -80,15 +179,10 @@ namespace gli
 		assert(Face < this->faces());
 
 		return texture2D(
-			this->format(),
-			this->Storage,
-			detail::view(
-				this->View.BaseLayer,
-				this->View.MaxLayer,
-				Face,
-				Face,
-				this->View.BaseLevel,
-				this->View.MaxLevel));
+			this->Storage, this->format(),
+			this->baseLayer(), this->maxLayer(), 
+			this->baseFace() + Face, 	this->baseFace() + Face,
+			this->baseLevel(), this->maxLevel());
 	}
 
 	inline bool textureCube::empty() const
@@ -96,25 +190,9 @@ namespace gli
 		return this->Storage.empty();
 	}
 
-	inline textureCube::size_type textureCube::size() const
-	{
-		assert(!this->empty());
-
-		return this->Storage.layerSize();
-	}
-
-	template <typename genType>
-	inline textureCube::size_type textureCube::size() const
-	{
-		assert(!this->empty());
-		assert(sizeof(genType) <= this->Storage.blockSize());
-
-		return this->size() / sizeof(genType);
-	}
-
 	inline textureCube::dimensions_type textureCube::dimensions() const
 	{
-		return textureCube::dimensions_type(this->Storage.dimensions(this->View.BaseLevel));
+		return textureCube::dimensions_type(this->Storage.dimensions(this->baseLevel()));
 	}
 
 	inline textureCube::format_type textureCube::format() const
@@ -124,25 +202,35 @@ namespace gli
 
 	inline textureCube::size_type textureCube::layers() const
 	{
+		assert(this->maxLayer() - this->baseLayer() + 1 == 1);
 		return 1;
 	}
 	
 	inline textureCube::size_type textureCube::faces() const
 	{
-		return this->View.MaxFace - this->View.BaseFace + 1;
+		return this->maxFace() - this->baseFace() + 1;
 	}
 	
 	inline textureCube::size_type textureCube::levels() const
 	{
-		return this->View.MaxLevel - this->View.BaseLevel + 1;
+		return this->maxLevel() - this->baseLevel() + 1;
+	}
+
+	inline textureCube::size_type textureCube::size() const
+	{
+		assert(!this->empty());
+
+		return this->Storage.layerSize(
+			this->baseFace(), this->maxFace(),
+			this->baseLevel(), this->maxLevel());
 	}
 
 	inline void * textureCube::data()
 	{
 		assert(!this->empty());
 
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->baseLayer(), this->baseFace(), this->baseLevel());
 
 		return this->Storage.data() + offset;
 	}
@@ -151,10 +239,19 @@ namespace gli
 	{
 		assert(!this->empty());
 		
-		size_type const offset = detail::linearAddressing(
-			this->Storage, this->View.BaseLayer, this->View.BaseFace, this->View.BaseLevel);
+		size_type const offset = detail::imageAddressing(
+			this->Storage, this->baseLayer(), this->baseFace(), this->baseLevel());
 
 		return this->Storage.data() + offset;
+	}
+
+	template <typename genType>
+	inline textureCube::size_type textureCube::size() const
+	{
+		assert(!this->empty());
+		assert(sizeof(genType) <= this->Storage.blockSize());
+
+		return this->size() / sizeof(genType);
 	}
 
 	template <typename genType>
@@ -173,5 +270,50 @@ namespace gli
 		assert(this->Storage.blockSize() >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
+	}
+
+	inline void textureCube::clear()
+	{
+		for(size_type Face = 0; Face < this->faces(); ++Face)
+			(*this)[Face].clear();
+	}
+
+	template <typename genType>
+	inline void textureCube::clear(genType const & Texel)
+	{
+		assert(this->Storage.blockSize() == sizeof(genType));
+
+		for(size_type Face = 0; Face < this->faces(); ++Face)
+			(*this)[Face].clear<genType>(Texel);
+	}
+
+	inline textureCube::size_type textureCube::baseLayer() const
+	{
+		return this->BaseLayer;
+	}
+
+	inline textureCube::size_type textureCube::maxLayer() const
+	{
+		return this->MaxLayer;
+	}
+
+	inline textureCube::size_type textureCube::baseFace() const
+	{
+		return this->BaseFace;
+	}
+
+	inline textureCube::size_type textureCube::maxFace() const
+	{
+		return this->MaxFace;
+	}
+
+	inline textureCube::size_type textureCube::baseLevel() const
+	{
+		return this->BaseLevel;
+	}
+
+	inline textureCube::size_type textureCube::maxLevel() const
+	{
+		return this->MaxLevel;
 	}
 }//namespace gli

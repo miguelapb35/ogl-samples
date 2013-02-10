@@ -38,12 +38,14 @@
 
 // GLM
 #include <glm/glm.hpp>
-#include <glm/gtx/number_precision.hpp>
-#include <glm/gtx/raw_data.hpp>
-#include <glm/gtx/gradient_paint.hpp>
+#include <glm/gtx/bit.hpp>
 #include <glm/gtx/component_wise.hpp>
+#include <glm/gtx/gradient_paint.hpp>
 #include <glm/gtx/integer.hpp>
 #include <glm/gtx/multiple.hpp>
+#include <glm/gtx/number_precision.hpp>
+#include <glm/gtx/raw_data.hpp>
+#include <glm/gtx/scalar_relational.hpp>
 
 #include "shared_ptr.hpp"
 #include "header.hpp"
@@ -69,18 +71,19 @@ namespace gli
 	public:
 		storage();
 
-		explicit storage(
+		storage(
 			size_type const & Layers, 
 			size_type const & Faces,
 			size_type const & Levels,
 			format_type const & Format,
 			dimensions_type const & Dimensions);
 
-		explicit storage(
+		storage(
 			size_type const & Layers, 
 			size_type const & Faces,
 			size_type const & Levels,
 			dimensions_type const & Dimensions,
+			format_type const & Format,
 			size_type const & BlockSize,
 			dimensions_type const & BlockDimensions);
 
@@ -98,9 +101,16 @@ namespace gli
 		glm::byte * data();
 		glm::byte const * data() const;
 
-		size_type levelSize(size_type const & Level) const;
-		size_type faceSize() const;
-		size_type layerSize() const;
+		size_type levelSize(
+			size_type const & Level) const;
+		size_type faceSize(
+			size_type const & BaseLevel,
+			size_type const & MaxLevel) const;
+		size_type layerSize(
+			size_type const & BaseFace,
+			size_type const & MaxFace,
+			size_type const & BaseLevel,
+			size_type const & MaxLevel) const;
 
 	private:
 		struct impl

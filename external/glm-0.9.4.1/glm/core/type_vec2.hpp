@@ -59,7 +59,7 @@ namespace detail
 		//////////////////////////////////////
 		// Data
 
-#	if(GLM_COMPONENT == GLM_COMPONENT_CXX11)
+#	if(GLM_COMPONENT == GLM_COMPONENT_CXXMS)
 		union 
 		{
 #		if(defined(GLM_SWIZZLE))
@@ -74,9 +74,9 @@ namespace detail
 			_GLM_SWIZZLE2_4_MEMBERS(value_type, glm::detail::tvec4<value_type>, s, t)
 #		endif//(defined(GLM_SWIZZLE))
 
-			struct{value_type r, g;};
-			struct{value_type s, t;};
-			struct{value_type x, y;};
+			struct {value_type r, g;};
+			struct {value_type s, t;};
+			struct {value_type x, y;};
 		};
 #	elif(GLM_COMPONENT == GLM_COMPONENT_CXX98)
 		union {value_type x, r, s;};

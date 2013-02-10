@@ -10,8 +10,6 @@
 //**********************************
 
 #include <glf/glf.hpp>
-#include <gli/gtx/loader_dds9.hpp>
-#include <gli/gtx/loader_dds10.hpp>
 
 namespace
 {

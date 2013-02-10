@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Bindless 
-// 09/03/2011
+// 09/03/2011 - 10/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -10,8 +10,6 @@
 //**********************************
 
 #include <glf/glf.hpp>
-#include <gli/gtx/loader_dds9.hpp>
-#include <gli/gtx/loader_dds10.hpp>
 
 namespace
 {

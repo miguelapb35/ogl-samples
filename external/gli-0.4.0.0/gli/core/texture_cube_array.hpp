@@ -29,10 +29,13 @@
 #ifndef GLI_CORE_TEXTURE_CUBE_ARRAY_INCLUDED
 #define GLI_CORE_TEXTURE_CUBE_ARRAY_INCLUDED
 
-#include "texture_cube.hpp"
+#include "image.hpp"
 
 namespace gli
 {
+	class textureCube;
+	class texture2D;
+	
 	class textureCubeArray
 	{
 	public:
@@ -44,7 +47,7 @@ namespace gli
 	public:
 		textureCubeArray();
 
-		/// Allocate a new storage constructor
+		/// Create a textureCubeArray and allocate a new storage
 		explicit textureCubeArray(
 			size_type const & Layers, 
 			size_type const & Faces,
@@ -52,45 +55,94 @@ namespace gli
 			format_type const & Format,
 			dimensions_type const & Dimensions);
 
-		/// Reference an exiting storage constructor
+		/// Create a textureCubeArray and allocate a new storage with a complete mipmap chain
+		explicit textureCubeArray(
+			size_type const & Layers, 
+			size_type const & Faces,
+			format_type const & Format,
+			dimensions_type const & Dimensions);
+
+		/// Create a texture2D view with an existing storage
 		explicit textureCubeArray(
 			storage const & Storage);
 
 		/// Reference a subset of an exiting storage constructor
 		explicit textureCubeArray(
-			format_type const & Format,
 			storage const & Storage,
-			detail::view const & View);
+			format_type const & Format,
+			size_type BaseLayer,
+			size_type MaxLayer,
+			size_type BaseFace,
+			size_type MaxFace,
+			size_type BaseLevel,
+			size_type MaxLevel);
+
+		/// Create a texture view, reference a subset of an exiting textureCubeArray instance
+		explicit textureCubeArray(
+			textureCubeArray const & Texture,
+			size_type const & BaseLayer,
+			size_type const & MaxLayer,
+			size_type const & BaseFace,
+			size_type const & MaxFace,
+			size_type const & BaseLevel,
+			size_type const & MaxLevel);
+
+		/// Create a texture view, reference a subset of an exiting textureCube instance
+		explicit textureCubeArray(
+			textureCube const & Texture,
+			size_type const & BaseFace,
+			size_type const & MaxFace,
+			size_type const & BaseLevel,
+			size_type const & MaxLevel);
+
+		/// Create a texture view, reference a subset of an exiting texture2D instance
+		explicit textureCubeArray(
+			texture2D const & Texture,
+			size_type const & BaseLevel,
+			size_type const & MaxLevel);
 
 		operator storage() const;
 		textureCube operator[] (size_type const & Layer) const;
 
 		bool empty() const;
-		size_type size() const;
-		template <typename genType>
-		size_type size() const;
-
 		format_type format() const;
 		dimensions_type dimensions() const;
 		size_type layers() const;
 		size_type faces() const;
 		size_type levels() const;
 
+		size_type size() const;
 		void * data();
 		void const * data() const;
 
+		template <typename genType>
+		size_type size() const;
 		template <typename genType>
 		genType * data();
 		template <typename genType>
 		genType const * data() const;
 
+		void clear();
+		template <typename genType>
+		void clear(genType const & Texel);
+
+		size_type baseLayer() const;
+		size_type maxLayer() const;
+		size_type baseFace() const;
+		size_type maxFace() const;
+		size_type baseLevel() const;
+		size_type maxLevel() const;
+
 	private:
 		storage Storage;
-		detail::view View;
+		size_type BaseLayer; 
+		size_type MaxLayer; 
+		size_type BaseFace;
+		size_type MaxFace;
+		size_type BaseLevel;
+		size_type MaxLevel;
 		format_type Format;
 	};
 }//namespace gli
-
-#include "texture_cube_array.inl"
 
 #endif//GLI_CORE_TEXTURE_CUBE_ARRAY_INCLUDED

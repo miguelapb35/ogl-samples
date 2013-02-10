@@ -128,7 +128,6 @@ bool initDebugOutput()
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
-	glf::logImplementationDependentLimit(GL_MAX_TEXTURE_UNITS, "GL_MAX_TEXTURE_UNITS");
 	glf::logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
 
 	return true;
@@ -199,6 +198,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

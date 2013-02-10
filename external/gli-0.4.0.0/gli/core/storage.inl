@@ -419,7 +419,7 @@ inline format_desc const getFormatInfo(format const & Format)
 			gli::block_size(Format), 
 			gli::block_dimensions(Format)))
 	{
-		Impl->Data.resize(this->layerSize() * Layers);
+		Impl->Data.resize(this->layerSize(0, Faces - 1, 0, Levels - 1) * Layers, 0);
 	}
 
 	inline storage::storage
@@ -428,6 +428,7 @@ inline format_desc const getFormatInfo(format const & Format)
 		size_type const & Faces,
 		size_type const & Levels,
 		dimensions_type const & Dimensions,
+		format_type const & Format,
 		size_type const & BlockSize,
 		dimensions_type const & BlockDimensions
 	) : 
@@ -435,12 +436,12 @@ inline format_desc const getFormatInfo(format const & Format)
 			Layers, 
 			Faces, 
 			Levels, 
-			FORMAT_NULL, 
+			Format, 
 			Dimensions, 
 			BlockSize, 
 			BlockDimensions))
 	{
-		Impl->Data.resize(this->layerSize() * Layers);	
+		Impl->Data.resize(this->layerSize(0, Faces - 1, 0, Levels - 1) * Layers, 0);
 	}
 
 	inline bool storage::empty() const
@@ -518,29 +519,40 @@ inline format_desc const getFormatInfo(format const & Format)
 		storage::size_type const & Level
 	) const
 	{
-		assert(Level < this->Impl->Levels);
+		assert(Level < this->levels());
 
 		return this->blockSize() * glm::compMul(glm::higherMultiple(
 			this->dimensions(Level), 
 			this->blockDimensions()) / this->blockDimensions()); 
 	}
 
-	inline storage::size_type storage::faceSize() const
+	inline storage::size_type storage::faceSize(
+		size_type const & BaseLevel,
+		size_type const & MaxLevel) const
 	{
+		assert(MaxLevel < this->levels());
+		
 		size_type FaceSize(0);
 
 		// The size of a face is the sum of the size of each level.
-		for(storage::size_type Level(0); Level < this->levels(); ++Level)
+		for(storage::size_type Level(BaseLevel); Level <= MaxLevel; ++Level)
 			FaceSize += this->levelSize(Level);
 
 		return FaceSize;// * TexelSize;
 	}
 
-	inline storage::size_type storage::layerSize() const
+	inline storage::size_type storage::layerSize(
+		size_type const & BaseFace,
+		size_type const & MaxFace,
+		size_type const & BaseLevel,
+		size_type const & MaxLevel) const
 	{
+		assert(MaxFace < this->faces());
+		assert(MaxLevel < this->levels());
+
 		// The size of a layer is the sum of the size of each face.
 		// All the faces have the same size.
-		return this->faceSize() * this->faces();
+		return this->faceSize(BaseLevel, MaxLevel) * (MaxFace - BaseFace + 1);
 	}
 
 /*
@@ -565,7 +577,7 @@ inline format_desc const getFormatInfo(format const & Format)
 
 		memcpy(
 			SubStorage.data(), 
-			Storage.data() + Storage.linearAddressing(Offset, 0, 0), 
+			Storage.data() + Storage.imageAddressing(Offset, 0, 0), 
 			Storage.layerSize() * Size);
 
 		return SubStorage;
@@ -590,7 +602,7 @@ inline format_desc const getFormatInfo(format const & Format)
 
 		memcpy(
 			SubStorage.data(), 
-			Storage.data() + Storage.linearAddressing(0, storage::size_type(Face), 0), 
+			Storage.data() + Storage.imageAddressing(0, storage::size_type(Face), 0), 
 			Storage.faceSize());
 
 		return SubStorage;
@@ -616,7 +628,7 @@ inline format_desc const getFormatInfo(format const & Format)
 
 		memcpy(
 			SubStorage.data(), 
-			Storage.data() + Storage.linearAddressing(0, 0, Level), 
+			Storage.data() + Storage.imageAddressing(0, 0, Level), 
 			Storage.levelSize(Level));
 
 		return SubStorage;
@@ -637,8 +649,8 @@ inline format_desc const getFormatInfo(format const & Format)
 		assert(SourceStorage.layers() <= SourceLayerOffset + SourceLayerSize);
 		assert(DestinationStorage.layers() <= DestinationLayerOffset + SourceLayerSize);
 
-		std::size_t OffsetSrc = SourceStorage.linearAddressing(SourceLayerOffset, 0, 0);
-		std::size_t OffsetDst = DestinationStorage.linearAddressing(DestinationLayerOffset, 0, 0);
+		std::size_t OffsetSrc = SourceStorage.imageAddressing(SourceLayerOffset, 0, 0);
+		std::size_t OffsetDst = DestinationStorage.imageAddressing(DestinationLayerOffset, 0, 0);
 
 		memcpy(
 			DestinationStorage.data() + OffsetDst * DestinationStorage.blockSize(), 

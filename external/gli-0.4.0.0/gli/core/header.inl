@@ -26,9 +26,9 @@
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-namespace gli{
-namespace detail
+namespace gli
 {
+/*
 	view::view
 	(
 		size_type const & BaseLayer,
@@ -56,6 +56,5 @@ namespace detail
 		this->MaxLevel = View.MaxLevel;
 		return *this;
 	}
-
-}//namespace detail
+*/
 }//namespace gli

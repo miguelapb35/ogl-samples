@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Image Array 2D
-// 28/08/2009
+// OpenGL Texture 2D Array
+// 28/08/2009 - 10/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,15 +13,15 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Texture Array 2D";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-array.frag");
+	std::string const SAMPLE_NAME = "OpenGL Texture 2D Array";
+	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-array.vert");
+	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-array.frag");
 	//std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "array.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MAJOR_VERSION(4);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -130,9 +130,6 @@ bool initTextureArray()
 
 	// Set image
 	gli::texture2DArray Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
-
-	//gli::texture2D Texture2D = Texture[0];
-	//glm::u8vec4 Color = *Texture2D.data<glm::u8vec4>();
 
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY,
@@ -264,7 +261,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		//WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
-		WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, 
+		WGL_CONTEXT_CORE_PROFILE_BIT_ARB, 
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

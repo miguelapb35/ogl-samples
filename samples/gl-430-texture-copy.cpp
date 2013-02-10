@@ -175,7 +175,7 @@ bool initTexture()
 	// Fill texture data of texture::COPY from texture::DIFFUSE.
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glCopyImageSubDataNV(
+		glCopyImageSubData(
 			TextureName[texture::DIFFUSE], GL_TEXTURE_2D, GLint(Level), 0, 0, 0,
 			TextureName[texture::COPY], GL_TEXTURE_2D, GLint(Level), 0, 0, 0,
 			GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y), 1);

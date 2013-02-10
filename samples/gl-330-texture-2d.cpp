@@ -104,8 +104,8 @@ bool initBuffer()
 
 bool initTexture()
 {
-	TextureName = gli::createTexture2D(TEXTURE_DIFFUSE);
-/*
+	//TextureName = gli::createTexture2D(TEXTURE_DIFFUSE);
+
 	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -139,7 +139,7 @@ bool initTexture()
 	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-*/
+
 	return glf::checkError("initTexture");
 }
 
