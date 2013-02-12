@@ -74,6 +74,12 @@ set(GLI_DIRECTORY gli-0.4.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
 
 ################################
+# Add GLO 
+
+set(GLO_DIRECTORY glo-0.1.0.0)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLO_DIRECTORY})
+
+################################
 # Add GLF
 
 set(GLF_DIRECTORY glf)

@@ -18,7 +18,7 @@ void main()
 	vec2 TextureSize = vec2(textureSize(Diffuse, 0));
 
 	vec2 TexCoord = gl_FragCoord.xy / TextureSize;
-	float Depth = LinearizeDepth(TexCoord);
+	float Depth = texture(Diffuse, TexCoord).x;//LinearizeDepth(TexCoord);
 		
 	Color = vec4(Depth, Depth, Depth, 1.0);
 }
