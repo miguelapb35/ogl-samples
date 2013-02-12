@@ -8,7 +8,6 @@ uniform transform
 } Transform;
 
 in vec3 Position;
-in vec2 Texcoord;
 
 void main()
 {	

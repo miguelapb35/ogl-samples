@@ -31,17 +31,17 @@ namespace
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(8);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv2f);
-	glf::vertex_v3fv2f const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);
+	glf::vertex_v3fv4u8 const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fv2f(glm::vec3(-1.0f,-1.0f, 0.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v3fv2f(glm::vec3( 1.0f,-1.0f, 0.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v3fv2f(glm::vec3( 1.0f, 1.0f, 0.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v3fv2f(glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec2(0.0f, 0.0f)),
-		glf::vertex_v3fv2f(glm::vec3(-0.1f,-0.1f, 0.2f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v3fv2f(glm::vec3( 0.1f,-0.1f, 0.2f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v3fv2f(glm::vec3( 0.1f, 0.1f, 0.2f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v3fv2f(glm::vec3(-0.1f, 0.1f, 0.2f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v3fv4u8(glm::vec3(-1.0f,-1.0f, 0.0f), glm::u8vec4(255, 127,   0, 255)),
+		glf::vertex_v3fv4u8(glm::vec3( 1.0f,-1.0f, 0.0f), glm::u8vec4(255, 127,   0, 255)),
+		glf::vertex_v3fv4u8(glm::vec3( 1.0f, 1.0f, 0.0f), glm::u8vec4(255, 127,   0, 255)),
+		glf::vertex_v3fv4u8(glm::vec3(-1.0f, 1.0f, 0.0f), glm::u8vec4(255, 127,   0, 255)),
+		glf::vertex_v3fv4u8(glm::vec3(-0.1f,-0.1f, 0.2f), glm::u8vec4(  0, 127, 255, 255)),
+		glf::vertex_v3fv4u8(glm::vec3( 0.1f,-0.1f, 0.2f), glm::u8vec4(  0, 127, 255, 255)),
+		glf::vertex_v3fv4u8(glm::vec3( 0.1f, 0.1f, 0.2f), glm::u8vec4(  0, 127, 255, 255)),
+		glf::vertex_v3fv4u8(glm::vec3(-0.1f, 0.1f, 0.2f), glm::u8vec4(  0, 127, 255, 255))
 	};
 
 	GLsizei const ElementCount(12);
@@ -83,7 +83,6 @@ namespace
 		{
 			DEPTH,
 			RENDER,
-			SPLASH,
 			MAX
 		};
 	}//namespace program
@@ -126,7 +125,7 @@ bool initProgram()
 		glAttachShader(ProgramName[program::RENDER], VertShaderName);
 		glAttachShader(ProgramName[program::RENDER], FragShaderName);
 		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::POSITION, "Position");
-		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::COLOR, "Color");
 		glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::RENDER]);
 		glDeleteShader(VertShaderName);
@@ -155,7 +154,6 @@ bool initProgram()
 		glAttachShader(ProgramName[program::DEPTH], VertShaderName);
 		glAttachShader(ProgramName[program::DEPTH], FragShaderName);
 		glBindAttribLocation(ProgramName[program::DEPTH], glf::semantic::attr::POSITION, "Position");
-		glBindAttribLocation(ProgramName[program::DEPTH], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::DEPTH], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::DEPTH]);
 		glDeleteShader(VertShaderName);
@@ -168,32 +166,6 @@ bool initProgram()
 	{
 		UniformTransform[program::DEPTH] = glGetUniformBlockIndex(ProgramName[program::DEPTH], "transform");
 		UniformDiffuse[program::DEPTH] = glGetUniformLocation(ProgramName[program::DEPTH], "Diffuse");
-	}
-
-	if(Validated)
-	{
-		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SPLASH, 
-			"--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SPLASH,
-			"--version 150 --profile core");
-		Validated = Validated && Compiler.check();
-
-		ProgramName[program::SPLASH] = glCreateProgram();
-		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
-		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
-		glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
-		glLinkProgram(ProgramName[program::SPLASH]);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
-		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
-	}
-
-	if(Validated)
-	{
-		UniformTransform[program::SPLASH] = glGetUniformBlockIndex(ProgramName[program::SPLASH], "transform");
-		UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
 	}
 
 	return Validated;
@@ -277,6 +249,8 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, ShadowSize.x, ShadowSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -291,17 +265,14 @@ bool initVertexArray()
 	glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 	glBindVertexArray(VertexArrayName[program::RENDER]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv2f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv4u8), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v3fv4u8), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glBindVertexArray(0);
-
-	glBindVertexArray(VertexArrayName[program::SPLASH]);
 	glBindVertexArray(0);
 
 	return true;
@@ -401,42 +372,22 @@ void renderFramebuffer()
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH , 0, &Depth);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-	// Bind rendering objects
 	glUseProgram(ProgramName[program::RENDER]);
-	glUniform1i(UniformDiffuse[program::RENDER], 0);
-	glUniform1i(UniformShadow, 1);
+	glUniform1i(UniformShadow, 0);
 	glUniformBlockBinding(ProgramName[program::RENDER], UniformTransform[program::RENDER], glf::semantic::uniform::TRANSFORM0);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::SHADOWMAP]);
-	glActiveTexture(GL_TEXTURE0);
 
 	glBindVertexArray(VertexArrayName[program::RENDER]);
-
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 	glDisable(GL_DEPTH_TEST);
-}
-
-void renderSplash()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glUseProgram(ProgramName[program::SPLASH]);
-	glUniform1i(UniformDiffuse[program::SPLASH], 0);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-	//glBindTexture(GL_TEXTURE_2D, TextureName[texture::SHADOWMAP]);
-	glBindVertexArray(VertexArrayName[program::SPLASH]);
-
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 }
 
 void display()
@@ -479,7 +430,7 @@ void display()
 
 	renderShadow();
 	renderFramebuffer();
-	renderSplash();
+	//renderSplash();
 
 	glf::swapBuffers();
 }

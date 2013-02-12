@@ -35,6 +35,21 @@ namespace glf
 		glm::vec2 Texcoord;
 	};
 
+	struct vertex_v3fv4u8
+	{
+		vertex_v3fv4u8
+		(
+			glm::vec3 const & Position,
+			glm::u8vec4 const & Color
+		) :
+			Position(Position),
+			Color(Color)
+		{}
+
+		glm::vec3 Position;
+		glm::u8vec4 Color;
+	};
+
 	struct vertex_v2fv3f
 	{
 		vertex_v2fv3f
