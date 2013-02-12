@@ -1,5 +1,5 @@
 //**********************************
-// OpenGL Shadow
+// OpenGL Shadow Gather
 // 11/02/2013 - 11/02/2013
 //**********************************
 // Christophe Riccio
@@ -15,15 +15,15 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Shadow");
-	std::string const VERT_SHADER_SOURCE_DEPTH(glf::DATA_DIRECTORY + "gl-320/fbo-shadow-depth.vert");
-	std::string const VERT_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-320/fbo-shadow-render.vert");
-	std::string const FRAG_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-320/fbo-shadow-render.frag");
+	std::string const SAMPLE_NAME("OpenGL Shadow Gather");
+	std::string const VERT_SHADER_SOURCE_DEPTH(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-depth.vert");
+	std::string const VERT_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-render.vert");
+	std::string const FRAG_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-render.frag");
 	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
+	int const SAMPLE_MAJOR_VERSION(4);
+	int const SAMPLE_MINOR_VERSION(0);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -101,7 +101,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(512, 512);
+	glm::ivec2 const ShadowSize(2048, 2048);
 }//namespace
 
 bool initProgram()
@@ -112,9 +112,9 @@ bool initProgram()
 	{
 		glf::compiler Compiler;
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_RENDER, 
-			"--version 150 --profile core");
+			"--version 400 --profile core");
 		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_RENDER,
-			"--version 150 --profile core");
+			"--version 400 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::RENDER] = glCreateProgram();
@@ -140,7 +140,7 @@ bool initProgram()
 	{
 		glf::compiler Compiler;
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_DEPTH, 
-			"--version 150 --profile core");
+			"--version 400 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::DEPTH] = glCreateProgram();
@@ -153,7 +153,9 @@ bool initProgram()
 	}
 
 	if(Validated)
+	{
 		UniformTransform[program::DEPTH] = glGetUniformBlockIndex(ProgramName[program::DEPTH], "transform");
+	}
 
 	return Validated;
 }
@@ -386,7 +388,7 @@ void display()
 
 	// Update of the MVP matrix for the render pass
 	{
-		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 10.0f);
+		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.01f, 5.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y + 3.0f));
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - 60.f, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 30.f, glm::vec3(0.f, 0.f, 1.f));
@@ -396,7 +398,7 @@ void display()
 
 	// Update of the MVP matrix for the depth pass
 	{
-		glm::mat4 Projection = glm::ortho<float>(-2, 2, -2, 2,-4, 8);
+		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
 		glm::mat4 View = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 DepthMVP = Projection * View * Model;
@@ -417,6 +419,7 @@ void display()
 
 	renderShadow();
 	renderFramebuffer();
+	//renderSplash();
 
 	glf::swapBuffers();
 }
