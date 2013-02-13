@@ -3,18 +3,6 @@
 uniform sampler2D Diffuse;
 uniform sampler2DShadow Shadow;
 
-const float Spread = 1.5;
-const int SampleCount = 8;
-const vec2 Offsets[SampleCount] = vec2[](
-	vec2( 0.7, 0.3),
-	vec2( 0.3,-0.7),
-	vec2(-0.7,-0.3),
-	vec2(-0.3, 0.7),
-	vec2( 0.7,-0.3),
-	vec2(-0.3,-0.7),
-	vec2(-0.7, 0.3),
-	vec2( 0.3, 0.7));
-
 in block
 {
 	vec4 Color;
@@ -25,17 +13,19 @@ out vec4 Color;
 
 void main()
 {
+	vec4 Diffuse = In.Color;
+
+	ivec2 ShadowSize = textureSize(Shadow, 0);
 	vec4 ShadowCoord = In.ShadowCoord;
 	ShadowCoord.z -= 0.005;
 
-	vec4 Diffuse = In.Color;
+	vec4 Gather = textureGather(Shadow, ShadowCoord.xy, ShadowCoord.z);
 
-	vec2 ShadowSize = vec2(textureSize(Shadow, 0));
-	float Size = max(ShadowSize.x, ShadowSize.y);
+	vec2 TexelCoord = ShadowCoord.xy * vec2(ShadowSize.xy);
+	vec2 SampleCoord = fract(TexelCoord + 0.5);
 
-	float Visibility = 0.0;
-	for(int SampleIndex = 0; SampleIndex < 8; ++SampleIndex)
-		Visibility += mix(0.5, 1.0, texture(Shadow, ShadowCoord.xyz + vec3(Offsets[SampleIndex] * Spread, 0.0) / Size));
-
-	Color = Visibility / float(SampleCount) * Diffuse;
+	float Texel0 = mix(Gather.x, Gather.y, SampleCoord.x);
+	float Texel1 = mix(Gather.w, Gather.z, SampleCoord.x);
+	float Visibility = mix(Texel1, Texel0, SampleCoord.y);
+	Color = vec4(mix(vec4(0.5), vec4(1.0), Visibility) * Diffuse);
 }

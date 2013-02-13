@@ -29,7 +29,9 @@ void main()
 	vec4 Texel11 = texelFetch(Diffuse, Coord + ivec2(1, 1), 0);
 	vec4 Texel01 = texelFetch(Diffuse, Coord + ivec2(0, 1), 0);
 	
-	vec4 Texel0 = mix(Texel00, Texel01, fract(Texcoord.y));
-	vec4 Texel1 = mix(Texel10, Texel11, fract(Texcoord.y));
-	Color  = mix(Texel0, Texel1, fract(Texcoord.x));
+	vec2 SampleCoord = fract(Texcoord.xy);
+
+	vec4 Texel0 = mix(Texel00, Texel01, SampleCoord.y);
+	vec4 Texel1 = mix(Texel10, Texel11, SampleCoord.y);
+	Color = mix(Texel0, Texel1, SampleCoord.x);
 }

@@ -101,7 +101,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(2048, 2048);
+	glm::ivec2 const ShadowSize(1024, 1024);
 }//namespace
 
 bool initProgram()
@@ -238,8 +238,8 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, ShadowSize.x, ShadowSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
