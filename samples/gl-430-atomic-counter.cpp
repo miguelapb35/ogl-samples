@@ -16,9 +16,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Atomic Counter");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/atomic-counter.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/atomic-counter.frag");
+	char const * SAMPLE_NAME("OpenGL Atomic Counter");
+	char const * VERT_SHADER_SOURCE("gl-430/atomic-counter.vert");
+	char const * FRAG_SHADER_SOURCE("gl-430/atomic-counter.frag");
 	int const SAMPLE_SIZE_WIDTH(1024);
 	int const SAMPLE_SIZE_HEIGHT(768);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -71,9 +71,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 

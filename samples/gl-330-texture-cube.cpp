@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Cube map";
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-cube.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-cube.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "cube.dds");
+	char const * SAMPLE_NAME = "OpenGL Cube map";
+	char const * VERT_SHADER_SOURCE("gl-330/texture-cube.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/texture-cube.frag");
+	char const * TEXTURE_DIFFUSE("cube.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -69,8 +69,8 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
@@ -133,7 +133,7 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::textureCube Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
 	for(std::size_t Face = 0; Face < 6; ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Framebuffer sRGB decode";	
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-srgb-decode.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/fbo-srgb-decode.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-dxt1.dds");
+	char const * SAMPLE_NAME = "OpenGL Framebuffer sRGB decode";	
+	char const * VERT_SHADER_SOURCE("gl-420/fbo-srgb-decode.vert");
+	char const * FRAG_SHADER_SOURCE("gl-420/fbo-srgb-decode.frag");
+	char const * TEXTURE_DIFFUSE("kueken2-dxt1.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -81,9 +81,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
 			"--version 430 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -154,7 +154,7 @@ bool initSampler()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 	if(Texture.empty())
 		return false;

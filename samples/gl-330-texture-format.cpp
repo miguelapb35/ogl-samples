@@ -13,14 +13,14 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Texture Format";
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-format.vert");
-	std::string const FRAG_SHADER_SOURCE[3] = 
+	char const * SAMPLE_NAME = "OpenGL Texture Format";
+	char const * VERT_SHADER_SOURCE("gl-330/texture-format.vert");
+	char const * FRAG_SHADER_SOURCE[3] = 
 	{
-		glf::DATA_DIRECTORY + "gl-330/texture-format-normalized.frag", 
-		glf::DATA_DIRECTORY + "gl-330/texture-format-uint.frag"
+		"gl-330/texture-format-normalized.frag", 
+		"gl-330/texture-format-uint.frag"
 	};
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -130,8 +130,8 @@ bool initProgram()
 	
 	for(std::size_t i = 0; (i < program::MAX) && Validated; ++i)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[i]);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i]);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
@@ -167,7 +167,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

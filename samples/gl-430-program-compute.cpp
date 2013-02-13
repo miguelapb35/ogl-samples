@@ -16,11 +16,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Compute Program");
-	std::string const VS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.vert");
-	std::string const FS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.frag");
-	std::string const CS_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-compute.comp");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	char const * SAMPLE_NAME("OpenGL Compute Program");
+	char const * VS_SOURCE("gl-430/program-compute.vert");
+	char const * FS_SOURCE("gl-430/program-compute.frag");
+	char const * CS_SOURCE("gl-430/program-compute.comp");
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -97,9 +97,9 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VS_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FS_SOURCE);
-		GLuint ComputeShaderName = glf::createShader(GL_COMPUTE_SHADER, CS_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VS_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FS_SOURCE);
+		GLuint ComputeShaderName = glf::createShader(GL_COMPUTE_SHADER, glf::DATA_DIRECTORY + CS_SOURCE);
 
 		ProgramName[program::GRAPHICS] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::GRAPHICS], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -212,7 +212,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

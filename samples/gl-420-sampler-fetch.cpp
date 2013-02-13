@@ -13,11 +13,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Programmable trilinear filtering");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/sampler-fetch.vert");
-	std::string const FRAG_SHADER_LIBRARY(glf::DATA_DIRECTORY + "gl-420/sampler-library.frag");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/sampler-fetch.frag");
-	std::string const TEXTURE_DIFFUSE_DXT5(glf::DATA_DIRECTORY + "kueken1-dxt5.dds");
+	char const * SAMPLE_NAME("OpenGL Programmable trilinear filtering");
+	char const * VERT_SHADER_SOURCE("gl-420/sampler-fetch.vert");
+	char const * FRAG_SHADER_LIBRARY("gl-420/sampler-library.frag");
+	char const * FRAG_SHADER_SOURCE("gl-420/sampler-fetch.frag");
+	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -96,11 +96,11 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
 			"--version 420 --profile core");
-		GLuint LibShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_LIBRARY,
+		GLuint LibShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_LIBRARY,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -140,7 +140,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

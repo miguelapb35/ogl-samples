@@ -16,11 +16,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Image Store");
-	std::string const VERT_SHADER_SOURCE_SAVE(glf::DATA_DIRECTORY + "gl-420/image-store-write.vert");
-	std::string const FRAG_SHADER_SOURCE_SAVE(glf::DATA_DIRECTORY + "gl-420/image-store-write.frag");
-	std::string const VERT_SHADER_SOURCE_READ(glf::DATA_DIRECTORY + "gl-420/image-store-read.vert");
-	std::string const FRAG_SHADER_SOURCE_READ(glf::DATA_DIRECTORY + "gl-420/image-store-read.frag");
+	char const * SAMPLE_NAME("OpenGL Image Store");
+	char const * VERT_SHADER_SOURCE_SAVE("gl-420/image-store-write.vert");
+	char const * FRAG_SHADER_SOURCE_SAVE("gl-420/image-store-write.frag");
+	char const * VERT_SHADER_SOURCE_READ("gl-420/image-store-read.vert");
+	char const * FRAG_SHADER_SOURCE_READ("gl-420/image-store-read.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -65,7 +65,7 @@ bool initProgram()
 	glBindProgramPipeline(PipelineName[pipeline::READ]);
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE_READ);
+		std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_READ);
 		char const * VertexSourcePointer = VertexSourceContent.c_str();
 		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -73,7 +73,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE_READ);
+		std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_READ);
 		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
@@ -89,7 +89,7 @@ bool initProgram()
 	glBindProgramPipeline(PipelineName[pipeline::SAVE]);
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE_SAVE);
+		std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SAVE);
 		char const * VertexSourcePointer = VertexSourceContent.c_str();
 		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -97,7 +97,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE_SAVE);
+		std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SAVE);
 		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);

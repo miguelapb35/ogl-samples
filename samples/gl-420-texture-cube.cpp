@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Cube map");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-cube.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-cube.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "cube.dds");//compressed
+	char const * SAMPLE_NAME("OpenGL Cube map");
+	char const * VERT_SHADER_SOURCE("gl-420/texture-cube.vert");
+	char const * FRAG_SHADER_SOURCE("gl-420/texture-cube.frag");
+	char const * TEXTURE_DIFFUSE("cube.dds");//compressed
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -80,9 +80,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -151,7 +151,7 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::textureCube Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));

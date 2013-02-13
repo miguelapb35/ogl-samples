@@ -16,10 +16,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Image Unpack");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/image-unpack.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/image-unpack.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-bgra8.dds");
+	char const * SAMPLE_NAME("OpenGL Image Unpack");
+	char const * VERT_SHADER_SOURCE("gl-420/image-unpack.vert");
+	char const * FRAG_SHADER_SOURCE("gl-420/image-unpack.frag");
+	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -101,7 +101,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE);
+		std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
 		char const * VertexSourcePointer = VertexSourceContent.c_str();
 		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -115,7 +115,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE);
+		std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
@@ -151,7 +151,7 @@ bool initTexture2D()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

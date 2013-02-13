@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Primitive instancing";	
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/primitive-instancing.vert");
-	std::string const GEOM_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/primitive-instancing.geom");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/primitive-instancing.frag");
+	char const * SAMPLE_NAME = "OpenGL Primitive instancing";	
+	char const * VERT_SHADER_SOURCE("gl-410/primitive-instancing.vert");
+	char const * GEOM_SHADER_SOURCE("gl-410/primitive-instancing.geom");
+	char const * FRAG_SHADER_SOURCE("gl-410/primitive-instancing.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -93,9 +93,9 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		ProgramName[program::VERT] = glCreateProgram();
 		ProgramName[program::FRAG] = glCreateProgram();

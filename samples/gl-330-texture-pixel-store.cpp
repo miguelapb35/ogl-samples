@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Texture Pixel Store";
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-bgra8.dds");
+	char const * SAMPLE_NAME = "OpenGL Texture Pixel Store";
+	char const * VERT_SHADER_SOURCE("gl-330/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/texture-2d.frag");
+	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -80,8 +80,8 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
@@ -128,7 +128,7 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture

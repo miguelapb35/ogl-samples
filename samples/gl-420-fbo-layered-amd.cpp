@@ -13,11 +13,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Layered rendering");
-	std::string const VERT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-420/layer-amd.vert");
-	std::string const FRAG_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-420/layer-amd.frag");
-	std::string const VERT_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-420/viewport-amd.vert");
-	std::string const FRAG_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-420/viewport-amd.frag");
+	char const * SAMPLE_NAME("OpenGL Layered rendering");
+	char const * VERT_SHADER_SOURCE1("gl-420/layer-amd.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-420/layer-amd.frag");
+	char const * VERT_SHADER_SOURCE2("gl-420/viewport-amd.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-420/viewport-amd.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -83,9 +83,9 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE1, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -103,9 +103,9 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 

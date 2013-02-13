@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Render to texture";
-	std::string const VERTEX_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-330/multiple-output.vert");
-	std::string const FRAGMENT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-330/multiple-output.frag");
-	std::string const VERTEX_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-330/rtt-array.vert");
-	std::string const FRAGMENT_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-330/rtt-array.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
+	char const * SAMPLE_NAME = "OpenGL Render to texture";
+	char const * VERTEX_SHADER_SOURCE1("gl-330/multiple-output.vert");
+	char const * FRAGMENT_SHADER_SOURCE1("gl-330/multiple-output.frag");
+	char const * VERTEX_SHADER_SOURCE2("gl-330/rtt-array.vert");
+	char const * FRAGMENT_SHADER_SOURCE2("gl-330/rtt-array.frag");
+	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -100,8 +100,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE1);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE1);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE1);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE1);
 
 		ProgramNameMultiple = glCreateProgram();
 		glAttachShader(ProgramNameMultiple, VertexShaderName);
@@ -120,8 +120,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE2);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE2);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE2);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE2);
 
 		ProgramNameSingle = glCreateProgram();
 		glAttachShader(ProgramNameSingle, VertexShaderName);

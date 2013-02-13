@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Blend Index");
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/blend-index.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/blend-index.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	char const * SAMPLE_NAME("OpenGL Blend Index");
+	char const * VERTEX_SHADER_SOURCE("gl-330/blend-index.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-330/blend-index.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -79,8 +79,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);
@@ -123,7 +123,7 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
 
 	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(

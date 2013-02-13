@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Render to texture blending";
-	std::string const VERTEX_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-400/mrt.vert");
-	std::string const FRAGMENT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-400/mrt.frag");
-	std::string const VERTEX_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-400/image-2d.vert");
-	std::string const FRAGMENT_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-400/image-2d.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
+	char const * SAMPLE_NAME = "OpenGL Render to texture blending";
+	char const * VERTEX_SHADER_SOURCE1("gl-400/mrt.vert");
+	char const * FRAGMENT_SHADER_SOURCE1("gl-400/mrt.frag");
+	char const * VERTEX_SHADER_SOURCE2("gl-400/image-2d.vert");
+	char const * FRAGMENT_SHADER_SOURCE2("gl-400/image-2d.frag");
+	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -95,8 +95,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE1);
-		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE1);
+		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE1);
+		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE1);
 
 		Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE1);
 		Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE1);
@@ -118,8 +118,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE2);
-		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE2);
+		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE2);
+		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE2);
 
 		Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE2);
 		Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE2);
@@ -162,7 +162,7 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(TEXTURE_MAX, TextureName);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
 	// Load image
 	glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_RGB8]);

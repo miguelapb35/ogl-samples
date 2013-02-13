@@ -13,11 +13,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Subroutine";	
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/subroutine.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/subroutine.frag");
-	std::string const TEXTURE_DIFFUSE_RGB8(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
-	std::string const TEXTURE_DIFFUSE_DXT1(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
+	char const * SAMPLE_NAME = "OpenGL Subroutine";	
+	char const * VERTEX_SHADER_SOURCE("gl-400/subroutine.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-400/subroutine.frag");
+	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE_DXT1("kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH = 640;
 	int const SAMPLE_SIZE_HEIGHT = 480;
 	int const SAMPLE_MAJOR_VERSION = 4;
@@ -101,8 +101,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -167,7 +167,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, TextureName);
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_RGB8));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
@@ -193,7 +193,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT1));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);

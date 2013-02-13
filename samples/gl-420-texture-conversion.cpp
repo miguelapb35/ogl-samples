@@ -13,14 +13,14 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Texture Conversion");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-conversion.vert");
-	std::string const FRAG_SHADER_SOURCE[2] = 
+	char const * SAMPLE_NAME("OpenGL Texture Conversion");
+	char const * VERT_SHADER_SOURCE("gl-420/texture-conversion.vert");
+	char const * FRAG_SHADER_SOURCE[2] = 
 	{
-		glf::DATA_DIRECTORY + "gl-420/texture-conversion-normalized.frag", 
-		glf::DATA_DIRECTORY + "gl-420/texture-conversion-uint.frag"
+		"gl-420/texture-conversion-normalized.frag", 
+		"gl-420/texture-conversion-uint.frag"
 	};
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -130,11 +130,11 @@ bool initProgram()
 	glGenProgramPipelines(program::MAX, PipelineName);
 
 	glf::compiler Compiler;
-	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 		"--version 420 --profile core");
-	GLuint FragShaderNameNorm = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::NORM],
+	GLuint FragShaderNameNorm = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[program::NORM],
 		"--version 420 --profile core");
-	GLuint FragShaderNameUint = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[program::UINT],
+	GLuint FragShaderNameUint = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[program::UINT],
 		"--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
@@ -198,7 +198,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

@@ -14,13 +14,13 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Texture 2D Compressed";
-	std::string const SHADER_VERT_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.vert");
-	std::string const SHADER_FRAG_SOURCE(glf::DATA_DIRECTORY + "gl-330/texture-2d.frag");
-	std::string const TEXTURE_DIFFUSE_BC1(glf::DATA_DIRECTORY + "kueken2-dxt1.dds");
-	std::string const TEXTURE_DIFFUSE_BC3(glf::DATA_DIRECTORY + "kueken2-dxt5.dds");
-	std::string const TEXTURE_DIFFUSE_BC4(glf::DATA_DIRECTORY + "kueken2-bc4.dds");
-	std::string const TEXTURE_DIFFUSE_BC5(glf::DATA_DIRECTORY + "kueken2-bc5.dds");
+	char const * SAMPLE_NAME = "OpenGL Texture 2D Compressed";
+	std::string const SHADER_VERT_SOURCE("gl-330/texture-2d.vert");
+	std::string const SHADER_FRAG_SOURCE("gl-330/texture-2d.frag");
+	char const * TEXTURE_DIFFUSE_BC1("kueken2-dxt1.dds");
+	char const * TEXTURE_DIFFUSE_BC3("kueken2-dxt5.dds");
+	char const * TEXTURE_DIFFUSE_BC4("kueken2-bc4.dds");
+	char const * TEXTURE_DIFFUSE_BC5("kueken2-bc5.dds");
 
 	int const SAMPLE_SIZE_WIDTH = 640;
 	int const SAMPLE_SIZE_HEIGHT = 480;
@@ -95,8 +95,8 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, SHADER_VERT_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, SHADER_FRAG_SOURCE);
@@ -138,7 +138,7 @@ bool initTexture2D()
 
 	// Set image
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC1));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC1));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -163,7 +163,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC3));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC3));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC3]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -188,7 +188,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC4));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC4));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -213,7 +213,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_BC5));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC5));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);

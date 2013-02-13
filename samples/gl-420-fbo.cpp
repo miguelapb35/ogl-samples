@@ -15,12 +15,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Framebuffer Object");
-	std::string const VERT_SHADER_SOURCE_TEXTURE(glf::DATA_DIRECTORY + "gl-420/fbo-texture-2d.vert");
-	std::string const FRAG_SHADER_SOURCE_TEXTURE(glf::DATA_DIRECTORY + "gl-420/fbo-texture-2d.frag");
-	std::string const VERT_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/fbo-splash.vert");
-	std::string const FRAG_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/fbo-splash.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
+	char const * SAMPLE_NAME("OpenGL Framebuffer Object");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-420/fbo-texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-420/fbo-texture-2d.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-420/fbo-splash.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-420/fbo-splash.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -96,9 +96,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_TEXTURE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_TEXTURE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -119,9 +119,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SPLASH, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SPLASH,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -173,7 +173,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

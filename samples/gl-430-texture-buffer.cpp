@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Buffer Texture");
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/texture-buffer.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/texture-buffer.frag");
+	char const * SAMPLE_NAME("OpenGL Buffer Texture");
+	char const * VERTEX_SHADER_SOURCE("gl-430/texture-buffer.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-430/texture-buffer.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -93,8 +93,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShaderName);

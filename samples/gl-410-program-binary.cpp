@@ -13,14 +13,14 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Program binary";
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/binary.vert");
-	std::string const GEOM_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/binary.geom");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/binary.frag");
-	std::string const VERT_PROGRAM_BINARY(glf::DATA_DIRECTORY + "gl-410/binary.vert.bin");
-	std::string const GEOM_PROGRAM_BINARY(glf::DATA_DIRECTORY + "gl-410/binary.vert.bin");
-	std::string const FRAG_PROGRAM_BINARY(glf::DATA_DIRECTORY + "gl-410/binary.frag.bin");
-	std::string const TEXTURE_DIFFUSE_DXT5(glf::DATA_DIRECTORY + "kueken1-dxt5.dds");
+	char const * SAMPLE_NAME = "OpenGL Program binary";
+	char const * VERT_SHADER_SOURCE("gl-410/binary.vert");
+	char const * GEOM_SHADER_SOURCE("gl-410/binary.geom");
+	char const * FRAG_SHADER_SOURCE("gl-410/binary.frag");
+	char const * VERT_PROGRAM_BINARY("gl-410/binary.vert.bin");
+	char const * GEOM_PROGRAM_BINARY("gl-410/binary.vert.bin");
+	char const * FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
+	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -117,7 +117,7 @@ bool initProgram()
 		GLenum Format = 0;
 		GLint Size = 0;
 		std::vector<glm::byte> Data;
-		if(glf::loadBinary(VERT_PROGRAM_BINARY, Format, Data, Size))
+		if(glf::loadBinary(glf::DATA_DIRECTORY + VERT_PROGRAM_BINARY, Format, Data, Size))
 		{
 			glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
 			glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
@@ -127,7 +127,7 @@ bool initProgram()
 	// Create program
 	if(Validated && !Success)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
 
 		glAttachShader(ProgramName[program::VERT], VertShaderName);
 		glDeleteShader(VertShaderName);
@@ -144,7 +144,7 @@ bool initProgram()
 		GLenum Format = 0;
 		GLint Size = 0;
 		std::vector<glm::byte> Data;
-		if(glf::loadBinary(VERT_PROGRAM_BINARY, Format, Data, Size))
+		if(glf::loadBinary(glf::DATA_DIRECTORY + GEOM_PROGRAM_BINARY, Format, Data, Size))
 		{
 			glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
 			glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
@@ -154,7 +154,7 @@ bool initProgram()
 	// Create program
 	if(Validated && !Success)
 	{
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE);
+		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE);
 
 		glAttachShader(ProgramName[program::GEOM], GeomShaderName);
 		glDeleteShader(GeomShaderName);
@@ -171,7 +171,7 @@ bool initProgram()
 		GLenum Format = 0;
 		GLint Size = 0;
 		std::vector<glm::byte> Data;
-		if(glf::loadBinary(FRAG_PROGRAM_BINARY, Format, Data, Size))
+		if(glf::loadBinary(glf::DATA_DIRECTORY + FRAG_PROGRAM_BINARY, Format, Data, Size))
 		{
 			glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
 			glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
@@ -181,7 +181,7 @@ bool initProgram()
 	// Create program
 	if(Validated && !Success)
 	{
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		glAttachShader(ProgramName[program::FRAG], FragShaderName);
 		glDeleteShader(FragShaderName);
@@ -221,7 +221,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(

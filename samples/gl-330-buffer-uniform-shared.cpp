@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Uniform Buffer Shared";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/uniform-buffer.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/uniform-buffer.frag");
+	char const * SAMPLE_NAME = "OpenGL Uniform Buffer Shared";
+	char const * VERTEX_SHADER_SOURCE("gl-330/uniform-buffer.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-330/uniform-buffer.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -69,8 +69,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);

@@ -11,8 +11,8 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Sampler offset";
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	char const * SAMPLE_NAME = "OpenGL Sampler offset";
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -58,7 +58,7 @@ namespace
 		};
 	}//namespace program
 
-	std::string const SHADER_VERT(glf::DATA_DIRECTORY + "gl-330/sampler.vert");
+	std::string const SHADER_VERT("gl-330/sampler.vert");
 
 	std::string const SHADER_FRAG[program::MAX] = 
 	{
@@ -144,7 +144,7 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(

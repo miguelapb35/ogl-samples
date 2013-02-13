@@ -13,15 +13,15 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Primitive smooth shading";	
-	std::string const SAMPLE_VERT_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.vert");
-	std::string const SAMPLE_CONT_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.cont");
-	std::string const SAMPLE_EVAL_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.eval");
-	std::string const SAMPLE_GEOM_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.geom");
-	std::string const SAMPLE_FRAG_SHADER1(glf::DATA_DIRECTORY + "gl-400/tess.frag");
-	std::string const SAMPLE_VERT_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.vert");
-	std::string const SAMPLE_GEOM_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.geom");
-	std::string const SAMPLE_FRAG_SHADER2(glf::DATA_DIRECTORY + "gl-400/smooth-shading-geom.frag");
+	char const * SAMPLE_NAME = "OpenGL Primitive smooth shading";	
+	std::string const SAMPLE_VERT_SHADER1("gl-400/tess.vert");
+	std::string const SAMPLE_CONT_SHADER1("gl-400/tess.cont");
+	std::string const SAMPLE_EVAL_SHADER1("gl-400/tess.eval");
+	std::string const SAMPLE_GEOM_SHADER1("gl-400/tess.geom");
+	std::string const SAMPLE_FRAG_SHADER1("gl-400/tess.frag");
+	std::string const SAMPLE_VERT_SHADER2("gl-400/smooth-shading-geom.vert");
+	std::string const SAMPLE_GEOM_SHADER2("gl-400/smooth-shading-geom.geom");
+	std::string const SAMPLE_FRAG_SHADER2("gl-400/smooth-shading-geom.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -82,11 +82,11 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER1);
-		GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER1);
-		GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER1);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER1);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER1);
+		GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER1);
+		GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER1);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER1);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER1);
 
 		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
 		Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
@@ -119,9 +119,9 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER2);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER2);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER2);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER2);
 
 		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
 		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);

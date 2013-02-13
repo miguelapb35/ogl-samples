@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Buffer Type");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/flat-color.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/flat-color.frag");
+	char const * SAMPLE_NAME("OpenGL Buffer Type");
+	char const * VERT_SHADER_SOURCE("gl-330/flat-color.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/flat-color.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -102,8 +102,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);

@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Subroutine");	
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-subroutine.vert");
-	std::string const GEOM_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-subroutine.geom");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/program-subroutine.frag");
-	std::string const TEXTURE_DIFFUSE_RGB8(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
-	std::string const TEXTURE_DIFFUSE_DXT1(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
+	char const * SAMPLE_NAME("OpenGL Subroutine");	
+	char const * VERT_SHADER_SOURCE("gl-430/program-subroutine.vert");
+	char const * GEOM_SHADER_SOURCE("gl-430/program-subroutine.geom");
+	char const * FRAG_SHADER_SOURCE("gl-430/program-subroutine.frag");
+	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE_DXT1("kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -124,9 +124,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE);
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE);
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 		Validated = Validated && Compiler.check();
 
 		if(Validated)
@@ -197,7 +197,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, TextureName);
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_RGB8));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);
@@ -224,7 +224,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT1));
+		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);

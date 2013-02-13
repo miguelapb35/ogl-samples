@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Render to texture";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/fbo-rtt.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/fbo-rtt.frag");
+	char const * SAMPLE_NAME = "OpenGL Render to texture";
+	char const * VERTEX_SHADER_SOURCE("gl-400/fbo-rtt.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-400/fbo-rtt.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -60,8 +60,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);

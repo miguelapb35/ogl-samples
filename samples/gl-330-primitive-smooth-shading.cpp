@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Primitive smooth shading";	
-	std::string const VERT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-330/smooth-shading.vert");
-	std::string const FRAG_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-330/smooth-shading.frag");
-	std::string const VERT_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-330/smooth-shading-geom.vert");
-	std::string const GEOM_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-330/smooth-shading-geom.geom");
-	std::string const FRAG_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-330/smooth-shading-geom.frag");
+	char const * SAMPLE_NAME = "OpenGL Primitive smooth shading";	
+	char const * VERT_SHADER_SOURCE1("gl-330/smooth-shading.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-330/smooth-shading.frag");
+	char const * VERT_SHADER_SOURCE2("gl-330/smooth-shading-geom.vert");
+	char const * GEOM_SHADER_SOURCE2("gl-330/smooth-shading-geom.geom");
+	char const * FRAG_SHADER_SOURCE2("gl-330/smooth-shading-geom.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -78,8 +78,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE1);
 		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE1);
@@ -104,9 +104,9 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE2);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE2);
 		Validated = Validated && glf::checkShader(GeomShader, GEOM_SHADER_SOURCE2);

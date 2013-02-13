@@ -13,8 +13,8 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Framebuffer Explicit Multisample";	
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken3-bgr8.dds");
+	char const * SAMPLE_NAME = "OpenGL Framebuffer Explicit Multisample";	
+	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -47,12 +47,12 @@ namespace
 		};
 	}//namespace program
 
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-330/multisample-explicit-texture.vert");
-	std::string const FRAG_SHADER_SOURCE[program::MAX] = 
+	char const * VERT_SHADER_SOURCE("gl-330/multisample-explicit-texture.vert");
+	char const * FRAG_SHADER_SOURCE[program::MAX] = 
 	{
-		glf::DATA_DIRECTORY + "gl-330/multisample-explicit-texture.frag",
-		glf::DATA_DIRECTORY + "gl-330/multisample-explicit-box.frag",
-		glf::DATA_DIRECTORY + "gl-330/multisample-explicit-near.frag",
+		"gl-330/multisample-explicit-texture.frag",
+		"gl-330/multisample-explicit-box.frag",
+		"gl-330/multisample-explicit-near.frag",
 	};
 
 	GLuint VertexArrayName = 0;
@@ -109,8 +109,8 @@ bool initProgram()
 	// Create program
 	for(int i = 0; i < program::MAX; ++i)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE[i]);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i]);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
@@ -150,7 +150,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(

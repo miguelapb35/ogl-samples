@@ -1,6 +1,6 @@
 #version 420 core
 
-#include "texture-2d.glsl"
+#include "texture-storage.glsl"
 #line 5
 
 #define COUNT 24

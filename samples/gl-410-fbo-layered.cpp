@@ -13,13 +13,13 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Layered rendering");
-	std::string const VERT_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.vert");
-	std::string const GEOM_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.geom");
-	std::string const FRAG_SHADER_SOURCE1(glf::DATA_DIRECTORY + "gl-410/layer.frag");
-	std::string const VERT_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-410/viewport.vert");
-	std::string const GEOM_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-410/viewport.geom");
-	std::string const FRAG_SHADER_SOURCE2(glf::DATA_DIRECTORY + "gl-410/viewport.frag");
+	char const * SAMPLE_NAME("OpenGL Layered rendering");
+	char const * VERT_SHADER_SOURCE1("gl-410/layer.vert");
+	char const * GEOM_SHADER_SOURCE1("gl-410/layer.geom");
+	char const * FRAG_SHADER_SOURCE1("gl-410/layer.frag");
+	char const * VERT_SHADER_SOURCE2("gl-410/viewport.vert");
+	char const * GEOM_SHADER_SOURCE2("gl-410/viewport.geom");
+	char const * FRAG_SHADER_SOURCE2("gl-410/viewport.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -90,9 +90,9 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE1);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE1);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE1);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1);
+		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE1);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1);
 
 		ProgramName[LAYERING] = glCreateProgram();
 		glAttachShader(ProgramName[LAYERING], VertShaderName);
@@ -107,9 +107,9 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE2);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE2);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE2);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2);
+		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE2);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2);
 
 		ProgramName[VIEWPORT] = glCreateProgram();
 		glAttachShader(ProgramName[VIEWPORT], VertShaderName);

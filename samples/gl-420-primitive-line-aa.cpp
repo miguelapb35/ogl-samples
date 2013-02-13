@@ -16,11 +16,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Primitive Line AA");
-	std::string const VERT_SHADER_SOURCE_AA(glf::DATA_DIRECTORY + "gl-420/primitive-line-aa.vert");
-	std::string const FRAG_SHADER_SOURCE_AA(glf::DATA_DIRECTORY + "gl-420/primitive-line-aa.frag");
-	std::string const VERT_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/primitive-line-splash.vert");
-	std::string const FRAG_SHADER_SOURCE_SPLASH(glf::DATA_DIRECTORY + "gl-420/primitive-line-splash.frag");
+	char const * SAMPLE_NAME("OpenGL Primitive Line AA");
+	char const * VERT_SHADER_SOURCE_AA("gl-420/primitive-line-aa.vert");
+	char const * FRAG_SHADER_SOURCE_AA("gl-420/primitive-line-aa.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-420/primitive-line-splash.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-420/primitive-line-splash.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -87,8 +87,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_AA);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_AA);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_AA);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_AA);
 
 		ProgramName[pipeline::MULTISAMPLE] = glCreateProgram();
 		glProgramParameteri(ProgramName[pipeline::MULTISAMPLE], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -110,8 +110,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SPLASH);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SPLASH);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH);
 
 		ProgramName[pipeline::SPLASH] = glCreateProgram();
 		glProgramParameteri(ProgramName[pipeline::SPLASH], GL_PROGRAM_SEPARABLE, GL_TRUE);

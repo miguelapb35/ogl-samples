@@ -16,11 +16,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Image Store");
-	std::string const VERT_SHADER_SOURCE_SAVE(glf::DATA_DIRECTORY + "gl-430/image-store-write.vert");
-	std::string const FRAG_SHADER_SOURCE_SAVE(glf::DATA_DIRECTORY + "gl-430/image-store-write.frag");
-	std::string const VERT_SHADER_SOURCE_READ(glf::DATA_DIRECTORY + "gl-430/image-store-read.vert");
-	std::string const FRAG_SHADER_SOURCE_READ(glf::DATA_DIRECTORY + "gl-430/image-store-read.frag");
+	char const * SAMPLE_NAME("OpenGL Image Store");
+	char const * VERT_SHADER_SOURCE_SAVE("gl-430/image-store-write.vert");
+	char const * FRAG_SHADER_SOURCE_SAVE("gl-430/image-store-write.frag");
+	char const * VERT_SHADER_SOURCE_READ("gl-430/image-store-read.vert");
+	char const * FRAG_SHADER_SOURCE_READ("gl-430/image-store-read.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -56,9 +56,11 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_READ, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_READ, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_READ,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
+			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_READ,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -75,9 +77,11 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_SAVE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SAVE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_SAVE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
+			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SAVE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 

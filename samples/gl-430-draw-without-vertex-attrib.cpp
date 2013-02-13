@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Draw Without Vertex Attribute");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/draw-without-vertex-attrib.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-430/draw-without-vertex-attrib.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
+	char const * SAMPLE_NAME("OpenGL Draw Without Vertex Attribute");
+	char const * VERT_SHADER_SOURCE("gl-430/draw-without-vertex-attrib.vert");
+	char const * FRAG_SHADER_SOURCE("gl-430/draw-without-vertex-attrib.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -96,9 +96,11 @@ bool initProgram()
 	{
 		glf::compiler Compiler;
 
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER,
+			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -118,7 +120,7 @@ bool initProgram()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -166,7 +168,6 @@ bool begin()
 {
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_compute_shader");
 	Validated = Validated && glf::checkExtension("GL_ARB_shader_storage_buffer_object");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))

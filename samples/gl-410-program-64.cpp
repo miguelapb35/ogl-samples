@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Double";
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/double.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/double.frag");
+	char const * SAMPLE_NAME = "OpenGL Double";
+	char const * VERT_SHADER_SOURCE("gl-410/double.vert");
+	char const * FRAG_SHADER_SOURCE("gl-410/double.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -90,7 +90,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERT_SHADER_SOURCE);
+		std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
 		char const * VertexSourcePointer = VertexSourceContent.c_str();
 		ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -104,7 +104,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		std::string FragmentSourceContent = glf::loadFile(FRAG_SHADER_SOURCE);
+		std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 		ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);

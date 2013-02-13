@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Memory barrier";
-	std::string const SHADER_VERT_SOURCE_UPDATE(glf::DATA_DIRECTORY + "gl-420/memory-barrier-update.vert");
-	std::string const SHADER_FRAG_SOURCE_UPDATE(glf::DATA_DIRECTORY + "gl-420/memory-barrier-update.frag");
-	std::string const SHADER_VERT_SOURCE_BLIT(glf::DATA_DIRECTORY + "gl-420/memory-barrier-blit.vert");
-	std::string const SHADER_FRAG_SOURCE_BLIT(glf::DATA_DIRECTORY + "gl-420/memory-barrier-blit.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken4-dxt1.dds");
+	char const * SAMPLE_NAME = "OpenGL Memory barrier";
+	std::string const SHADER_VERT_SOURCE_UPDATE("gl-420/memory-barrier-update.vert");
+	std::string const SHADER_FRAG_SOURCE_UPDATE("gl-420/memory-barrier-update.frag");
+	std::string const SHADER_VERT_SOURCE_BLIT("gl-420/memory-barrier-blit.vert");
+	std::string const SHADER_FRAG_SOURCE_BLIT("gl-420/memory-barrier-blit.frag");
+	char const * TEXTURE_DIFFUSE("kueken4-dxt1.dds");
 	glm::ivec2 FRAMEBUFFER_SIZE(0);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -139,7 +139,7 @@ bool initTexture2D()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	FRAMEBUFFER_SIZE = Texture.dimensions();
 
 	glActiveTexture(GL_TEXTURE0);

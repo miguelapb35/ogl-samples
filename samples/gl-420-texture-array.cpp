@@ -13,11 +13,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Texture 2D Array";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-array.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-420/texture-array.frag");
-	//std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-bgr8.dds");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "array.dds");
+	char const * SAMPLE_NAME = "OpenGL Texture 2D Array";
+	char const * VERTEX_SHADER_SOURCE("gl-420/texture-array.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-420/texture-array.frag");
+	//char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("array.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -80,8 +80,8 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -129,7 +129,7 @@ bool initTextureArray()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DArrayName);
 
 	// Set image
-	gli::texture2DArray Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2DArray Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY,

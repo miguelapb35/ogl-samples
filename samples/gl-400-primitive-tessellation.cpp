@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Tessellation";	
-	std::string const SAMPLE_VERTEX_SHADER(glf::DATA_DIRECTORY + "gl-400/tess.vert");
-	std::string const SAMPLE_CONTROL_SHADER(glf::DATA_DIRECTORY + "gl-400/tess.cont");
-	std::string const SAMPLE_EVALUATION_SHADER(glf::DATA_DIRECTORY + "gl-400/tess.eval");
-	std::string const SAMPLE_GEOMETRY_SHADER(glf::DATA_DIRECTORY + "gl-400/tess.geom");
-	std::string const SAMPLE_FRAGMENT_SHADER(glf::DATA_DIRECTORY + "gl-400/tess.frag");
+	char const * SAMPLE_NAME = "OpenGL Tessellation";	
+	std::string const SAMPLE_VERTEX_SHADER("gl-400/tess.vert");
+	std::string const SAMPLE_CONTROL_SHADER("gl-400/tess.cont");
+	std::string const SAMPLE_EVALUATION_SHADER("gl-400/tess.eval");
+	std::string const SAMPLE_GEOMETRY_SHADER("gl-400/tess.geom");
+	std::string const SAMPLE_FRAGMENT_SHADER("gl-400/tess.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -48,11 +48,11 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERTEX_SHADER);
-		GLuint ControlShader = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONTROL_SHADER);
-		GLuint EvaluationShader = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVALUATION_SHADER);
-		GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOMETRY_SHADER);
-		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAGMENT_SHADER);
+		GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERTEX_SHADER);
+		GLuint ControlShader = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONTROL_SHADER);
+		GLuint EvaluationShader = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVALUATION_SHADER);
+		GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOMETRY_SHADER);
+		GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAGMENT_SHADER);
 
 		Validated = Validated && glf::checkShader(VertexShader, SAMPLE_VERTEX_SHADER);
 		Validated = Validated && glf::checkShader(ControlShader, SAMPLE_CONTROL_SHADER);

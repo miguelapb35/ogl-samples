@@ -13,12 +13,12 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Shader Interface Matching");	
-	std::string const SAMPLE_VERT_SHADER(glf::DATA_DIRECTORY + "gl-420/interface-matching.vert");
-	std::string const SAMPLE_CONT_SHADER(glf::DATA_DIRECTORY + "gl-420/interface-matching.cont");
-	std::string const SAMPLE_EVAL_SHADER(glf::DATA_DIRECTORY + "gl-420/interface-matching.eval");
-	std::string const SAMPLE_GEOM_SHADER(glf::DATA_DIRECTORY + "gl-420/interface-matching.geom");
-	std::string const SAMPLE_FRAG_SHADER(glf::DATA_DIRECTORY + "gl-420/interface-matching.frag");
+	char const * SAMPLE_NAME("OpenGL Shader Interface Matching");	
+	std::string const SAMPLE_VERT_SHADER("gl-420/interface-matching.vert");
+	std::string const SAMPLE_CONT_SHADER("gl-420/interface-matching.cont");
+	std::string const SAMPLE_EVAL_SHADER("gl-420/interface-matching.eval");
+	std::string const SAMPLE_GEOM_SHADER("gl-420/interface-matching.geom");
+	std::string const SAMPLE_FRAG_SHADER("gl-420/interface-matching.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -72,11 +72,11 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SAMPLE_VERT_SHADER);
-		GLuint ContShaderName = glf::createShader(GL_TESS_CONTROL_SHADER, SAMPLE_CONT_SHADER);
-		GLuint EvalShaderName = glf::createShader(GL_TESS_EVALUATION_SHADER, SAMPLE_EVAL_SHADER);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, SAMPLE_GEOM_SHADER);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SAMPLE_FRAG_SHADER);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER);
+		GLuint ContShaderName = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER);
+		GLuint EvalShaderName = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER);
+		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER);
 
 		ProgramName[program::VERT] = glCreateProgram();
 		ProgramName[program::FRAG] = glCreateProgram();

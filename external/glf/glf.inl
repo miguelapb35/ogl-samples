@@ -284,11 +284,15 @@ namespace glf
 				break;
 			}
 		}
+
+		if(Window.KeyPressed[GLFW_KEY_ESC] == 1)
+			end();
 	}
 
 	static int GLFWCALL close_callback()
 	{
 		Window.KeyPressed[GLFW_KEY_ESC] = 1;
+		end();
 		return GL_FALSE;
 	}
 
@@ -298,7 +302,7 @@ namespace glf
 		++FrameID;
 #ifdef GLF_AUTO_STATUS
 		if(FrameID > 10)
-			exit(end() ? 0 : 1);
+			Window.KeyPressed[GLFW_KEY_ESC] = 1;
 #endif//GLF_AUTO_STATUS
 		display();
 	}
@@ -332,7 +336,7 @@ namespace glf
 #		else
 			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #		endif
-		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 8, 8, 8, 8, 24, 0, GLFW_WINDOW);
+		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
 		assert(Result == GL_TRUE);
 
 		glfwSetWindowTitle(argv[0]);
@@ -347,17 +351,17 @@ namespace glf
 
 		if(Run)
 		{
-			do
+			while(true)
 			{
+				if(Window.KeyPressed[GLFW_KEY_ESC] == 1)
+					break;
 				display();
 			}
-			while(Window.KeyPressed[GLFW_KEY_ESC] != 1);
-
-			Run = end();
-			glfwCloseWindow();
 		}
 
 		glfwTerminate();
+
+		exit(EXIT_SUCCESS);
 
 		return Run ? 0 : 1;
 	}

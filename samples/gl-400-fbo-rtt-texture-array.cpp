@@ -13,9 +13,9 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL FBO texture array");
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/rtt-array.vert");
-	std::string const FRAG_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-400/rtt-array.frag");
+	char const * SAMPLE_NAME("OpenGL FBO texture array");
+	char const * VERT_SHADER_SOURCE("gl-400/rtt-array.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/rtt-array.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -62,8 +62,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
 		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);

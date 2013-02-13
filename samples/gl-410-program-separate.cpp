@@ -13,10 +13,10 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME = "OpenGL Separate program";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/separate.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "gl-410/separate.frag");
-	std::string const TEXTURE_DIFFUSE_DXT5(glf::DATA_DIRECTORY + "kueken1-dxt5.dds");
+	char const * SAMPLE_NAME("OpenGL Separate program");
+	char const * VERTEX_SHADER_SOURCE("gl-410/separate.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-410/separate.frag");
+	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -95,8 +95,8 @@ bool initUnifiedProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
 		UnifiedProgramName = glCreateProgram();
 		glAttachShader(UnifiedProgramName, VertShaderName);
@@ -124,7 +124,7 @@ bool initSeparateProgram()
 
 	if(Validated)
 	{
-		std::string VertexSourceContent = glf::loadFile(VERTEX_SHADER_SOURCE);
+		std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
 		char const * VertexSourcePointer = VertexSourceContent.c_str();
 		SeparateProgramName[program::VERTEX] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		Validated = glf::checkProgram(SeparateProgramName[program::VERTEX]);
@@ -135,7 +135,7 @@ bool initSeparateProgram()
 
 	if(Validated)
 	{
-		std::string FragmentSourceContent = glf::loadFile(FRAGMENT_SHADER_SOURCE);
+		std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 		char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 		SeparateProgramName[program::FRAGMENT] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		Validated = glf::checkProgram(SeparateProgramName[program::FRAGMENT]);
@@ -156,7 +156,7 @@ bool initSeparateProgram()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
 
 	glGenTextures(1, &TextureName);
 

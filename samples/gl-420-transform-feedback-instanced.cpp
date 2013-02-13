@@ -16,11 +16,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Transform Feedback Instanced");
-	std::string const VERT_SHADER_SOURCE_TRANSFORM(glf::DATA_DIRECTORY + "gl-420/transform-stream.vert");
-	std::string const GEOM_SHADER_SOURCE_TRANSFORM(glf::DATA_DIRECTORY + "gl-420/transform-stream.geom");
-	std::string const VERT_SHADER_SOURCE_FEEDBACK(glf::DATA_DIRECTORY + "gl-420/feedback-stream.vert");
-	std::string const FRAG_SHADER_SOURCE_FEEDBACK(glf::DATA_DIRECTORY + "gl-420/feedback-stream.frag");
+	char const * SAMPLE_NAME("OpenGL Transform Feedback Instanced");
+	char const * VERT_SHADER_SOURCE_TRANSFORM("gl-420/transform-stream.vert");
+	char const * GEOM_SHADER_SOURCE_TRANSFORM("gl-420/transform-stream.geom");
+	char const * VERT_SHADER_SOURCE_FEEDBACK("gl-420/feedback-stream.vert");
+	char const * FRAG_SHADER_SOURCE_FEEDBACK("gl-420/feedback-stream.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -84,9 +84,11 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_TRANSFORM, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TRANSFORM, 
 			"--version 420 --profile core");
-		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, GEOM_SHADER_SOURCE_TRANSFORM,
+		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER,
+			glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE_TRANSFORM,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -120,9 +122,11 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_FEEDBACK, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_FEEDBACK, 
 			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_FEEDBACK,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER,
+			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_FEEDBACK,
 			"--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 

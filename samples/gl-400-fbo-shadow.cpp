@@ -15,11 +15,11 @@
 
 namespace
 {
-	std::string const SAMPLE_NAME("OpenGL Shadow Gather");
-	std::string const VERT_SHADER_SOURCE_DEPTH(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-depth.vert");
-	std::string const VERT_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-render.vert");
-	std::string const FRAG_SHADER_SOURCE_RENDER(glf::DATA_DIRECTORY + "gl-400/fbo-shadow-render.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken1-dxt1.dds");
+	char const * SAMPLE_NAME("OpenGL Shadow Gather");
+	char const * VERT_SHADER_SOURCE_DEPTH("gl-400/fbo-shadow-depth.vert");
+	char const * VERT_SHADER_SOURCE_RENDER("gl-400/fbo-shadow-render.vert");
+	char const * FRAG_SHADER_SOURCE_RENDER("gl-400/fbo-shadow-render.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -111,9 +111,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_RENDER, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_RENDER, 
 			"--version 400 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, FRAG_SHADER_SOURCE_RENDER,
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_RENDER,
 			"--version 400 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -139,7 +139,7 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, VERT_SHADER_SOURCE_DEPTH, 
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_DEPTH, 
 			"--version 400 --profile core");
 		Validated = Validated && Compiler.check();
 
@@ -191,7 +191,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
