@@ -6,10 +6,7 @@
 #define TEXCOORD	4
 #define FRAG_COLOR	0
 
-uniform Samplers 
-{
-	sampler2D Diffuse;
-};
+uniform sampler2D Diffuse;
 
 in block
 {

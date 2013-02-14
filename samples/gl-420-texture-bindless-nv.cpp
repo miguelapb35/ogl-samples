@@ -63,14 +63,6 @@ namespace
 	GLuint TextureName(0);
 	GLuint64 TextureHandle(0);
 	GLuint TextureLocation(0);
-
-	//typedef void (GLAPIENTRY * PFNGLPROGRAMUNIFORMHANDLEUI64NVPROC) (GLuint program, GLint location, GLuint64 value);
-	//typedef void (GLAPIENTRY * PFNGLMAKETEXTUREHANDLERESIDENTNVPROC) (GLuint64 handle);
-	//typedef GLuint64 (GLAPIENTRY * PFNGLTEXTUREHANDLENVPROC) (GLuint texture);
-
-	//PFNGLPROGRAMUNIFORMHANDLEUI64NVPROC glProgramUniformHandleui64NV = 0;
-	//PFNGLMAKETEXTUREHANDLERESIDENTNVPROC glMakeTextureHandleResidentNV = 0;
-	//PFNGLTEXTUREHANDLENVPROC glGetTextureHandleNV = 0;
 }//namespace
 
 bool initProgram()
@@ -99,7 +91,7 @@ bool initProgram()
 	if(Validated)
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	TextureLocation = glGetUniformLocation(ProgramName, "Samplers.Diffuse");
+	TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
 
 	return Validated;
 }
@@ -154,16 +146,21 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
-	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+	glTexStorage2D(GL_TEXTURE_2D,
+		GLint(Texture.levels()),
+		gli::internal_format(Texture.format()),
+		GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+
+	for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 	{
 		glTexSubImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			0, 0, 
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			GL_BGR, GL_UNSIGNED_BYTE, 
+			GL_TEXTURE_2D,
+			GLint(Level),
+			0, 0,
+			GLsizei(Texture[Level].dimensions().x),
+			GLsizei(Texture[Level].dimensions().y),
+			gli::external_format(Texture.format()),
+			gli::type_format(Texture.format()),
 			Texture[Level].data());
 	}
 
@@ -172,6 +169,8 @@ bool initTexture()
 	// Query the texture handle and make the texture resident
 	TextureHandle = glGetTextureHandleNV(TextureName);
 	glMakeTextureHandleResidentNV(TextureHandle);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return Validated;
 }
@@ -208,10 +207,6 @@ bool begin()
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_NV_bindless_texture");
-
-	//glProgramUniformHandleui64NV = (PFNGLPROGRAMUNIFORMHANDLEUI64NVPROC)glutGetProcAddress("glProgramUniformHandleui64NV");
-	//glMakeTextureHandleResidentNV = (PFNGLMAKETEXTUREHANDLERESIDENTNVPROC)glutGetProcAddress("glMakeTextureHandleResidentNV");
-	//glGetTextureHandleNV = (PFNGLTEXTUREHANDLENVPROC)glutGetProcAddress("glGetTextureHandleNV");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -265,8 +260,6 @@ void display()
 
 	// Bind rendering objects
 	glBindProgramPipeline(PipelineName);
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, TextureName);
 
 	glProgramUniformHandleui64NV(ProgramName, TextureLocation, TextureHandle);
 
