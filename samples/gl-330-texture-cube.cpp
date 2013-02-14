@@ -138,13 +138,13 @@ bool initTexture()
 	for(std::size_t Face = 0; Face < 6; ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glCompressedTexSubImage2D(
+		glCompressedTexImage2D(
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
 			GLint(Level),
-			0, 0,
+			GLenum(gli::internal_format(Texture.format())),
 			GLsizei(Texture[Face][Level].dimensions().x), 
 			GLsizei(Texture[Face][Level].dimensions().y), 
-			GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
+			0, 
 			GLsizei(Texture[Face][Level].size()), 
 			Texture[Face][Level].data());
 	}
