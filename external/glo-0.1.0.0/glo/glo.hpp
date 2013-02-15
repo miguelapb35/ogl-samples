@@ -980,7 +980,6 @@
 	PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB(0);
 	PFNGLGETDEBUGMESSAGELOGARBPROC glGetDebugMessageLogARB(0);
 
-#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 #ifndef GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD
 #define GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD 0x9160
 #endif
@@ -1009,7 +1008,10 @@
 #define WGL_CONTEXT_ES2_PROFILE_BIT_EXT 0x00000004
 #endif
 
-#endif
+#endif//WIN32
+
+#define GLO_BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 namespace gl
 {
