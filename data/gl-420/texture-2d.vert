@@ -21,19 +21,10 @@ out gl_PerVertex
 out block
 {
 	vec2 Texcoord;
-	vec4 Lumimance[COUNT];
 } Out;
 
 void main()
 {
-/*
-	mediump int A = int(0);
-	lowp float B = float(A);
-	highp int C = int(B);
-*/
-	for(int i = 0; i < int(COUNT); ++i)
-		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);
-
 	Out.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 1.0);
 }
