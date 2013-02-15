@@ -30,8 +30,10 @@
 #	define WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <GL/gl.h>
+#	include "core/glcorearb.h"
 #elif defined(linux) || defined(__linux)
 #	define GL_GLEXT_PROTOTYPES 1
+#	define GLCOREARB_PROTOTYPES 1
 #	include <GL/gl.h>
 #	include <GL/glext.h>
 #elif defined(__APPLE__)
@@ -39,8 +41,6 @@
 #else
 #	error "Unsupported platform"
 #endif
-
-#include "core/glcorearb.h"
 
 #ifdef WIN32
 #	define gloGetProcAddress wglGetProcAddress
