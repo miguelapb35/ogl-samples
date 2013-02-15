@@ -61,6 +61,8 @@ glCreateSampleGTC(primitive-shading)
 set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-2d)
 
+if(NOT APPLE)
+
 # OpenGL 3.3 samples
 set(GL_VERSION_GTC 330)
 
@@ -337,3 +339,4 @@ glCreateSampleGTC(texture-storage)
 set(GL_SHADER_GTC texture-view.vert texture-view.geom texture-view.frag)
 glCreateSampleGTC(texture-view)
 
+endif(NOT APPLE)
