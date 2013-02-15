@@ -983,6 +983,15 @@
 	PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB(0);
 	PFNGLGETDEBUGMESSAGELOGARBPROC glGetDebugMessageLogARB(0);
 
+	// WGL_EXT_swap_control
+#ifdef WIN32
+	typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) (int interval);
+	typedef int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) (void);
+
+	PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT(0);
+	PFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT(0);
+#endif
+
 #ifndef GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD
 #define GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD 0x9160
 #endif
@@ -1672,6 +1681,10 @@ namespace gl
 		// GL_AMD_sparse_texture
 		glTexStorageSparseAMD = (PFNGLTEXSTORAGESPARSEAMDPROC)gloGetProcAddress("glTexStorageSparseAMD");
 		glTextureStorageSparseAMD = (PFNGLTEXTURESTORAGESPARSEAMDPROC)gloGetProcAddress("glTextureStorageSparseAMD");
+
+		//WGL_EXT_swap_control
+		wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)gloGetProcAddress("wglSwapIntervalEXT");
+		wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC)gloGetProcAddress("wglGetSwapIntervalEXT");
 #endif//WIN32
 	}
 }//namespace glo
