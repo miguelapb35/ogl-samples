@@ -99,7 +99,9 @@ if(MSVC AND CMAKE_CL_64)
 endif(MSVC AND CMAKE_CL_64)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${ES_DIRECTORY})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${ES_DIRECTORY}/lib/${ES_BINARY_DIRECTORY})
+if(WIN32)
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${ES_DIRECTORY}/lib/${ES_BINARY_DIRECTORY})
+endif()
 
 set(ES_LIBRARY libGLESv2)
 
@@ -117,7 +119,9 @@ if(MSVC AND CMAKE_CL_64)
 endif(MSVC AND CMAKE_CL_64)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${EGL_DIRECTORY})
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${EGL_DIRECTORY}/lib/${EGL_BINARY_DIRECTORY})
+if(WIN32)
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${EGL_DIRECTORY}/lib/${EGL_BINARY_DIRECTORY})
+endif()
 
 set(EGL_LIBRARY libEGL)
 

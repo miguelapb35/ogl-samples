@@ -2,22 +2,22 @@
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
-
+/*
 in gl_PerVertex
 {
 	vec4 gl_Position;
 } gl_in[];
-
+*/
 in block
 {
 	vec4 Color;
 } In[];
-
+/*
 out gl_PerVertex 
 {
 	vec4 gl_Position;
 };
-
+*/
 out block
 {
 	vec4 Color;

@@ -165,7 +165,6 @@ namespace glf
 
 		std::string::size_type IncludeFirstQuote = Line.find("\"", Offset);
 		std::string::size_type IncludeSecondQuote = Line.find("\"", IncludeFirstQuote + 1);
-		std::string::size_type IncludeEndl = Line.find("\n", Offset);
 
 		return Line.substr(IncludeFirstQuote + 1, IncludeSecondQuote - IncludeFirstQuote - 1);
 	}

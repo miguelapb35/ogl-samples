@@ -300,17 +300,6 @@ namespace glf
 		return GL_FALSE;
 	}
 
-	static void displayProxy()
-	{
-		static int FrameID = 0;
-		++FrameID;
-#ifdef GLF_AUTO_STATUS
-		if(FrameID > 10)
-			Window.KeyPressed[GLFW_KEY_ESC] = 1;
-#endif//GLF_AUTO_STATUS
-		display();
-	}
-
 	inline int run
 	(
 		int argc, char* argv[], 
