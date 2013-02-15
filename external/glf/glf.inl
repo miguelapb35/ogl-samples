@@ -5,6 +5,10 @@ bool begin();
 bool end();
 void display();
 
+#define GLF_CONTEXT_CORE_PROFILE_BIT 0x0001
+#define GLF_CONTEXT_COMPATIBILITY_PROFILE_BIT 0x0002
+#define GLF_CONTEXT_ES2_PROFILE_BIT 0x0004
+
 namespace glf
 {
 	inline void logImplementationDependentLimit(GLenum Value, std::string const & String)
@@ -328,7 +332,7 @@ namespace glf
 			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #		else
 			//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, Profile == WGL_CONTEXT_CORE_PROFILE_BIT_ARB ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
 #		endif
 			//glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #		if defined(NDEBUG)
