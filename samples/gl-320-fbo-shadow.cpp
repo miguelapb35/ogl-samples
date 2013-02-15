@@ -267,8 +267,6 @@ bool initVertexArray()
 
 bool initFramebuffer()
 {
-	bool Validated(true);
-
 	glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);

@@ -230,8 +230,6 @@ bool initVertexArray()
 
 bool initFramebuffer()
 {
-	bool Validated(true);
-
 	glGenFramebuffers(1, &FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);

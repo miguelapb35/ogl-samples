@@ -25,6 +25,8 @@ endfunction(glCreateSampleGTC)
 #add_subdirectory(gl-alpha-to-coverage)
 #add_subdirectory(gl-buffer-render)
 
+if(NOT APPLE)
+
 # OpenGL ES 2.0 samples
 set(GL_PROFILE_GTC es)
 set(GL_VERSION_GTC 200)
@@ -39,7 +41,10 @@ set(GL_SHADER_GTC image-2d.vert image-2d.frag)
 glCreateSampleGTC(fbo-multisample)
 glCreateSampleGTC(test-alpha)
 
+endif(NOT APPLE)
+
 # OpenGL 3.2 samples
+set(GL_PROFILE_GTC gl)
 set(GL_VERSION_GTC 320)
 
 set(GL_SHADER_GTC draw-image-space.vert draw-image-space.frag)

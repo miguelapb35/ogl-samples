@@ -44,7 +44,7 @@ namespace glf
 		glm::vec2 RotationOrigin;
 		glm::vec2 RotationCurrent;
 		int MouseButtonFlags;
-		std::size_t KeyPressed[256];
+		std::size_t KeyPressed[512];
 	};
 
 	int version(int Major, int Minor);

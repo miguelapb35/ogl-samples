@@ -238,8 +238,6 @@ bool initVertexArray()
 
 bool initFramebuffer()
 {
-	bool Validated(true);
-
 	glGenFramebuffers(1, &FramebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
