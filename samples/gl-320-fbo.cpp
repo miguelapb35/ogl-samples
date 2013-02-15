@@ -259,6 +259,7 @@ bool initDebugOutput()
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 #	endif
+
 	return true;
 }
 

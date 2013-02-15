@@ -61,13 +61,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
