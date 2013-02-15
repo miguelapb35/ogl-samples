@@ -32,11 +32,12 @@ endif(NOT OPENGL_FOUND)
 ################################
 # Add GLFW
 
+set(GLFW_DIRECTORY glfw-2.7.7)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
+
 if(APPLE)
 	find_library(GLFW_LIBRARY GLFW)
 else()
-	set(GLFW_DIRECTORY glfw-2.7.7)
-
 	if(MSVC AND NOT CMAKE_CL_64)
 		set(GLFW_BINARY_DIRECTORY "win32-vc")
 	endif(MSVC AND NOT CMAKE_CL_64)
@@ -45,7 +46,6 @@ else()
 		set(GLFW_BINARY_DIRECTORY "win64-vc")
 	endif(MSVC AND CMAKE_CL_64)
 
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
 
 	message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)

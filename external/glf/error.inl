@@ -34,7 +34,6 @@ namespace glf
 		return Error == GL_NO_ERROR;
 	}
 
-#if !defined(__APPLE__)
 	inline bool checkFramebuffer(GLuint FramebufferName)
 	{
 		GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -68,5 +67,4 @@ namespace glf
 
 		return Status != GL_FRAMEBUFFER_COMPLETE;
 	}
-#endif
 }//namespace glf
