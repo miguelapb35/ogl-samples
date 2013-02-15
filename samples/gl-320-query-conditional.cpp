@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Conditional Render
-// 26/03/2010
+// OpenGL Conditional Rendering
+// 26/03/2010 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,17 +13,17 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Conditional Render";
-	char const * VERTEX_SHADER_SOURCE("gl-330/flat-color.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/flat-color.frag");
+	char const * SAMPLE_NAME("OpenGL Conditional Rendering");
+	char const * VERTEX_SHADER_SOURCE("gl-320/query-conditional.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-320/query-conditional.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const PositionData[VertexCount] =
 	{
@@ -35,23 +35,23 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	GLuint VertexArrayName = 0;
-	GLuint ProgramName = 0;
-	GLuint BufferName = 0;
-	GLuint QueryName = 0;
-	GLint UniformMVP = 0;
-	GLint UniformColor = 0;
+	GLuint VertexArrayName(0);
+	GLuint ProgramName(0);
+	GLuint BufferName(0);
+	GLuint QueryName(0);
+	GLint UniformMVP(0);
+	GLint UniformColor(0);
 }//namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initQuery()
@@ -76,6 +76,8 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShaderName);
 		glAttachShader(ProgramName, FragmentShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertexShaderName);
 		glDeleteShader(FragmentShaderName);
 
@@ -198,6 +200,10 @@ void display()
 	// Draw only if one sample went through the tests, 
 	// we don't need to get the query result which prevent the rendering pipeline to stall.
 	glBeginConditionalRender(QueryName, GL_QUERY_WAIT);
+
+		// Clear color buffer with white
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
+
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	glEndConditionalRender();
 	

@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL GLSL discard
-// 18/02/2011 - 19/02/2011
+// 18/02/2011 - 15/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,14 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL GLSL discard";
+	char const * SAMPLE_NAME("OpenGL GLSL discard");
 	char const * VERT_SHADER_SOURCE("gl-330/discard.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/discard.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -88,6 +88,9 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -108,8 +111,8 @@ bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");;
