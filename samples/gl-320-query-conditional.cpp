@@ -159,7 +159,7 @@ bool end()
 void display()
 {
 	// Compute the MVP (Model View Projection matrix)
-	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 10.0f);
 	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
 	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
@@ -185,11 +185,11 @@ void display()
 	glColorMaski(0, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	// Beginning of the samples count query
-	glBeginQuery(GL_ANY_SAMPLES_PASSED, QueryName);
+	glBeginQuery(GL_SAMPLES_PASSED, QueryName);
 		// To test the condional rendering, comment this line, the next draw call won't happen.
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	// End of the samples count query
-	glEndQuery(GL_ANY_SAMPLES_PASSED);
+	glEndQuery(GL_SAMPLES_PASSED);
 
 	// The second blue quad is written in the framebuffer only if a sample pass the occlusion query.
 	glColorMaski(0, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -206,6 +206,11 @@ void display()
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	glEndConditionalRender();
+	
+	// Clear color buffer with blue
+	//glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
+	
+	//glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	
 	glf::checkError("display");
 	glf::swapBuffers();

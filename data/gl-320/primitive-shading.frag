@@ -7,10 +7,10 @@ in block
 	vec4 Color;
 } In;
 
-out vec4 FragColor;
+out vec4 Color;
 
 void main()
 {
-	FragColor = In.Color;
+	Color = In.Color;
 }
 
