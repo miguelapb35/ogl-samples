@@ -45,15 +45,23 @@ http://www.cmake.org/cmake/resources/software.html
 The samples run only when launched from Visual C++ IDE.
 
 ================================================================================
-Linux G++ instructions
+Linux instructions
 --------------------------------------------------------------------------------
-- Install FreeGLUT package
-- Download GLEW 1.9.0 (http://glew.sourceforge.net) and install depend packages
+- Install the GLFW library included in the external directory.
+-- sudo make x11-dist-install
 - Run CMake to create a makefile for G++
 - Launch the sample from the build output directory
 
 ================================================================================
-OpenGL Samples Pack 4.3.2.0: 2013-02-17
+MacOS instructions
+--------------------------------------------------------------------------------
+- Install the GLFW library included in the external directory.
+-- sudo make cocoa-dist-install
+- Run CMake to create a XCode project
+- Launch the sample from XCode
+
+================================================================================
+OpenGL Samples Pack 4.3.2.0: 2013-02-16
 --------------------------------------------------------------------------------
 - Added MacOS X support
 - Fixed Linux support
