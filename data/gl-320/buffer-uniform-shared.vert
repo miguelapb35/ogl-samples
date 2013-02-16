@@ -2,6 +2,8 @@
 
 #define ATTR_POSITION	0
 
+layout(std140, column_major) uniform;
+
 uniform transform
 {
 	mat4 MVP;
