@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL GLSL discard");
-	char const * VERT_SHADER_SOURCE("gl-330/discard.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/discard.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/glsl-discard.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/glsl-discard.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -64,13 +64,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
+	
+	return glf::checkError("initDebugOutput");
 }
 
 bool initProgram()
