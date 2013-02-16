@@ -7,7 +7,7 @@ ogl-samples@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2012 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,19 @@ Linux G++ instructions
 - Download GLEW 1.9.0 (http://glew.sourceforge.net) and install depend packages
 - Run CMake to create a makefile for G++
 - Launch the sample from the build output directory
+
+================================================================================
+OpenGL Samples Pack 4.3.2.0: 2013-02-17
+--------------------------------------------------------------------------------
+- Added MacOS X support
+- Fixed Linux support
+- Migrate many samples to OpenGL 3.2
+- Removed GLEW
+- Replace FreeGLUT by GLFW
+- Added 320-glsl-precision sample
+- Added 320-glsl-builtin-blocks sample
+- Added 320-fbo-shadow sample
+- Added 400-fbo-shadow sample
 
 ================================================================================
 OpenGL Samples Pack 4.3.1.0: 2012-12-22

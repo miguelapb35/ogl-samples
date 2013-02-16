@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Primitive front face
-// 20/05/2011
+// 20/05/2011 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,13 +13,13 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Primitive front face";	
-	char const * VERT_SHADER_SOURCE("gl-330/front-face.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/front-face.frag");
+	char const * SAMPLE_NAME("OpenGL Primitive front face");
+	char const * VERT_SHADER_SOURCE("gl-320/primitive-front-face.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/primitive-front-face.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -33,7 +33,7 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
@@ -41,23 +41,32 @@ namespace
 		2, 3, 0
 	};
 
-	GLuint ProgramName = 0;
-	GLuint ElementBufferName = 0;
-	GLuint ArrayBufferName = 0;
-	GLuint VertexArrayName = 0;
-	GLint UniformMVP = 0;
-	GLint UniformDiffuse = 0;
+	namespace buffer
+	{
+		enum type
+		{
+			ELEMENT,
+			VERTEX,
+			MAX
+		};
+	};
+
+	GLuint ProgramName(0);
+	std::vector<GLuint> BufferName(buffer::MAX);
+	GLuint VertexArrayName(0);
+	GLint UniformMVP(0);
+	GLint UniformDiffuse(0);
 }//namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -76,6 +85,8 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShader);
 		glAttachShader(ProgramName, FragShader);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShader);
 		glDeleteShader(FragShader);
 
@@ -97,29 +108,32 @@ bool initVertexArray()
 	// Build a vertex array object
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	// Generate a buffer object
-	glGenBuffers(1, &ElementBufferName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glGenBuffers(1, &ArrayBufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool begin()
@@ -132,7 +146,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 
@@ -142,8 +156,7 @@ bool begin()
 bool end()
 {
 	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteBuffers(1, &ArrayBufferName);
-	glDeleteBuffers(1, &ElementBufferName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
 
 	return glf::checkError("end");
@@ -169,7 +182,6 @@ void display()
 
 	// Bind vertex array & draw 
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 
 	// Set the display viewport
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
