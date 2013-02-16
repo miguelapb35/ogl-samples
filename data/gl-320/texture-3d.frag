@@ -1,16 +1,11 @@
-#version 330 core
-
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define FRAG_COLOR	0
+#version 150 core
 
 in vec4 gl_FragCoord;
 
 uniform sampler3D Diffuse;
 uniform mat3 Orientation;
 
-layout(location = FRAG_COLOR, index = 0) out vec4 Color;
+out vec4 Color;
 
 void main()
 {

@@ -1,9 +1,4 @@
-#version 330 core
-
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define FRAG_COLOR	0
+#version 150 core
 
 uniform mat4 MV;
 uniform mat4 MVP;
@@ -12,7 +7,7 @@ uniform vec3 Camera;
 const vec3 ConstView = vec3(0, 0,-1);
 const vec3 ConstNormal = vec3(0, 0, 1);
 
-layout(location = POSITION) in vec2 Position;
+in vec2 Position;
 
 out block
 {

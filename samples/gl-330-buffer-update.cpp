@@ -101,13 +101,13 @@ bool initArrayBuffer()
 	glGenBuffers(1, &BufferName);
 
 	// Bind the buffer for use
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 
 	// Reserve buffer memory but don't copy the values
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, NULL, GL_STATIC_DRAW);
 
 	// Copy the vertex data in the buffer, in this sample for the whole range of data.
-    glBufferSubData(GL_ARRAY_BUFFER, 0, PositionSize, &PositionData[0][0]);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, PositionSize, &PositionData[0][0]);
 
 	// Unbind the buffer
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -150,7 +150,7 @@ bool initArrayBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::ARRAY]);
 
 	// Reserve buffer memory but don't copy the values
-    glBufferData(
+	glBufferData(
 		GL_ARRAY_BUFFER, 
 		PositionSize, 
 		0, 
@@ -158,7 +158,7 @@ bool initArrayBuffer()
 
 	// Copy the vertex data in the buffer, in this sample for the whole range of data.
 	// It doesn't required to be the buffer size but pointers require no memory overlapping.
-    GLvoid* Data = glMapBufferRange(
+	GLvoid* Data = glMapBufferRange(
 		GL_ARRAY_BUFFER, 
 		0,				// Offset
 		PositionSize,	// Size,
@@ -175,7 +175,7 @@ bool initArrayBuffer()
 
 	// Copy buffer
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, 0, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_COPY_READ_BUFFER, BufferName[buffer::ARRAY]);

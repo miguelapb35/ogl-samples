@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Texture 2D Compressed
-// 27/08/2009
+// 27/08/2009 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -10,22 +10,21 @@
 //**********************************
 
 #include <glf/glf.hpp>
-#include <gli/gtx/gl_texture2d.hpp>
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Texture 2D Compressed";
-	std::string const SHADER_VERT_SOURCE("gl-330/texture-2d.vert");
-	std::string const SHADER_FRAG_SOURCE("gl-330/texture-2d.frag");
+	char const * SAMPLE_NAME("OpenGL Texture 2D Compressed");
+	std::string const SHADER_VERT_SOURCE("gl-320/texture-compressed.vert");
+	std::string const SHADER_FRAG_SOURCE("gl-320/texture-compressed.frag");
 	char const * TEXTURE_DIFFUSE_BC1("kueken2-dxt1.dds");
 	char const * TEXTURE_DIFFUSE_BC3("kueken2-dxt5.dds");
 	char const * TEXTURE_DIFFUSE_BC4("kueken2-bc4.dds");
 	char const * TEXTURE_DIFFUSE_BC5("kueken2-bc5.dds");
 
-	int const SAMPLE_SIZE_WIDTH = 640;
-	int const SAMPLE_SIZE_HEIGHT = 480;
-	int const SAMPLE_MAJOR_VERSION = 3;
-	int const SAMPLE_MINOR_VERSION = 3;
+	int const SAMPLE_SIZE_WIDTH(640);
+	int const SAMPLE_SIZE_HEIGHT(480);
+	int const SAMPLE_MAJOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -45,7 +44,7 @@ namespace
 	};
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
 	vertex const VertexData[VertexCount] =
 	{
@@ -80,13 +79,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -104,6 +103,9 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -143,10 +145,6 @@ bool initTexture2D()
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -168,10 +166,6 @@ bool initTexture2D()
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC3]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -193,10 +187,6 @@ bool initTexture2D()
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -218,10 +208,6 @@ bool initTexture2D()
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{

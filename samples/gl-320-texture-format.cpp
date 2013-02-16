@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Texture Format
-// 23/01/2012 - 23/01/2012
+// 23/01/2012 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,18 +13,18 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Texture Format";
-	char const * VERT_SHADER_SOURCE("gl-330/texture-format.vert");
+	char const * SAMPLE_NAME("OpenGL Texture Format");
+	char const * VERT_SHADER_SOURCE("gl-320/texture-format.vert");
 	char const * FRAG_SHADER_SOURCE[3] = 
 	{
-		"gl-330/texture-format-normalized.frag", 
-		"gl-330/texture-format-uint.frag"
+		"gl-320/texture-format-normalized.frag", 
+		"gl-320/texture-format-uint.frag"
 	};
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -115,13 +115,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -139,6 +139,9 @@ bool initProgram()
 		ProgramName[i] = glCreateProgram();
 		glAttachShader(ProgramName[i], VertShaderName);
 		glAttachShader(ProgramName[i], FragShaderName);
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -158,8 +161,8 @@ bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");;

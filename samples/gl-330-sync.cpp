@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Sync
-// 10/05/2011 - 10/05/2011
+// 10/05/2011 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,7 +13,7 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Sync";
+	char const * SAMPLE_NAME("OpenGL Sync");
 	char const * VERT_SHADER_SOURCE("gl-330/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/texture-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
@@ -51,13 +51,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()

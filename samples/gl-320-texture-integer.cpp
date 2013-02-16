@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Texture 3D
-// 20/03/2012 - 20/03/2012
+// OpenGL Texture Integer
+// 28/01/2013 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,13 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Texture 3D");
-	char const * VERT_SHADER_SOURCE("gl-330/texture-3d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/texture-3d.frag");
+	char const * SAMPLE_NAME("OpenGL Texture Integer");
+	char const * VERT_SHADER_SOURCE("gl-320/texture-integer.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/texture-integer.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -42,19 +43,20 @@ namespace
 	GLuint BufferName(0);
 	GLuint TextureName(0);
 
-	GLint UniformTextureMatrix(0);
+	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
+
 }//namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -72,6 +74,9 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -81,7 +86,7 @@ bool initProgram()
 
 	if(Validated)
 	{
-		UniformTextureMatrix = glGetUniformLocation(ProgramName, "Orientation");
+		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
 		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 	}
 
@@ -101,45 +106,37 @@ bool initBuffer()
 
 bool initTexture()
 {
-	std::size_t const Size(128);
-
-	std::vector<float> Data(Size * Size * Size);
-	for(std::size_t k = 0; k < Size; ++k)
-	for(std::size_t j = 0; j < Size; ++j)
-	for(std::size_t i = 0; i < Size; ++i)
-		Data[i + j * Size + k * Size * Size] = glm::simplex(glm::vec4(i, j, k, 0.0f) / float((Size / 8 - 1)));
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	glGenTextures(1, &TextureName);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_3D, TextureName);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_G, GL_RED);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_A, GL_RED);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAX_LEVEL, int(glm::log2(float(Size))));
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage3D(
-		GL_TEXTURE_3D, 
-		0, 
-		GL_R32F, 
-		GLsizei(Size), 
-		GLsizei(Size), 
-		GLsizei(Size), 
-		0,
-		GL_RED, 
-		GL_FLOAT, 
-		&Data[0]);
-
-	glGenerateMipmap(GL_TEXTURE_3D);
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+	{
+		glTexImage2D(
+			GL_TEXTURE_2D, 
+			GLint(Level), 
+			GL_RGBA8UI, 
+			GLsizei(Texture[Level].dimensions().x), 
+			GLsizei(Texture[Level].dimensions().y), 
+			0,
+			GL_BGR_INTEGER, 
+			GL_UNSIGNED_BYTE, 
+			Texture[Level].data());
+	}
+	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -192,20 +189,23 @@ bool end()
 
 void display()
 {
-	static glm::vec3 Orientation(0);
-	Orientation += glm::vec3(0.020, 0.010, 0.005);
-
-	glm::mat3 TextureMatrix = glm::mat3(glm::yawPitchRoll(Orientation.x, Orientation.y, Orientation.z));
+	// Compute the MVP (Model View Projection matrix)
+	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
+	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 MVP = Projection * View * Model;
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glUseProgram(ProgramName);
 	glUniform1i(UniformDiffuse, 0);
-	glUniformMatrix3fv(UniformTextureMatrix, 1, GL_FALSE, &TextureMatrix[0][0]);
+	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_3D, TextureName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
@@ -219,6 +219,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }
