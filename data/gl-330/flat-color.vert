@@ -18,7 +18,7 @@ uniform mat4 MVP;
 layout(location = ATTR_POSITION) in vec4 Position;
 
 void main()
-{	
+{
 	gl_Position = MVP * Position;
 }
 

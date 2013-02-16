@@ -57,6 +57,17 @@ namespace
 		glm::i8vec2(-1,-1)
 	};
 
+	GLsizeiptr const PositionSizeRGB10A2 = VertexCount * sizeof(glm::u32);
+	glm::u32 const PositionDataRGB10A2[VertexCount] =
+	{
+		glm::u32(0x3FF | (0x3FF << 10)),
+		glm::u32(0x001 | (0x3FF << 10)),
+		glm::u32(0x001 | (0x001 << 10)),
+		glm::u32(0x001 | (0x001 << 10)),
+		glm::u32(0x3FF | (0x001 << 10)),
+		glm::u32(0x3FF | (0x3FF << 10))
+	};
+
 	GLsizeiptr const PositionSizeI32 = VertexCount * sizeof(glm::i32vec2);
 	glm::i32vec2 const PositionDataI32[VertexCount] =
 	{
@@ -68,21 +79,25 @@ namespace
 		glm::i32vec2(-1,-1)
 	};
 
-	enum buffer_index
+	namespace buffer
 	{
-		BUFFER_F16,
-		BUFFER_F32,
-		BUFFER_I8,
-		BUFFER_I32,
-		BUFFER_MAX
-	};
+		enum type
+		{
+			RGB10A2,
+			//F16,
+			F32,
+			I8,
+			I32,
+			MAX
+		};
+	}
 
 	GLuint ProgramName(0);
-	GLuint BufferName[BUFFER_MAX] = {0, 0, 0, 0};
-	GLuint VertexArrayName[BUFFER_MAX] = {0, 0, 0, 0};
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
-	glm::ivec4 Viewport[BUFFER_MAX] = {glm::ivec4(0), glm::ivec4(0), glm::ivec4(0), glm::ivec4(0)};
+	std::vector<GLuint> BufferName(buffer::MAX);
+	std::vector<GLuint> VertexArrayName(buffer::MAX);
+	std::vector<glm::ivec4> Viewport(buffer::MAX);
 
 }//namespace
 
@@ -131,20 +146,23 @@ bool initProgram()
 bool initBuffer()
 {
 	// Generate a buffer object
-	glGenBuffers(BUFFER_MAX, BufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
 	// Allocate and copy buffers memory
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F16]);
-	glBufferData(GL_ARRAY_BUFFER, PositionSizeF16, PositionDataF16, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F16]);
+	//glBufferData(GL_ARRAY_BUFFER, PositionSizeF16, PositionDataF16, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F32]);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
 	glBufferData(GL_ARRAY_BUFFER, PositionSizeF32, PositionDataF32, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I8]);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I8]);
 	glBufferData(GL_ARRAY_BUFFER, PositionSizeI8, PositionDataI8, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I32]);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I32]);
 	glBufferData(GL_ARRAY_BUFFER, PositionSizeI32, PositionDataI32, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::RGB10A2]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSizeRGB10A2, PositionDataRGB10A2, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -153,35 +171,45 @@ bool initBuffer()
 
 bool initVertexArray()
 {
-	glGenVertexArrays(BUFFER_MAX, VertexArrayName);
+	glGenVertexArrays(buffer::MAX, &VertexArrayName[0]);
 
-	glBindVertexArray(VertexArrayName[BUFFER_F16]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F16]);
+	/*
+	glBindVertexArray(VertexArrayName[buffer::F16]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F16]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
+	*/
 
-	glBindVertexArray(VertexArrayName[BUFFER_F32]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_F32]);
+	glBindVertexArray(VertexArrayName[buffer::F32]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-	glBindVertexArray(VertexArrayName[BUFFER_I8]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I8]);
+	glBindVertexArray(VertexArrayName[buffer::I8]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I8]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, sizeof(glm::u8vec2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	glBindVertexArray(0);
 
-	glBindVertexArray(VertexArrayName[BUFFER_I32]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_I32]);
+	glBindVertexArray(VertexArrayName[buffer::I32]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I32]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_INT, GL_FALSE, sizeof(glm::i32vec2), GLF_BUFFER_OFFSET(0));
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+	glBindVertexArray(0);
+
+	glBindVertexArray(VertexArrayName[buffer::RGB10A2]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::RGB10A2]);
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_FALSE, sizeof(glm::u32), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
@@ -192,10 +220,10 @@ bool initVertexArray()
 
 bool begin()
 {
-	Viewport[BUFFER_F16] = glm::ivec4(0, 0, Window.Size >> 1);
-	Viewport[BUFFER_F32] = glm::ivec4(Window.Size.x >> 1, 0, Window.Size >> 1);
-	Viewport[BUFFER_I8]  = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size >> 1);
-	Viewport[BUFFER_I32] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
+	Viewport[buffer::RGB10A2] = glm::ivec4(0, 0, Window.Size >> 1);
+	Viewport[buffer::F32] = glm::ivec4(Window.Size.x >> 1, 0, Window.Size >> 1);
+	Viewport[buffer::I8]  = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size >> 1);
+	Viewport[buffer::I32] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
@@ -215,8 +243,8 @@ bool begin()
 bool end()
 {
 	// Delete objects
-	glDeleteBuffers(BUFFER_MAX, BufferName);
-	glDeleteVertexArrays(BUFFER_MAX, VertexArrayName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
+	glDeleteVertexArrays(buffer::MAX, &VertexArrayName[0]);
 	glDeleteProgram(ProgramName);
 
 	return glf::checkError("end");
@@ -239,7 +267,7 @@ void display()
 	glUniform4fv(UniformDiffuse, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
-	for(std::size_t Index = 0; Index < BUFFER_MAX; ++Index)
+	for(std::size_t Index = 0; Index < buffer::MAX; ++Index)
 	{
 		glViewport(Viewport[Index].x, Viewport[Index].y, Viewport[Index].z, Viewport[Index].w);
 

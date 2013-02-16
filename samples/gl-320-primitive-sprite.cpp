@@ -3,7 +3,7 @@
 // ogl-samples.g-truc.net
 //**********************************
 // OpenGL Point Sprite
-// 18/07/2011 - 18/07/2011
+// 18/07/2011 - 16/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -16,9 +16,9 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Point Sprite";
-	char const * VERT_SHADER_SOURCE("gl-330/point-sprite.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/point-sprite.frag");
+	char const * SAMPLE_NAME("OpenGL Point Sprite");
+	char const * VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -48,13 +48,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -73,6 +73,9 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -92,7 +95,7 @@ bool initProgram()
 }
 
 // Buffer update using glBufferSubData
-bool initArrayBuffer()
+bool initBuffer()
 {
 	// Generate a buffer object
 	glGenBuffers(1, &BufferName);
@@ -109,7 +112,7 @@ bool initArrayBuffer()
 	// Unbind the buffer
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool initVertexArray()
@@ -178,7 +181,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 
