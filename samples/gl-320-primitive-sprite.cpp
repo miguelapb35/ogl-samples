@@ -23,7 +23,7 @@ namespace
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -242,6 +242,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		GLF_CONTEXT_CORE_PROFILE_BIT,
+		::SAMPLE_MAJOR_VERSION,
 		::SAMPLE_MINOR_VERSION);
 }
