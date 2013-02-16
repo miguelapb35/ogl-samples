@@ -60,7 +60,6 @@ namespace
 
 	GLint UniformTransform(0);
 	GLint UniformDiffuse(0);
-
 }//namespace
 
 bool initDebugOutput()

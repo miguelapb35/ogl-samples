@@ -98,6 +98,8 @@ set(GL_SHADER_GTC texture-integer.vert texture-integer.frag)
 glCreateSampleGTC(texture-integer)
 set(GL_SHADER_GTC texture-format.vert texture-format-normalized.frag texture-format-uint.frag)
 glCreateSampleGTC(texture-format)
+set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
+glCreateSampleGTC(texture-pixel-store)
 
 if(NOT APPLE)
 
@@ -143,7 +145,6 @@ set(GL_SHADER_GTC fbo-integer-render.vert fbo-integer-render.frag fbo-integer-sp
 glCreateSampleGTC(fbo-multisample-integer)
 glCreateSampleGTC(fbo-srgb)
 set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
-glCreateSampleGTC(texture-pixel-store)
 glCreateSampleGTC(texture-swizzle)
 set(GL_SHADER_GTC texture-rect.vert texture-rect.frag)
 glCreateSampleGTC(texture-rect)
