@@ -89,6 +89,8 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName);
