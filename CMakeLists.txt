@@ -48,9 +48,6 @@ else()
 
 	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
 
-	message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
-	message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
-
 	set(GLFW_LIBRARY glfw)
 endif()
 
@@ -136,8 +133,6 @@ set(BINARY_FILES
 	${GLI_LIBRARY}
 	${COCOA_LIBRARY}
 	${IOKIT_LIBRARY})
-
-message(STATUS ${BINARY_FILES})
 
 ################################
 # Add output directory
