@@ -3,7 +3,7 @@
 precision mediump float;
 precision highp int;
 
-#define COUNT 24
+#define COUNT 4
 
 uniform transform
 {
