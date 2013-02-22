@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Layered rendering
-// 19/08/2010 - 23/08/2010
+// 19/08/2010 - 22/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,12 +13,12 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Layered rendering";
-	char const * VERT_SHADER_SOURCE1("gl-330/layer.vert");
-	char const * GEOM_SHADER_SOURCE1("gl-330/layer.geom");
-	char const * FRAG_SHADER_SOURCE1("gl-330/layer.frag");
-	char const * VERT_SHADER_SOURCE2("gl-330/rtt-array.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-330/rtt-array.frag");
+	char const * SAMPLE_NAME("OpenGL Layered rendering");
+	char const * VERT_SHADER_SOURCE1("gl-320/layer.vert");
+	char const * GEOM_SHADER_SOURCE1("gl-320/layer.geom");
+	char const * FRAG_SHADER_SOURCE1("gl-320/layer.frag");
+	char const * VERT_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -27,7 +27,7 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 4;
+	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
@@ -37,7 +37,7 @@ namespace
 		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
@@ -45,32 +45,35 @@ namespace
 		2, 3, 0
 	};
 
-	enum buffer_type
+	namespace buffer
 	{
-		BUFFER_VERTEX,
-		BUFFER_ELEMENT,
-		BUFFER_MAX
-	};
+		enum type
+		{
+			VERTEX,
+			ELEMENT,
+			MAX
+		};
+	}//namespace buffer
 
-	enum program 
+	namespace program
 	{
-		LAYERING,
-		IMAGE_2D,
-		PROGRAM_MAX
-	};
+		enum type
+		{
+			LAYERING,
+			SPLASH,
+			MAX
+		};
+	}//namespace program
 
-	GLuint FramebufferName = 0;
-	GLuint VertexArrayName[PROGRAM_MAX];
+	GLuint FramebufferName(0);
+	std::vector<GLuint> VertexArrayName(program::MAX);
+	std::vector<GLuint> ProgramName(program::MAX);
+	std::vector<GLuint> UniformMVP(program::MAX);
+	GLint UniformDiffuse(0);
+	GLint UniformLayer(0);
 
-	GLuint ProgramName[PROGRAM_MAX];
-	GLint UniformMVP[PROGRAM_MAX];
-	GLint UniformDiffuse = 0;
-	GLint UniformLayer = 0;
-
-	GLuint BufferName[BUFFER_MAX];
-	GLuint TextureColorbufferName = 0;
-	GLuint SamplerName = 0;
-
+	std::vector<GLuint> BufferName(buffer::MAX);
+	GLuint TextureColorbufferName(0);
 	glm::ivec4 Viewport[4];
 }//namespace
 
@@ -89,69 +92,66 @@ bool initProgram()
 {
 	bool Validated = true;
 
+	glf::compiler Compiler;
+
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1);
-		GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE1);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE1, "--version 150 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE1);
-		Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE1);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE1);
-
-		ProgramName[LAYERING] = glCreateProgram();
-		glAttachShader(ProgramName[LAYERING], VertShaderName);
-		glAttachShader(ProgramName[LAYERING], GeomShaderName);
-		glAttachShader(ProgramName[LAYERING], FragShaderName);
+		ProgramName[program::LAYERING] = glCreateProgram();
+		glAttachShader(ProgramName[program::LAYERING], VertShaderName);
+		glAttachShader(ProgramName[program::LAYERING], GeomShaderName);
+		glAttachShader(ProgramName[program::LAYERING], FragShaderName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(GeomShaderName);
 		glDeleteShader(FragShaderName);
-		glLinkProgram(ProgramName[LAYERING]);
-		Validated = Validated && glf::checkProgram(ProgramName[LAYERING]);
+		glLinkProgram(ProgramName[program::LAYERING]);
+		Validated = Validated && glf::checkProgram(ProgramName[program::LAYERING]);
 	}
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE2);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE2);
-
-		ProgramName[IMAGE_2D] = glCreateProgram();
-		glAttachShader(ProgramName[IMAGE_2D], VertShaderName);
-		glAttachShader(ProgramName[IMAGE_2D], FragShaderName);
+		ProgramName[program::SPLASH] = glCreateProgram();
+		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
+		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
-		glLinkProgram(ProgramName[IMAGE_2D]);
-		Validated = Validated && glf::checkProgram(ProgramName[IMAGE_2D]);
+		glLinkProgram(ProgramName[program::SPLASH]);
+		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 	}
 
 	if(Validated)
 	{
-		for(std::size_t i = 0; i < PROGRAM_MAX; ++i)
+		for(std::size_t i = 0; i < program::MAX; ++i)
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 
-		UniformDiffuse = glGetUniformLocation(ProgramName[IMAGE_2D], "Diffuse");
-		UniformLayer = glGetUniformLocation(ProgramName[IMAGE_2D], "Layer");
+		UniformDiffuse = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
+		UniformLayer = glGetUniformLocation(ProgramName[program::SPLASH], "Layer");
 	}
 
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initVertexBuffer()
+bool initBuffer()
 {
-	glGenBuffers(BUFFER_MAX, BufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool initTexture()
@@ -161,22 +161,20 @@ bool initTexture()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, TextureColorbufferName);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 1000);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glTexImage3D(
-		GL_TEXTURE_2D_ARRAY, 
-		0, 
-		GL_RGB8, 
-		GLsizei(FRAMEBUFFER_SIZE.x), 
-		GLsizei(FRAMEBUFFER_SIZE.y), 
+		GL_TEXTURE_2D_ARRAY,
+		0,
+		GL_RGB8,
+		GLsizei(FRAMEBUFFER_SIZE.x),
+		GLsizei(FRAMEBUFFER_SIZE.y),
 		GLsizei(4), //depth
-		0,  
-		GL_RGB, 
-		GL_UNSIGNED_BYTE, 
+		0,
+		GL_RGB,
+		GL_UNSIGNED_BYTE,
 		NULL);
 
 	return glf::checkError("initTexture");
@@ -197,45 +195,31 @@ bool initFramebuffer()
 
 bool initVertexArray()
 {
-	glGenVertexArrays(PROGRAM_MAX, VertexArrayName);
+	glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 
-	glBindVertexArray(VertexArrayName[IMAGE_2D]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
+	glBindVertexArray(VertexArrayName[program::SPLASH]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
-	glBindVertexArray(VertexArrayName[LAYERING]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
+	glBindVertexArray(VertexArrayName[program::LAYERING]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");
-}
-
-bool initSampler()
-{
-	glGenSamplers(1, &SamplerName);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glSamplerParameterfv(SamplerName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MIN_LOD, -1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_LOD, 1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_LOD_BIAS, 0.0f);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-	return glf::checkError("initSampler");
 }
 
 bool begin()
@@ -246,7 +230,7 @@ bool begin()
 	Viewport[2] = glm::ivec4((Window.Size.x >> 1) + Border, (Window.Size.y >> 1) + Border, FRAMEBUFFER_SIZE - 2 * Border);
 	Viewport[3] = glm::ivec4(Border, (Window.Size.y >> 1) + Border, FRAMEBUFFER_SIZE - 2 * Border);
 
-	bool Validated = true;
+	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -254,28 +238,25 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initVertexBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
 		Validated = initTexture();
 	if(Validated)
 		Validated = initFramebuffer();
-	if(Validated)
-		Validated = initSampler();
 
 	return Validated && glf::checkError("begin");
 }
 
 bool end()
 {
-	glDeleteVertexArrays(PROGRAM_MAX, VertexArrayName);
-	glDeleteBuffers(BUFFER_MAX, BufferName);
+	for(std::size_t i = 0; i < program::MAX; ++i)
+		glDeleteProgram(ProgramName[i]);
+	glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteTextures(1, &TextureColorbufferName);
 	glDeleteFramebuffers(1, &FramebufferName);
-	glDeleteProgram(ProgramName[IMAGE_2D]);
-	glDeleteProgram(ProgramName[LAYERING]);
-	glDeleteSamplers(1, &SamplerName);
 
 	return glf::checkError("end");
 }
@@ -289,15 +270,14 @@ void display()
 
 	// Pass 1
 	{
-		glBindSampler(0, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 
-		glUseProgram(ProgramName[LAYERING]);
-		glUniformMatrix4fv(UniformMVP[LAYERING], 1, GL_FALSE, &MVP[0][0]);
+		glUseProgram(ProgramName[program::LAYERING]);
+		glUniformMatrix4fv(UniformMVP[program::LAYERING], 1, GL_FALSE, &MVP[0][0]);
 
-		glBindVertexArray(VertexArrayName[LAYERING]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
+		glBindVertexArray(VertexArrayName[program::LAYERING]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 	}
 
@@ -305,16 +285,14 @@ void display()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glUseProgram(ProgramName[IMAGE_2D]);
-		glUniformMatrix4fv(UniformMVP[IMAGE_2D], 1, GL_FALSE, &MVP[0][0]);
+		glUseProgram(ProgramName[program::SPLASH]);
+		glUniformMatrix4fv(UniformMVP[program::SPLASH], 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(UniformDiffuse, 0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureColorbufferName);
-		glBindSampler(0, SamplerName);
 
-		glBindVertexArray(VertexArrayName[IMAGE_2D]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
+		glBindVertexArray(VertexArrayName[program::SPLASH]);
 
 		for(int i = 0; i < 4; ++i)
 		{

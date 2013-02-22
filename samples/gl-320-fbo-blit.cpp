@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Framebuffer Blit
-// 05/12/2009
+// 05/12/2009 - 22/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,15 +13,15 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Framebuffer Blit";
-	char const * VERT_SHADER_SOURCE("gl-330/fbo-mipmaps.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/fbo-mipmaps.frag");
+	char const * SAMPLE_NAME("OpenGL Framebuffer Blit");
+	char const * VERT_SHADER_SOURCE("gl-320/fbo-blit.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/fbo-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -53,31 +53,46 @@ namespace
 		vertex(glm::vec2(-3.0f,-3.0f), glm::vec2(0.0f, 0.0f))
 	};
 
-	GLuint VertexArrayName = 0;
+	namespace framebuffer
+	{
+		enum type
+		{
+			RENDER,
+			RESOLVE,
+			MAX
+		};
+	}//namespace framebuffer
 
-	GLuint ProgramName = 0;
+	namespace texture
+	{
+		enum type
+		{
+			DIFFUSE,
+			COLORBUFFER,
+			MAX
+		};
+	}//namespace texture
 
-	GLuint BufferName = 0;
-	GLuint Texture2DName = 0;
-	GLuint SamplerName = 0;
-	
-	GLuint ColorRenderbufferName = 0;
-	GLuint ColorTextureName = 0;
-	
-	GLuint FramebufferRenderName = 0;
-	GLuint FramebufferResolveName = 0;
+	GLuint ProgramName(0);
+	GLint UniformMVP(0);
+	GLint UniformDiffuse(0);
 
-	GLint UniformMVP = 0;
-	GLint UniformDiffuse = 0;
+	GLuint VertexArrayName(0);
+	GLuint BufferName(0);
+	GLuint ColorRenderbufferName(0);
+	std::vector<GLuint> TextureName(texture::MAX);
+	std::vector<GLuint> FramebufferName(framebuffer::MAX);
 }//namespace
 
 bool initDebugOutput()
 {
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	return glf::checkError("initDebugOutput");
+	return true;
 }
 
 bool initProgram()
@@ -96,6 +111,9 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
@@ -112,43 +130,25 @@ bool initProgram()
 	return glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
+	return glf::checkError("initBuffer");;
 }
 
-bool initSampler()
+bool initTexture()
 {
-	glGenSamplers(1, &SamplerName);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glSamplerParameterfv(SamplerName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MIN_LOD, -1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_LOD, 1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_LOD_BIAS, 0.0f);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-	return glf::checkError("initSampler");
-}
-
-bool initTexture2D()
-{
-	glGenTextures(1, &Texture2DName);
+	glGenTextures(texture::MAX, &TextureName[0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -166,31 +166,32 @@ bool initTexture2D()
 	}
 	glGenerateMipmap(GL_TEXTURE_2D); // Allocate all mipmaps memory
 
-	return glf::checkError("initTexture2D");
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	return glf::checkError("initTexture");
 }
 
 bool initFramebuffer()
 {
+	glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
+
 	glGenRenderbuffers(1, &ColorRenderbufferName);
 	glBindRenderbuffer(GL_RENDERBUFFER, ColorRenderbufferName);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 
-	glGenFramebuffers(1, &FramebufferRenderName);
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ColorRenderbufferName);
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return glf::checkError("initFramebuffer");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glGenTextures(1, &ColorTextureName);
-	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-	glGenFramebuffers(1, &FramebufferResolveName);
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferResolveName);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ColorTextureName, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return glf::checkError("initFramebuffer");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -223,11 +224,9 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
-		Validated = initSampler();
-	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initFramebuffer();
 	if(Validated)
@@ -240,11 +239,9 @@ bool end()
 {
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
-	glDeleteTextures(1, &Texture2DName);
-	glDeleteTextures(1, &ColorTextureName);
+	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteRenderbuffers(1, &ColorRenderbufferName);
-	glDeleteFramebuffers(1, &FramebufferRenderName);
-	glDeleteFramebuffers(1, &FramebufferResolveName);
+	glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
 	return glf::checkError("end");
@@ -260,8 +257,7 @@ void renderFBO()
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
-	glBindSampler(0, SamplerName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
@@ -280,8 +276,7 @@ void renderFB()
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
-	glBindSampler(0, SamplerName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
@@ -295,7 +290,7 @@ void display()
 	glUniform1i(UniformDiffuse, 0);
 
 	// Pass 1
-	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
+	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 	renderFBO();
@@ -304,15 +299,15 @@ void display()
 
 	// Generate FBO mipmaps
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Blit framebuffers
 	GLint const Border = 2;
 	int const Tile = 4;
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferRenderName);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferResolveName);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
 
 	for(int j = 0; j < Tile; ++j)
 	for(int i = 0; i < Tile; ++i)
@@ -343,6 +338,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
