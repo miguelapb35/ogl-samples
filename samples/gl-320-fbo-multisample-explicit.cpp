@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Framebuffer Multisample
-// 20/02/2011 - 20/02/2011
+// 20/02/2011 - 22/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,13 +13,13 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Framebuffer Explicit Multisample";	
+	char const * SAMPLE_NAME("OpenGL Framebuffer Explicit Multisample");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
+	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -47,59 +47,45 @@ namespace
 		};
 	}//namespace program
 
-	char const * VERT_SHADER_SOURCE("gl-330/multisample-explicit-texture.vert");
+	namespace texture
+	{
+		enum type
+		{
+			COLORBUFFER,
+			MULTISAMPLE_DEPTHBUFFER,
+			MULTISAMPLE_COLORBUFFER,
+			DIFFUSE,
+			MAX
+		};
+	}//namespace texture
+
+	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample-explicit.vert");
 	char const * FRAG_SHADER_SOURCE[program::MAX] = 
 	{
-		"gl-330/multisample-explicit-texture.frag",
-		"gl-330/multisample-explicit-box.frag",
-		"gl-330/multisample-explicit-near.frag",
+		"gl-320/fbo-multisample-explicit-texture.frag",
+		"gl-320/fbo-multisample-explicit-box.frag",
+		"gl-320/fbo-multisample-explicit-near.frag",
 	};
 
-	GLuint VertexArrayName = 0;
-	GLuint ProgramName[program::MAX];
-
-	GLuint BufferName = 0;
-	GLuint Texture2DName = 0;
-	GLuint SamplerName = 0;
-	
-	GLuint MultisampleTextureName = 0;
-	GLuint DepthTextureName = 0;
-	GLuint ColorTextureName = 0;
-	
-	GLuint FramebufferRenderName = 0;
-	GLuint FramebufferResolveName = 0;
-
-	GLint UniformMVP[program::MAX];
-	GLint UniformDiffuse[program::MAX];
+	GLuint VertexArrayName(0);
+	GLuint BufferName(0);
+	GLuint FramebufferRenderName(0);
+	GLuint FramebufferResolveName(0);
+	std::vector<GLuint> ProgramName(program::MAX);
+	std::vector<GLuint> TextureName(texture::MAX);
+	std::vector<GLint> UniformMVP(program::MAX);
+	std::vector<GLint> UniformDiffuse(program::MAX);
 }//namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
-}
-
-bool initSampler()
-{
-	glGenSamplers(1, &SamplerName);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glSamplerParameterfv(SamplerName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MIN_LOD, -1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_LOD, 1000.f);
-	glSamplerParameterf(SamplerName, GL_TEXTURE_LOD_BIAS, 0.0f);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-	glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-	return glf::checkError("initSampler");
+	return true;
 }
 
 bool initProgram()
@@ -143,10 +129,10 @@ bool initBuffer()
 
 bool initTexture()
 {
-	glGenTextures(1, &Texture2DName);
+	glGenTextures(texture::MAX, &TextureName[0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
 
@@ -165,35 +151,33 @@ bool initTexture()
 			Texture[Level].data());
 	}
 
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_COLORBUFFER]);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_DEPTHBUFFER]);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
 	return glf::checkError("initTexture");
 }
 
 bool initFramebuffer()
 {
-	glGenTextures(1, &MultisampleTextureName);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, MultisampleTextureName);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
-
-	glGenTextures(1, &DepthTextureName);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, DepthTextureName);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
 
 	glGenFramebuffers(1, &FramebufferRenderName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, MultisampleTextureName, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, DepthTextureName, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE_COLORBUFFER], 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::MULTISAMPLE_DEPTHBUFFER], 0);
 
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glGenTextures(1, &ColorTextureName);
-	glBindTexture(GL_TEXTURE_2D, ColorTextureName);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
 	glGenFramebuffers(1, &FramebufferResolveName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferResolveName);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ColorTextureName, 0);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 
 	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		return false;
@@ -232,8 +216,6 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initSampler();
-	if(Validated)
 		Validated = initTexture();
 	if(Validated)
 		Validated = initFramebuffer();
@@ -246,10 +228,7 @@ bool end()
 	glDeleteBuffers(1, &BufferName);
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
-	glDeleteSamplers(1, &SamplerName);
-	glDeleteTextures(1, &Texture2DName);
-	glDeleteTextures(1, &ColorTextureName);
-	glDeleteTextures(1, &MultisampleTextureName);
+	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteFramebuffers(1, &FramebufferRenderName);
 	glDeleteFramebuffers(1, &FramebufferResolveName);
 	glDeleteVertexArrays(1, &VertexArrayName);
@@ -287,8 +266,7 @@ void renderFBO(GLuint Framebuffer)
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
-	glBindSampler(0, SamplerName);
+	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
@@ -319,8 +297,7 @@ void resolveMultisampling()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, MultisampleTextureName);
-	glBindSampler(0, SamplerName);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_COLORBUFFER]);
 
 	glBindVertexArray(VertexArrayName);
 
@@ -378,8 +355,8 @@ int main(int argc, char* argv[])
 	if(glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION))
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION))
 		return 0;
 	return 1;
 }

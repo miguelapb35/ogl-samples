@@ -106,9 +106,7 @@ bool initProgram()
 		glAttachShader(ProgramName[program::LAYERING], GeomShaderName);
 		glAttachShader(ProgramName[program::LAYERING], FragShaderName);
 		glBindAttribLocation(ProgramName[program::LAYERING], glf::semantic::attr::POSITION, "Position");
-		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::RED, "Red");
-		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::GREEN, "Green");
-		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::BLUE, "Blue");
+		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::COLOR, "FragColor");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(GeomShaderName);
 		glDeleteShader(FragShaderName);
