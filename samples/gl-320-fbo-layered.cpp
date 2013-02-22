@@ -14,16 +14,16 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Layered rendering");
-	char const * VERT_SHADER_SOURCE1("gl-320/layer.vert");
-	char const * GEOM_SHADER_SOURCE1("gl-320/layer.geom");
-	char const * FRAG_SHADER_SOURCE1("gl-320/layer.frag");
+	char const * VERT_SHADER_SOURCE1("gl-320/fbo-layered.vert");
+	char const * GEOM_SHADER_SOURCE1("gl-320/fbo-layered.geom");
+	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-layered.frag");
 	char const * VERT_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -79,13 +79,13 @@ namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
@@ -105,6 +105,10 @@ bool initProgram()
 		glAttachShader(ProgramName[program::LAYERING], VertShaderName);
 		glAttachShader(ProgramName[program::LAYERING], GeomShaderName);
 		glAttachShader(ProgramName[program::LAYERING], FragShaderName);
+		glBindAttribLocation(ProgramName[program::LAYERING], glf::semantic::attr::POSITION, "Position");
+		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::RED, "Red");
+		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::GREEN, "Green");
+		glBindFragDataLocation(ProgramName[program::LAYERING], glf::semantic::frag::BLUE, "Blue");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(GeomShaderName);
 		glDeleteShader(FragShaderName);
@@ -121,6 +125,9 @@ bool initProgram()
 		ProgramName[program::SPLASH] = glCreateProgram();
 		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
 		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
+		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName[program::SPLASH]);
@@ -277,7 +284,6 @@ void display()
 		glUniformMatrix4fv(UniformMVP[program::LAYERING], 1, GL_FALSE, &MVP[0][0]);
 
 		glBindVertexArray(VertexArrayName[program::LAYERING]);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 	}
 
