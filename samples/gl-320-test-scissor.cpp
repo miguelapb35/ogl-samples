@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Texture 2D
-// 27/08/2009 - 11/03/2011
+// OpenGL Test Scissor
+// 06/12/2009 - 23/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,9 +13,9 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Texture 2D");
-	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
+	char const * SAMPLE_NAME("OpenGL Test Scissor");
+	char const * VERTEX_SHADER_SOURCE("gl-320/test-scissor.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-320/test-scissor.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -24,22 +24,17 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount(4);
+	// With DDS textures, v texture coordinate are reversed, from top to bottom
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
 		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
 		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
 		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
-	};
-
-	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
-	{
-		0, 1, 2, 
-		2, 3, 0
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace buffer
@@ -47,17 +42,15 @@ namespace
 		enum type
 		{
 			VERTEX,
-			ELEMENT,
 			TRANSFORM,
 			MAX
 		};
 	}//namespace buffer
 
+	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint TextureName(0);
-	std::vector<GLuint> BufferName(buffer::MAX);
-
 	GLint UniformTransform(0);
 	GLint UniformDiffuse(0);
 }//namespace
@@ -75,14 +68,14 @@ bool initDebugOutput()
 
 bool initProgram()
 {
-	bool Validated(true);
+	bool Validated = true;
 	
 	glf::compiler Compiler;
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 150 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -111,10 +104,6 @@ bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, &BufferName[0]);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -131,15 +120,12 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	return glf::checkError("initBuffer");;
+	return glf::checkError("initBuffer");
 }
 
 bool initTexture()
 {
 	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
-	assert(!Texture.empty());
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	glGenTextures(1, &TextureName);
 
@@ -152,12 +138,12 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
-			GL_RGBA8,
+			GL_RGB8,
 			GLsizei(Texture[Level].dimensions().x),
 			GLsizei(Texture[Level].dimensions().y),
 			0,
@@ -165,11 +151,6 @@ bool initTexture()
 			GL_UNSIGNED_BYTE,
 			Texture[Level].data());
 	}
-
-	if(Texture.levels() == 1)
-		glGenerateMipmap(GL_TEXTURE_2D);
-	
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 	return glf::checkError("initTexture");
 }
@@ -185,9 +166,7 @@ bool initVertexArray()
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glBindVertexArray(0);
+	glBindVertexArray(VertexArrayName);
 
 	return glf::checkError("initVertexArray");
 }
@@ -199,11 +178,11 @@ bool begin()
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
-		Validated = initTexture();
-	if(Validated)
 		Validated = initProgram();
 	if(Validated)
 		Validated = initBuffer();
+	if(Validated)
+		Validated = initTexture();
 	if(Validated)
 		Validated = initVertexArray();
 
@@ -222,6 +201,9 @@ bool end()
 
 void display()
 {
+	glm::vec3 MinScissor( 10000.f);
+	glm::vec3 MaxScissor(-10000.f);
+
 	// Update of the uniform buffer
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -239,11 +221,29 @@ void display()
 
 		// Make sure the uniform buffer is uploaded
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+		glm::mat4 Ortho = glm::ortho(0.0f, 0.0f, float(Window.Size.x), float(Window.Size.y));
+		for(GLsizei i = 0; i < VertexCount; ++i)
+		{
+			glm::vec3 Projected = glm::project(
+				glm::vec3(VertexData[i].Position, 0.0f), 
+				View * Model, 
+				Projection, 
+				glm::ivec4(0, 0, Window.Size.x, Window.Size.y));
+
+			MinScissor = glm::min(MinScissor, glm::vec3(Projected));
+			MaxScissor = glm::max(MaxScissor, glm::vec3(Projected));
+		}
 	}
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
+	glScissor(GLint(MinScissor.x), GLint(MinScissor.y), GLsizei(MaxScissor.x - MinScissor.x), GLsizei(MaxScissor.y - MinScissor.y));
+	glEnable(GL_SCISSOR_TEST);
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+
+	// Bind the program for use
 	glUseProgram(ProgramName);
 	glUniform1i(UniformDiffuse, 0);
 	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
@@ -253,8 +253,9 @@ void display()
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindVertexArray(VertexArrayName);
 
-	glDrawElementsInstancedBaseVertex(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+
+	glDisable(GL_SCISSOR_TEST);
 
 	glf::checkError("display");
 	glf::swapBuffers();
@@ -265,7 +266,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		GLF_CONTEXT_CORE_PROFILE_BIT,
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
