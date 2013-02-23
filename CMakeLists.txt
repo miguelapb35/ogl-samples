@@ -178,11 +178,6 @@ if(OGL_SAMPLES_STATUS)
 	add_definitions(-DGLF_AUTO_STATUS)
 endif()
 
-option(INTEL_SUPPORT "For Intel" OFF)
-if(INTEL_SUPPORT)
-	add_definitions(-D__INTEL__)
-endif()
-
 ################################
 # Add definitions
 

@@ -158,7 +158,44 @@
 	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv(0);
 	PFNGLGETACTIVEATTRIBPROC glGetActiveAttrib(0);
 	PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform(0);
-		
+
+	PFNGLVERTEXATTRIB1DPROC glVertexAttrib1d(0);
+	PFNGLVERTEXATTRIB1DVPROC glVertexAttrib1dv(0);
+	PFNGLVERTEXATTRIB1FPROC glVertexAttrib1f(0);
+	PFNGLVERTEXATTRIB1FVPROC glVertexAttrib1fv(0);
+	PFNGLVERTEXATTRIB1SPROC glVertexAttrib1s(0);
+	PFNGLVERTEXATTRIB1SVPROC glVertexAttrib1sv(0);
+	PFNGLVERTEXATTRIB2DPROC glVertexAttrib2d(0);
+	PFNGLVERTEXATTRIB2DVPROC glVertexAttrib2dv(0);
+	PFNGLVERTEXATTRIB2FPROC glVertexAttrib2f(0);
+	PFNGLVERTEXATTRIB2FVPROC glVertexAttrib2fv(0);
+	PFNGLVERTEXATTRIB2SPROC glVertexAttrib2s(0);
+	PFNGLVERTEXATTRIB2SVPROC glVertexAttrib2sv(0);
+	PFNGLVERTEXATTRIB3DPROC glVertexAttrib3d(0);
+	PFNGLVERTEXATTRIB3DVPROC glVertexAttrib3dv(0);
+	PFNGLVERTEXATTRIB3FPROC glVertexAttrib3f(0);
+	PFNGLVERTEXATTRIB3FVPROC glVertexAttrib3fv(0);
+	PFNGLVERTEXATTRIB3SPROC glVertexAttrib3s(0);
+	PFNGLVERTEXATTRIB3SVPROC glVertexAttrib3sv(0);
+	PFNGLVERTEXATTRIB4DPROC glVertexAttrib4d(0);
+	PFNGLVERTEXATTRIB4DVPROC glVertexAttrib4dv(0);
+	PFNGLVERTEXATTRIB4FPROC glVertexAttrib4f(0);
+	PFNGLVERTEXATTRIB4FVPROC glVertexAttrib4fv(0);
+	PFNGLVERTEXATTRIB4SPROC glVertexAttrib4s(0);
+	PFNGLVERTEXATTRIB4SVPROC glVertexAttrib4sv(0);
+	PFNGLVERTEXATTRIB4NBVPROC glVertexAttrib4Nbv(0);
+	PFNGLVERTEXATTRIB4NIVPROC glVertexAttrib4Niv(0);
+	PFNGLVERTEXATTRIB4NSVPROC glVertexAttrib4Nsv(0);
+	PFNGLVERTEXATTRIB4NUBPROC glVertexAttrib4Nub(0);
+	PFNGLVERTEXATTRIB4NUBVPROC glVertexAttrib4Nubv(0);
+	PFNGLVERTEXATTRIB4NUIVPROC glVertexAttrib4Nuiv(0);
+	PFNGLVERTEXATTRIB4NUSVPROC glVertexAttrib4Nusv(0);
+	PFNGLVERTEXATTRIB4BVPROC glVertexAttrib4bv(0);
+	PFNGLVERTEXATTRIB4IVPROC glVertexAttrib4iv(0);
+	PFNGLVERTEXATTRIB4UBVPROC glVertexAttrib4ubv(0);
+	PFNGLVERTEXATTRIB4UIVPROC glVertexAttrib4uiv(0);
+	PFNGLVERTEXATTRIB4USVPROC glVertexAttrib4usv(0);
+
 	// OpenGL 3.0
 	PFNGLCOLORMASKIPROC glColorMaski(0);
 	PFNGLGETBOOLEANI_VPROC glGetBooleani_v(0);
@@ -1138,6 +1175,43 @@ namespace gl
 		glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)gloGetProcAddress("glUniformMatrix4fv");
 		glGetActiveAttrib = (PFNGLGETACTIVEATTRIBPROC)gloGetProcAddress("glGetActiveAttrib");
 		glGetActiveUniform = (PFNGLGETACTIVEUNIFORMPROC)gloGetProcAddress("glGetActiveUniform");
+
+		glVertexAttrib1d = (PFNGLVERTEXATTRIB1DPROC)gloGetProcAddress("glVertexAttrib1d");
+		glVertexAttrib1dv = (PFNGLVERTEXATTRIB1DVPROC)gloGetProcAddress("glVertexAttrib1dv");
+		glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)gloGetProcAddress("glVertexAttrib1f");
+		glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)gloGetProcAddress("glVertexAttrib1fv");
+		glVertexAttrib1s = (PFNGLVERTEXATTRIB1SPROC)gloGetProcAddress("glVertexAttrib1s");
+		glVertexAttrib1sv = (PFNGLVERTEXATTRIB1SVPROC)gloGetProcAddress("glVertexAttrib1sv");
+		glVertexAttrib2d = (PFNGLVERTEXATTRIB2DPROC)gloGetProcAddress("glVertexAttrib2d");
+		glVertexAttrib2dv = (PFNGLVERTEXATTRIB2DVPROC)gloGetProcAddress("glVertexAttrib2dv");
+		glVertexAttrib2f = (PFNGLVERTEXATTRIB2FPROC)gloGetProcAddress("glVertexAttrib2f");
+		glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)gloGetProcAddress("glVertexAttrib2fv");
+		glVertexAttrib2s = (PFNGLVERTEXATTRIB2SPROC)gloGetProcAddress("glVertexAttrib2s");
+		glVertexAttrib2sv = (PFNGLVERTEXATTRIB2SVPROC)gloGetProcAddress("glVertexAttrib2sv");
+		glVertexAttrib3d = (PFNGLVERTEXATTRIB3DPROC)gloGetProcAddress("glVertexAttrib3d");
+		glVertexAttrib3dv = (PFNGLVERTEXATTRIB3DVPROC)gloGetProcAddress("glVertexAttrib3dv");
+		glVertexAttrib3f = (PFNGLVERTEXATTRIB3FPROC)gloGetProcAddress("glVertexAttrib3f");
+		glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)gloGetProcAddress("glVertexAttrib3fv");
+		glVertexAttrib3s = (PFNGLVERTEXATTRIB3SPROC)gloGetProcAddress("glVertexAttrib3s");
+		glVertexAttrib3sv = (PFNGLVERTEXATTRIB3SVPROC)gloGetProcAddress("glVertexAttrib3sv");
+		glVertexAttrib4d = (PFNGLVERTEXATTRIB4DPROC)gloGetProcAddress("glVertexAttrib4d");
+		glVertexAttrib4dv = (PFNGLVERTEXATTRIB4DVPROC)gloGetProcAddress("glVertexAttrib4dv");
+		glVertexAttrib4f = (PFNGLVERTEXATTRIB4FPROC)gloGetProcAddress("glVertexAttrib4f");
+		glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)gloGetProcAddress("glVertexAttrib4fv");
+		glVertexAttrib4s = (PFNGLVERTEXATTRIB4SPROC)gloGetProcAddress("glVertexAttrib4s");
+		glVertexAttrib4sv = (PFNGLVERTEXATTRIB4SVPROC)gloGetProcAddress("glVertexAttrib4sv");
+		glVertexAttrib4Nbv = (PFNGLVERTEXATTRIB4NBVPROC)gloGetProcAddress("glVertexAttrib4Nbv");
+		glVertexAttrib4Niv = (PFNGLVERTEXATTRIB4NIVPROC)gloGetProcAddress("glVertexAttrib4Niv");
+		glVertexAttrib4Nsv = (PFNGLVERTEXATTRIB4NSVPROC)gloGetProcAddress("glVertexAttrib4Nsv");
+		glVertexAttrib4Nub = (PFNGLVERTEXATTRIB4NUBPROC)gloGetProcAddress("glVertexAttrib4Nub");
+		glVertexAttrib4Nubv = (PFNGLVERTEXATTRIB4NUBVPROC)gloGetProcAddress("glVertexAttrib4Nubv");
+		glVertexAttrib4Nuiv = (PFNGLVERTEXATTRIB4NUIVPROC)gloGetProcAddress("glVertexAttrib4Nuiv");
+		glVertexAttrib4Nusv = (PFNGLVERTEXATTRIB4NUSVPROC)gloGetProcAddress("glVertexAttrib4Nusv");
+		glVertexAttrib4bv = (PFNGLVERTEXATTRIB4BVPROC)gloGetProcAddress("glVertexAttrib4bv");
+		glVertexAttrib4iv = (PFNGLVERTEXATTRIB4IVPROC)gloGetProcAddress("glVertexAttrib4iv");
+		glVertexAttrib4ubv = (PFNGLVERTEXATTRIB4UBVPROC)gloGetProcAddress("glVertexAttrib4ubv");
+		glVertexAttrib4uiv = (PFNGLVERTEXATTRIB4UIVPROC)gloGetProcAddress("glVertexAttrib4uiv");
+		glVertexAttrib4usv = (PFNGLVERTEXATTRIB4USVPROC)gloGetProcAddress("glVertexAttrib4usv");
 
 		// OpenGL 3.0
 		glColorMaski = (PFNGLCOLORMASKIPROC)gloGetProcAddress("glColorMaski");

@@ -1,26 +1,25 @@
 //**********************************
-// OpenGL Sampler offset
-// 18/02/2011
+// OpenGL Texture offset
+// 18/02/2011 - 23/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
 //**********************************
 
-
 #include <glf/glf.hpp>
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Sampler offset";
+	char const * SAMPLE_NAME("OpenGL Sampler offset");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const VertexCount = 4;
+	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
@@ -30,7 +29,7 @@ namespace
 		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
 	};
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLuint);
 	GLuint const ElementData[ElementCount] =
 	{
@@ -58,52 +57,53 @@ namespace
 		};
 	}//namespace program
 
-	std::string const SHADER_VERT("gl-330/sampler.vert");
-
-	std::string const SHADER_FRAG[program::MAX] = 
+	char const * SHADER_VERT("gl-320/texture-offset.vert");
+	char const * SHADER_FRAG[program::MAX] = 
 	{
-		glf::DATA_DIRECTORY + "gl-330/sampler-offset.frag",
-		glf::DATA_DIRECTORY + "gl-330/sampler-bicubic.frag",
+		"gl-320/texture-offset.frag",
+		"gl-320/texture-offset-bicubic.frag",
 	};
 
 	GLuint VertexArrayName(0);
-	GLuint ProgramName[program::MAX];
-	GLint UniformMVP[program::MAX];
-	GLint UniformDiffuse[program::MAX];
+	GLuint TextureName(0);
+	std::vector<GLuint> BufferName(buffer::MAX);
+	std::vector<GLuint> ProgramName(program::MAX);
+	std::vector<GLint> UniformMVP(program::MAX);
+	std::vector<GLint> UniformDiffuse(program::MAX);
 	GLint UniformOffset;
-	glm::vec4 Viewport[program::MAX];
-
-	GLuint BufferName[buffer::MAX];
-	GLuint Image2DName(0);
+	std::vector<glm::vec4> Viewport(program::MAX);
 }//namespace
 
 bool initDebugOutput()
 {
-	bool Validated(true);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
+	return true;
 }
 
 bool initProgram()
 {
 	bool Validated = true;
 
-	for(int i = 0; i < program::MAX; ++i)
-	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG[i]);
+	glf::compiler Compiler;
 
-		Validated = Validated && glf::checkShader(VertShaderName, SHADER_VERT);
-		Validated = Validated && glf::checkShader(FragShaderName, SHADER_FRAG[i]);
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT, "--version 150 --profile core");
+
+	for(std::size_t i = 0; i < program::MAX; ++i)
+	{
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG[i], "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName[i] = glCreateProgram();
 		glAttachShader(ProgramName[i], VertShaderName);
 		glAttachShader(ProgramName[i], FragShaderName);
-		glDeleteShader(VertShaderName);
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
 		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName[i]);
 		Validated = Validated && glf::checkProgram(ProgramName[i]);
@@ -112,14 +112,16 @@ bool initProgram()
 		UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
 	}
 
+	glDeleteShader(VertShaderName);
+
 	UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
 
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initVertexBuffer()
+bool initBuffer()
 {
-	glGenBuffers(buffer::MAX, BufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
@@ -129,22 +131,22 @@ bool initVertexBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
-bool initTexture2D()
+bool initTexture()
 {
-	glGenTextures(1, &Image2DName);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Image2DName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-
 	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+
+	glGenTextures(1, &TextureName);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
@@ -173,6 +175,8 @@ bool initVertexArray()
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");
@@ -193,21 +197,21 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initVertexBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 
 	return Validated && glf::checkError("begin");
 }
 
 bool end()
 {
-	glDeleteBuffers(buffer::MAX, BufferName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
-	glDeleteTextures(1, &Image2DName);
+	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
 	return glf::checkError("end");
@@ -227,10 +231,9 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Image2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 	glUseProgram(ProgramName[program::OFFSET]);
 	glUniform2iv(UniformOffset, 1, &glm::ivec2(63, 107)[0]);
@@ -255,6 +258,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

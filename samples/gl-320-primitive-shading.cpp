@@ -13,7 +13,7 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Primitive Shading");	
+	char const * SAMPLE_NAME("OpenGL Primitive Shading");
 	char const * SAMPLE_VERT_SHADER2("gl-320/primitive-shading.vert");
 	char const * SAMPLE_GEOM_SHADER2("gl-320/primitive-shading.geom");
 	char const * SAMPLE_FRAG_SHADER2("gl-320/primitive-shading.frag");

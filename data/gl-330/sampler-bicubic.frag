@@ -1,12 +1,6 @@
-#version 330 core
+#version 150 core
 
 precision highp int;
-
-// Declare all the semantics
-#define ATTR_POSITION	0
-#define ATTR_COLOR		3
-#define ATTR_TEXCOORD	4
-#define FRAG_COLOR		0
 
 uniform sampler2D Diffuse;
 
@@ -15,7 +9,7 @@ in block
 	vec2 Texcoord;
 } In;
 
-layout(location = FRAG_COLOR, index = 0) out vec4 FragColor;
+out vec4 Color;
 
 vec4 catmullRom(in vec4 A, in vec4 B, in vec4 C, in vec4 D, in float s)
 {
@@ -71,6 +65,6 @@ vec4 textureCatmullrom(in sampler2D Sampler, in vec2 Texcoord)
 
 void main()
 {
-	FragColor = textureCatmullrom(Diffuse, In.Texcoord);
+	Color = textureCatmullrom(Diffuse, In.Texcoord);
 }
 

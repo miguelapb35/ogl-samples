@@ -197,6 +197,8 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_RGBA8, GLsizei(Window.Size.x), GLsizei(Window.Size.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	//glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGB10_A2, GLsizei(Window.Size.x), GLsizei(Window.Size.y));
+	//glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_RGB10_A2UI, GLsizei(Window.Size.x), GLsizei(Window.Size.y), 0, GL_RGBA_INTEGER, GL_UNSIGNED_INT_2_10_10_10_REV, NULL);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
