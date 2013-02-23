@@ -1,6 +1,6 @@
 //**********************************
-// OpenGL Framebuffer Multisample
-// 28/01/2013 - 28/01/2013
+// OpenGL Framebuffer Multisample Integer
+// 28/01/2013 - 23/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,9 +13,9 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Multisample");	
-	char const * VERTEX_SHADER_SOURCE("gl-330/fbo-integer-render.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/fbo-integer-render.frag");
+	char const * SAMPLE_NAME("OpenGL Framebuffer Multisample Integer");	
+	char const * VERTEX_SHADER_SOURCE("gl-320/fbo-multisample-integer.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-320/fbo-integer-render.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);

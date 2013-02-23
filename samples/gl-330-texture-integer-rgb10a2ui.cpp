@@ -1,5 +1,5 @@
 //**********************************
-// OpenGL Texture Integer
+// OpenGL Texture Integer RGB10A2UI
 // 28/01/2013 - 16/02/2013
 //**********************************
 // Christophe Riccio
@@ -13,14 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Texture Integer");
-	char const * VERT_SHADER_SOURCE("gl-320/texture-integer.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-integer.frag");
+	char const * SAMPLE_NAME("OpenGL Texture Integer RGB10A2UI");
+	char const * VERT_SHADER_SOURCE("gl-330/texture-integer.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/texture-integer.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
+	int const SAMPLE_MINOR_VERSION(3);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -116,15 +116,13 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGBA8UI, 
+			GL_RGB10_A2UI, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			0,
@@ -132,7 +130,7 @@ bool initTexture()
 			GL_UNSIGNED_BYTE, 
 			Texture[Level].data());
 	}
-	//glGenerateMipmap(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
