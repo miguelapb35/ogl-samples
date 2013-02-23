@@ -1,12 +1,8 @@
-#version 330 core
-
-#define POSITION	0
-#define COLOR		3
-#define FRAG_COLOR	0
+#version 150 core
 
 uniform mat4 MVP;
 
-layout(location = POSITION) in vec4 Position;
+in vec4 Position;
 
 out block
 {
