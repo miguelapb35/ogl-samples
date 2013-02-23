@@ -164,27 +164,25 @@ bool initBuffer()
 
 bool initTexture()
 {
-	glGenTextures(texture::MAX, &TextureName[0]);
+	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 
+	glGenTextures(texture::MAX, &TextureName[0]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
 			GL_TEXTURE_2D, 
 			GLint(Level), 
-			GL_RGB8, 
+			GL_RGBA8UI, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			0,
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
+			GL_BGR_INTEGER, GL_UNSIGNED_BYTE,
 			Texture[Level].data());
 	}
 
@@ -294,7 +292,7 @@ void renderFBO(GLuint Framebuffer)
 
 	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
+	glClearBufferuiv(GL_COLOR, 0, &glm::uvec4(0, 128, 255, 255)[0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);

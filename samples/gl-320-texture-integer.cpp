@@ -109,7 +109,6 @@ bool initTexture()
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	glGenTextures(1, &TextureName);
-
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -122,14 +121,13 @@ bool initTexture()
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGBA8UI, 
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
+			GL_TEXTURE_2D,
+			GLint(Level),
+			GL_RGBA8UI,
+			GLsizei(Texture[Level].dimensions().x),
+			GLsizei(Texture[Level].dimensions().y),
 			0,
-			GL_BGR_INTEGER, 
-			GL_UNSIGNED_BYTE, 
+			GL_BGR_INTEGER, GL_UNSIGNED_BYTE,
 			Texture[Level].data());
 	}
 	//glGenerateMipmap(GL_TEXTURE_2D);

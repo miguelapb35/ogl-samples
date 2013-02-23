@@ -1,13 +1,13 @@
 #version 150 core
 
-uniform sampler2D Diffuse;
+uniform usampler2D Diffuse;
 
 in block
 {
 	vec2 Texcoord;
 } In;
 
-out vec4 Color;
+out uvec4 Color;
 
 void main()
 {
