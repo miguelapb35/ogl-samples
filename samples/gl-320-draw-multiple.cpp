@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL multiple draw base vertex
-// 04/12/2009
+// 04/12/2009 - 23/02/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,17 +13,17 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL multiple draw base vertex";
-	char const * VERTEX_SHADER_SOURCE("gl-330/flat-color.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/flat-color.frag");
+	char const * SAMPLE_NAME("OpenGL multiple draw base vertex");
+	char const * VERTEX_SHADER_SOURCE("gl-320/draw-multiple.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-320/draw-multiple.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MINOR_VERSION(2);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const ElementCount = 6;
+	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
 	glm::uint32 const ElementData[ElementCount] =
 	{
@@ -31,7 +31,7 @@ namespace
 		0, 2, 3
 	};
 
-	GLsizei const VertexCount = 8;
+	GLsizei const VertexCount(8);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec3);
 	glm::vec3 const PositionData[VertexCount] =
 	{
@@ -59,9 +59,11 @@ namespace
 
 bool initDebugOutput()
 {
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	ifdef GL_ARB_debug_output
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+#	endif
 
 	return glf::checkError("initDebugOutput");
 }
@@ -70,20 +72,22 @@ bool initProgram()
 {
 	bool Validated = true;
 	
+	glf::compiler Compiler;
+
 	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 150 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
+		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+		glDeleteShader(VertShaderName);
+		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
@@ -99,19 +103,19 @@ bool initProgram()
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	glGenBuffers(1, &ArrayBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &ElementBufferName);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool initVertexArray()
@@ -137,7 +141,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 

@@ -170,7 +170,7 @@ bool initVertexArray()
 
 	// Build a vertex array object
 	glBindVertexArray(VertexArrayName[program::TRANSFORM]);
-		glBindBuffer(GL_ARRAY_BUFFER, VertexArrayName[program::TRANSFORM]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[program::TRANSFORM]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -179,7 +179,7 @@ bool initVertexArray()
 
 	// Build a vertex array object
 	glBindVertexArray(VertexArrayName[program::FEEDBACK]);
-		glBindBuffer(GL_ARRAY_BUFFER, VertexArrayName[program::FEEDBACK]);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[program::FEEDBACK]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec4)));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -201,7 +201,7 @@ bool initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[program::FEEDBACK]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glf::vertex_v4fc4f) * VertexCount, NULL, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glf::vertex_v4fc4f) * VertexCount, NULL, GL_STATIC_COPY);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");
