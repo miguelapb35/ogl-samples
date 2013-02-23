@@ -108,8 +108,8 @@ bool initArrayBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");;
@@ -191,7 +191,7 @@ void display()
 	// Setup blending
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_COLOR, GL_SRC1_COLOR);
+	glBlendFunc(GL_ONE, GL_SRC1_COLOR);
 
 	// Compute the MVP (Model View Projection matrix)
 	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -202,7 +202,7 @@ void display()
 	glm::mat4 MVP = Projection * View * Model;
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glUseProgram(ProgramName);
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
@@ -223,6 +223,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		GLF_CONTEXT_CORE_PROFILE_BIT,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }
