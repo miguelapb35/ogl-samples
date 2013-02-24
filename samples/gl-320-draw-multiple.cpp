@@ -45,9 +45,8 @@ namespace
 		glm::vec3(-1.5f, 1.0f,-0.5f)
 	};
 
-	GLsizei Count[2] = {ElementCount, ElementCount};
-	GLvoid * Indexes[2] = {0, 0};
-	GLint BaseVertex[2] = {0, 4};
+	GLsizei const Count[2] = {ElementCount, ElementCount};
+	GLint const BaseVertex[2] = {0, 4};
 
 	GLuint VertexArrayName;
 	GLuint ProgramName;
@@ -109,7 +108,7 @@ bool initBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
 	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	
 	glGenBuffers(1, &ElementBufferName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
@@ -140,6 +139,7 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -179,16 +179,24 @@ void display()
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 // Bug fix for cross platform build...
-#	ifdef WIN32
+#	if defined(WIN32)// || defined(__APPLE__)
 #		define CONV(x)		x
 #	else
-#		define CONV(x)		(void **)x
+#		define CONV(x)		(GLvoid **)x
 #	endif
 
+	GLvoid const * Indexes[2] = {0, 0};
+	
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-	glMultiDrawElementsBaseVertex(GL_TRIANGLES, Count, GL_UNSIGNED_INT, CONV(Indexes), 2, BaseVertex);
-
+	glMultiDrawElementsBaseVertex(
+		GL_TRIANGLES,
+		Count,
+		GL_UNSIGNED_INT,
+		Indexes,//CONV(Indexes),
+		2,
+		BaseVertex);
+	
 	glf::swapBuffers();
 	glf::checkError("display");
 }

@@ -83,11 +83,10 @@ bool initProgram()
 		glAttachShader(ProgramName, FragShaderName);
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+		glLinkProgram(ProgramName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
-
-		glLinkProgram(ProgramName);
-		Validated = glf::checkProgram(ProgramName);
+		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	// Get variables locations
@@ -249,6 +248,7 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)

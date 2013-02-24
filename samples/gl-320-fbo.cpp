@@ -81,6 +81,7 @@ namespace
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
+	std::vector<GLint> UniformDiffuse(program::MAX);
 	GLint UniformTransform(0);
 }//namespace
 
@@ -110,8 +111,11 @@ bool initProgram()
 	}
 
 	if(Validated)
+	{
 		UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
-
+		UniformDiffuse[program::TEXTURE] = glGetUniformLocation(ProgramName[program::TEXTURE], "Diffuse");
+	}
+		
 	if(Validated)
 	{
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
@@ -121,15 +125,18 @@ bool initProgram()
 		ProgramName[program::SPLASH] = glCreateProgram();
 		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
 		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
-		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
+		glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::SPLASH]);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 	}
+	
+	if(Validated)
+		UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
 
-	return Validated;
+	return Validated && glf::checkError("initProgram");
 }
 
 bool initBuffer()
@@ -298,7 +305,7 @@ void display()
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
+			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		//glm::mat4 Projection = glm::perspectiveFov(45.f, 640.f, 480.f, 0.1f, 100.0f);
@@ -326,6 +333,7 @@ void display()
 
 	// Bind rendering objects
 	glUseProgram(ProgramName[program::TEXTURE]);
+	glUniform1i(UniformDiffuse[program::TEXTURE], 0);
 	glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, glf::semantic::uniform::TRANSFORM0);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -339,6 +347,7 @@ void display()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(ProgramName[program::SPLASH]);
+	glUniform1i(UniformDiffuse[program::SPLASH], 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VertexArrayName[program::SPLASH]);
