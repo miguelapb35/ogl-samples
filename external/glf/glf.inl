@@ -313,22 +313,26 @@ namespace glf
 		glfwEnable(GLFW_AUTO_POLL_EVENTS); /* No explicit call to glfwPollEvents() */
 
 		glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_FALSE);
-		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
-		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
-#		if defined(__APPLE__)
-			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#		elif defined(__INTEL__)
-			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-#		else
-			//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-			glfwOpenWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-#		endif
-			//glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#		if defined(NDEBUG)
-			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-#		else
-			glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#		endif
+		if(version(Major, Minor) >= version(3, 2))
+		{
+			glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, Major);
+			glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, Minor);
+
+#			if defined(__APPLE__)
+				glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#			elif defined(__INTEL__)
+				glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#			else
+				glfwOpenWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+				glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GL_TRUE : GL_FALSE);
+#			endif
+
+#			if defined(NDEBUG)
+				glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+#			else
+				glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#			endif
+		}
 		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
 		assert(Result == GL_TRUE);
 
