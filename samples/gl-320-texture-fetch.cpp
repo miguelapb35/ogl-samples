@@ -187,6 +187,7 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram"); // Apple implementation work around...
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)

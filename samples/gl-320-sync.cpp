@@ -183,6 +183,7 @@ bool begin()
 		Validated = initTexture();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)

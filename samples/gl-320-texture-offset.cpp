@@ -104,17 +104,18 @@ bool initProgram()
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName[i]);
 		Validated = Validated && glf::checkProgram(ProgramName[i]);
-
+		
 		UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 		UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
+		if(i == program::OFFSET)
+			UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
+		
+		//glDeleteShader(FragShaderName);
 	}
 
-	glDeleteShader(VertShaderName);
-
-	UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
+	//glDeleteShader(VertShaderName);
 
 	return Validated && glf::checkError("initProgram");
 }
@@ -196,6 +197,7 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)

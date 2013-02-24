@@ -91,10 +91,9 @@ bool initProgram()
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+		glLinkProgram(ProgramName);
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
-
-		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
@@ -103,8 +102,10 @@ bool initProgram()
 		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
 		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 	}
-
-	return Validated && glf::checkError("initProgram");
+	
+	Validated = Validated && glf::checkError("initProgram");
+	
+	return Validated;
 }
 
 bool initBuffer()
@@ -176,6 +177,8 @@ bool initTexture()
 
 bool initVertexArray()
 {
+	glf::checkError("initVertexArray 0");
+	
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -199,11 +202,11 @@ bool begin()
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
+		Validated = initBuffer();
+	if(Validated)
 		Validated = initTexture();
 	if(Validated)
 		Validated = initProgram();
-	if(Validated)
-		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 
