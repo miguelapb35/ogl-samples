@@ -21,6 +21,31 @@ namespace
 	int const SAMPLE_MAJOR_VERSION(3);
 	int const SAMPLE_MINOR_VERSION(3);
 
+	class i10i10i10i2
+	{
+	public:
+		i10i10i10i2(float x, float y, float z) :
+			x(int(511.0f * x)),
+			y(int(511.0f * y)),
+			z(int(511.0f * z)),
+			w(0)
+		{}
+
+		operator glm::vec3()
+		{
+			return glm::vec3(
+				float(x) / 511.0f,
+				float(y) / 511.0f,
+				float(z) / 511.0f);
+		}
+
+	private:
+		int x : 10;
+		int y : 10;
+		int z : 10;
+		int w : 2;
+	};
+
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
@@ -57,15 +82,15 @@ namespace
 		glm::i8vec2(-1,-1)
 	};
 
-	GLsizeiptr const PositionSizeRGB10A2 = VertexCount * sizeof(glm::u32);
-	glm::u32 const PositionDataRGB10A2[VertexCount] =
+	GLsizeiptr const PositionSizeRGB10A2 = VertexCount * sizeof(i10i10i10i2);
+	i10i10i10i2 const PositionDataRGB10A2[VertexCount] =
 	{
-		glm::u32(0x3FF | (0x3FF << 10)),
-		glm::u32(0x001 | (0x3FF << 10)),
-		glm::u32(0x001 | (0x001 << 10)),
-		glm::u32(0x001 | (0x001 << 10)),
-		glm::u32(0x3FF | (0x001 << 10)),
-		glm::u32(0x3FF | (0x3FF << 10))
+		i10i10i10i2(-1.0f,-1.0f, 0.0f),
+		i10i10i10i2( 1.0f,-1.0f, 0.0f),
+		i10i10i10i2( 1.0f, 1.0f, 0.0f),
+		i10i10i10i2( 1.0f, 1.0f, 0.0f),
+		i10i10i10i2(-1.0f, 1.0f, 0.0f),
+		i10i10i10i2(-1.0f,-1.0f, 0.0f)
 	};
 
 	GLsizeiptr const PositionSizeI32 = VertexCount * sizeof(glm::i32vec2);
@@ -209,7 +234,7 @@ bool initVertexArray()
 
 	glBindVertexArray(VertexArrayName[buffer::RGB10A2]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::RGB10A2]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_FALSE, sizeof(glm::u32), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_FALSE, sizeof(i10i10i10i2), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
