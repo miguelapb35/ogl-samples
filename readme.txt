@@ -61,9 +61,11 @@ MacOS instructions
 - Launch the sample from XCode
 
 ================================================================================
-OpenGL Samples Pack 4.3.2.1: 2013-02-XX
+OpenGL Samples Pack 4.3.2.1: 2013-02-24
 --------------------------------------------------------------------------------
 - Fixed GLFW 2.7.7 source
+- Back port many more OpenGL 3.3 samples to OpenGL 3.2
+- Fixed OpenGL 3.0 samples which crashed at context creation
 
 ================================================================================
 OpenGL Samples Pack 4.3.2.0: 2013-02-16
