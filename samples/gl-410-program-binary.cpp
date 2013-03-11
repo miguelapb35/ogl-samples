@@ -18,7 +18,7 @@ namespace
 	char const * GEOM_SHADER_SOURCE("gl-410/binary.geom");
 	char const * FRAG_SHADER_SOURCE("gl-410/binary.frag");
 	char const * VERT_PROGRAM_BINARY("gl-410/binary.vert.bin");
-	char const * GEOM_PROGRAM_BINARY("gl-410/binary.vert.bin");
+	char const * GEOM_PROGRAM_BINARY("gl-410/binary.geom.bin");
 	char const * FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
 	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -244,12 +244,12 @@ bool initBuffer()
 	// Generate a buffer object
 	glGenBuffers(buffer::MAX, BufferName);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-    glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initArrayBuffer");
@@ -292,15 +292,16 @@ bool begin()
 
 bool end()
 {
-	saveProgram(ProgramName[program::VERT], VERT_PROGRAM_BINARY);
-	saveProgram(ProgramName[program::FRAG], FRAG_PROGRAM_BINARY);
+	saveProgram(ProgramName[program::VERT], glf::DATA_DIRECTORY + VERT_PROGRAM_BINARY);
+	saveProgram(ProgramName[program::GEOM], glf::DATA_DIRECTORY + GEOM_PROGRAM_BINARY);
+	saveProgram(ProgramName[program::FRAG], glf::DATA_DIRECTORY + FRAG_PROGRAM_BINARY);
 
 	// Delete objects
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteTextures(1, &Texture2DName);
-	glDeleteProgram(ProgramName[program::VERT]);
-	glDeleteProgram(ProgramName[program::FRAG]);
+	for(std::size_t i = 0; i < program::MAX; ++i)
+		glDeleteProgram(ProgramName[i]);
 	glDeleteProgramPipelines(1, &PipelineName);
 
 	return glf::checkError("end");
@@ -309,7 +310,7 @@ bool end()
 void display()
 {
 	// Compute the MVP (Model View Projection matrix)
-    glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 	glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, float(Window.RotationCurrent.y), glm::vec3(1.f, 0.f, 0.f));
 	glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, float(Window.RotationCurrent.x), glm::vec3(0.f, 1.f, 0.f));
