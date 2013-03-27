@@ -139,7 +139,7 @@ bool initTexture()
 			GL_RGBA8, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			0,  
+			0,
 			GL_BGRA, 
 			GL_UNSIGNED_BYTE, 
 			Texture[Level].data());
@@ -164,7 +164,7 @@ bool initTexture()
 			GL_RGBA8, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			0,  
+			0,
 			GL_BGRA, 
 			GL_UNSIGNED_BYTE, 
 			NULL);

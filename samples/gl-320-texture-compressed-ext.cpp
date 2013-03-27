@@ -159,6 +159,7 @@ bool initTexture2D()
 				Texture[Level].data());
 		}
 	}
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	{
 		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC3));
