@@ -24,6 +24,7 @@ layout(location = 0) in vertexIn st_In[][2];
 in block
 {
 	vec4 Color;
+	mediump float Lumimance[2];
 } bl_In[]; 
 
 out gl_PerVertex
@@ -43,14 +44,13 @@ layout(location = 0) out vertexOut st_Out[][2];
 out block
 {
 	vec4 Color;
-	float Lumimance[2];
 } bl_Out[]; 
 
 void main()
 {
 	float Luminance = 0.0;
 	for(int i = 0; i < 2; ++i)
-		Luminance += bl_Out[gl_InvocationID].Lumimance[i];
+		Luminance += bl_In[gl_InvocationID].Lumimance[i];
 
 	gl_TessLevelInner[0] = 16.0;
 	gl_TessLevelInner[1] = 16.0;

@@ -32,7 +32,7 @@ layout(location = 0) out vertex st_Out[2];
 out block
 {
 	vec4 Color;
-	float Lumimance[2];
+	mediump float Lumimance[2];
 } bl_Out; 
 
 void main()

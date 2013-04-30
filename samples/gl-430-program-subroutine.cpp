@@ -316,17 +316,19 @@ void display()
 	glActiveTexture(GL_TEXTURE0 + sementics::sampler::DXT1);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
 
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindProgramPipeline(PipelineName);
+	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindVertexArray(VertexArrayName);
 
 	glViewportIndexedf(0, 0, 0, GLfloat(Window.Size.x) / 2.0f, GLfloat(Window.Size.y));
 	glViewportIndexedf(1, GLfloat(Window.Size.x) / 2.0f, 0, GLfloat(Window.Size.x) / 2.0f, GLfloat(Window.Size.y));
 
+	glUseProgram(ProgramName);
 	std::vector<GLuint> Index(2);
 	Index[0] = sementics::sampling::RGB8;
 	Index[1] = sementics::sampling::DXT1;
 	glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(Index.size()), &Index[0]);
+
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 2, 0);
 
 	glf::swapBuffers();

@@ -11,7 +11,7 @@ layout(binding = 0, rgba8) uniform image2D Diffuse[3];
 in block
 {
 	vec2 Texcoord;
-	flat mediump int Instance;
+	flat int Instance;
 } In;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;

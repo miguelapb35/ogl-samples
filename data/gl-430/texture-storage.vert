@@ -21,7 +21,7 @@ out gl_PerVertex
 out block
 {
 	vec2 Texcoord;
-	vec4 Lumimance[COUNT];
+	mediump vec4 Lumimance[COUNT];
 } Out;
 
 void main()

@@ -10,7 +10,7 @@ layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 in block
 {
 	vec2 Texcoord;
-	vec4 Lumimance[COUNT];
+	mediump vec4 Lumimance[COUNT];
 } In;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
