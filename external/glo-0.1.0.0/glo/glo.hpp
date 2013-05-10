@@ -1059,8 +1059,8 @@
 
 #endif//WIN32
 
-#define GLO_BUFFER_OFFSET(i) ((char *)NULL + (i))
-#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define GLO_BUFFER_OFFSET(i) reinterpret_cast<void*>(i)
+#define GLF_BUFFER_OFFSET(i) reinterpret_cast<void*>(i)
 
 namespace gl
 {
