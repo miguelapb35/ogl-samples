@@ -333,7 +333,7 @@ namespace glf
 				glfwOpenWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #			endif
 		}
-		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+		GLboolean Result = glfwOpenWindow(Size.x, Size.y, 0, 0, 0, 0, 24, 0, GLFW_WINDOW);
 		assert(Result == GL_TRUE);
 
 		glfwSetWindowTitle(argv[0]);
