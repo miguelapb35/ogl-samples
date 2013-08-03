@@ -8,6 +8,7 @@ void display();
 #define GLF_CONTEXT_CORE_PROFILE_BIT 0x0001
 #define GLF_CONTEXT_COMPATIBILITY_PROFILE_BIT 0x0002
 #define GLF_CONTEXT_ES2_PROFILE_BIT 0x0004
+#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 namespace glf
 {
@@ -342,7 +343,10 @@ namespace glf
 		glfwSetWindowCloseCallback(close_callback);
 		glfwSetKeyCallback(key_callback);
 
-		gl::init();
+		//gl::init();
+		glewExperimental = GL_TRUE;
+		glewInit();
+		glGetError();
 
 		bool Run = begin();
 
