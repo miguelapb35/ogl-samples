@@ -1,7 +1,8 @@
 #ifndef GLF_INCLUDED
 #define GLF_INCLUDED
 
-#include <glo/glo.hpp>
+//#include <glo/glo.hpp>
+#include <GL/glew.h>
 #include <GL/glfw.h>
 
 #include "common.hpp"
