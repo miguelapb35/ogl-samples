@@ -343,4 +343,16 @@ glCreateSampleGTC(texture-storage)
 set(GL_SHADER_GTC texture-view.vert texture-view.geom texture-view.frag)
 glCreateSampleGTC(texture-view)
 
+# OpenGL 4.4 samples
+set(GL_VERSION_GTC 440)
+
+set(GL_SHADER_GTC buffer-type.vert buffer-type.frag)
+glCreateSampleGTC(buffer-type)
+set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matching.eval interface-matching.geom interface-matching.frag)
+glCreateSampleGTC(interface-matching)
+set(GL_SHADER_GTC sampler-wrap.vert sampler-wrap.frag)
+glCreateSampleGTC(sampler-wrap)
+set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
+glCreateSampleGTC(transform-feedback)
+
 endif(NOT APPLE)

@@ -30,6 +30,34 @@ if(NOT OPENGL_FOUND)
 endif(NOT OPENGL_FOUND)
 
 ################################
+# Add GLEW
+
+set(GLEW_DIRECTORY glew-1.10.0)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
+
+if(APPLE)
+	find_library(GLEW_LIBRARY GLEW)
+else()
+	add_definitions(-DGLEW_STATIC)
+
+	if(MSVC AND NOT CMAKE_CL_64)
+		set(GLEW_BINARY_DIRECTORY "Win32")
+	endif(MSVC AND NOT CMAKE_CL_64)
+
+	if(MSVC AND CMAKE_CL_64)
+		set(GLEW_BINARY_DIRECTORY "x64")
+	endif(MSVC AND CMAKE_CL_64)
+
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/lib/Release/${GLEW_BINARY_DIRECTORY})
+
+	if(WIN32)
+		set(GLEW_LIBRARY glew32s)
+	else()
+		set(GLEW_LIBRARY glew)
+	endif()
+endif()
+
+################################
 # Add GLFW
 
 set(GLFW_DIRECTORY glfw-2.7.7)
@@ -47,7 +75,7 @@ else()
 	endif(MSVC AND CMAKE_CL_64)
 
 	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
-
+	
 	set(GLFW_LIBRARY glfw)
 endif()
 
