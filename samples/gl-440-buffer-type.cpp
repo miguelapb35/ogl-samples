@@ -46,6 +46,119 @@ namespace
 		int w : 2;
 	};
 
+namespace detail
+{
+	glm::uint16 float2half(glm::uint32 const & f)
+	{
+		// 10 bits    =>                         EE EEEFFFFF
+		// 11 bits    =>                        EEE EEFFFFFF
+		// Half bits  =>                   SEEEEEFF FFFFFFFF
+		// Float bits => SEEEEEEE EFFFFFFF FFFFFFFF FFFFFFFF
+
+		// 0x00007c00 => 00000000 00000000 01111100 00000000
+		// 0x000003ff => 00000000 00000000 00000011 11111111
+		// 0x38000000 => 00111000 00000000 00000000 00000000 
+		// 0x7f800000 => 01111111 10000000 00000000 00000000 
+		// 0x00008000 => 00000000 00000000 10000000 00000000 
+		return 
+			((f >> 16) & 0x8000) | // sign
+			((((f & 0x7f800000) - 0x38000000) >> 13) & 0x7c00) | // exponential
+			((f >> 13) & 0x03ff); // Mantissa
+	}
+
+	glm::uint16 float2packed11(glm::uint32 const & f)
+	{
+		// 10 bits    =>                         EE EEEFFFFF
+		// 11 bits    =>                        EEE EEFFFFFF
+		// Half bits  =>                   SEEEEEFF FFFFFFFF
+		// Float bits => SEEEEEEE EFFFFFFF FFFFFFFF FFFFFFFF
+
+		// 0x000007c0 => 00000000 00000000 00000111 11000000
+		// 0x00007c00 => 00000000 00000000 01111100 00000000
+		// 0x000003ff => 00000000 00000000 00000011 11111111
+		// 0x38000000 => 00111000 00000000 00000000 00000000 
+		// 0x7f800000 => 01111111 10000000 00000000 00000000 
+		// 0x00008000 => 00000000 00000000 10000000 00000000 
+		return 
+			((((f & 0x7f800000) - 0x38000000) >> 17) & 0x07c0) | // exponential
+			((f >> 17) & 0x003f); // Mantissa
+	}
+
+	glm::uint16 float2packed10(glm::uint32 const & f)
+	{
+		// 10 bits    =>                         EE EEEFFFFF
+		// 11 bits    =>                        EEE EEFFFFFF
+		// Half bits  =>                   SEEEEEFF FFFFFFFF
+		// Float bits => SEEEEEEE EFFFFFFF FFFFFFFF FFFFFFFF
+
+		// 0x0000001F => 00000000 00000000 00000000 00011111
+		// 0x0000003F => 00000000 00000000 00000000 00111111
+		// 0x000003E0 => 00000000 00000000 00000011 11100000
+		// 0x000007C0 => 00000000 00000000 00000111 11000000
+		// 0x00007C00 => 00000000 00000000 01111100 00000000
+		// 0x000003FF => 00000000 00000000 00000011 11111111
+		// 0x38000000 => 00111000 00000000 00000000 00000000 
+		// 0x7f800000 => 01111111 10000000 00000000 00000000 
+		// 0x00008000 => 00000000 00000000 10000000 00000000 
+		return 
+			((((f & 0x7f800000) - 0x38000000) >> 18) & 0x03E0) | // exponential
+			((f >> 18) & 0x001f); // Mantissa
+	}
+
+	glm::uint32 half2float(glm::uint16 const & h)
+	{
+		return ((h & 0x8000) << 16) | ((( h & 0x7c00) + 0x1C000) << 13) | ((h & 0x03FF) << 13);
+	}
+
+	int floatTo11bit(float x)
+	{
+		if(x == 0.0f)
+			return 0;
+		else if(glm::isnan(x))
+			return ~0;
+		else if(glm::isinf(x))
+			return 0x1f << 6;
+	}
+
+	int floatTo10bit(float x)
+	{
+		if(x == 0.0f)
+			return 0;
+		else if(glm::isnan(x))
+			return ~0;
+		else if(glm::isinf(x))
+			return 0x1f << 5;
+	}
+
+	glm::uint32 f11_f11_f10(float x, float y, float z)
+	{
+		return floatTo11bit(x) |  (floatTo11bit(y) << 11) | (floatTo11bit(z) << 22);
+	}
+}//namespace detail
+
+	class f11f11f10
+	{
+	public:
+		f11f11f10(float x, float y, float z) :
+			x(detail::floatTo11bit(x)),
+			y(detail::floatTo11bit(y)),
+			z(detail::floatTo10bit(z))
+		{}
+/*
+		operator glm::vec3()
+		{
+			return glm::vec3(
+				float(x) / 511.0f,
+				float(y) / 511.0f,
+				float(z) / 511.0f);
+		}
+*/
+	private:
+		int x : 11;
+		int y : 11;
+		int z : 10;
+	};
+
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
@@ -102,6 +215,17 @@ namespace
 		glm::i32vec2( 1, 1),
 		glm::i32vec2(-1, 1),
 		glm::i32vec2(-1,-1)
+	};
+
+	GLsizeiptr const PositionSizeRG11FB10F = VertexCount * sizeof(f11f11f10);
+	glm::uint32 const PositionDataRG11FB10F[VertexCount] =
+	{
+		glm::uint32(detail::f11_f11_f10(-1.0f,-1.0f, 0.0f)),
+		glm::uint32(detail::f11_f11_f10( 1.0f,-1.0f, 0.0f)),
+		glm::uint32(detail::f11_f11_f10( 1.0f, 1.0f, 0.0f)),
+		glm::uint32(detail::f11_f11_f10( 1.0f, 1.0f, 0.0f)),
+		glm::uint32(detail::f11_f11_f10(-1.0f, 1.0f, 0.0f)),
+		glm::uint32(detail::f11_f11_f10(-1.0f,-1.0f, 0.0f))
 	};
 
 	namespace vertex_format
@@ -164,7 +288,7 @@ namespace
 	};
 
 	std::vector<view> Viewport(viewport::MAX);
-
+	glm::mat4* UniformPointer(NULL);
 }//namespace
 
 bool initDebugOutput()
@@ -222,7 +346,7 @@ bool initBuffer()
 	glGenBuffers(buffer::MAX, &BufferName[0]);
 
 	// Allocate and copy buffers memory
-	std::vector<glm::byte> Data(PositionSizeF32 + PositionSizeI8 + PositionSizeI32 + PositionSizeRGB10A2 + PositionSizeF16);
+	std::vector<glm::byte> Data(PositionSizeF32 + PositionSizeI8 + PositionSizeI32 + PositionSizeRGB10A2 + PositionSizeF16 + PositionSizeRG11FB10F);
 	
 	std::size_t CurrentOffset = 0;
 	memcpy(&Data[0] + CurrentOffset, PositionDataF32, PositionSizeF32);
@@ -234,6 +358,8 @@ bool initBuffer()
 	memcpy(&Data[0] + CurrentOffset, PositionDataRGB10A2, PositionSizeRGB10A2);
 	CurrentOffset += PositionSizeRGB10A2;
 	memcpy(&Data[0] + CurrentOffset, PositionDataF16, PositionSizeF16);
+	CurrentOffset += PositionSizeF16;
+	memcpy(&Data[0] + CurrentOffset, PositionDataRG11FB10F, PositionSizeRG11FB10F);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 	glBufferStorage(GL_ARRAY_BUFFER, GLsizeiptr(Data.size()), &Data[0], 0);
@@ -247,7 +373,7 @@ bool initBuffer()
 	GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+	glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -284,6 +410,11 @@ bool initVertexArray()
 	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(CurrentOffset));
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
+	CurrentOffset += PositionSizeRG11FB10F;
+	glBindVertexArray(VertexArrayName[vertex_format::RG11B10F]);
+	glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_FALSE, sizeof(glm::uint), GLF_BUFFER_OFFSET(CurrentOffset));
+	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+	
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -299,7 +430,7 @@ bool begin()
 	Viewport[viewport::VIEWPORT2] = view(glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::RGB10A2);
 	Viewport[viewport::VIEWPORT3] = view(glm::vec4(ViewportSize.x * 0.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::I8);
 	Viewport[viewport::VIEWPORT4] = view(glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::F32);
-	Viewport[viewport::VIEWPORT5] = view(glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::I8);
+	Viewport[viewport::VIEWPORT5] = view(glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::RG11B10F);
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
@@ -313,11 +444,23 @@ bool begin()
 	if(Validated)
 		Validated = initVertexArray();
 
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+	UniformPointer = (glm::mat4*)glMapBufferRange(
+		GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+		GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+
 	return Validated && glf::checkError("begin");
 }
 
 bool end()
 {
+	if(!UniformPointer)
+	{
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		UniformPointer = NULL;
+	}
+
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteVertexArrays(buffer::MAX, &VertexArrayName[0]);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -329,11 +472,6 @@ bool end()
 void display()
 {
 	{
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
 		// Compute the MVP (Model View Projection matrix)
 		float Aspect = (Window.Size.x * 0.33f) / (Window.Size.y * 0.50f);
 		glm::mat4 Projection = glm::perspective(45.0f, Aspect, 0.1f, 100.0f);
@@ -344,13 +482,11 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
-		*Pointer = MVP;
-
-		// Make sure the uniform buffer is uploaded
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		*UniformPointer = MVP;
 	}
 
-	//glViewportArrayv(0, 4, &Viewport[0][0]);
+	glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
+
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glBindProgramPipeline(PipelineName);
