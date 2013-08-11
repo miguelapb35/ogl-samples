@@ -1,4 +1,4 @@
-#version 430 core
+#version 440 core
 
 #define POSITION		0
 #define COLOR			3
@@ -11,7 +11,7 @@ struct vertex
 
 layout(location = 0) in vertex st_In;
 
-in block
+layout(location = 0 + 1) in block
 {
 	vec4 Color;
 } bl_In; 

@@ -1,11 +1,10 @@
-#version 420 core
-#extension GL_ARB_arrays_of_arrays : require
+#version 440 core
 
 #define POSITION		0
 #define COLOR			3
 #define FRAG_COLOR		0
 
-#define TRANSFORM0	1
+#define TRANSFORM0		1
 
 layout(binding = TRANSFORM0) uniform transform
 {
@@ -29,7 +28,7 @@ struct vertex
 
 layout(location = 0) out vertex st_Out[2];
 
-out block
+layout(location = 0 + 1 * st_Out.length()) out block
 {
 	vec4 Color;
 	mediump float Lumimance[2];

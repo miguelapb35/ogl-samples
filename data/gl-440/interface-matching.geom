@@ -1,5 +1,4 @@
-#version 420 core
-#extension GL_ARB_arrays_of_arrays : require
+#version 440 core
 
 #define POSITION		0
 #define COLOR			3
@@ -22,7 +21,7 @@ in gl_PerVertex
 
 layout(location = 0) in vertex st_In[][2];
 
-in block
+layout(location = 0 + 1 * st_In.length()) in block
 {
 	vec4 Color;
 } bl_In[]; 
@@ -38,12 +37,12 @@ layout(location = 0) out vertex st_Out;
 
 out vec4 ColorGNI;
 
-out block
+layout(location = 0 + 1) out block
 {
 	vec4 Color;
 } bl_Out; 
 
-out block2
+layout(location = 0 + 2) out block2
 {
 	vec4 Color;
 } bl_Pou; 

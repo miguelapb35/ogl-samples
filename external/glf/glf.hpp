@@ -55,7 +55,7 @@ namespace glf
 	{
 		vertexattrib() :
 			Enabled(GL_FALSE),
-			//Binding(0),
+			Binding(0),
 			Size(4),
 			Stride(0),
 			Type(GL_FLOAT),
@@ -69,7 +69,7 @@ namespace glf
 		vertexattrib
 		(
 			GLint Enabled,
-			//GLint Binding,
+			GLint Binding,
 			GLint Size,
 			GLint Stride,
 			GLint Type,
@@ -80,7 +80,7 @@ namespace glf
 			GLvoid* Pointer
 		) :
 			Enabled(Enabled),
-			//Binding(Binding),
+			Binding(Binding),
 			Size(Size),
 			Stride(Stride),
 			Type(Type),
@@ -92,7 +92,7 @@ namespace glf
 		{}
 
 		GLint Enabled;
-		//GLint Binding;
+		GLint Binding;
 		GLint Size;
 		GLint Stride;
 		GLint Type;

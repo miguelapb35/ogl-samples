@@ -22,7 +22,7 @@ namespace
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
+	int const SAMPLE_MINOR_VERSION(4);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -58,15 +58,15 @@ namespace
 	}//namespace buffer
 
 	GLuint PipelineName(0);
-	GLuint ProgramName[program::MAX] = {0, 0};
-	GLuint BufferName[buffer::MAX] = {0, 0, 0};
+	std::vector<GLuint> ProgramName(program::MAX);
+	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
-	GLint UniformMVP(0);
+	glm::mat4* UniformPointer(NULL);
 }//namespace
 
 bool initDebugOutput()
 {
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
@@ -75,10 +75,10 @@ bool initDebugOutput()
 
 bool initBuffer()
 {
-	glGenBuffers(buffer::MAX, BufferName);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBufferStorage(GL_ARRAY_BUFFER, VertexSize, VertexData, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GLint UniformBufferOffset(0);
@@ -90,7 +90,7 @@ bool initBuffer()
 	GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+	glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	return true;
@@ -99,8 +99,6 @@ bool initBuffer()
 bool initProgram()
 {
 	bool Validated = true;
-	
-	glGenProgramPipelines(1, &PipelineName);
 
 	if(Validated)
 	{
@@ -132,6 +130,7 @@ bool initProgram()
 
 	if(Validated)
 	{
+		glGenProgramPipelines(1, &PipelineName);
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT | GL_GEOMETRY_SHADER_BIT, ProgramName[program::VERT]);
 		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
 	}
@@ -155,6 +154,7 @@ bool initVertexArray()
 		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 	glBindVertexArray(0);
 
+	/*
 	std::vector<glf::vertexattrib> Valid(16); 
 	Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
 	Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
@@ -162,6 +162,7 @@ bool initVertexArray()
 
 	// TODO
 	//glf::validateVAO(VertexArrayName, Valid);
+	*/
 
 	return true;
 }
@@ -198,10 +199,8 @@ bool begin()
 {
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-	Validated = Validated && glf::checkExtension("GL_ARB_arrays_of_arrays");
-	Validated = Validated && glf::checkExtension("GL_ARB_program_interface_query");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
+	if(Validated)
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initMax();;
@@ -218,7 +217,7 @@ bool begin()
 bool end()
 {
 	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteBuffers(buffer::MAX, BufferName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -284,7 +283,7 @@ bool validate(GLuint const & ProgramName)
 		GLint AttribLocation = glGetAttribLocation(ProgramName, NameString.c_str());
 
 		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &VertexAttrib.Enabled);
-		//glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
 		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &VertexAttrib.Size);
 		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &VertexAttrib.Stride);
 		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &VertexAttrib.Type);
@@ -407,6 +406,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
