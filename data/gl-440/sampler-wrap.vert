@@ -1,13 +1,32 @@
-#version 140
+#version 440 core
 
-uniform mat4 MVP;
+#define POSITION		0
+#define COLOR			3
+#define TEXCOORD		4
 
-in vec2 Position;
-in vec2 Texcoord;
-out vec2 VertTexcoord;
+#define TRANSFORM0		1
+#define INDIRECTION		3
+
+layout(binding = TRANSFORM0) uniform transform
+{
+	mat4 MVP;
+} Transform;
+
+layout(location = POSITION) in vec2 Position;
+layout(location = TEXCOORD) in vec2 Texcoord;
+
+out block
+{
+	vec2 Texcoord;
+} Out;
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 void main()
 {	
-	VertTexcoord = Texcoord;
-	gl_Position = MVP * vec4(Position, 0.0, 1.0);
+	Out.Texcoord = Texcoord;
+	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

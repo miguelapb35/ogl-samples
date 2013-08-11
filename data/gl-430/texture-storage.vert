@@ -10,7 +10,7 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP;
 } Transform;
 
-layout(location = POSITION) in vec3 Position;
+layout(location = POSITION) in vec2 Position;
 layout(location = TEXCOORD) in vec2 Texcoord;
 
 out gl_PerVertex
@@ -35,5 +35,5 @@ void main()
 		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);
 
 	Out.Texcoord = Texcoord;
-	gl_Position = Transform.MVP * vec4(Position, 1.0);
+	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

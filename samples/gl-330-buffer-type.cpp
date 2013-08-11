@@ -21,44 +21,9 @@ namespace
 	int const SAMPLE_MAJOR_VERSION(3);
 	int const SAMPLE_MINOR_VERSION(3);
 
-	class i10i10i10i2
-	{
-	public:
-		i10i10i10i2(float x, float y, float z) :
-			x(int(511.0f * x)),
-			y(int(511.0f * y)),
-			z(int(511.0f * z)),
-			w(1)
-		{}
-
-		operator glm::vec3()
-		{
-			return glm::vec3(
-				float(x) / 511.0f,
-				float(y) / 511.0f,
-				float(z) / 511.0f);
-		}
-
-	private:
-		int x : 10;
-		int y : 10;
-		int z : 10;
-		int w : 2;
-	};
-
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
-	GLsizeiptr const PositionSizeF16 = VertexCount * sizeof(glm::half) * 2;
-	glm::half const PositionDataF16[VertexCount * 2] =
-	{
-		glm::half(-1.0f), glm::half(-1.0f),
-		glm::half( 1.0f), glm::half(-1.0f),
-		glm::half( 1.0f), glm::half( 1.0f),
-		glm::half( 1.0f), glm::half( 1.0f),
-		glm::half(-1.0f), glm::half( 1.0f),
-		glm::half(-1.0f), glm::half(-1.0f)
-	};
 
 	GLsizeiptr const PositionSizeF32 = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const PositionDataF32[VertexCount] =
@@ -82,15 +47,16 @@ namespace
 		glm::i8vec2(-1,-1)
 	};
 
-	GLsizeiptr const PositionSizeRGB10A2 = VertexCount * sizeof(i10i10i10i2);
-	i10i10i10i2 const PositionDataRGB10A2[VertexCount] =
+	GLsizeiptr const PositionSizeRGB10A2 = VertexCount * sizeof(glm::uint32);
+
+	glm::uint32 const PositionDataRGB10A2[VertexCount] =
 	{
-		i10i10i10i2(-1.0f,-1.0f, 0.0f),
-		i10i10i10i2( 1.0f,-1.0f, 0.0f),
-		i10i10i10i2( 1.0f, 1.0f, 0.0f),
-		i10i10i10i2( 1.0f, 1.0f, 0.0f),
-		i10i10i10i2(-1.0f, 1.0f, 0.0f),
-		i10i10i10i2(-1.0f,-1.0f, 0.0f)
+		glm::packSnorm3x10_1x2(glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f)),
+		glm::packSnorm3x10_1x2(glm::vec4( 1.0f,-1.0f, 0.0f, 1.0f)),
+		glm::packSnorm3x10_1x2(glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f)),
+		glm::packSnorm3x10_1x2(glm::vec4( 1.0f, 1.0f, 0.0f, 1.0f)),
+		glm::packSnorm3x10_1x2(glm::vec4(-1.0f, 1.0f, 0.0f, 1.0f)),
+		glm::packSnorm3x10_1x2(glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f)),
 	};
 
 	GLsizeiptr const PositionSizeI32 = VertexCount * sizeof(glm::i32vec2);
@@ -173,10 +139,6 @@ bool initBuffer()
 	// Generate a buffer object
 	glGenBuffers(buffer::MAX, &BufferName[0]);
 
-	// Allocate and copy buffers memory
-	//glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F16]);
-	//glBufferData(GL_ARRAY_BUFFER, PositionSizeF16, PositionDataF16, GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
 	glBufferData(GL_ARRAY_BUFFER, PositionSizeF32, PositionDataF32, GL_STATIC_DRAW);
 
@@ -197,16 +159,6 @@ bool initBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(buffer::MAX, &VertexArrayName[0]);
-
-	/*
-	glBindVertexArray(VertexArrayName[buffer::F16]);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F16]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(0));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-	glBindVertexArray(0);
-	*/
 
 	glBindVertexArray(VertexArrayName[buffer::F32]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
@@ -234,7 +186,7 @@ bool initVertexArray()
 
 	glBindVertexArray(VertexArrayName[buffer::RGB10A2]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::RGB10A2]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(i10i10i10i2), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(glm::uint32), GLF_BUFFER_OFFSET(0));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);

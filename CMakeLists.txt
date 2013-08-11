@@ -89,7 +89,7 @@ endif()
 ################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.4.1)
+set(GLM_DIRECTORY glm-0.9.5.A)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################

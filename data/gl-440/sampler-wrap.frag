@@ -1,11 +1,17 @@
-#version 140
+#version 440 core
 
-uniform sampler2D Diffuse;
+#define FRAG_COLOR		0
 
-in vec2 VertTexcoord;
-out vec4 FragColor;
+layout(binding = 0) uniform sampler2D Diffuse;
+
+in block
+{
+	vec2 Texcoord;
+} In;
+
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	FragColor = texture2D(Diffuse, VertTexcoord);
+	Color = texture2D(Diffuse, In.Texcoord);
 }

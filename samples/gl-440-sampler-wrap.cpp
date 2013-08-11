@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Sampler Wrap
-// 27/08/2009
+// 11/08/2013 - 11/08/2013
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,14 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Sampler Wrap";	
-	char const * VERTEX_SHADER_SOURCE("gl-330/texture-2d.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/texture-2d.frag");
+	char const * SAMPLE_NAME("OpenGL Sampler Wrap");	
+	char const * VERT_SHADER_SOURCE("gl-440/sampler-wrap.vert");
+	char const * FRAG_SHADER_SOURCE("gl-440/sampler-wrap.frag");
 	char const * TEXTURE_DIFFUSE_DXT5("kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(1024);
 	int const SAMPLE_SIZE_HEIGHT(768);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
+	int const SAMPLE_MAJOR_VERSION(4);
+	int const SAMPLE_MINOR_VERSION(4);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
@@ -40,8 +40,8 @@ namespace
 	};
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
-	GLsizei const VertexCount = 6;
-	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
+	GLsizei const VertexCount(6);
+	GLsizeiptr const VertexSize(VertexCount * sizeof(vertex));
 	vertex const VertexData[VertexCount] =
 	{
 		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(-2.0f, 2.0f)),
@@ -56,32 +56,44 @@ namespace
 	{
 		enum type
 		{
-			V00,
-			V10,
-			V11,
-			V01,
+			VIEWPORT0,
+			VIEWPORT1,
+			VIEWPORT2,
+			VIEWPORT3,
+			VIEWPORT4,
+			VIEWPORT5,
 			MAX
 		};
 	}//namespace viewport
 
-	GLuint VertexArrayName;
-	GLuint ProgramName;
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
 
-	GLuint BufferName;
-	GLuint Texture2DName;
+	GLuint VertexArrayName(0);
+	GLuint PipelineName(0);
+	GLuint ProgramName(0);
 
-	GLint UniformMVP;
-	GLint UniformDiffuse;
+	std::vector<GLuint> BufferName(buffer::MAX);
+	GLuint TextureName(0);
 
-	GLuint SamplerName[viewport::MAX];
-	glm::ivec4 Viewport[viewport::MAX];
+	std::vector<GLuint> SamplerName(viewport::MAX);
+	std::vector<glm::vec4> Viewport(viewport::MAX);
+
+	glm::mat4* UniformPointer(NULL);
 }//namespace
 
 bool initDebugOutput()
 {
 	bool Validated(true);
 
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
 
@@ -90,52 +102,65 @@ bool initDebugOutput()
 
 bool initProgram()
 {
-	bool Validated = true;
+	bool Validated(true);
 	
+	glGenProgramPipelines(1, &PipelineName);
+
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		glf::compiler Compiler;
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
+			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
+			"--version 440 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
+			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
+			"--version 440 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
+		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(ProgramName, VertShaderName);
+		glAttachShader(ProgramName, FragShaderName);
 		glLinkProgram(ProgramName);
+		glDeleteShader(VertShaderName);
+		glDeleteShader(FragShaderName);
+
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
 	if(Validated)
-	{
-		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
-	}
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
-	glGenBuffers(1, &BufferName);
+	// Generate a buffer object
+	glGenBuffers(buffer::MAX, &BufferName[0]);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+	glBufferStorage(GL_ARRAY_BUFFER, VertexSize, VertexData, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
-}
+	GLint UniformBufferOffset(0);
 
-#define GL_MIRROR_CLAMP_TO_EDGE			0x8743
-#define GL_MIRROR_CLAMP_TO_BORDER_EXT	0x8912
+	glGetIntegerv(
+		GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
+		&UniformBufferOffset);
+
+	GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+	glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	return glf::checkError("initBuffer");;
+}
 
 bool initSampler()
 {
-	glGenSamplers(viewport::MAX, SamplerName);
+	glGenSamplers(viewport::MAX, &SamplerName[0]);
 
 	for(std::size_t i = 0; i < viewport::MAX; ++i)
 	{
@@ -145,25 +170,35 @@ bool initSampler()
 		glSamplerParameterfv(SamplerName[i], GL_TEXTURE_BORDER_COLOR, &BorderColor[0]);
 	}
 
-	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_BORDER_EXT);
-	glSamplerParameteri(SamplerName[viewport::V10], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);//GL_CLAMP_TO_BORDER);
-	glSamplerParameteri(SamplerName[viewport::V11], GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT0], GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT1], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_EDGE);
+	if(glf::checkExtension("GL_EXT_texture_mirror_clamp"))
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_BORDER_EXT);
+	else
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 
-	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_BORDER_EXT);
-	glSamplerParameteri(SamplerName[viewport::V10], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glSamplerParameteri(SamplerName[viewport::V11], GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT0], GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT1], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_EDGE);
+	if(glf::checkExtension("GL_EXT_texture_mirror_clamp"))
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_BORDER_EXT);
+	else
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
 	return glf::checkError("initSampler");
 }
 
-bool initTexture2D()
+bool initTexture()
 {
-	glGenTextures(1, &Texture2DName);
+	glGenTextures(1, &TextureName);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 
 	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -186,7 +221,7 @@ bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
 		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -200,34 +235,43 @@ bool initVertexArray()
 
 bool begin()
 {
-	Viewport[viewport::V00] = glm::ivec4(0, 0, Window.Size >> 1);
-	Viewport[viewport::V10] = glm::ivec4(Window.Size.x >> 1, 0, Window.Size >> 1);
-	Viewport[viewport::V11] = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size >> 1);
-	Viewport[viewport::V01] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
+	glm::vec2 ViewportSize(Window.Size.x * 0.33f, Window.Size.y * 0.50f);
+
+	Viewport[viewport::VIEWPORT0] = glm::vec4(ViewportSize.x * 0.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
+	Viewport[viewport::VIEWPORT1] = glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
+	Viewport[viewport::VIEWPORT2] = glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
+	Viewport[viewport::VIEWPORT3] = glm::vec4(ViewportSize.x * 0.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
+	Viewport[viewport::VIEWPORT4] = glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
+	Viewport[viewport::VIEWPORT5] = glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
 
 	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
+	if(Validated)
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initSampler();
 	if(Validated)
 		Validated = initVertexArray();
+
+	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+	UniformPointer = (glm::mat4*)glMapBufferRange(
+		GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+		GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
 	return Validated && glf::checkError("begin");
 }
 
 bool end()
 {
-	glDeleteBuffers(1, &BufferName);
+	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
-	glDeleteTextures(1, &Texture2DName);
+	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
 	return glf::checkError("end");
@@ -235,29 +279,40 @@ bool end()
 
 void display()
 {
-	// Compute the MVP (Model View Projection matrix)
-	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 1000.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+	{
+		// Compute the MVP (Model View Projection matrix)
+		float Aspect = (Window.Size.x * 0.33f) / (Window.Size.y * 0.50f);
+		glm::mat4 Projection = glm::perspective(45.0f, Aspect, 0.1f, 100.0f);
+		glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
+		glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+		glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 View = ViewRotateY;
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * View * Model;
+
+		*UniformPointer = MVP;
+	}
+
+	glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
 
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-	// Bind the program for use
-	glUseProgram(ProgramName);
-	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glUniform1i(UniformDiffuse, 0);
+	glBindProgramPipeline(PipelineName);
+	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 
 	glBindVertexArray(VertexArrayName);
 
 	for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 	{
-		glViewport(Viewport[Index].x, Viewport[Index].y, Viewport[Index].z, Viewport[Index].w);
+		glViewportIndexedf(0, 
+			Viewport[Index].x, 
+			Viewport[Index].y, 
+			Viewport[Index].z, 
+			Viewport[Index].w);
+
 		glBindSampler(0, SamplerName[Index]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
@@ -271,6 +326,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

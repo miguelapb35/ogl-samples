@@ -145,15 +145,15 @@ bool initSampler()
 		glSamplerParameterfv(SamplerName[i], GL_TEXTURE_BORDER_COLOR, &BorderColor[0]);
 	}
 
-	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_BORDER_EXT);
-	glSamplerParameteri(SamplerName[viewport::V10], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);//GL_CLAMP_TO_BORDER);
+	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::V10], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glSamplerParameteri(SamplerName[viewport::V11], GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 
-	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_BORDER_EXT);
+	glSamplerParameteri(SamplerName[viewport::V00], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glSamplerParameteri(SamplerName[viewport::V10], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	glSamplerParameteri(SamplerName[viewport::V11], GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	return glf::checkError("initSampler");
 }
