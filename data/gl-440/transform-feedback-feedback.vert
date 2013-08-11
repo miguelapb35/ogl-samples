@@ -1,4 +1,4 @@
-#version 400 core
+#version 440 core
 
 #define POSITION	0
 #define COLOR		3
@@ -11,6 +11,11 @@ out block
 {
 	vec4 Color;
 } Out;
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 void main()
 {	

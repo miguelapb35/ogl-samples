@@ -238,36 +238,41 @@ bool initBuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(vertex_format::MAX, &VertexArrayName[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 
 	std::size_t CurrentOffset(0);
 	glBindVertexArray(VertexArrayName[vertex_format::F32]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-	
+
 	CurrentOffset += PositionSizeF32;
 	glBindVertexArray(VertexArrayName[vertex_format::I8]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, sizeof(glm::u8vec2), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
 	CurrentOffset += PositionSizeI8;
 	glBindVertexArray(VertexArrayName[vertex_format::I32]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_INT, GL_FALSE, sizeof(glm::i32vec2), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_INT, GL_FALSE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
 	CurrentOffset += PositionSizeI32;
 	glBindVertexArray(VertexArrayName[vertex_format::RGB10A2]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(glm::uint), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
 	CurrentOffset += PositionSizeRGB10A2;
 	glBindVertexArray(VertexArrayName[vertex_format::F16]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
 	CurrentOffset += PositionSizeRG11FB10F;
 	glBindVertexArray(VertexArrayName[vertex_format::RG11B10F]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_FALSE, sizeof(glm::uint), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribFormat(glf::semantic::attr::POSITION, 3, GL_UNSIGNED_INT_10F_11F_11F_REV, GL_FALSE, CurrentOffset);
+	glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 	
 	glBindVertexArray(0);
@@ -317,7 +322,7 @@ bool end()
 	}
 
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
-	glDeleteVertexArrays(vertex_format::MAX, &VertexArrayName[0]);
+	glDeleteVertexArrays(buffer::MAX, &VertexArrayName[0]);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
 
@@ -346,6 +351,7 @@ void display()
 
 	glBindProgramPipeline(PipelineName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+	glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, 0);
 
 	for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 	{
@@ -358,7 +364,7 @@ void display()
 		glBindVertexArray(VertexArrayName[Viewport[Index].VertexFormat]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
-
+	
 	glf::checkError("display");
 	glf::swapBuffers();
 }

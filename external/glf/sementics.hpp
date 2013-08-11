@@ -4,6 +4,15 @@
 namespace glf{
 namespace semantic
 {
+	namespace buffer
+	{
+		enum type
+		{
+			STATIC = 0,
+			DYNAMIC = 1
+		};
+	};
+
 	namespace uniform
 	{
 		enum type
@@ -15,11 +24,11 @@ namespace semantic
 		};
 	};
 
-	namespace sampling
+	namespace sampler
 	{
 		enum type
 		{
-			SAMPLER_DIFFUSE		= 0,
+			DIFFUSE		= 0,
 		};
 	}//namespace sampling
 

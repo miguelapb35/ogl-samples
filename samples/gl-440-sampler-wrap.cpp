@@ -221,12 +221,12 @@ bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+		glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+
+		glVertexAttribFormat(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glVertexAttribBinding(glf::semantic::attr::TEXCOORD, glf::semantic::buffer::STATIC);
 		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 	glBindVertexArray(0);
 
@@ -271,6 +271,7 @@ bool end()
 {
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
+	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
@@ -298,12 +299,10 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glBindProgramPipeline(PipelineName);
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
-
+	glBindBuffersBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, 1, &BufferName[buffer::TRANSFORM]);
+	glBindTextures(glf::semantic::sampler::DIFFUSE, 1, &TextureName);
 	glBindVertexArray(VertexArrayName);
+	glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, GLsizei(sizeof(vertex)));
 
 	for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 	{
@@ -313,7 +312,7 @@ void display()
 			Viewport[Index].z, 
 			Viewport[Index].w);
 
-		glBindSampler(0, SamplerName[Index]);
+		glBindSamplers(0, 1, &SamplerName[Index]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
 
