@@ -229,7 +229,6 @@ bool initBuffer()
 
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 	glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	return glf::checkError("initBuffer");
