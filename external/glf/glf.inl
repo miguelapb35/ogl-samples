@@ -162,6 +162,12 @@ namespace glf
 				strcpy(debType, "performance");
 			else if(type == GL_DEBUG_TYPE_OTHER_ARB)
 				strcpy(debType, "message");
+			else if(type == GL_DEBUG_TYPE_MARKER)
+				strcpy(debType, "marker");
+			else if(type == GL_DEBUG_TYPE_PUSH_GROUP)
+				strcpy(debType, "push group");
+			else if(type == GL_DEBUG_TYPE_POP_GROUP)
+				strcpy(debType, "pop group");
  
 			if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 			{
