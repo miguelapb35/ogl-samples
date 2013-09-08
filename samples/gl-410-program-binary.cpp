@@ -13,7 +13,7 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Program binary";
+	char const * SAMPLE_NAME("OpenGL Program binary");
 	char const * VERT_SHADER_SOURCE("gl-410/binary.vert");
 	char const * GEOM_SHADER_SOURCE("gl-410/binary.geom");
 	char const * FRAG_SHADER_SOURCE("gl-410/binary.frag");
@@ -275,6 +275,12 @@ bool initVertexArray()
 bool begin()
 {
 	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+
+	GLint NumProgramBinaryFormats(0);
+	glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
+
+	std::vector<GLint> ProgramBinaryFormats(static_cast<std::size_t>(NumProgramBinaryFormats));
+	glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, &ProgramBinaryFormats[0]);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
