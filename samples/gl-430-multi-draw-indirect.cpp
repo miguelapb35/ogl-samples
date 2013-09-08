@@ -113,6 +113,7 @@ namespace
 	GLuint ProgramName(0);
 	GLuint BufferName[buffer::MAX];
 	GLuint TextureName[texture::MAX];
+	GLint UniformArrayStride(256);
 
 }//namespace
 
@@ -136,6 +137,23 @@ bool initProgram()
 	glLinkProgram(ProgramName);
 	Validated = Validated && glf::checkProgram(ProgramName);
 
+	GLint ActiveUniform(0);
+	glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniform);
+
+	for (GLuint i = 0; i < ActiveUniform; ++i)
+	{
+		char Name[128];
+		memset(Name, '\0', sizeof(Name));
+		GLsizei Length(0);
+
+		glGetActiveUniformName(ProgramName, i, GLsizei(sizeof(Name)), &Length, Name);
+
+		std::string StringName(Name);
+
+		if(StringName == std::string("transform.MVP[0]"))
+			glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStride);
+	}
+	
 	if(Validated)
 		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
@@ -163,8 +181,9 @@ bool initBuffer()
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * 3, VertexIndirection, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+	std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * 3, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, Padding * 3, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	DrawElementsIndirectCommand CommandA[3];
@@ -391,9 +410,11 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	{
+		std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
+
 		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3, 
+		glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, Padding * 3,
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -402,9 +423,9 @@ void display()
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 45.0f, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
 
-		*(Pointer + 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
-		*(Pointer + 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-		*(Pointer + 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f,-0.5f));
+		*reinterpret_cast<glm::mat4*>(Pointer + Padding * 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
+		*reinterpret_cast<glm::mat4*>(Pointer + Padding * 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+		*reinterpret_cast<glm::mat4*>(Pointer + Padding * 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f));
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 	}
 	
