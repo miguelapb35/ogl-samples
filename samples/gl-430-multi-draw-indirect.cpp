@@ -36,22 +36,22 @@ namespace
 	};
 
 	GLsizei const VertexCount(11);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv3f);
-	glf::vertex_v2fv3f const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
+	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv3f(glm::vec2(-1.0f,-1.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 1.0f,-1.0f), glm::vec3(1.0f, 1.0f, 0.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
-		glf::vertex_v2fv3f(glm::vec2(-1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, -1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(1.0f, -1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
 
-		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 1.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 1.5f,-1.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 0.5f, 1.0f), glm::vec3(1.0f, 0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-0.5f, -1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(1.5f, -1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(0.5f, 1.0f), glm::vec2(1.0f, 0.0f)),
 
-		glf::vertex_v2fv3f(glm::vec2(-0.5f,-1.0f), glm::vec3(0.0f, 1.0f, 2.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 0.5f,-1.0f), glm::vec3(1.0f, 1.0f, 2.0f)),
-		glf::vertex_v2fv3f(glm::vec2( 1.5f, 1.0f), glm::vec3(1.0f, 0.0f, 2.0f)),
-		glf::vertex_v2fv3f(glm::vec2(-1.5f, 1.0f), glm::vec3(0.0f, 0.0f, 2.0f))
+		glf::vertex_v2fv2f(glm::vec2(-0.5f, -1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(0.5f, -1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(1.5f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.5f, 1.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const DrawDataCount(3);
@@ -223,8 +223,8 @@ bool initVertexArray()
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv3f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
+		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
 		glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), GLF_BUFFER_OFFSET(0));
 		glVertexAttribDivisor(glf::semantic::attr::DRAW_ID, 1);

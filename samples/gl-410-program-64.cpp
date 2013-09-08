@@ -204,8 +204,6 @@ void display()
 
 	glBindProgramPipeline(PipelineName);
 
-	validate(ProgramName[program::VERT]);
-
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);

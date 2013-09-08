@@ -373,7 +373,36 @@ namespace glf
 		return Run ? 0 : 1;
 	}
 
-	bool validateVAO(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	{
+		bool Success = true;
+#if !defined(__APPLE__)
+		GLint MaxVertexAttrib(0);
+		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttrib);
+
+		glBindVertexArray(VertexArrayName);
+		for (GLuint AttribLocation = 0; AttribLocation < glm::min(GLuint(MaxVertexAttrib), GLuint(Expected.size())); ++AttribLocation)
+		{
+			glf::vertexattrib VertexAttrib;
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &VertexAttrib.Enabled);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &VertexAttrib.Size);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &VertexAttrib.Stride);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &VertexAttrib.Type);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &VertexAttrib.Normalized);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_INTEGER, &VertexAttrib.Integer);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_LONG, &VertexAttrib.Long);
+			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_DIVISOR, &VertexAttrib.Divisor);
+			glGetVertexAttribPointerv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_POINTER, &VertexAttrib.Pointer);
+			Success = Success && (VertexAttrib == Expected[AttribLocation]);
+			assert(Success);
+		}
+		glBindVertexArray(0);
+#endif//!defined(__APPLE__)
+		return Success;
+	}
+
+	bool validateVAO42(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
 #if !defined(__APPLE__)
@@ -391,7 +420,7 @@ namespace glf
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &VertexAttrib.Type);
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &VertexAttrib.Normalized);
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_INTEGER, &VertexAttrib.Integer);
-			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_LONG, &VertexAttrib.Long);
+			//glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_LONG, &VertexAttrib.Long);
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_DIVISOR, &VertexAttrib.Divisor);
 			glGetVertexAttribPointerv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_POINTER, &VertexAttrib.Pointer);
 			Success = Success && (VertexAttrib == Expected[AttribLocation]);

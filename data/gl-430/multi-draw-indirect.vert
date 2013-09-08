@@ -22,8 +22,8 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP[MAX_DRAW];
 } Transform;
 
-layout(location = POSITION) in vec3 Position;
-layout(location = TEXCOORD) in vec3 Texcoord;
+layout(location = POSITION) in vec2 Position;
+layout(location = TEXCOORD) in vec2 Texcoord;
 layout(location = DRAW_ID) in int DrawID;
 
 out gl_PerVertex
@@ -41,5 +41,5 @@ void main()
 {
 	Out.DrawID = DrawID;
 	Out.Texcoord = Texcoord.st;
-	gl_Position = Transform.MVP[Indirection.Transform[DrawID]] * vec4(Position, 1.0);
+	gl_Position = Transform.MVP[Indirection.Transform[DrawID]] * vec4(Position, 0.0, 1.0);
 }

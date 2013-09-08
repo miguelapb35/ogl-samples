@@ -14,10 +14,10 @@
 namespace
 {
 	char const * SAMPLE_NAME = "OpenGL Memory barrier";
-	std::string const SHADER_VERT_SOURCE_UPDATE("gl-420/memory-barrier-update.vert");
-	std::string const SHADER_FRAG_SOURCE_UPDATE("gl-420/memory-barrier-update.frag");
-	std::string const SHADER_VERT_SOURCE_BLIT("gl-420/memory-barrier-blit.vert");
-	std::string const SHADER_FRAG_SOURCE_BLIT("gl-420/memory-barrier-blit.frag");
+	char const * SHADER_VERT_SOURCE_UPDATE("gl-420/memory-barrier-update.vert");
+	char const * SHADER_FRAG_SOURCE_UPDATE("gl-420/memory-barrier-update.frag");
+	char const * SHADER_VERT_SOURCE_BLIT("gl-420/memory-barrier-blit.vert");
+	char const * SHADER_FRAG_SOURCE_BLIT("gl-420/memory-barrier-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken4-dxt1.dds");
 	glm::ivec2 FRAMEBUFFER_SIZE(0);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -79,8 +79,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT_SOURCE_UPDATE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG_SOURCE_UPDATE);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT_SOURCE_UPDATE);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG_SOURCE_UPDATE);
 
 		ProgramName[program::UPDATE] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::UPDATE], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -100,8 +100,8 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, SHADER_VERT_SOURCE_BLIT);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, SHADER_FRAG_SOURCE_BLIT);
+		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT_SOURCE_BLIT);
+		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG_SOURCE_BLIT);
 
 		ProgramName[program::BLIT] = glCreateProgram();
 		glProgramParameteri(ProgramName[program::BLIT], GL_PROGRAM_SEPARABLE, GL_TRUE);

@@ -143,17 +143,6 @@ namespace
 		};
 	}//namespace image
 
-	namespace sampling
-	{
-		enum type
-		{
-			SAMPLER_DIFFUSE		= 0,
-			SAMPLER_POSITION	= 4,
-			SAMPLER_TEXCOORD	= 5,
-			SAMPLER_COLOR		= 6
-		};
-	}//namespace sampling
-
 	namespace semantics
 	{
 		enum type
@@ -418,13 +407,13 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glBindProgramPipeline(PipelineName[program::GRAPHICS]);
-	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampling::SAMPLER_DIFFUSE);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::DIFFUSE);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_POSITION);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::POSITION);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
-	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_TEXCOORD);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::TEXCOORD);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
-	glActiveTexture(GL_TEXTURE0 + sampling::SAMPLER_COLOR);
+	glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::COLOR);
 	glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
 
 	glBindVertexArray(VertexArrayName);

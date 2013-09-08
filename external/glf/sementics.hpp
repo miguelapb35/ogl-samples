@@ -29,6 +29,9 @@ namespace semantic
 		enum type
 		{
 			DIFFUSE		= 0,
+			POSITION	= 4,
+			TEXCOORD	= 5,
+			COLOR		= 6
 		};
 	}//namespace sampling
 

@@ -11,19 +11,14 @@
 
 #include <glf/glf.hpp>
 
-out vec4 A;
-out vec3 B;
-out float C;
-
-
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Shader Interface Matching");	
-	std::string const SAMPLE_VERT_SHADER("gl-420/interface-matching.vert");
-	std::string const SAMPLE_CONT_SHADER("gl-420/interface-matching.cont");
-	std::string const SAMPLE_EVAL_SHADER("gl-420/interface-matching.eval");
-	std::string const SAMPLE_GEOM_SHADER("gl-420/interface-matching.geom");
-	std::string const SAMPLE_FRAG_SHADER("gl-420/interface-matching.frag");
+	char const * SAMPLE_VERT_SHADER("gl-420/interface-matching.vert");
+	char const * SAMPLE_CONT_SHADER("gl-420/interface-matching.cont");
+	char const * SAMPLE_EVAL_SHADER("gl-420/interface-matching.eval");
+	char const * SAMPLE_GEOM_SHADER("gl-420/interface-matching.geom");
+	char const * SAMPLE_FRAG_SHADER("gl-420/interface-matching.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -137,11 +132,11 @@ bool initVertexArray()
 	glBindVertexArray(0);
 
 	std::vector<glf::vertexattrib> Valid(16); 
-	Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
-	Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
-	Valid[glf::semantic::attr::COLOR] = glf::vertexattrib(GL_TRUE, 4, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+	Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+	Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+	Valid[glf::semantic::attr::COLOR] = glf::vertexattrib(GL_TRUE, 0, 4, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
 
-	glf::validateVAO(VertexArrayName, Valid);
+	glf::validateVAO42(VertexArrayName, Valid);
 
 	return true;
 }
