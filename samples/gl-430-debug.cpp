@@ -176,7 +176,9 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_LINEAR); // Generates an error
+
+	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glTexParameteri");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_LINEAR); // Generates an error GL_LINEAR instead of GL_ALPHA 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -231,6 +233,37 @@ bool initDebug()
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 	glDebugMessageCallback(&glf::debugOutput, NULL);
+
+	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Messafge test: Begin");
+
+		GLuint MessageId(4);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_FALSE);
+		glDebugMessageControlARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageControlARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, GL_DONT_CARE, 1, &MessageId, GL_FALSE);
+		std::string Message1("Message 1");
+		glDebugMessageInsertARB(
+			GL_DEBUG_SOURCE_APPLICATION_ARB,
+			GL_DEBUG_TYPE_OTHER_ARB, 1,
+			GL_DEBUG_SEVERITY_MEDIUM_ARB,
+			GLsizei(Message1.size()), Message1.c_str());
+		std::string Message2("Message 2");
+		glDebugMessageInsertARB(
+			GL_DEBUG_SOURCE_THIRD_PARTY_ARB,
+			GL_DEBUG_TYPE_OTHER_ARB, 2,
+			GL_DEBUG_SEVERITY_MEDIUM_ARB,
+			GLsizei(Message2.size()), Message2.c_str());
+		glDebugMessageInsertARB(
+			GL_DEBUG_SOURCE_APPLICATION_ARB,
+			GL_DEBUG_TYPE_OTHER_ARB, 2,
+			GL_DEBUG_SEVERITY_MEDIUM_ARB,
+			-1, "Message 3");
+		glDebugMessageInsertARB(
+			GL_DEBUG_SOURCE_APPLICATION_ARB,
+			GL_DEBUG_TYPE_OTHER_ARB, MessageId,
+			GL_DEBUG_SEVERITY_MEDIUM_ARB,
+			-1, "Message 4");
+
+	glPopDebugGroup();
 
 	return Validated;
 }
@@ -304,7 +337,9 @@ void display()
 	}
 
 	glViewportIndexedf(0, 0, 0, GLfloat(Window.Size.x), GLfloat(Window.Size.y));
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+
+	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glClearBufferfv");
+	glClearBufferfv(GL_TEXTURE_2D, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]); // Add an error for testing: GL_TEXTURE_2D instead of GL_COLOR
 
 	// Bind rendering objects
 	glBindProgramPipeline(PipelineName);
@@ -313,8 +348,9 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
+	glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glDrawElementsInstancedBaseVertexBaseInstance");
 	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+		GL_TRIANGLES, ElementCount, GL_FLOAT, 0, 1, 0, 0); // Add an error for testing: GL_FLOAT instead of GL_UNSIGNED_SHORT
 
 	glPopDebugGroup();
 
