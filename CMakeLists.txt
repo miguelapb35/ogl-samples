@@ -22,12 +22,21 @@ elseif(UNIX)
 	set(GL_LIBRARY GL)
 endif(WIN32)
 
-set(GL_DIRECTORY gl)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GL_DIRECTORY}/)
-
 if(NOT OPENGL_FOUND)
 	message("ERROR: OpenGL not found")
 endif(NOT OPENGL_FOUND)
+
+function(getKhronosGLHeader HEADER)
+	file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER}
+		khronos-headers/GL/${HEADER})
+endfunction(getKhronosGLHeader)
+
+#download Updated OpenGL Extension headers.
+getKhronosGLHeader(glext.h)
+getKhronosGLHeader(glcorearb.h)
+getKhronosGLHeader(glxext.h)
+getKhronosGLHeader(wglext.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/khronos-headers/)
 
 ################################
 # Add GLEW
