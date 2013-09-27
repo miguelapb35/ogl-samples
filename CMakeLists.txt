@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-cmake_policy(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_policy(VERSION 2.8)
 
 project(ogl-samples-pack)
 enable_testing()
@@ -39,44 +39,28 @@ if(APPLE)
 	find_library(GLEW_LIBRARY GLEW)
 else()
 	add_definitions(-DGLEW_STATIC)
-
-	if(MSVC AND NOT CMAKE_CL_64)
-		set(GLEW_BINARY_DIRECTORY "Win32")
-	endif(MSVC AND NOT CMAKE_CL_64)
-
-	if(MSVC AND CMAKE_CL_64)
-		set(GLEW_BINARY_DIRECTORY "x64")
-	endif(MSVC AND CMAKE_CL_64)
-
-	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/lib/Release/${GLEW_BINARY_DIRECTORY})
-
-	if(WIN32)
-		set(GLEW_LIBRARY glew32s)
-	else()
-		set(GLEW_LIBRARY glew)
-	endif()
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
+	set(GLEW_LIBRARY ${GLEW_LIBRARIES})
+	link_directories(${CMAKE_CURRENT_BINARY_DIR}/GLEW-prefix/)
 endif()
 
 ################################
 # Add GLFW
 
-set(GLFW_DIRECTORY glfw-2.7.7)
+set(GLFW_DIRECTORY glfw-3.0.3)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 
 if(APPLE)
 	find_library(GLFW_LIBRARY GLFW)
 else()
-	if(MSVC AND NOT CMAKE_CL_64)
-		set(GLFW_BINARY_DIRECTORY "win32-vc")
-	endif(MSVC AND NOT CMAKE_CL_64)
-
-	if(MSVC AND CMAKE_CL_64)
-		set(GLFW_BINARY_DIRECTORY "win64-vc")
-	endif(MSVC AND CMAKE_CL_64)
-
-	link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/bin/${GLFW_BINARY_DIRECTORY})
-	
-	set(GLFW_LIBRARY glfw)
+	set(GLFW_INSTALL OFF)
+	set(GLFW_BUILD_EXAMPLES OFF)
+	set(GLFW_BUILD_TESTS OFF)
+	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY})
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
+	set(GLFW_LIBRARY ${GLFW_LIBRARIES})
+	list(APPEND GLFW_LIBRARY glfw3 ${GLFW_LIBRARIES} )
 endif()
 
 ################################
@@ -155,8 +139,10 @@ set(EGL_LIBRARY libEGL)
 
 set(BINARY_FILES 
 	${GL_LIBRARY} 
-	${GLEW_LIBRARY}
-	${GLFW_LIBRARY}
+	GLEW
+	${GLEW_LIBRARIES}
+	glfw
+	${GLFW_LIBRARIES}
 	${GLM_LIBRARY} 
 	${GLI_LIBRARY}
 	${COCOA_LIBRARY}
@@ -206,6 +192,10 @@ if(OGL_SAMPLES_STATUS)
 	add_definitions(-DGLF_AUTO_STATUS)
 endif()
 
+
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+	add_definitions(-fpermissive)
+endif()
 ################################
 # Add definitions
 
@@ -235,6 +225,7 @@ function(createSample NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
+	add_dependencies(${NAME} glfw GLEW)
 	target_link_libraries(${NAME} ${BINARY_FILES})
 endfunction(createSample)
 
@@ -257,6 +248,7 @@ function(createSampleWGL NAME)
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
+	add_dependencies(${NAME} GLEW glfw)
 	target_link_libraries(${NAME} ${BINARY_FILES})
 endfunction(createSampleWGL)
 
