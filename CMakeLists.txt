@@ -227,6 +227,7 @@ function(createSample NAME)
 
 	add_dependencies(${NAME} glfw GLEW)
 	target_link_libraries(${NAME} ${BINARY_FILES})
+	install ( TARGETS ${NAME} DESTINATION .)
 endfunction(createSample)
 
 function(createSampleWGL NAME)
@@ -250,9 +251,36 @@ function(createSampleWGL NAME)
 
 	add_dependencies(${NAME} GLEW glfw)
 	target_link_libraries(${NAME} ${BINARY_FILES})
+	install ( TARGETS ${NAME} DESTINATION .)
 endfunction(createSampleWGL)
 
 ################################
 # Add subdirectory
 
 add_subdirectory(samples)
+
+install (
+	DIRECTORY data
+	DESTINATION .
+)
+# See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
+set (CPACK_PACKAGE_VERSION_MAJOR "4")
+set (CPACK_PACKAGE_VERSION_MINOR "4")
+set (CPACK_PACKAGE_VERSION_PATCH "1")
+# Use current date in YYYYMMDD format as patch number
+
+# cpack mistakenly detects Mingw-w64 as win32
+if (MINGW)
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set (CPACK_SYSTEM_NAME win64)
+	endif ()
+endif ()
+
+
+if (WIN32)
+	set (CPACK_GENERATOR "ZIP")
+else ()
+	set (CPACK_GENERATOR "TBZ2")
+endif ()
+
+include(CPack)

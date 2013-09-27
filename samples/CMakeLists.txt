@@ -21,6 +21,7 @@ function(glCreateSampleGTC NAME)
 	endif(WIN32)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
 	add_dependencies(${SAMPLE_NAME} GLEW glfw)
+	install ( TARGETS ${SAMPLE_NAME} DESTINATION .)
 endfunction(glCreateSampleGTC)
 
 #add_subdirectory(gl-alpha-to-coverage)
