@@ -31,17 +31,17 @@ namespace
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
 		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2( 3.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 3.0f, 3.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 3.0f), glm::vec2(0.0f, 0.0f))
 	};
 
-	GLsizei const ElementCount(6);
+	GLsizei const ElementCount(3);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
-		0, 1, 2, 
-		2, 3, 0
+		0, 1, 3, 
+		//2, 3, 1
 	};
 
 	namespace buffer
