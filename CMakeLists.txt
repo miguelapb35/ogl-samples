@@ -34,7 +34,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/inclu
 add_definitions(-DGLEW_STATIC)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/GLEW-prefix/)
 
 ################################
 # Add GLFW
