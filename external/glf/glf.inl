@@ -123,7 +123,6 @@ namespace glf
 		return Result;
 	}
 
-	#if !defined(__APPLE__)
 	static void APIENTRY debugOutput
 	(
 		GLenum source,
@@ -229,7 +228,7 @@ namespace glf
 			delete [] messageLog;
 	}
 */
-#endif
+
 	static void cursor_position_callback(GLFWwindow* pWindow,double x, double y)
 	{
 		Window.MouseCurrent = glm::ivec2(x, y);
