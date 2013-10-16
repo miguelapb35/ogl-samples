@@ -27,8 +27,11 @@ if(NOT OPENGL_FOUND)
 endif(NOT OPENGL_FOUND)
 
 function(getKhronosGLHeader HEADER)
-	file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER}
-		khronos-headers/GL/${HEADER})
+	if(WIN32)
+		
+	elseif(UNIX)
+		file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER} khronos-headers/GL/${HEADER})
+	endif(WIN32)
 endfunction(getKhronosGLHeader)
 
 #download Updated OpenGL Extension headers.
@@ -266,7 +269,11 @@ endfunction(createSampleWGL)
 ################################
 # Add subdirectory
 
-add_subdirectory(samples)
+add_subdirectory(tests)
+add_subdirectory(perfs)
+
+################################
+# Add install
 
 install (
 	DIRECTORY data
