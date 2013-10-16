@@ -275,7 +275,7 @@ install (
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
 set (CPACK_PACKAGE_VERSION_MINOR "4")
-set (CPACK_PACKAGE_VERSION_PATCH "1")
+set (CPACK_PACKAGE_VERSION_PATCH "0")
 # Use current date in YYYYMMDD format as patch number
 
 # cpack mistakenly detects Mingw-w64 as win32
