@@ -347,10 +347,9 @@ namespace glf
 #			endif
 		}
 		glfwWindowHint(GLFW_DEPTH_BITS,24);
-		glf_window = glfwCreateWindow(Size.x, Size.y, "GLFW: Sample Window", NULL,NULL);
+		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 
-		glfwSetWindowTitle(glf_window,argv[0]);
 		glfwSetMouseButtonCallback(glf_window,mouse_button_callback);
 		glfwSetCursorPosCallback(glf_window,cursor_position_callback);
 		glfwSetKeyCallback(glf_window,key_callback);
