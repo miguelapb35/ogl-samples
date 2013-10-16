@@ -311,13 +311,13 @@ namespace glf
 
 		if(Window.KeyPressed[GLFW_KEY_ESCAPE] == 1)
 		{
-	        glfwSetWindowShouldClose(pWindow, GL_TRUE);
-        }
+			glfwSetWindowShouldClose(pWindow, GL_TRUE);
+		}
 	}
 
 	static void close_callback(GLFWwindow* pWindow)
 	{
-        glfwSetWindowShouldClose(pWindow, GL_TRUE);
+		glfwSetWindowShouldClose(pWindow, GL_TRUE);
 	}
 
 	inline int run
@@ -351,7 +351,7 @@ namespace glf
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #			endif
 		}
-	    glfwWindowHint(GLFW_DEPTH_BITS,24);
+		glfwWindowHint(GLFW_DEPTH_BITS,24);
 		glf_window = glfwCreateWindow(Size.x, Size.y, "GLFW: Sample Window", NULL,NULL);
 		assert(glf_window!= NULL);
 
@@ -361,7 +361,7 @@ namespace glf
 		glfwSetWindowCloseCallback(glf_window,close_callback);
 		glfwSetKeyCallback(glf_window,key_callback);
 		glfwMakeContextCurrent(glf_window);
-		//gl::init();
+
 		glewExperimental = GL_TRUE;
 		glewInit();
 		glGetError();
@@ -373,8 +373,8 @@ namespace glf
 			while(true)
 			{
 				display();
-		        // Wait for new events
-		        glfwWaitEvents();
+				// Wait for new events
+				glfwWaitEvents();
 				if(glfwWindowShouldClose(glf_window))
 					break;
 			}

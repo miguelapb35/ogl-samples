@@ -24,15 +24,15 @@ namespace
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
-	GLsizeiptr const PositionSizeF16 = VertexCount * sizeof(glm::half) * 2;
-	glm::half const PositionDataF16[VertexCount * 2] =
+	GLsizeiptr const PositionSizeF16 = VertexCount * sizeof(glm::uint16) * 2;
+	glm::uint16 const PositionDataF16[VertexCount * 2] =
 	{
-		glm::half(0.0f), glm::half(0.0f),
-		glm::half(1.0f), glm::half(0.0f),
-		glm::half(1.0f), glm::half(1.0f),
-		glm::half(1.0f), glm::half(1.0f),
-		glm::half(0.0f), glm::half(1.0f),
-		glm::half(0.0f), glm::half(0.0f)
+		glm::packHalf1x16(0.0f), glm::packHalf1x16(0.0f),
+		glm::packHalf1x16(1.0f), glm::packHalf1x16(0.0f),
+		glm::packHalf1x16(1.0f), glm::packHalf1x16(1.0f),
+		glm::packHalf1x16(1.0f), glm::packHalf1x16(1.0f),
+		glm::packHalf1x16(0.0f), glm::packHalf1x16(1.0f),
+		glm::packHalf1x16(0.0f), glm::packHalf1x16(0.0f)
 	};
 
 	GLsizeiptr const PositionSizeF32 = VertexCount * sizeof(glm::vec2);
@@ -82,12 +82,12 @@ namespace
 	GLsizeiptr const PositionSizeRG11FB10F = VertexCount * sizeof(glm::uint32);
 	glm::uint32 const PositionDataRG11FB10F[VertexCount] =
 	{
-		glm::packF11F11F10(glm::vec3( 0.0f, 0.0f, 0.0f)),
-		glm::packF11F11F10(glm::vec3( 1.0f, 0.0f, 0.0f)),
-		glm::packF11F11F10(glm::vec3( 1.0f, 1.0f, 0.0f)),
-		glm::packF11F11F10(glm::vec3( 1.0f, 1.0f, 0.0f)),
-		glm::packF11F11F10(glm::vec3( 0.0f, 1.0f, 0.0f)),
-		glm::packF11F11F10(glm::vec3( 0.0f, 0.0f, 0.0f))
+		glm::packF2x11_1x10(glm::vec3( 0.0f, 0.0f, 0.0f)),
+		glm::packF2x11_1x10(glm::vec3( 1.0f, 0.0f, 0.0f)),
+		glm::packF2x11_1x10(glm::vec3( 1.0f, 1.0f, 0.0f)),
+		glm::packF2x11_1x10(glm::vec3( 1.0f, 1.0f, 0.0f)),
+		glm::packF2x11_1x10(glm::vec3( 0.0f, 1.0f, 0.0f)),
+		glm::packF2x11_1x10(glm::vec3( 0.0f, 0.0f, 0.0f))
 	};
 
 	namespace vertex_format
@@ -261,7 +261,7 @@ bool initVertexArray()
 
 	CurrentOffset += PositionSizeRGB10A2;
 	glBindVertexArray(VertexArrayName[vertex_format::F16]);
-	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::hvec2), GLF_BUFFER_OFFSET(CurrentOffset));
+	glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_HALF_FLOAT, GL_FALSE, sizeof(glm::uint16) * 2, GLF_BUFFER_OFFSET(CurrentOffset));
 	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
 	CurrentOffset += PositionSizeRG11FB10F;
