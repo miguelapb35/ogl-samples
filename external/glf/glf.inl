@@ -346,7 +346,6 @@ namespace glf
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #			endif
 		}
-		glfwWindowHint(GLFW_DEPTH_BITS,24);
 		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 
