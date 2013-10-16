@@ -315,11 +315,6 @@ namespace glf
 		}
 	}
 
-	static void close_callback(GLFWwindow* pWindow)
-	{
-		glfwSetWindowShouldClose(pWindow, GL_TRUE);
-	}
-
 	inline int run
 	(
 		int argc, char* argv[], 
@@ -358,7 +353,6 @@ namespace glf
 		glfwSetWindowTitle(glf_window,argv[0]);
 		glfwSetMouseButtonCallback(glf_window,mouse_button_callback);
 		glfwSetCursorPosCallback(glf_window,cursor_position_callback);
-		glfwSetWindowCloseCallback(glf_window,close_callback);
 		glfwSetKeyCallback(glf_window,key_callback);
 		glfwMakeContextCurrent(glf_window);
 
