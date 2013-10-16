@@ -162,8 +162,10 @@ if(OGL_SAMPLES_STATUS)
 endif()
 
 
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-	add_definitions(-fpermissive)
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+	if (NOT APPLE)
+		add_definitions(-fpermissive)
+	endif()
 endif()
 ################################
 # Add definitions
