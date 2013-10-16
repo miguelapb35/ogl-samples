@@ -31,14 +31,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/khronos-headers/)
 set(GLEW_DIRECTORY glew-1.10.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
 
-if(APPLE)
-	find_library(GLEW_LIBRARY GLEW)
-else()
-	add_definitions(-DGLEW_STATIC)
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
-	link_directories(${CMAKE_CURRENT_BINARY_DIR}/GLEW-prefix/)
-endif()
+add_definitions(-DGLEW_STATIC)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/GLEW-prefix/)
 
 ################################
 # Add GLFW
@@ -46,15 +42,11 @@ endif()
 set(GLFW_DIRECTORY glfw-3.0.3)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 
-if(APPLE)
-	find_library(GLFW_LIBRARY GLFW)
-else()
-	set(GLFW_INSTALL OFF CACHE STRING "" FORCE)
-	set(GLFW_BUILD_EXAMPLES OFF CACHE STRING "" FORCE)
-	set(GLFW_BUILD_TESTS OFF CACHE STRING "" FORCE)
-	add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY})
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
-endif()
+set(GLFW_INSTALL OFF CACHE STRING "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE STRING "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE STRING "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 
 ################################
 # Add GLM 
