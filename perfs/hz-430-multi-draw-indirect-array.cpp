@@ -36,7 +36,7 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	GLsizei const DrawCount(1000000);
+	GLsizei const DrawCount(100000);
 
 	namespace buffer
 	{
@@ -212,9 +212,14 @@ void display()
 		glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount), 0);
 	glEndQuery(GL_TIME_ELAPSED);
 
-	GLuint Time = 0;
-	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &Time);
-	fprintf(stdout, "Time: %f ms   \r", Time / 1000.f / 1000.f);
+	GLuint QueryTime = 0;
+	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &QueryTime);
+	double InstantTime = static_cast<double>(QueryTime) / 1000.0 / 1000.0;
+
+	static double ConvergingTime = 0;
+	ConvergingTime = (ConvergingTime * 0.99 + InstantTime * 0.01);
+
+	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 
 	glf::swapBuffers();
 }

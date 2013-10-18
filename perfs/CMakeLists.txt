@@ -30,6 +30,8 @@ set(GL_VERSION_GTC 430)
 if(NOT APPLE)
 
 set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
+glCreatePerfGTC(thread)
+set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
 glCreatePerfGTC(multi-draw-indirect-array)
 set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
 glCreatePerfGTC(multi-draw-indirect-element)

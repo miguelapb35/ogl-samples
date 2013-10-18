@@ -364,7 +364,7 @@ namespace glf
 			{
 				display();
 				// Wait for new events
-				glfwWaitEvents();
+				//glfwWaitEvents();
 				if(glfwWindowShouldClose(glf_window))
 					break;
 			}
