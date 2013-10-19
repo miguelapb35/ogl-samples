@@ -10,6 +10,7 @@
 //**********************************
 
 #include <glf/glf.hpp>
+#include <thread>
 
 namespace
 {
@@ -36,7 +37,7 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	GLsizei const DrawCount(1000000);
+	GLsizei const DrawCount(100000);
 
 	namespace buffer
 	{
@@ -212,19 +213,84 @@ void display()
 		glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount), 0);
 	glEndQuery(GL_TIME_ELAPSED);
 
-	GLuint Time = 0;
-	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &Time);
-	fprintf(stdout, "Time: %f ms   \r", Time / 1000.f / 1000.f);
+	GLuint QueryTime = 0;
+	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &QueryTime);
 
-	glf::swapBuffers();
+	double InstantTime = static_cast<double>(QueryTime) / 1000.0 / 1000.0;
+	static double ConvergingTime = 0;
+	ConvergingTime = (ConvergingTime * 0.99 + InstantTime * 0.01);
+	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
+}
+
+static volatile GLboolean running = GL_TRUE;
+
+static void error_callback(int error, const char* description)
+{
+	fprintf(stderr, "Error: %s\n", description);
+}
+
+int thread_main(GLFWwindow* Window)
+{
+	glfwMakeContextCurrent(Window);
+	glfwSwapInterval(1);
+
+	glewExperimental = GL_TRUE;
+	glewInit();
+	glGetError();
+
+	begin();
+
+	while (running)
+	{
+		display();
+
+		glfwSwapBuffers(Window);
+	}
+
+	end();
+
+	glfwMakeContextCurrent(nullptr);
+	return 0;
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	glfwSetErrorCallback(error_callback);
+
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
+
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, SAMPLE_MAJOR_VERSION);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, SAMPLE_MINOR_VERSION);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
+
+	GLFWwindow* Window = glfwCreateWindow(
+		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
+		argv[0],
+		NULL, NULL);
+
+	if (!Window)
+	{
+		glfwTerminate();
+		exit(EXIT_FAILURE);
+	}
+
+	glfwShowWindow(Window);
+
+	std::thread Thread(thread_main, Window);
+
+	while (running)
+	{
+		glfwWaitEvents();
+
+		if (glfwWindowShouldClose(Window))
+			running = GL_FALSE;
+	}
+
+	Thread.join();
+
+	exit(EXIT_SUCCESS);
 }

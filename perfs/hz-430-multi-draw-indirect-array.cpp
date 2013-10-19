@@ -214,11 +214,10 @@ void display()
 
 	GLuint QueryTime = 0;
 	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &QueryTime);
-	double InstantTime = static_cast<double>(QueryTime) / 1000.0 / 1000.0;
 
+	double InstantTime = static_cast<double>(QueryTime) / 1000.0 / 1000.0;
 	static double ConvergingTime = 0;
 	ConvergingTime = (ConvergingTime * 0.99 + InstantTime * 0.01);
-
 	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 
 	glf::swapBuffers();
