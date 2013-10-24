@@ -11,6 +11,9 @@
 
 #include <glf/glf.hpp>
 #include <thread>
+#include <atomic>
+#include <array>
+#include <cstring>
 
 namespace
 {
@@ -65,6 +68,189 @@ namespace
 	GLuint QueryName(0);
 
 }//namespace
+
+namespace utl
+{
+	template <typename key, std::size_t N>
+	class buffer
+	{
+	public:
+		buffer() :
+			Size(0)
+		{}
+
+		class const_iterator
+		{
+			friend buffer;
+
+		private:
+			const_iterator
+			(
+				std::uint8_t const * const Pointer,
+				std::ptrdiff_t Offset
+			) :
+				Pointer(Pointer),
+				Offset(Offset)
+			{}
+
+		public:
+			const_iterator& operator++ ()
+			{
+				Offset += *Pointer;
+				return *this;
+			}
+
+			inline bool operator== (const_iterator const & it) const
+			{
+				return this->Offset == it.Offset;
+			}
+
+			inline bool operator!= (const_iterator const & it) const
+			{
+				return this->Offset != it.Offset;
+			}
+
+		private:
+			std::uint8_t const * const Pointer;
+			std::ptrdiff_t Offset;
+		};
+
+		typedef std::size_t size_type;
+
+		const_iterator begin() const
+		{
+			return const_iterator(&this->Data[0], 0);
+		}
+
+		const_iterator end() const
+		{
+			return const_iterator(&this->Data[0], this->Size);
+		}
+
+		template <typename chunk>
+		bool push(key const & Key, chunk const & Chunk)
+		{
+			ptrdiff_t WriteSize = sizeof(ptrdiff_t) + sizeof(key) + sizeof(Chunk);
+			if(this->Size + WriteSize > this->capacity())
+				return false;
+
+			struct helper
+			{
+				helper(std::ptrdiff_t WriteSize, key Key, chunk const & Chunk) :
+					WriteSize(WriteSize),
+					Key(Key),
+					Chunk(Chunk)
+				{}
+
+				std::ptrdiff_t WriteSize;
+				key Key;
+				chunk Chunk;
+			};
+
+			helper Helper(WriteSize, Key, Chunk);
+
+			memcpy(&this->Data[this->Size], &Helper, sizeof(Helper));
+			this->Size += WriteSize;
+
+			return true;
+		}
+
+		key const & name(const_iterator const & it) const
+		{
+			return reinterpret_cast<key const &>(this->Data[it.Offset + sizeof(ptrdiff_t)]);
+		}
+
+		template <typename command>
+		command const & data(const_iterator const & it) const
+		{
+			return reinterpret_cast<command const &>(this->Data[it.Offset + sizeof(ptrdiff_t) + sizeof(key)]);
+		}
+
+		void clear()
+		{
+			memset(&Data[0], 0, this->capacity());
+		}
+
+		size_type size() const
+		{
+			return this->Size;
+		}
+
+		size_type capacity() const
+		{
+			return this->Data.size();
+		}
+
+	private:
+		std::array<std::uint8_t, N> Data;
+		size_type Size;
+	};
+
+	template <typename data>
+	class ring
+	{
+	public:
+		class node
+		{
+		public:
+
+
+		private:
+			node* Next;
+			data Data;
+		};
+
+	public:
+		ring() :
+			Head(new node),
+			Tail(new node)
+		{
+			assert(Head && Tail);
+
+			this->Head->Next = Tail;
+			this->Tail->Next = Head;
+		}
+
+		~ring()
+		{
+			node* Node = this->Head;
+			while(&Node != &this->Head)
+			{
+				node* Temp = Node;
+				Node = Node->Next;
+				delete Temp;
+			}
+		}
+
+		void push_head(node* Node);
+		node* pop_head();
+		void push_tail(node* Node);
+		node* pop_tail();
+
+	private:
+		std::atomic<node*> Head;
+		std::atomic<node*> Tail;
+	};
+}//namespapce utl
+
+namespace cmd
+{
+	enum name
+	{
+		CLEAR
+	};
+
+	struct clear
+	{
+		clear(glm::vec4 const & Color, float Depth) :
+			Color(Color),
+			Depth(Depth)
+		{}
+
+		glm::vec4 const Color;
+		float const Depth;
+	};
+}//cmd
 
 bool initProgram()
 {
@@ -181,10 +367,28 @@ bool end()
 
 void display()
 {
-	// Clear framebuffer
-	float Depth(1.0f);
-	glClearBufferfv(GL_DEPTH, 0, &Depth);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
+	utl::buffer<cmd::name, 65536> Buffer;
+	Buffer.push(cmd::CLEAR, cmd::clear(glm::vec4(1.0, 0.5, 0.0, 1.0), 1));
+	Buffer.push(cmd::CLEAR, cmd::clear(glm::vec4(0.0, 0.5, 1.0, 1.0), 1));
+
+	for(utl::buffer<cmd::name, 65536>::const_iterator it = Buffer.begin(); it != Buffer.end(); ++it)
+	{
+		switch(Buffer.name(it))
+		{
+			case cmd::CLEAR:
+			{
+				cmd::clear const & Command = Buffer.data<cmd::clear>(it);
+				glClearBufferfv(GL_DEPTH, 0, &Command.Depth);
+				glClearBufferfv(GL_COLOR, 0, &Command.Color[0]);
+			}
+			break;
+			default:
+			{
+				// Unknowned command
+				assert(0);
+			}
+		}
+	}
 
 	{
 		// Update the transformation matrix
@@ -222,14 +426,20 @@ void display()
 	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 }
 
-static volatile GLboolean running = GL_TRUE;
+static volatile GLboolean runningOpenGL = GL_TRUE;
+static volatile GLboolean runningRendering = GL_TRUE;
+static volatile GLboolean runningMain = GL_TRUE;
 
 static void error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Error: %s\n", description);
 }
 
-int thread_main(GLFWwindow* Window)
+std::atomic_uint AtomicCount;
+
+unsigned int OpenGLThreadCount(0);
+
+int opengl_thread(GLFWwindow* Window)
 {
 	glfwMakeContextCurrent(Window);
 	glfwSwapInterval(1);
@@ -240,8 +450,11 @@ int thread_main(GLFWwindow* Window)
 
 	begin();
 
-	while (running)
+	while (runningOpenGL)
 	{
+		++OpenGLThreadCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+
 		display();
 
 		glfwSwapBuffers(Window);
@@ -250,11 +463,35 @@ int thread_main(GLFWwindow* Window)
 	end();
 
 	glfwMakeContextCurrent(nullptr);
+
 	return 0;
 }
 
+unsigned int RenderingThreadCount(0);
+
+int rendering_thread(GLFWwindow* Window)
+{
+	std::thread Thread(opengl_thread, Window);
+
+	while (runningRendering)
+	{
+		++RenderingThreadCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+	}
+
+	runningOpenGL = GL_FALSE;
+	Thread.join();
+
+	return 0;
+}
+
+unsigned int MainCount(0);
+
 int main(int argc, char* argv[])
 {
+	std::atomic_store(&AtomicCount, 0);
+	assert(AtomicCount.is_lock_free());
+
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit())
@@ -280,16 +517,20 @@ int main(int argc, char* argv[])
 
 	glfwShowWindow(Window);
 
-	std::thread Thread(thread_main, Window);
+	std::thread Thread(rendering_thread, Window);
 
-	while (running)
+	while (runningMain)
 	{
+		++MainCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+
 		glfwWaitEvents();
 
 		if (glfwWindowShouldClose(Window))
-			running = GL_FALSE;
+			runningMain = GL_FALSE;
 	}
 
+	runningRendering = GL_FALSE;
 	Thread.join();
 
 	exit(EXIT_SUCCESS);
