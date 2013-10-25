@@ -96,7 +96,7 @@ namespace utl
 		public:
 			const_iterator& operator++ ()
 			{
-				Offset += *Pointer;
+				Offset += *reinterpret_cast<std::ptrdiff_t const * const>(this->Pointer);
 				return *this;
 			}
 
@@ -136,18 +136,18 @@ namespace utl
 
 			struct helper
 			{
-				helper(std::ptrdiff_t WriteSize, key Key, chunk const & Chunk) :
-					WriteSize(WriteSize),
+				helper(key Key, std::ptrdiff_t WriteSize, chunk const & Chunk) :
 					Key(Key),
+					WriteSize(WriteSize),
 					Chunk(Chunk)
 				{}
 
-				std::ptrdiff_t WriteSize;
-				key Key;
-				chunk Chunk;
+				std::ptrdiff_t const WriteSize;
+				key const Key;
+				chunk const Chunk;
 			};
 
-			helper Helper(WriteSize, Key, Chunk);
+			helper Helper(Key, WriteSize, Chunk);
 
 			memcpy(&this->Data[this->Size], &Helper, sizeof(Helper));
 			this->Size += WriteSize;
@@ -163,7 +163,7 @@ namespace utl
 		template <typename command>
 		command const & data(const_iterator const & it) const
 		{
-			return reinterpret_cast<command const &>(this->Data[it.Offset + sizeof(ptrdiff_t) + sizeof(key)]);
+			return reinterpret_cast<command const &>(this->Data[it.Offset + sizeof(key) + sizeof(ptrdiff_t)]);
 		}
 
 		void clear()
@@ -237,16 +237,43 @@ namespace cmd
 {
 	enum name
 	{
-		CLEAR
+		CLEAR = 76
 	};
 
 	struct clear
 	{
-		clear(glm::vec4 const & Color, float Depth) :
+		enum drawbuffer
+		{
+			DRAWBUFFER0,
+			DRAWBUFFER1,
+			DRAWBUFFER2,
+			DRAWBUFFER3,
+			DRAWBUFFER4,
+			DRAWBUFFER5,
+			DRAWBUFFER6,
+			DRAWBUFFER7
+		};
+
+		enum mode
+		{
+			COLOR = (1 << 0),
+			DEPTH = (1 << 1),
+			STENCIL = (1 << 2),
+			COLOR_DEPTH = COLOR | DEPTH,
+			DEPTH_STENCIL = DEPTH | STENCIL,
+			COLOR_STENCIL = COLOR | STENCIL,
+			COLOR_DEPTH_STENCIL = COLOR | DEPTH | STENCIL
+		};
+
+		clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth) :
+			Drawbuffer(static_cast<GLint>(Drawbuffer)),
+			Mode(Mode),
 			Color(Color),
 			Depth(Depth)
 		{}
 
+		GLint const Drawbuffer;
+		mode const Mode;
 		glm::vec4 const Color;
 		float const Depth;
 	};
@@ -282,13 +309,8 @@ bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
+	glNamedBufferDataEXT(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 
 	std::vector<DrawArraysIndirectCommand> Commands;
 	Commands.resize(DrawCount);
@@ -300,9 +322,7 @@ bool initBuffer()
 		Commands[i].baseInstance = 0;
 	}
 
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawArraysIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+	glNamedBufferDataEXT(BufferName[buffer::INDIRECT], sizeof(DrawArraysIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
 
 	return true;
 }
@@ -368,8 +388,14 @@ bool end()
 void display()
 {
 	utl::buffer<cmd::name, 65536> Buffer;
-	Buffer.push(cmd::CLEAR, cmd::clear(glm::vec4(1.0, 0.5, 0.0, 1.0), 1));
-	Buffer.push(cmd::CLEAR, cmd::clear(glm::vec4(0.0, 0.5, 1.0, 1.0), 1));
+	Buffer.push(cmd::CLEAR, cmd::clear(
+		cmd::clear::DRAWBUFFER0, 
+		cmd::clear::COLOR, 
+		glm::vec4(1.0, 0.5, 0.0, 1.0), 1));
+	Buffer.push(cmd::CLEAR, cmd::clear(
+		cmd::clear::DRAWBUFFER0, 
+		cmd::clear::DEPTH, 
+		glm::vec4(0.0, 0.5, 1.0, 1.0), 1));
 
 	for(utl::buffer<cmd::name, 65536>::const_iterator it = Buffer.begin(); it != Buffer.end(); ++it)
 	{
@@ -378,8 +404,10 @@ void display()
 			case cmd::CLEAR:
 			{
 				cmd::clear const & Command = Buffer.data<cmd::clear>(it);
-				glClearBufferfv(GL_DEPTH, 0, &Command.Depth);
-				glClearBufferfv(GL_COLOR, 0, &Command.Color[0]);
+				if(Command.Mode & cmd::clear::COLOR)
+					glClearBufferfv(GL_COLOR, Command.Drawbuffer, &Command.Color[0]);
+				if(Command.Mode & cmd::clear::DEPTH)
+					glClearBufferfv(GL_DEPTH, Command.Drawbuffer, &Command.Depth);
 			}
 			break;
 			default:
@@ -392,8 +420,7 @@ void display()
 
 	{
 		// Update the transformation matrix
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRangeEXT(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 2048.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y - 512));
@@ -402,7 +429,7 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		*Pointer = Projection * View * Model;
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		glUnmapNamedBufferEXT(BufferName[buffer::TRANSFORM]);
 	}
 
 	glEnable(GL_DEPTH_TEST);
