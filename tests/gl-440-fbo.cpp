@@ -87,6 +87,326 @@ namespace
 	glm::mat4* UniformPointer(NULL);
 }//namespace
 
+struct caps
+{
+private:
+	struct version
+	{
+		GLint Major;					// GL_MINOR_VERSION
+		GLint Minor;					// GL_MAJOR_VERSION
+		GLint NumExtensions;			// GL_NUM_EXTENSIONS
+		bool ARB_shader_group_vote;
+		bool ARB_sparse_texture;
+	} VersionData;
+
+	void initVersion()
+	{
+		glGetIntegerv(GL_MINOR_VERSION, &VersionData.Minor);
+		glGetIntegerv(GL_MAJOR_VERSION, &VersionData.Major);
+		glGetIntegerv(GL_NUM_EXTENSIONS, &VersionData.NumExtensions);
+	}
+
+	struct debug
+	{
+		GLint ContextFlags; // GL_CONTEXT_FLAGS
+		GLint MaxDebugGroupStackDepth; // GL_MAX_DEBUG_GROUP_STACK_DEPTH
+		GLint MaxLabelLength; // GL_MAX_LABEL_LENGTH
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_SERVER_WAIT_TIMEOUT
+	} DebugData;
+
+	void initDebug()
+	{
+		glGetIntegerv(GL_CONTEXT_FLAGS, &DebugData.ContextFlags);
+		glGetIntegerv(GL_MAX_DEBUG_GROUP_STACK_DEPTH, &DebugData.MaxDebugGroupStackDepth);
+		glGetIntegerv(GL_MAX_LABEL_LENGTH, &DebugData.MaxLabelLength);
+	}
+
+	struct combined
+	{
+		GLint MaxCombinedShaderStorageBlocks; // GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS
+		GLint MaxCombinedComputeUniformComponents; // GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS
+		GLint MaxCombinedAtomicCounters; // GL_MAX_COMBINED_ATOMIC_COUNTERS
+	} CombinedData;
+
+	void initCombined()
+	{
+		glGetIntegerv(GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS, &CombinedData.MaxCombinedShaderStorageBlocks);
+		glGetIntegerv(GL_MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS, &CombinedData.MaxCombinedComputeUniformComponents);
+		glGetIntegerv(GL_MAX_COMBINED_ATOMIC_COUNTERS, &CombinedData.MaxCombinedAtomicCounters);
+	}
+
+	struct compute
+	{
+		GLint MaxComputeShaderStorageBlocks;	// GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeUniformBlocks;			// GL_MAX_COMPUTE_UNIFORM_BLOCKS
+		GLint MaxComputeTextureImageUnits;		// GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeUniformComponents;		// GL_MAX_COMPUTE_UNIFORM_COMPONENTS
+		GLint MaxComputeAtomicCounters;			// GL_MAX_COMPUTE_ATOMIC_COUNTERS
+		GLint MaxComputeAtomicCounterBuffers;	// GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS
+		GLint MaxComputeWorkGroupInvocations;	// GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS
+		GLint MaxComputeWorkGroupCount;			// GL_MAX_COMPUTE_WORK_GROUP_COUNT
+		GLint MaxComputeWorkGroupSize;			// GL_MAX_COMPUTE_WORK_GROUP_SIZE
+	} ComputeData;
+
+	void initCompute()
+	{
+		glGetIntegerv(GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS, &ComputeData.MaxComputeShaderStorageBlocks);
+		glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_BLOCKS, &ComputeData.MaxComputeUniformBlocks);
+		glGetIntegerv(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, &ComputeData.MaxComputeTextureImageUnits);
+		glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &ComputeData.MaxComputeUniformComponents);
+		glGetIntegerv(GL_MAX_COMPUTE_ATOMIC_COUNTERS, &ComputeData.MaxComputeAtomicCounters);
+		glGetIntegerv(GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS, &ComputeData.MaxComputeAtomicCounterBuffers);
+		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &ComputeData.MaxComputeWorkGroupInvocations);
+		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_COUNT, &ComputeData.MaxComputeWorkGroupCount);
+		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &ComputeData.MaxComputeWorkGroupSize);
+	}
+
+	struct vertex
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_ATOMIC_COUNTERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_ATTRIBS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_OUTPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_UNIFORM_VECTORS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS
+	} VertexData;
+
+	void initVertex()
+	{
+
+	}
+
+	struct control
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_ATOMIC_COUNTERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_INPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_OUTPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS
+	} ControlData;
+
+	void initControl()
+	{
+
+	}
+
+	struct evaluation
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_ATOMIC_COUNTERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_INPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_OUTPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS
+	} EvaluationData;
+
+	void initEvaluation()
+	{
+
+	}
+
+	struct geometry
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_ATOMIC_COUNTERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_INPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_OUTPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_GEOMETRY_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS
+		GLint MaxVertexStreams; // GL_MAX_VERTEX_STREAMS
+	} GeometryData;
+
+	void initGeometry()
+	{
+
+	}
+
+	struct fragment
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_ATOMIC_COUNTERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_SHADER_STORAGE_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_INPUT_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_UNIFORM_VECTORS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAGMENT_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_DRAW_BUFFERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_DUAL_SOURCE_DRAW_BUFFERS
+	} FragmentData;
+
+	void initFragment()
+	{
+
+	}
+
+	struct pulling
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_ELEMENTS_INDICES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_ELEMENTS_VERTICES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_ATTRIB_RELATIVE_OFFSET
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VERTEX_ATTRIB_BINDINGS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_ELEMENT_INDEX
+	} PullingData;
+
+	void initPulling()
+	{
+
+	}
+
+	struct rasterizer
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_SUBPIXEL_BITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_CLIP_DISTANCES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VIEWPORT_DIMS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VIEWPORTS
+		GLint MaxComputeShaderStorageBlocks; // GL_VIEWPORT_SUBPIXEL_BITS
+		GLint MaxComputeShaderStorageBlocks; // GL_VIEWPORT_BOUNDS_RANGE // returns two values
+	} RasterizerData;
+
+	void initRasterizer()
+	{
+
+	}
+
+	struct framebuffer
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAMEBUFFER_WIDTH
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAMEBUFFER_HEIGHT
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAMEBUFFER_LAYERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_FRAMEBUFFER_SAMPLES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_RENDERBUFFER_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_SAMPLE_MASK_WORDS
+	} FramebufferData;
+
+	void initFramebuffer()
+	{
+
+	}
+
+	struct buffer
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MIN_MAP_BUFFER_ALIGNMENT
+	} BufferData;
+
+	void initBuffer()
+	{
+
+	}
+
+	struct texture
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TEXTURE_LOD_BIAS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TEXTURE_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_RECTANGLE_TEXTURE_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_3D_TEXTURE_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_ARRAY_TEXTURE_LAYERS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_CUBE_MAP_TEXTURE_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COLOR_TEXTURE_SAMPLES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_DEPTH_TEXTURE_SAMPLES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_INTEGER_SAMPLES
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_TEXTURE_BUFFER_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_NUM_COMPRESSED_TEXTURE_FORMATS
+	} TextureData;
+
+	void initTexture()
+	{
+
+	}
+
+	struct program
+	{
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_PROGRAM_TEXEL_OFFSET
+		GLint MaxComputeShaderStorageBlocks; // GL_MIN_PROGRAM_TEXEL_OFFSET
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_COMBINED_UNIFORM_BLOCKS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_UNIFORM_BUFFER_BINDINGS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_UNIFORM_BLOCK_SIZE
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_UNIFORM_LOCATIONS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VARYING_COMPONENTS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VARYING_VECTORS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_VARYING_FLOATS
+		GLint MaxComputeShaderStorageBlocks; // GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS
+		GLint MaxComputeShaderStorageBlocks; // GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT
+		GLint MaxComputeShaderStorageBlocks; // GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT
+		GLint MaxComputeShaderStorageBlocks; // GL_NUM_PROGRAM_BINARY_FORMATS
+		GLint MaxComputeShaderStorageBlocks; // GL_NUM_SHADER_BINARY_FORMATS
+		GLint MaxComputeShaderStorageBlocks; // GL_PROGRAM_BINARY_FORMATS
+	} ProgramData;
+
+	void initProgram()
+	{
+
+	}
+
+public:
+	caps() :
+		Version(VersionData),
+		Debug(DebugData),
+		Combined(CombinedData),
+		Compute(ComputeData),
+		Vertex(VertexData),
+		Control(ControlData),
+		Evaluation(EvaluationData),
+		Geometry(GeometryData),
+		Fragment(FragmentData),
+		Pulling(PullingData),
+		Framebuffer(FramebufferData),
+		Rasterizer(RasterizerData),
+		Buffer(BufferData),
+		Texture(TextureData),
+		Program(ProgramData)
+	{
+		this->initVersion();
+		this->initDebug();
+		this->initCombined();
+		this->initCompute();
+		this->initVertex();
+		this->initControl();
+		this->initEvaluation();
+		this->initGeometry();
+		this->initFragment();
+		this->initPulling();
+		this->initRasterizer();
+		this->initFramebuffer();
+		this->initBuffer();
+		this->initTexture();
+		this->initProgram();
+	}
+
+	version const & Version;
+	debug const & Debug;
+	combined const & Combined;
+	compute const & Compute;
+	vertex const & Vertex;
+	control const & Control;
+	evaluation const & Evaluation;
+	geometry const & Geometry;
+	fragment const & Fragment;
+	pulling const & Pulling;
+	rasterizer const & Rasterizer;
+	framebuffer const & Framebuffer;
+	buffer const & Buffer;
+	texture const & Texture;
+	program const & Program;
+};
+
+bool initCaps()
+{
+	caps Caps;
+	
+}
+
 bool initProgram()
 {
 	bool Validated(true);
