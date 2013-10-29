@@ -240,6 +240,39 @@ namespace cmd
 		CLEAR = 76
 	};
 
+	namespace buffer
+	{
+		struct name
+		{
+
+		};
+
+		struct create
+		{
+
+		};
+
+		struct destroy
+		{
+
+		};
+
+		struct map
+		{
+
+		};
+
+		struct unmap
+		{
+
+		};
+
+		struct copy
+		{
+
+		};
+	}//namespace
+
 	struct clear
 	{
 		enum drawbuffer
@@ -276,6 +309,28 @@ namespace cmd
 		mode const Mode;
 		glm::vec4 const Color;
 		float const Depth;
+	};
+
+	struct context
+	{
+
+	};
+
+	struct device
+	{
+
+	};
+
+	class queue
+	{
+	public:
+		const_iterator begin() const;
+		const_iterator end() const;
+
+		void clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth);
+
+	private:
+		std::list<utl::buffer<cmd::name, 65536>> Storage;
 	};
 }//cmd
 
