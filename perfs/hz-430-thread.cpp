@@ -305,8 +305,49 @@ bool initProgram()
 	return Validated;
 }
 
+class name
+{
+public:
+	enum type
+	{
+		TEXTURE,
+		BUFFER,
+		FRAMEBUFFER,
+		VERTEX_ARRAY,
+		QUERY,
+		PROGRAM,
+		SHADER,
+		PIPELINE
+	};
+
+	name
+	(
+		type const & Type,
+		std::size_t const & Index
+	) :
+		Type(Type),
+		Index(Index)
+	{}
+
+	type getType() const
+	{
+		return this->Type;
+	}
+
+	std::size_t getIndex() const
+	{
+		return this->Index;
+	}
+
+private:
+	type Type;
+	std::size_t Index;
+};
+
 bool initBuffer()
 {
+	//name BufferName[buffer::VERTEX] = Queue->createBuffer(0, VertexSize, VertexData);
+
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
@@ -377,6 +418,9 @@ bool begin()
 
 bool end()
 {
+	//std::vector<name> Names;
+	//Queue->destroy(Names);
+
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
