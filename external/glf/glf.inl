@@ -11,6 +11,13 @@ void display();
 
 namespace glf
 {
+	enum profile
+	{
+		CORE = GLFW_OPENGL_CORE_PROFILE,
+		COMPATIBILITY = GLFW_OPENGL_COMPAT_PROFILE,
+		ES = GLFW_OPENGL_ES_PROFILE
+	};
+
 	static GLFWwindow* glf_window = NULL;
 	inline void logImplementationDependentLimit(GLenum Value, std::string const & String)
 	{
@@ -317,33 +324,29 @@ namespace glf
 	(
 		int argc, char* argv[], 
 		glm::ivec2 const & Size, 
-		int Profile,
+		profile Profile,
 		int Major, int Minor
 	)
 	{
 		glfwInit();
 
+		glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Major);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Minor);
 
-		if(version(Major, Minor) >= version(3, 2))
-		{
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Major);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Minor);
+#		if defined(__APPLE__)
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#		else
+			glfwWindowHint(GLFW_OPENGL_PROFILE, Profile);
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
+#		endif
 
-#			if defined(__APPLE__)
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#			elif defined(__INTEL__)
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-#			else
-				glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-				glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GL_TRUE : GL_FALSE);
-#			endif
+#		if defined(NDEBUG)
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+#		else
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#		endif
 
-#			if defined(NDEBUG)
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-#			else
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#			endif
-		}
 		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 

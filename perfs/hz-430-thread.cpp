@@ -360,8 +360,49 @@ bool initProgram()
 	return Validated;
 }
 
+class name
+{
+public:
+	enum type
+	{
+		TEXTURE,
+		BUFFER,
+		FRAMEBUFFER,
+		VERTEX_ARRAY,
+		QUERY,
+		PROGRAM,
+		SHADER,
+		PIPELINE
+	};
+
+	name
+	(
+		type const & Type,
+		std::size_t const & Index
+	) :
+		Type(Type),
+		Index(Index)
+	{}
+
+	type getType() const
+	{
+		return this->Type;
+	}
+
+	std::size_t getIndex() const
+	{
+		return this->Index;
+	}
+
+private:
+	type Type;
+	std::size_t Index;
+};
+
 bool initBuffer()
 {
+	//name BufferName[buffer::VERTEX] = Queue->createBuffer(0, VertexSize, VertexData);
+
 	glGenBuffers(buffer::MAX, BufferName);
 
 	glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
@@ -432,6 +473,9 @@ bool begin()
 
 bool end()
 {
+	//std::vector<name> Names;
+	//Queue->destroy(Names);
+
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
@@ -590,6 +634,18 @@ int main(int argc, char* argv[])
 		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
 		argv[0],
 		NULL, NULL);
+
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, 0x0004);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
+
+	GLFWwindow* WindowES = glfwCreateWindow(
+		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
+		argv[0],
+		NULL, Window);
 
 	if (!Window)
 	{
