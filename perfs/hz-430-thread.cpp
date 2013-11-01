@@ -536,6 +536,18 @@ int main(int argc, char* argv[])
 		argv[0],
 		NULL, NULL);
 
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, 0x0004);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
+
+	GLFWwindow* WindowES = glfwCreateWindow(
+		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
+		argv[0],
+		NULL, Window);
+
 	if (!Window)
 	{
 		glfwTerminate();
