@@ -14,6 +14,8 @@
 #include <atomic>
 #include <array>
 #include <cstring>
+#include <forward_list>
+#include <memory>
 
 namespace
 {
@@ -311,26 +313,145 @@ namespace cmd
 		float const Depth;
 	};
 
-	struct context
-	{
+	class context;
 
-	};
-
-	struct device
-	{
-
-	};
+	static const std::size_t BUFFER_SIZE = 65536;
+	typedef utl::buffer<cmd::name, BUFFER_SIZE> chunk;
 
 	class queue
 	{
 	public:
-		const_iterator begin() const;
-		const_iterator end() const;
+		queue(context & Context) :
+			Context(Context)
+		{}
 
-		void clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth);
+		//void clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth);
+		//void draw(draw::primitive const & Primitive, std::size_t const & drawOffset, std::size_t const & drawCount);
+		void flush();
 
 	private:
-		std::list<utl::buffer<cmd::name, 65536>> Storage;
+		typedef std::forward_list<chunk*> list;
+		typedef list::iterator iterator;
+
+		context & Context;
+		list Storage;
+	};
+
+	class context
+	{
+		struct node
+		{
+			node() :
+				Next(nullptr)
+			{}
+
+			node(chunk const & Chunk) :
+				Chunk(Chunk),
+				Next(nullptr)
+			{}
+
+			chunk Chunk;
+			node* Next;
+		};
+
+	public:
+		context(GLFWwindow* Window);
+		~context();
+
+		void push(chunk const & Chunk);
+
+	private:
+		void main();
+
+		std::unique_ptr<std::thread> Thread;
+		std::size_t TotalBufferCount;
+		GLFWwindow* Window;
+		std::atomic<node*> Head;
+		std::atomic<node*> Tail;
+	};
+
+	context::context(GLFWwindow* Window) :
+		Window(Window),
+		Head(nullptr)
+	{
+		this->Thread.reset(new std::thread(&context::main, this));
+	}
+
+	context::~context()
+	{
+		Thread->join();
+	}
+
+	// Multiple thread can sutmit command buffers
+	void context::push(chunk const & Chunk)
+	{
+		if(this->Head.load() == nullptr)
+		{
+			this->Head.store(new node(Chunk));
+			this->Tail.store(this->Head);
+		}
+		else
+		{
+			node* Head(this->Head.load());
+			node* Node(new node(Chunk));
+			Node->Next = this->Head.load();
+
+			while(!std::atomic_compare_exchange_weak_explicit(
+				&this->Head,
+				&Node->Next,
+				Node,
+				std::memory_order_release,
+				std::memory_order_relaxed));
+		}
+	}
+
+	void context::main()
+	{
+		while(this->Tail.load() != nullptr)
+		{
+			node* Node(nullptr);
+
+			while(!std::atomic_compare_exchange_weak_explicit(
+				&this->Tail,
+				&Node,
+				Node,
+				std::memory_order_release,
+				std::memory_order_relaxed));
+	/*
+			for(utl::buffer<cmd::name, 65536>::const_iterator it = Node.Chunk.begin(); it != Node.Chunk.end(); ++it)
+			{
+				switch(Buffer.name(it))
+				{
+					case cmd::CLEAR:
+					{
+						cmd::clear const & Command = Buffer.data<cmd::clear>(it);
+						if(Command.Mode & cmd::clear::COLOR)
+							glClearBufferfv(GL_COLOR, Command.Drawbuffer, &Command.Color[0]);
+						if(Command.Mode & cmd::clear::DEPTH)
+							glClearBufferfv(GL_DEPTH, Command.Drawbuffer, &Command.Depth);
+					}
+					break;
+					default:
+					{
+						// Unknowned command
+						assert(0);
+					}
+				}
+			}
+	*/
+		}
+	}
+
+	void queue::flush()
+	{
+		for(iterator it = Storage.begin(); it != Storage.end(); ++it)
+			Context.push(**it);
+		Storage.clear();
+	}
+
+	struct device
+	{
+
 	};
 }//cmd
 
@@ -486,6 +607,8 @@ bool end()
 
 void display()
 {
+	//queue Queue;
+	
 	utl::buffer<cmd::name, 65536> Buffer;
 	Buffer.push(cmd::CLEAR, cmd::clear(
 		cmd::clear::DRAWBUFFER0, 
@@ -623,6 +746,7 @@ int main(int argc, char* argv[])
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, SAMPLE_MAJOR_VERSION);
@@ -635,12 +759,14 @@ int main(int argc, char* argv[])
 		argv[0],
 		NULL, NULL);
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, 0x0004);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_FALSE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	GLFWwindow* WindowES = glfwCreateWindow(
 		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
