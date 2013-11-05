@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

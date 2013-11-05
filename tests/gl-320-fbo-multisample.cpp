@@ -312,11 +312,10 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
+	glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
+		::SAMPLE_MINOR_VERSION);
 }
