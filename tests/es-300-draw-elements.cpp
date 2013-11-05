@@ -14,11 +14,11 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Draw Elements");	
-	char const * VERTEX_SHADER_SOURCE("es-200/flat-color.vert");
-	char const * FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
+	char const * VERTEX_SHADER_SOURCE("es-300/flat-color.vert");
+	char const * FRAGMENT_SHADER_SOURCE("es-300/flat-color.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(2);
+	int const SAMPLE_MAJOR_VERSION(3);
 	int const SAMPLE_MINOR_VERSION(0);
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
@@ -58,12 +58,16 @@ bool initProgram()
 	{
 		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
 		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+		glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+		glf::checkShader(VertexShaderName, FRAGMENT_SHADER_SOURCE);
 
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertexShaderName);
 		glAttachShader(ProgramName, FragmentShaderName);
 		glDeleteShader(VertexShaderName);
 		glDeleteShader(FragmentShaderName);
+
+		glf::checkProgram(ProgramName);
 
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glLinkProgram(ProgramName);
@@ -108,6 +112,21 @@ bool initBuffer()
 	return glf::checkError("initBuffer");
 }
 
+bool initVertexArray()
+{
+	glGenVertexArrays(1, &VertexArrayName);
+	glBindVertexArray(VertexArrayName);
+		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+
+		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+	glBindVertexArray(0);
+
+	return glf::checkError("initVertexArray");
+}
+
 bool begin()
 {
 	bool Validated(true);
@@ -119,6 +138,8 @@ bool begin()
 		Validated = initProgram();
 	if(Validated)
 		Validated = initBuffer();
+	if(Validated)
+		Validated = initVertexArray();
 	return Validated && glf::checkError("begin");
 }
 
@@ -144,31 +165,26 @@ void display()
 
 	// Set the display viewport
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
+	glf::checkError("display");
 
 	// Clear color buffer with black
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepthf(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glf::checkError("display");
 
 	// Bind program
 	glUseProgram(ProgramName);
+	glf::checkError("display");
 
 	// Set the value of MVP uniform.
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+	glf::checkError("display");
 
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-
-	glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+	glBindVertexArray(VertexArrayName);
+	glf::checkError("display");
 
 	glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
-
-	glDisableVertexAttribArray(glf::semantic::attr::POSITION);
-
-	// Unbind program
-	glUseProgram(0);
 
 	glf::checkError("display");
 	glf::swapBuffers();

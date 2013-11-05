@@ -35,6 +35,11 @@ set(GL_VERSION_GTC 200)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
 
+# OpenGL ES 3.0 samples
+set(GL_VERSION_GTC 300)
+set(GL_SHADER_GTC flat-color.vert flat-color.frag)
+glCreateSampleGTC(draw-elements)
+
 # OpenGL 3.0 samples
 set(GL_PROFILE_GTC gl)
 set(GL_VERSION_GTC 300)
