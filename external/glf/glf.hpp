@@ -12,6 +12,8 @@
 #include "error.hpp"
 //#include "window.hpp"
 
+#include <glu/glu.hpp>
+
 namespace glf
 {
 	enum mouse_button

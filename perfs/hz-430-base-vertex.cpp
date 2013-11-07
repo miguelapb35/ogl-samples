@@ -186,7 +186,7 @@ void display()
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
 	glBindVertexArray(VertexArrayName);
 	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
-		glDrawArrays(GL_TRIANGLES, DrawIndex * sizeof(VertexData), VertexCount);
+		glDrawArrays(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount);
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;

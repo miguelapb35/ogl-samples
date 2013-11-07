@@ -148,7 +148,7 @@ bool initTexture()
 	glBindTexture(GL_TEXTURE_2D, TextureName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_NEAREST : GL_NEAREST_MIPMAP_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -158,12 +158,12 @@ bool initTexture()
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
-			GL_RGBA8,
+			gli::internal_format(Texture.format()),
 			GLsizei(Texture[Level].dimensions().x),
 			GLsizei(Texture[Level].dimensions().y),
 			0,
-			GL_BGR,
-			GL_UNSIGNED_BYTE,
+			gli::external_format(Texture.format()),
+			gli::type_format(Texture.format()),
 			Texture[Level].data());
 	}
 

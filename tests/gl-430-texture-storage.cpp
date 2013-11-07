@@ -163,7 +163,7 @@ bool initTexture()
 
 	glTexStorage2D(GL_TEXTURE_2D, 
 		GLint(Texture.levels()), 
-		GL_RGBA8, 
+		gli::internal_format(Texture.format()),
 		GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
 	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -174,7 +174,8 @@ bool initTexture()
 			0, 0, 
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			GL_BGR, GL_UNSIGNED_BYTE, 
+			gli::external_format(Texture.format()),
+			gli::type_format(Texture.format()),
 			Texture[Level].data());
 	}
 	
