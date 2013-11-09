@@ -82,6 +82,11 @@ enum D3DFORMAT
 	D3DFMT_DXT4                 = GLI_MAKEFOURCC('D', 'X', 'T', '4'),
 	D3DFMT_DXT5                 = GLI_MAKEFOURCC('D', 'X', 'T', '5'),
 
+	D3DFMT_ATI1                 = GLI_MAKEFOURCC('A', 'T', 'I', '1'),
+	D3DFMT_AT1N                 = GLI_MAKEFOURCC('A', 'T', '1', 'N'),
+	D3DFMT_ATI2                 = GLI_MAKEFOURCC('A', 'T', 'I', '2'),
+	D3DFMT_AT2N                 = GLI_MAKEFOURCC('A', 'T', '2', 'N'),
+
 	D3DFMT_D16_LOCKABLE         = 70,
 	D3DFMT_D32                  = 71,
 	D3DFMT_D15S1                = 73,

@@ -38,6 +38,8 @@ glCreatePerfGTC(multi-draw-indirect-element)
 set(GL_SHADER_GTC vertex-array-object.vert vertex-array-object.frag)
 glCreatePerfGTC(vertex-array-object)
 set(GL_SHADER_GTC vertex-array-object.vert vertex-array-object.frag)
+glCreatePerfGTC(vertex-array-objects)
+set(GL_SHADER_GTC vertex-array-object.vert vertex-array-object.frag)
 glCreatePerfGTC(base-vertex)
 
 endif(NOT APPLE)

@@ -46,8 +46,16 @@ namespace
 		};
 	}//namespace buffer
 
-	std::size_t const DrawCount(100000);
-	GLuint VertexArrayName;
+	struct DrawArraysIndirectCommand
+	{
+		GLuint count;
+		GLuint primCount;
+		GLuint first;
+		GLuint baseInstance;
+	};
+
+	std::size_t const DrawCount(10000);
+	std::vector<GLuint> VertexArrayName(DrawCount);
 	GLuint PipelineName(0);
 	GLuint ProgramName(0);
 	GLuint BufferName[buffer::MAX];
@@ -100,14 +108,17 @@ bool initBuffer()
 
 bool initVertexArray()
 {
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::ARRAY_BUFFER]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glGenVertexArrays(static_cast<GLsizei>(VertexArrayName.size()), &VertexArrayName[0]);
+	for(std::size_t i = 0; i < VertexArrayName.size(); ++i)
+	{
+		glBindVertexArray(VertexArrayName[i]);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::ARRAY_BUFFER]);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(i * sizeof(VertexData)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-	glBindVertexArray(0);
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+		glBindVertexArray(0);
+	}
 
 	return true;
 }
@@ -150,7 +161,7 @@ bool end()
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
-	glDeleteVertexArrays(1, &VertexArrayName);
+	glDeleteVertexArrays(static_cast<GLsizei>(VertexArrayName.size()), &VertexArrayName[0]);
 
 	return true;
 }
@@ -184,9 +195,11 @@ void display()
 	glBindProgramPipeline(PipelineName);
 
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
-	glBindVertexArray(VertexArrayName);
 	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
-		glDrawArrays(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount);
+	{
+		glBindVertexArray(VertexArrayName[DrawIndex]);
+		glDrawArrays(GL_TRIANGLES, 0, VertexCount);
+	}
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;
