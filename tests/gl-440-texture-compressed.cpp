@@ -18,8 +18,8 @@
 namespace
 {
 	char const * SAMPLE_NAME = "OpenGL Texture 2D Compressed";
-	char const * VERT_SHADER_SOURCE("gl-420/texture-2d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-2d.frag");
+	char const * VERT_SHADER_SOURCE("gl-440/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-440/texture-2d.frag");
 	char const * TEXTURE_DIFFUSE_DXT5("kueken2-dxt5.dds");
 	char const * TEXTURE_DIFFUSE_RGTC("kueken2-bc4.dds");
 	char const * TEXTURE_DIFFUSE_BPTC("kueken2-bc7.dds");
@@ -138,6 +138,13 @@ bool initBuffer()
 bool initTexture()
 {
 	bool Validated(true);
+
+	Texture2DName[texture::BPTC] = glu::create_texture_2d_array((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BPTC).c_str());
+	Texture2DName[texture::DXT5] = glu::create_texture_2d_array((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str());
+	Texture2DName[texture::RGTC] = glu::create_texture_2d_array((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGTC).c_str());
+	Texture2DName[texture::RGB8] = glu::create_texture_2d_array((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str());
+
+	return Validated;
 
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(texture::MAX, Texture2DName);
@@ -392,7 +399,7 @@ void display()
 		glViewportIndexedfv(0, &glm::vec4(Viewport[Index])[0]);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture2DName[Index]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DName[Index]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(
 			GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);

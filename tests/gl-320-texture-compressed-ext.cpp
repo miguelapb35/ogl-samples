@@ -140,7 +140,7 @@ bool initTexture2D()
 
 	// Set image
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC1));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC1).c_str()));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC1]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -162,7 +162,7 @@ bool initTexture2D()
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC3));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC3).c_str()));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC3]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -173,17 +173,17 @@ bool initTexture2D()
 			glCompressedTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GLenum(gli::internal_format(Texture.format())),
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				static_cast<GLenum>(gli::internal_format(Texture.format())),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), 
+				static_cast<GLsizei>(Texture[Level].dimensions().y), 
 				0, 
-				GLsizei(Texture[Level].size()), 
+				static_cast<GLsizei>(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC4));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC4).c_str()));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -204,7 +204,7 @@ bool initTexture2D()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC5));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC5).c_str()));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_BC5]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);

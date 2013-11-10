@@ -16,7 +16,7 @@ namespace
 	char const * SAMPLE_NAME("OpenGL Fetch");
 	char const * VERTEX_SHADER_SOURCE("gl-320/texture-fetch.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-320/texture-fetch.frag");
-	char const * TEXTURE_DIFFUSE_DXT5("kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE("kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -143,7 +143,8 @@ bool initTexture()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+	
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(

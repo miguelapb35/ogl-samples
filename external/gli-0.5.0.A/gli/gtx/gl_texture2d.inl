@@ -164,13 +164,11 @@ namespace detail
 
 }//namespace detail
 
-	inline GLuint createTexture2D(std::string const & Filename)
+	inline GLuint createTexture2D(char const * Filename)
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(Filename));
+		gli::texture2D Texture(gli::load_dds(Filename));
 		if(Texture.empty())
 			return 0;
-
-		detail::format_desc Desc = detail::getFormatInfo(Texture.format());
 
 		GLint Alignment = 0;
 		GLint CurrentTextureName = 0;
@@ -179,25 +177,37 @@ namespace detail
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		GLuint Name = 0;
+		GLuint Name(0);
 		glGenTextures(1, &Name);
 		glBindTexture(GL_TEXTURE_2D, Name);
+
+		glTexStorage2D(GL_TEXTURE_2D,
+			static_cast<GLint>(Texture.levels()),
+			static_cast<GLenum>(gli::internal_format(Texture.format())),
+			static_cast<GLsizei>(Texture[0].dimensions().x),
+			static_cast<GLsizei>(Texture[0].dimensions().y));
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		if(gli::bits_per_pixel(Texture.format()) == gli::block_size(Texture.format()))
+		if(!gli::is_compressed(Texture.format()))
 		{
 			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexImage2D(
+				glTexSubImage2D(
 					GL_TEXTURE_2D, 
-					GLint(Level), 
-					Desc.Internal,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0,
-					Desc.External, 
-					Desc.Type, 
+					static_cast<GLint>(Level), 
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLenum>(gli::type_format(Texture.format())),
 					Texture[Level].data());
 			}
 		}
@@ -205,14 +215,14 @@ namespace detail
 		{
 			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
+				glCompressedTexSubImage2D(
 					GL_TEXTURE_2D,
-					GLint(Level),
-					Desc.Internal,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0, 
-					GLsizei(Texture[Level].size()), 
+					static_cast<GLint>(Level),
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLsizei>(Texture[Level].size()), 
 					Texture[Level].data());
 			}
 		}

@@ -139,7 +139,7 @@ bool initTexture2D()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	FRAMEBUFFER_SIZE = Texture.dimensions();
 
 	glActiveTexture(GL_TEXTURE0);

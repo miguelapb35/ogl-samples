@@ -108,7 +108,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::textureCube Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::textureCube Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &TextureName);

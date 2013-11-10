@@ -21,25 +21,22 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/gtx/gl_texture2d.hpp
-/// @date 2010-09-27 / 2013-01-13
+/// @file gli/core/gl.hpp
+/// @date 2013-11-09 / 2013-11-09
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef GLI_GTX_GL_TEXTURE2D_INCLUDED
-#define GLI_GTX_GL_TEXTURE2D_INCLUDED
+#ifndef GLI_DX_INCLUDED
+#define GLI_DX_INCLUDED
 
-#include "../gli.hpp"
-
-#ifndef GL_VERSION_1_1
-#	error "ERROR: OpenGL must be included before GLI_GTX_gl_texture2d"
-#endif//GL_VERSION_1_1
+#include "storage.hpp"
 
 namespace gli
 {
-	GLuint createTexture2D(char const * Filename);
+	dxgiFormat dxgi_format(format const & Format);
+
 }//namespace gli
 
-#include "gl_texture2d.inl"
+#include "dx.inl"
 
-#endif//GLI_GTX_GL_TEXTURE2D_INCLUDED
+#endif//GLI_DX_INCLUDED

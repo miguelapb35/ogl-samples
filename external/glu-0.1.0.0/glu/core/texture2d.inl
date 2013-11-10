@@ -167,61 +167,136 @@ namespace detail
 
 }//namespace detail
 
-	inline GLuint createTexture2D(std::string const & Filename)
+	inline GLuint create_texture_2d(char const * Filename)
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(Filename));
+		gli::texture2D Texture(gli::load_dds(Filename));
 		if(Texture.empty())
 			return 0;
 
-		gli::detail::format_desc Desc = gli::detail::getFormatInfo(Texture.format());
-
-		GLint Alignment = 0;
-		GLint CurrentTextureName = 0;
+		GLint Alignment(0);
 		glGetIntegerv(GL_UNPACK_ALIGNMENT, &Alignment);
-		glGetIntegerv(GL_TEXTURE_BINDING_2D, &CurrentTextureName);
-
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		GLuint Name = 0;
+		GLuint Name(0);
 		glGenTextures(1, &Name);
-		glBindTexture(GL_TEXTURE_2D, Name);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureStorage2DEXT(Name,
+			GL_TEXTURE_2D,
+			static_cast<GLint>(Texture.levels()),
+			static_cast<GLenum>(gli::internal_format(Texture.format())),
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y));
 
-		if(gli::bits_per_pixel(Texture.format()) == gli::block_size(Texture.format()))
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+		if(!gli::is_compressed(Texture.format()))
 		{
-			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 			{
-				glTexImage2D(
+				glTextureSubImage2DEXT(Name,
 					GL_TEXTURE_2D, 
-					GLint(Level), 
-					Desc.Internal,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0,
-					Desc.External, 
-					Desc.Type, 
+					static_cast<GLint>(Level), 
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLenum>(gli::type_format(Texture.format())),
 					Texture[Level].data());
 			}
 		}
 		else
 		{
-			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
+				glCompressedTextureSubImage2DEXT(Name,
 					GL_TEXTURE_2D,
-					GLint(Level),
-					Desc.Internal,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0, 
-					GLsizei(Texture[Level].size()), 
+					static_cast<GLint>(Level),
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLsizei>(Texture[Level].size()), 
 					Texture[Level].data());
 			}
 		}
 
 		// Restaure previous states
-		glBindTexture(GL_TEXTURE_2D, GLuint(CurrentTextureName));
+		glPixelStorei(GL_UNPACK_ALIGNMENT, Alignment);
+
+		return Name;
+	}
+
+	inline GLuint create_texture_2d_array(char const * Filename)
+	{
+		gli::texture2DArray Texture(gli::load_dds(Filename));
+		if(Texture.empty())
+			return 0;
+
+		GLint Alignment(0);
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &Alignment);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		GLuint Name(0);
+		glGenTextures(1, &Name);
+		glTextureStorage3DEXT(Name,
+			GL_TEXTURE_2D_ARRAY,
+			static_cast<GLint>(Texture.levels()),
+			static_cast<GLenum>(gli::internal_format(Texture.format())),
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.layers()));
+
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+		if(!gli::is_compressed(Texture.format()))
+		{
+			for(gli::texture2D::size_type Layer(0); Layer < Texture.layers(); ++Layer)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glTextureSubImage3DEXT(Name,
+					GL_TEXTURE_2D_ARRAY,
+					static_cast<GLint>(Level),
+					0, 0, static_cast<GLint>(Layer),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().x),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().y),
+					1,
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLenum>(gli::type_format(Texture.format())),
+					Texture[Layer][Level].data());
+			}
+		}
+		else
+		{
+			for(gli::texture2D::size_type Layer(0); Layer < Texture.layers(); ++Layer)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glCompressedTextureSubImage3DEXT(Name,
+					GL_TEXTURE_2D_ARRAY,
+					static_cast<GLint>(Level),
+					0, 0, static_cast<GLint>(Layer),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().x),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().y),
+					1,
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLsizei>(Texture[Layer][Level].size()), 
+					Texture[Layer][Level].data());
+			}
+		}
+
+		// Restaure previous states
 		glPixelStorei(GL_UNPACK_ALIGNMENT, Alignment);
 
 		return Name;

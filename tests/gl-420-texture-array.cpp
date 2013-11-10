@@ -129,7 +129,7 @@ bool initTextureArray()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DArrayName);
 
 	// Set image
-	gli::texture2DArray Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2DArray Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY,

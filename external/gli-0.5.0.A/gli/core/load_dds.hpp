@@ -33,8 +33,8 @@
 
 namespace gli
 {
-	storage loadStorageDDS(
-		std::string const & Filename);
+	storage load_dds(
+		char const * Filename);
 
 }//namespace gli
 

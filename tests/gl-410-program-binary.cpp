@@ -20,7 +20,7 @@ namespace
 	char const * VERT_PROGRAM_BINARY("gl-410/binary.vert.bin");
 	char const * GEOM_PROGRAM_BINARY("gl-410/binary.geom.bin");
 	char const * FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
-	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -221,7 +221,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(
