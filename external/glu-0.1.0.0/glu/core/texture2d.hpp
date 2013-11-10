@@ -35,7 +35,8 @@
 
 namespace glu
 {
-	GLuint createTexture2D(char const * Filename);
+	GLuint create_texture_2d(char const * Filename);
+	GLuint create_texture_2d_array(char const * Filename);
 }//namespace glu
 
 #include "texture2d.inl"

@@ -302,4 +302,156 @@ namespace detail
 		return Name;
 	}
 
+	inline GLuint create_texture_2d(gli::storage const & Storage)
+	{
+		gli::texture2D Texture(Storage);
+		if(Texture.empty())
+			return 0;
+
+		GLuint Name(0);
+		glGenTextures(1, &Name);
+		glTextureStorage2DEXT(Name,
+			GL_TEXTURE_2D,
+			static_cast<GLint>(Texture.levels()),
+			static_cast<GLenum>(gli::internal_format(Texture.format())),
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y));
+
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+		if(!gli::is_compressed(Texture.format()))
+		{
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glTextureSubImage2DEXT(Name,
+					GL_TEXTURE_2D, 
+					static_cast<GLint>(Level), 
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLenum>(gli::type_format(Texture.format())),
+					Texture[Level].data());
+			}
+		}
+		else
+		{
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glCompressedTextureSubImage2DEXT(Name,
+					GL_TEXTURE_2D,
+					static_cast<GLint>(Level),
+					0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), 
+					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLsizei>(Texture[Level].size()), 
+					Texture[Level].data());
+			}
+		}
+
+		return Name;
+	}
+
+	inline GLuint create_texture_2d_array(gli::storage const & Storage)
+	{
+		gli::texture2DArray Texture(Storage);
+		if(Texture.empty())
+			return 0;
+
+		GLuint Name(0);
+		glGenTextures(1, &Name);
+		glTextureStorage3DEXT(Name,
+			GL_TEXTURE_2D_ARRAY,
+			static_cast<GLint>(Texture.levels()),
+			static_cast<GLenum>(gli::internal_format(Texture.format())),
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.layers()));
+
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteriEXT(Name, GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+		if(!gli::is_compressed(Texture.format()))
+		{
+			for(gli::texture2D::size_type Layer(0); Layer < Texture.layers(); ++Layer)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glTextureSubImage3DEXT(Name,
+					GL_TEXTURE_2D_ARRAY,
+					static_cast<GLint>(Level),
+					0, 0, static_cast<GLint>(Layer),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().x),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().y),
+					1,
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLenum>(gli::type_format(Texture.format())),
+					Texture[Layer][Level].data());
+			}
+		}
+		else
+		{
+			for(gli::texture2D::size_type Layer(0); Layer < Texture.layers(); ++Layer)
+			for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+			{
+				glCompressedTextureSubImage3DEXT(Name,
+					GL_TEXTURE_2D_ARRAY,
+					static_cast<GLint>(Level),
+					0, 0, static_cast<GLint>(Layer),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().x),
+					static_cast<GLsizei>(Texture[Layer][Level].dimensions().y),
+					1,
+					static_cast<GLenum>(gli::external_format(Texture.format())),
+					static_cast<GLsizei>(Texture[Layer][Level].size()), 
+					Texture[Layer][Level].data());
+			}
+		}
+
+		return Name;
+	}
+
+	class scopedPixelStore
+	{
+	public:
+		scopedPixelStore(GLint Alignment) :
+			SavedAlignment(0)
+		{
+			glGetIntegerv(GL_UNPACK_ALIGNMENT, &this->SavedAlignment);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, Alignment);
+		}
+
+		~scopedPixelStore()
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, this->SavedAlignment);
+		}
+
+	private:
+		GLint SavedAlignment;
+	};
+
+	inline GLuint create_texture(char const * Filename)
+	{
+		gli::storage Storage(gli::load_dds(Filename));
+
+		scopedPixelStore PixelStore(1);
+
+		if(Storage.layers() > 1)
+			return create_texture_2d_array(Storage);
+		else
+			return create_texture_2d(Storage);
+	}
+
 }//namespace gli
