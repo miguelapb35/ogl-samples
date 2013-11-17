@@ -17,7 +17,7 @@ namespace
 	char const * VERTEX_SHADER_SOURCE("gl-320/fbo-srgb.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-320/fbo-srgb.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
+	glm::ivec2 const FRAMEBUFFER_SIZE(1024, 1024);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
