@@ -360,6 +360,8 @@ namespace glf
 		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 
+		glfwGetFramebufferSize(glf_window, &Window.Size.x, &Window.Size.y);
+		
 		glfwSetMouseButtonCallback(glf_window,mouse_button_callback);
 		glfwSetCursorPosCallback(glf_window,cursor_position_callback);
 		glfwSetKeyCallback(glf_window,key_callback);
