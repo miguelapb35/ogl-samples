@@ -14,10 +14,10 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Render to texture");
-	char const * VERTEX_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
-	char const * FRAGMENT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
-	char const * VERTEX_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.vert");
-	char const * FRAGMENT_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.frag");
+	char const * VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
+	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -76,7 +76,20 @@ namespace
 		};
 	}//namespace buffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT1,
+			FRAG1,
+			VERT2,
+			FRAG2,
+			MAX
+		};
+	}//namespace shader
+
 	GLuint FramebufferName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> UniformMVP(program::MAX);
 	std::vector<GLuint> UniformDiffuse(program::MAX);
@@ -105,19 +118,17 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE1, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::MULTIPLE] = glCreateProgram();
-		glAttachShader(ProgramName[program::MULTIPLE], VertShaderName);
-		glAttachShader(ProgramName[program::MULTIPLE], FragShaderName);
+		glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::VERT1]);
+		glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::FRAG1]);
 		glBindAttribLocation(ProgramName[program::MULTIPLE], glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::RED, "Red");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::GREEN, "Green");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::BLUE, "Blue");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::MULTIPLE]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::MULTIPLE]);
@@ -130,18 +141,16 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE2, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::SINGLE] = glCreateProgram();
-		glAttachShader(ProgramName[program::SINGLE], VertShaderName);
-		glAttachShader(ProgramName[program::SINGLE], FragShaderName);
+		glAttachShader(ProgramName[program::SINGLE], ShaderName[shader::VERT2]);
+		glAttachShader(ProgramName[program::SINGLE], ShaderName[shader::FRAG2]);
 		glBindAttribLocation(ProgramName[program::SINGLE], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::SINGLE], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::SINGLE], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::SINGLE]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::SINGLE]);
@@ -273,6 +282,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
