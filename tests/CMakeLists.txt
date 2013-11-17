@@ -136,8 +136,6 @@ set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.
 glCreateSampleGTC(transform-feedback-interleaved)
 glCreateSampleGTC(transform-feedback-separated)
 
-if(NOT APPLE)
-
 # OpenGL 3.3 samples
 set(GL_VERSION_GTC 330)
 
@@ -232,6 +230,8 @@ set(GL_SHADER_GTC binary.vert binary.geom binary.frag)
 glCreateSampleGTC(program-binary)
 set(GL_SHADER_GTC separate.vert separate.frag)
 glCreateSampleGTC(program-separate)
+
+if(NOT APPLE)
 
 # OpenGL 4.2 samples
 set(GL_VERSION_GTC 420)

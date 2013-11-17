@@ -37,7 +37,7 @@ namespace
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
-		0, 1, 2, 
+		0, 1, 2,
 		2, 3, 0
 	};
 
@@ -53,7 +53,18 @@ namespace
 		};
 	}//namespace buffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+	
 	GLuint ProgramName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
 	GLint UniformTransform(0);
@@ -76,21 +87,20 @@ bool initProgram()
 	bool Validated = true;
 
 	glf::compiler Compiler;
-
+	ShaderName.resize(shader::MAX);
+	
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
@@ -136,7 +146,7 @@ bool initProgram()
 			StringName == std::string("material.Diffuse") || 
 			StringName == std::string("transform.MVP"));
 	}
-
+	
 	return Validated && glf::checkError("initProgram");
 }
 
@@ -209,6 +219,7 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
+	glf::checkError("initProgram exit");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -219,6 +230,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
