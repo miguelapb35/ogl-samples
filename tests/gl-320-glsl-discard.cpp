@@ -52,12 +52,21 @@ namespace
 		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
-
 	GLuint BufferName(0);
 	GLuint Texture2DName(0);
-
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
 }//namespace
@@ -79,21 +88,18 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -107,7 +113,7 @@ bool initProgram()
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
@@ -118,7 +124,7 @@ bool initArrayBuffer()
 	return glf::checkError("initArrayBuffer");;
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	glGenTextures(1, &Texture2DName);
 
@@ -171,17 +177,19 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 
 	return Validated && glf::checkError("begin");
 }
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(1, &Texture2DName);

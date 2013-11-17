@@ -51,6 +51,17 @@ namespace
 		};
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint ProgramName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
@@ -76,20 +87,17 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShader);
-		glAttachShader(ProgramName, FragShader);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShader);
-		glDeleteShader(FragShader);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -155,6 +163,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);

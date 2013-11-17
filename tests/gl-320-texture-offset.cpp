@@ -52,7 +52,7 @@ namespace
 		enum type
 		{
 			OFFSET,
-			LINEAR,
+			BICUBIC,
 			MAX
 		};
 	}//namespace program
@@ -64,8 +64,20 @@ namespace
 		"gl-320/texture-offset-bicubic.frag",
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			FRAG_BICUBIC,
+			MAX
+		};
+	}//namespace shader
+
 	GLuint VertexArrayName(0);
 	GLuint TextureName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLint> UniformMVP(program::MAX);
@@ -90,17 +102,17 @@ bool initProgram()
 	bool Validated = true;
 
 	glf::compiler Compiler;
-
-	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT, "--version 150 --profile core");
+	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT, "--version 150 --profile core");
+	ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG[program::OFFSET], "--version 150 --profile core");
+	ShaderName[shader::FRAG_BICUBIC] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG[program::BICUBIC], "--version 150 --profile core");
+	Validated = Validated && Compiler.check();
 
 	for(std::size_t i = 0; i < program::MAX; ++i)
 	{
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG[i], "--version 150 --profile core");
-		Validated = Validated && Compiler.check();
-
 		ProgramName[i] = glCreateProgram();
-		glAttachShader(ProgramName[i], VertShaderName);
-		glAttachShader(ProgramName[i], FragShaderName);
+		glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
+		glAttachShader(ProgramName[i], ShaderName[shader::FRAG + i]);
+
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
@@ -111,11 +123,7 @@ bool initProgram()
 		UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
 		if(i == program::OFFSET)
 			UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
-		
-		//glDeleteShader(FragShaderName);
 	}
-
-	//glDeleteShader(VertShaderName);
 
 	return Validated && glf::checkError("initProgram");
 }
@@ -191,13 +199,12 @@ bool begin()
 	glm::ivec2 const ViewportSize = Window.Size / 2 - Border * 2;
 
 	Viewport[program::OFFSET] = glm::vec4(Border, Border, Window.Size.x / 2 - Border * 2, Window.Size.y - Border * 2);
-	Viewport[program::LINEAR] = glm::vec4(Border + Window.Size.x / 2, Border, Window.Size.x / 2 - Border * 2, Window.Size.y - Border * 2);
+	Viewport[program::BICUBIC] = glm::vec4(Border + Window.Size.x / 2, Border, Window.Size.x / 2 - Border * 2, Window.Size.y - Border * 2);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
-	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -210,6 +217,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
@@ -251,7 +260,6 @@ void display()
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 1, 0);
 	}
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 

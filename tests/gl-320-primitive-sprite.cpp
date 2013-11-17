@@ -37,6 +37,17 @@ namespace
 		glf::vertex_v2fc4f(glm::vec2(-1.0f, 1.0f), glm::vec4(0, 0, 1, 1))
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint BufferName(0);
@@ -64,21 +75,18 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -131,7 +139,7 @@ bool initVertexArray()
 	return glf::checkError("initVertexArray");
 }
 
-bool initTexture2D()
+bool initTexture()
 {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -142,19 +150,21 @@ bool initTexture2D()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Set image
 	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+	assert(!Texture.empty());
+	assert(!gli::is_compressed(Texture.format()));
+
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGBA8, 
+			GL_TEXTURE_2D,
+			GLint(Level),
+			gli::internal_format(Texture.format()),
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
 			0,
-			GL_BGRA, 
-			GL_UNSIGNED_BYTE, 
+			gli::external_format(Texture.format()),
+			gli::type_format(Texture.format()),
 			Texture[Level].data());
 	}
 	
@@ -171,13 +181,14 @@ bool begin()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_POINT_SPRITE);
 	//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
 	
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
-		Validated = initTexture2D();
+		Validated = initTexture();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -190,7 +201,8 @@ bool begin()
 
 bool end()
 {
-	// Delete objects
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteTextures(1, &TextureName);
 	glDeleteProgram(ProgramName);
@@ -226,6 +238,7 @@ void display()
 	glUseProgram(ProgramName);
 	glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+	glUniform1i(UniformDiffuse, 0);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
@@ -233,7 +246,6 @@ void display()
 
 	glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 

@@ -52,12 +52,22 @@ namespace
 			MAX
 		};
 	}//namespace buffer
+	
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
 
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint TextureName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
-
 	GLint UniformTransform(0);
 	GLint UniformDiffuse(0);
 }//namespace
@@ -77,23 +87,21 @@ bool initProgram()
 {
 	bool Validated(true);
 	
-	glf::compiler Compiler;
-
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
 
@@ -177,8 +185,6 @@ bool initTexture()
 
 bool initVertexArray()
 {
-	glf::checkError("initVertexArray 0");
-	
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -215,6 +221,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(1, &TextureName);

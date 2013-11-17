@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Framebuffer Multisample");
-	char const * VERTEX_SHADER_SOURCE("gl-320/fbo-multisample.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/fbo-multisample.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/fbo-multisample.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -94,22 +94,21 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	glf::compiler Compiler;
-
 	// Create program
 	if(Validated)
 	{
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 150 --profile core");
-		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 150 --profile core");
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, ShaderName[shader::VERT]);
 		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -216,7 +215,6 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
-	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
