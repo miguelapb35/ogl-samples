@@ -173,7 +173,7 @@ bool initTexture()
 		0, 
 		GL_RGB, 
 		GLsizei(Window.Size.x / FRAMEBUFFER_SIZE),
-		GLsizei(Window.Size.x / FRAMEBUFFER_SIZE),
+		GLsizei(Window.Size.y / FRAMEBUFFER_SIZE),
 		GLsizei(4), //depth
 		0,  
 		GL_RGB, 
@@ -293,7 +293,7 @@ void display()
 	glm::mat4 MVP = Projection * View * Model;
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0)[0]);	
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0)[0]);
 	
 	// Pass 1
 	{
@@ -329,7 +329,6 @@ void display()
 		}
 	}
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
