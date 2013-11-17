@@ -14,10 +14,10 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Render to texture blending");
-	char const * VERTEX_SHADER_SOURCE1("gl-330/mrt.vert");
-	char const * FRAGMENT_SHADER_SOURCE1("gl-330/mrt.frag");
-	char const * VERTEX_SHADER_SOURCE2("gl-330/image-2d.vert");
-	char const * FRAGMENT_SHADER_SOURCE2("gl-330/image-2d.frag");
+	char const * VERT_SHADER_SOURCE1("gl-330/mrt.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-330/mrt.frag");
+	char const * VERT_SHADER_SOURCE2("gl-330/image-2d.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-330/image-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -43,7 +43,7 @@ namespace
 	};
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
 	vertex const VertexData[VertexCount] =
 	{
@@ -64,21 +64,31 @@ namespace
 		TEXTURE_MAX
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT1,
+			FRAG1,
+			VERT2,
+			FRAG2,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
+
 	GLuint FramebufferName = 0;
 	GLuint VertexArrayName = 0;
-
 	GLuint ProgramNameSingle = 0;
 	GLint UniformMVPSingle = 0;
 	GLint UniformDiffuseSingle = 0;
-
 	GLuint ProgramNameMultiple = 0;
 	GLint UniformMVPMultiple = 0;
 	GLint UniformDiffuseMultiple = 0;
-
 	GLuint BufferName = 0;
 	GLuint Texture2DName[TEXTURE_MAX];
 	GLuint SamplerName = 0;
-
 	glm::ivec4 Viewport[TEXTURE_MAX];
 
 }//namespace
@@ -96,21 +106,18 @@ bool initProgram()
 {
 	bool Validated = true;
 
-	// Create program
+	glf::compiler Compiler;
+	ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 330 --profile core");
+	ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 330 --profile core");
+	ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 330 --profile core");
+	ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 330 --profile core");
+	Validated = Validated && Compiler.check();
+
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE1);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE1);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE1);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE1);
-
 		ProgramNameMultiple = glCreateProgram();
-		glAttachShader(ProgramNameMultiple, VertShaderName);
-		glAttachShader(ProgramNameMultiple, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
+		glAttachShader(ProgramNameMultiple, ShaderName[shader::VERT1]);
+		glAttachShader(ProgramNameMultiple, ShaderName[shader::FRAG1]);
 		glLinkProgram(ProgramNameMultiple);
 		Validated = Validated && glf::checkProgram(ProgramNameMultiple);
 	}
@@ -121,21 +128,11 @@ bool initProgram()
 		UniformDiffuseMultiple = glGetUniformLocation(ProgramNameMultiple, "Diffuse");
 	}
 
-	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE2);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE2);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE2);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE2);
-
 		ProgramNameSingle = glCreateProgram();
-		glAttachShader(ProgramNameSingle, VertShaderName);
-		glAttachShader(ProgramNameSingle, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
+		glAttachShader(ProgramNameSingle, ShaderName[shader::VERT2]);
+		glAttachShader(ProgramNameSingle, ShaderName[shader::FRAG2]);
 		glLinkProgram(ProgramNameSingle);
 		Validated = Validated && glf::checkProgram(ProgramNameSingle);
 	}
@@ -185,23 +182,19 @@ bool initTexture()
 
 	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
-	// Load image
 	glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_RGB8]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
-	{
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGB8,
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			0,
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
-			Texture[Level].data());
-	}
+	glTexImage2D(
+		GL_TEXTURE_2D, 
+		GLint(0), 
+		GL_RGB8,
+		GLsizei(Texture.dimensions().x), 
+		GLsizei(Texture.dimensions().y), 
+		0,
+		GL_BGR, 
+		GL_UNSIGNED_BYTE, 
+		Texture.data());
 
 	glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_R]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -326,6 +319,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramNameMultiple);
 	glDeleteProgram(ProgramNameSingle);

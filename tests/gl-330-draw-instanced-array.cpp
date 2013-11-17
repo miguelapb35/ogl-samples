@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME = "OpenGL Draw Instanced Array";
-	char const * VERTEX_SHADER_SOURCE("gl-330/instanced-array.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/instanced-array.frag");
+	char const * VERT_SHADER_SOURCE("gl-330/instanced-array.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/instanced-array.frag");
 	int const SAMPLE_SIZE_WIDTH = 640;
 	int const SAMPLE_SIZE_HEIGHT = 480;
 	int const SAMPLE_MAJOR_VERSION = 3;
@@ -46,10 +46,30 @@ namespace
 		glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	namespace buffer
+	{
+		enum type
+		{
+			POSITION,
+			COLOR,
+			MAX
+		};
+	}//namespace buffer
+
+	std::vector<GLuint> ShaderName(shader::MAX);
+	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
-	GLuint PositionBufferName = 0;
-	GLuint ColorBufferName = 0;
 	GLint UniformMVP = 0;
 }//namespace
 
@@ -74,21 +94,16 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	// Create program
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -102,30 +117,30 @@ bool initProgram()
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
-	glGenBuffers(1, &PositionBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, PositionBufferName);
-    glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
+	glGenBuffers(buffer::MAX, &BufferName[0]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION]);
+	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glGenBuffers(1, &ColorBufferName);
-    glBindBuffer(GL_ARRAY_BUFFER, ColorBufferName);
-    glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR]);
+	glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");
+	return glf::checkError("initBuffer");
 }
 
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, PositionBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION]);
 		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glVertexAttribDivisor(glf::semantic::attr::POSITION, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, ColorBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR]);
 		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glVertexAttribDivisor(glf::semantic::attr::COLOR, 2);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -149,7 +164,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 
@@ -158,9 +173,9 @@ bool begin()
 
 bool end()
 {
-	// Delete objects
-	glDeleteBuffers(1, &PositionBufferName);
-	glDeleteBuffers(1, &ColorBufferName);
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
+	glDeleteBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
 	glDeleteProgram(ProgramName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 

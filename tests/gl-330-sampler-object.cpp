@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME = "OpenGL Sampler Object";
-	char const * VERTEX_SHADER_SOURCE("gl-330/image-2d.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/image-2d.frag");
+	char const * VERT_SHADER_SOURCE("gl-330/image-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/image-2d.frag");
 	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -64,19 +64,27 @@ namespace
 		};
 	}
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
-
 	GLuint BufferName = 0;
 	GLuint TextureName = 0;
 	GLuint SamplerAName = 0;
 	GLuint SamplerBName = 0;
-
 	GLint UniformMVP = 0;
 	GLint UniformDiffuseA = 0;
 	GLint UniformDiffuseB = 0;
 	GLint UniformColor = 0;
-
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
@@ -97,18 +105,14 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -238,6 +242,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(1, &TextureName);

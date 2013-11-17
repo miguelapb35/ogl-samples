@@ -75,6 +75,19 @@ namespace
 		"gl-330/multisample-explicit-near-nv.frag",
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG_THROUGH,
+			FRAG_RESOLVE_BOX,
+			FRAG_RESOLVE_NEAR,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName[program::MAX];
 	GLuint BufferName(0);
@@ -118,19 +131,18 @@ bool initSampler()
 bool initProgram()
 {
 	bool Validated = true;
-	
-	// Create program
+
+	glf::compiler Compiler;
+	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
+	for(int i = 0; i < program::MAX; ++i)
+		ShaderName[shader::FRAG_THROUGH + i] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i], "--version 330 --profile core");
+	Validated = Validated && Compiler.check();
+
 	for(int i = 0; i < program::MAX; ++i)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i]);
-
 		ProgramName[i] = glCreateProgram();
-		glAttachShader(ProgramName[i], VertShaderName);
-		glAttachShader(ProgramName[i], FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
+		glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
+		glAttachShader(ProgramName[i], ShaderName[shader::FRAG_THROUGH + i]);
 		glLinkProgram(ProgramName[i]);
 		Validated = Validated && glf::checkProgram(ProgramName[i]);
 
@@ -146,7 +158,7 @@ bool initBuffer()
 	glGenBuffers(1, &BufferName);
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return glf::checkError("initBuffer");;
 }
@@ -159,8 +171,6 @@ bool initTexture()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // Required AMD bug
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Required AMD bug
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
@@ -252,6 +262,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
@@ -352,8 +364,6 @@ void resolveMultisampling()
 	}
 
 	glDisable(GL_SCISSOR_TEST);
-
-	glf::checkError("renderFB");
 }
 
 void display()
@@ -378,12 +388,10 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
+	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
 		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+		::SAMPLE_MINOR_VERSION);
 }

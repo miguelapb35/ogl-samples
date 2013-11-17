@@ -1,5 +1,4 @@
 #version 330 core
-
 #define POSITION	0
 #define COLOR		3
 #define TEXCOORD	4
