@@ -17,7 +17,7 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-420/sampler-fetch.vert");
 	char const * FRAG_SHADER_LIBRARY("gl-420/sampler-library.frag");
 	char const * FRAG_SHADER_SOURCE("gl-420/sampler-fetch.frag");
-	char const * TEXTURE_DIFFUSE_DXT5( "kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -140,7 +140,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -275,6 +275,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

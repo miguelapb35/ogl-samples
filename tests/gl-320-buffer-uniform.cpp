@@ -16,8 +16,8 @@ namespace
 	char const * SAMPLE_NAME("OpenGL Buffer Uniform");
 	char const * VERT_SHADER_SOURCE("gl-320/buffer-uniform.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/buffer-uniform.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
+	int const SAMPLE_SIZE_WIDTH(1024);
+	int const SAMPLE_SIZE_HEIGHT(768);
 	int const SAMPLE_MAJOR_VERSION(3);
 	int const SAMPLE_MINOR_VERSION(2);
 
@@ -256,14 +256,14 @@ void display()
 		glm::mat4 MVP = Projection * View * Model;
 		
 		*Pointer = MVP;
-
+		
 		// Make sure the uniform buffer is uploaded
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	glUseProgram(ProgramName);
 	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
@@ -287,6 +287,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

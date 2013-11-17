@@ -129,7 +129,7 @@ bool initTextureArray()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DArrayName);
 
 	// Set image
-	gli::texture2DArray Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2DArray Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glTexStorage3D(
 		GL_TEXTURE_2D_ARRAY,
@@ -261,6 +261,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

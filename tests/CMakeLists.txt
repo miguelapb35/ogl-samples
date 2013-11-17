@@ -35,6 +35,11 @@ set(GL_VERSION_GTC 200)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
 
+# OpenGL ES 3.0 samples
+set(GL_VERSION_GTC 300)
+set(GL_SHADER_GTC flat-color.vert flat-color.frag)
+glCreateSampleGTC(draw-elements)
+
 # OpenGL 3.0 samples
 set(GL_PROFILE_GTC gl)
 set(GL_VERSION_GTC 300)
@@ -354,6 +359,8 @@ set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matc
 glCreateSampleGTC(interface-matching)
 set(GL_SHADER_GTC sampler-wrap.vert sampler-wrap.frag)
 glCreateSampleGTC(sampler-wrap)
+set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
+glCreateSampleGTC(texture-compressed)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
 

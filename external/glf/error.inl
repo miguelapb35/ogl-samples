@@ -30,6 +30,7 @@ namespace glf
 				break;
 			}
 			fprintf(stdout, "OpenGL Error(%s): %s\n", ErrorString.c_str(), Title);
+			assert(0);
 		}
 		return Error == GL_NO_ERROR;
 	}

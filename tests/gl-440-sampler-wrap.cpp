@@ -200,7 +200,7 @@ bool initTexture()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str()));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(
@@ -325,6 +325,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

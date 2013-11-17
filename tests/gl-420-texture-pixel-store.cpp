@@ -135,7 +135,7 @@ bool initTexture()
 	glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_DEPTH, DXT1BlockDepth);
 	glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_SIZE, DXT1BlockSize);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC1));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BC1).c_str()));
 	assert(!Texture.empty());
 
 	glGenTextures(1, &TextureName);
@@ -284,6 +284,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }
