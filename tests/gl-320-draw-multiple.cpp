@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL multiple draw base vertex");
-	char const * VERTEX_SHADER_SOURCE("gl-320/draw-multiple.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/draw-multiple.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/draw-multiple.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/draw-multiple.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -47,7 +47,18 @@ namespace
 
 	GLsizei const Count[2] = {ElementCount, ElementCount};
 	GLint const BaseVertex[2] = {0, 4};
+	
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
 
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName;
 	GLuint ProgramName;
 	GLuint ArrayBufferName;
@@ -76,17 +87,16 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
@@ -150,7 +160,8 @@ bool begin()
 
 bool end()
 {
-	// Delete objects
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &ArrayBufferName);
 	glDeleteBuffers(1, &ElementBufferName);
 	glDeleteProgram(ProgramName);

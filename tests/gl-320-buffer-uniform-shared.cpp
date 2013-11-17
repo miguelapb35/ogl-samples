@@ -52,7 +52,18 @@ namespace
 		};
 	}//namespace buffer
 
-	GLuint ProgramName = 0;
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	GLuint ProgramName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName = 0;
 	GLint UniformTransform = 0;
@@ -80,19 +91,18 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+		ShaderName[shader::VERT] = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+		ShaderName[shader::FRAG] = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
-		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(ShaderName[shader::VERT], VERTEX_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(ShaderName[shader::FRAG], FRAGMENT_SHADER_SOURCE);
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -181,6 +191,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);

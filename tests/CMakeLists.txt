@@ -108,6 +108,8 @@ set(GL_SHADER_GTC primitive-shading.vert primitive-shading.geom primitive-shadin
 glCreateSampleGTC(primitive-shading)
 set(GL_SHADER_GTC primitive-sprite.vert primitive-sprite.frag)
 glCreateSampleGTC(primitive-sprite)
+set(GL_SHADER_GTC program.vert program.frag)
+glCreateSampleGTC(program)
 set(GL_SHADER_GTC query-conditional.vert query-conditional.frag)
 glCreateSampleGTC(query-conditional)
 set(GL_SHADER_GTC query-occlusion.vert query-occlusion.frag)
