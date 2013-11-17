@@ -213,10 +213,10 @@ bool initTexture()
 			GL_TEXTURE_2D,
 			GLint(Level),
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x),
+			GLsizei(Texture[Level].dimensions().y),
 			0, 
-			GLsizei(Texture[Level].size()), 
+			GLsizei(Texture[Level].size()),
 			Texture[Level].data());
 	}
 	
@@ -405,7 +405,7 @@ void display()
 		*(Pointer + 1) = DepthMVP;
 
 		glm::mat4 BiasMatrix(
-			0.5, 0.0, 0.0, 0.0, 
+			0.5, 0.0, 0.0, 0.0,
 			0.0, 0.5, 0.0, 0.0,
 			0.0, 0.0, 0.5, 0.0,
 			0.5, 0.5, 0.5, 1.0);
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
+		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT),
 		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
