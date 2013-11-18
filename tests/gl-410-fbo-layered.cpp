@@ -300,6 +300,9 @@ void display()
 		GLint Border = 2;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0)[0]);
+		
 		glViewportIndexedfv(0, &glm::vec4(Border, Border, Window.Size / 2 - 2 * Border)[0]);
 		glViewportIndexedfv(1, &glm::vec4((Window.Size.x >> 1) + Border, Border, Window.Size / 2 - 2 * Border)[0]);
 		glViewportIndexedfv(2, &glm::vec4((Window.Size.x >> 1) + Border, (Window.Size.y >> 1) + 1, Window.Size / 2 - 2 * Border)[0]);
