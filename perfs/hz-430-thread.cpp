@@ -452,6 +452,23 @@ namespace cmd
 	struct device
 	{
 
+/*
+	struct buffer
+	{
+		enum flag
+		{
+			MAP_READ_BIT = (1 << 0),
+			MAP_WRITE_BIT = (1 << 1),
+			MAP_PERSISTENT_BIT = (1 << 2),
+			MAP_COHERENT_BIT = (1 << 3),
+			DYNAMIC_STORAGE_BIT = (1 << 4)
+		};
+
+		buffer(std::size_t const & Size, glm::uint const & flags);
+
+		GLsizeiptr const Size;
+		GLbitfield const Flags;
+*/
 	};
 }//cmd
 
@@ -526,8 +543,8 @@ bool initBuffer()
 
 	glGenBuffers(buffer::MAX, BufferName);
 
-	glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
-	glNamedBufferDataEXT(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+	glNamedBufferStorageEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+	glNamedBufferStorageEXT(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), NULL, GL_DYNAMIC_STORAGE_BIT);
 
 	std::vector<DrawArraysIndirectCommand> Commands;
 	Commands.resize(DrawCount);
