@@ -21,26 +21,32 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/texture.hpp
+/// @date 2013-02-05 / 2013-02-05
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-namespace gli
-{
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
-	{
-		//assert(); TODO! genType need to match with internal format size
+#ifndef GLI_CORE_TEXTURE_INCLUDED
+#define GLI_CORE_TEXTURE_INCLUDED
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
+#include "image.hpp"
 
-}//namespace gli
+#include "texture1d.hpp"
+#include "texture1d_array.hpp"
+#include "texture2d.hpp"
+#include "texture2d_array.hpp"
+#include "texture3d.hpp"
+#include "texture_cube.hpp"
+#include "texture_cube_array.hpp"
+
+#include "addressing.hpp"
+
+#include "texture1d.inl"
+#include "texture1d_array.inl"
+#include "texture2d.inl"
+#include "texture2d_array.inl"
+#include "texture3d.inl"
+#include "texture_cube.inl"
+#include "texture_cube_array.inl"
+
+#endif//GLI_CORE_TEXTURE_INCLUDED

@@ -21,26 +21,34 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/addressing.inl
+/// @date 2012-11-19 / 2012-11-19
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-namespace gli
+namespace gli{
+namespace detail
 {
-	template <typename genType>
-	inline image clear
+	inline storage::size_type imageAddressing
 	(
-		image const & Image, 
-		genType const & Texel
+		storage const & Storage,
+		storage::size_type const & LayerOffset, 
+		storage::size_type const & FaceOffset, 
+		storage::size_type const & LevelOffset
 	)
 	{
-		//assert(); TODO! genType need to match with internal format size
+		assert(LayerOffset < Storage.layers());
+		assert(FaceOffset < Storage.faces());
+		assert(LevelOffset < Storage.levels());
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
+		storage::size_type LayerSize = Storage.layerSize(0, Storage.faces() - 1, 0, Storage.levels() - 1);
+		storage::size_type FaceSize = Storage.faceSize(0, Storage.levels() - 1);
+		storage::size_type BaseOffset = LayerSize * LayerOffset + FaceSize * FaceOffset; 
+
+		for(storage::size_type Level(0); Level < LevelOffset; ++Level)
+			BaseOffset += Storage.levelSize(Level);
+
+		return BaseOffset;
 	}
-
+}//namespace detail
 }//namespace gli

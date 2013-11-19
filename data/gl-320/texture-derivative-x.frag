@@ -20,7 +20,7 @@ float textureLevel(in sampler2D Sampler, in vec2 Texcoord)
 	float d = max(dot(dx, dx), dot(dy, dy));
 
 	d = clamp(d, 1.0, pow(2, (LevelCount - 1) * 2));
-  
+
 	return 0.5 * log2(d);
 }
 

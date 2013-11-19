@@ -8,10 +8,10 @@
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-/// 
+///
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-/// 
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,26 +21,74 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/cow_ptr.hpp
+/// @date 2012-09-24 / 2013-01-12
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
+#ifndef GLI_COW_PTR_INCLUDED
+#define GLI_COW_PTR_INCLUDED
+
+#include "shared_ptr.hpp"
+
 namespace gli
 {
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
+	template <typename T>
+	class cow_ptr
 	{
-		//assert(); TODO! genType need to match with internal format size
+	public:
+		cow_ptr(T* Pointer) :
+			SharedPtr(Pointer)
+		{}
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
+		cow_ptr(shared_ptr<T> const & SharedPtr) :
+			SharedPtr(SharedPtr)
+		{}
 
+		cow_ptr(cow_ptr<T> const & CowPtr) :
+			SharedPtr(CowPtr.Pointer)
+		{}
+
+		cow_ptr & operator=(cow_ptr<T> const & CowPtr)
+		{
+			// no need to check for self-assignment with shared_ptr
+
+			this->SharedPtr = CowPtr.SharedPtr; 
+			return *this;
+		}
+
+		T const & operator*() const
+		{
+			return *this->SharedPtr;
+		}
+
+		T & operator*()
+		{
+			this->detach();
+			return *this->SharedPtr;
+		}
+
+		T const * operator->() const
+		{
+			return this->SharedPtr.operator->();
+		}
+
+		T * operator->()
+		{
+			this->detach();
+			return this->SharedPtr.operator->();
+		}
+
+	private:
+		void detach()
+		{
+			T* Tmp = this->SharedPtr.get();
+			if(!(Tmp == 0 || this->SharedPtr.unique()))
+				this->SharedPtr = cow_ptr<T>(new T(*Tmp));
+		}
+
+		shared_ptr<T> SharedPtr;
+	};
 }//namespace gli
+
+#endif//GLI_COW_PTR_INCLUDED

@@ -8,10 +8,10 @@
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-/// 
+///
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-/// 
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,26 +21,27 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/operator.hpp
+/// @date 2010-01-19 / 2013-01-12
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-namespace gli
-{
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
-	{
-		//assert(); TODO! genType need to match with internal format size
+#ifndef GLI_OPERATOR_INCLUDED
+#define GLI_OPERATOR_INCLUDED
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
+#include "texture2d.hpp"
+
+namespace gli{
+namespace detail
+{
+
+}//namespace detail
+
+	texture2D operator+(texture2D const & TextureA, texture2D const & TextureB);
+	texture2D operator-(texture2D const & TextureA, texture2D const & TextureB);
 
 }//namespace gli
+
+#include "operator.inl"
+
+#endif//GLI_OPERATOR_INCLUDED

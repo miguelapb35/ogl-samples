@@ -18,7 +18,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-400/texture-derivative2.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-400/texture-derivative1.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-400/texture-derivative1.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const FRAMEBUFFER_SIZE(8);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -97,6 +97,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformDiffuse(program::MAX);
 	GLint UniformTransform(0);
+	GLint UniformUseGrad(0);
 	GLint UniformFramebufferSize(0);
 }//namespace
 
@@ -128,6 +129,7 @@ bool initProgram()
 	{
 		UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
 		UniformDiffuse[program::TEXTURE] = glGetUniformLocation(ProgramName[program::TEXTURE], "Diffuse");
+		UniformUseGrad = glGetUniformLocation(ProgramName[program::TEXTURE], "UseGrad");
 	}
 		
 	if(Validated)
@@ -186,7 +188,18 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+	std::size_t TextureSize(128);
+	std::size_t TextureLevel = glm::log2(TextureSize) + 1;
+	gli::texture2D Texture(TextureLevel, gli::RGBA8_UNORM, gli::texture2D::dimensions_type(TextureSize));
+	Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
+	Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
+	Texture[2].clear(glm::u8vec4(255, 255, 0, 255));
+	Texture[3].clear(glm::u8vec4(0, 255, 0, 255));
+	Texture[4].clear(glm::u8vec4(0, 255, 255, 255));
+	Texture[5].clear(glm::u8vec4(0, 0, 255, 255));
+	Texture[6].clear(glm::u8vec4(255, 0, 255, 255));
+	Texture[7].clear(glm::u8vec4(255, 255, 255, 255));
+
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -196,25 +209,26 @@ bool initTexture()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 2));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
-		glCompressedTexImage2D(
+		glTexImage2D(
 			GL_TEXTURE_2D,
 			GLint(Level),
-			GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+			gli::internal_format(Texture.format()),
 			GLsizei(Texture[Level].dimensions().x), 
 			GLsizei(Texture[Level].dimensions().y), 
-			0, 
-			GLsizei(Texture[Level].size()), 
+			0,
+			gli::external_format(Texture.format()),
+			gli::type_format(Texture.format()), 
 			Texture[Level].data());
 	}
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -326,26 +340,28 @@ bool end()
 
 void display()
 {
+	glm::ivec2 FramebufferSize = Window.Size / FRAMEBUFFER_SIZE;
+
 	// Update of the uniform buffer
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
+/*
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - 87.f, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 30.0f, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
-
-/* Flat
-		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - 87.f, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 3.0f, glm::vec3(0.f, 1.f, 0.f));
-		glm::mat4 Model = glm::mat4(1.0f);
 */
+// Flat
+		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y + 1));
+		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - 85.f, glm::vec3(1.f, 0.f, 0.f));
+		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 20.0f, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 Model = glm::mat4(1.0f);
+
 		*Pointer = Projection * View * Model;
 
 		// Make sure the uniform buffer is uploaded
@@ -355,7 +371,7 @@ void display()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	glViewport(0, 0, Window.Size.x/ FRAMEBUFFER_SIZE, Window.Size.y/ FRAMEBUFFER_SIZE);
+	glViewport(0, 0, FramebufferSize.x, FramebufferSize.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH , 0, &Depth);
@@ -370,10 +386,17 @@ void display()
 	glBindVertexArray(VertexArrayName[program::TEXTURE]);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+	glEnable(GL_SCISSOR_TEST);
+		glScissor(0, 0, FramebufferSize.x / 2, FramebufferSize.y);
+		glUniform1i(UniformUseGrad, 1);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+
+		glScissor(FramebufferSize.x / 2, 0, FramebufferSize.x / 2, FramebufferSize.y);
+		glUniform1i(UniformUseGrad, 0);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+	glDisable(GL_SCISSOR_TEST);
 
 	glDisable(GL_DEPTH_TEST);
-
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(ProgramName[program::SPLASH]);

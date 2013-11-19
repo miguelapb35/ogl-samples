@@ -8,10 +8,10 @@
 /// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 /// copies of the Software, and to permit persons to whom the Software is
 /// furnished to do so, subject to the following conditions:
-/// 
+///
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
-/// 
+///
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,26 +21,57 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/shared_ptr.hpp
+/// @date 2012-09-01 / 2013-01-12
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
+#ifndef GLI_SHARED_PTR_INCLUDED
+#define GLI_SHARED_PTR_INCLUDED
+
+#include <cassert>
+
 namespace gli
 {
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
+	template <typename T>
+	class shared_ptr
 	{
-		//assert(); TODO! genType need to match with internal format size
+/* TODO: make_shared
+		template typename T
+		class refcounter
+		{
+			Long Counter;
+			T Data;
+		};
+*/
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
+	public:
+		shared_ptr();
+		shared_ptr(shared_ptr const & SharedPtr);
+		explicit shared_ptr(T * Pointer);
+		~shared_ptr();
 
+		T * get() const;
+		T const & operator*() const;
+		T & operator*();
+		T const * const operator->() const;
+		T * operator->();
+		shared_ptr& operator=(shared_ptr const & SharedPtr);
+		shared_ptr& operator=(T * Pointer);
+		bool operator==(shared_ptr const & SharedPtr) const;
+		bool operator!=(shared_ptr const & SharedPtr) const;
+		
+		void reset();
+		void reset(T * Pointer);
+		long use_count() const;
+		bool unique() const;
+
+	private:
+		long * Counter;
+		T * Pointer;
+	};
 }//namespace gli
+
+#include "shared_ptr.inl"
+
+#endif //GLI_SHARED_PTR_INCLUDED

@@ -21,26 +21,15 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/dx.inl
+/// @date 2013-11-09 / 2013-11-09
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
 namespace gli
 {
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
+	inline dxgiFormat dxgi_format(format const & Format)
 	{
-		//assert(); TODO! genType need to match with internal format size
-
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
+		return detail::getFormatInfo(Format).Format;
 	}
-
 }//namespace gli
