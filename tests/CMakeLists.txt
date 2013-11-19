@@ -182,6 +182,8 @@ set(GL_VERSION_GTC 400)
 
 set(GL_SHADER_GTC mrt.vert mrt.frag image-2d.vert image-2d.frag)
 glCreateSampleGTC(blend-rtt)
+set(GL_SHADER_GTC texture-derivative1.vert texture-derivative1.frag texture-derivative2.vert texture-derivative2.frag)
+glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-indirect)
 set(GL_SHADER_GTC rtt-array.vert rtt-array.frag layer.vert layer.geom layer.frag)
