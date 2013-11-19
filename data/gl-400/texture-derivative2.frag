@@ -21,12 +21,10 @@ void main()
 		vec2 Texcoord11 = interpolateAtOffset(In.Texcoord, vec2( 0.5, 0.5));
 		vec2 Texcoord01 = interpolateAtOffset(In.Texcoord, vec2(-0.5, 0.5));
 		Color = textureGrad(Diffuse, In.Texcoord, abs(Texcoord10 - Texcoord00), abs(Texcoord01 - Texcoord00));
-	//	Color = textureFine(Diffuse, In.Texcoord);
 	}
 	else
 	{
 		Color = texture(Diffuse, In.Texcoord);
-	//	Color = textureCoarse(Diffuse, In.Texcoord);
 	}
 }
 
