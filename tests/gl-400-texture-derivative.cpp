@@ -287,6 +287,13 @@ bool begin()
 	bool Validated(true);
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
+	float MinFragmentInterpolationOffset(0);
+	float MaxFragmentInterpolationOffset(0);
+	float FragmentInterpolationOffsetBits(0);
+	glGetFloatv(GL_MIN_FRAGMENT_INTERPOLATION_OFFSET, &MinFragmentInterpolationOffset);
+	glGetFloatv(GL_MAX_FRAGMENT_INTERPOLATION_OFFSET, &MaxFragmentInterpolationOffset);
+	glGetFloatv(GL_FRAGMENT_INTERPOLATION_OFFSET_BITS, &FragmentInterpolationOffsetBits);
+
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
