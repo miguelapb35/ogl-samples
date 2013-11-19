@@ -1,4 +1,5 @@
 #version 150 core
+//#define FUNCTION
 
 uniform sampler2D Diffuse;
 uniform bool UseGrad;
@@ -9,21 +10,8 @@ in block
 } In;
 
 out vec4 Color;
-/*
-vec4 textureFine(in sampler2D Sampler, in vec2 Texcoord)
-{
-	vec2 Texcoord00 = interpolateAtOffset(Texcoord, vec2(-0.5,-0.5));
-	vec2 Texcoord10 = interpolateAtOffset(Texcoord, vec2( 0.5,-0.5));
-	vec2 Texcoord11 = interpolateAtOffset(Texcoord, vec2( 0.5, 0.5));
-	vec2 Texcoord01 = interpolateAtOffset(Texcoord, vec2(-0.5, 0.5));
-	return textureGrad(Sampler, Texcoord, abs(Texcoord10 - Texcoord00), abs(Texcoord01 - Texcoord00));
-}
 
-vec4 textureCoarse(in sampler2D Sampler, in vec2 Texcoord)
-{
-	return texture(Sampler, Texcoord);
-}
-*/
+#ifndef FUNCTION
 void main()
 {
 	if(UseGrad)
@@ -41,3 +29,33 @@ void main()
 	//	Color = textureCoarse(Diffuse, In.Texcoord);
 	}
 }
+
+#else//FUNCTION
+
+vec4 textureFine(in sampler2D Sampler, in vec2 Texcoord)
+{
+	vec2 Texcoord00 = interpolateAtOffset(Texcoord, vec2(-0.5,-0.5));
+	vec2 Texcoord10 = interpolateAtOffset(Texcoord, vec2( 0.5,-0.5));
+	vec2 Texcoord11 = interpolateAtOffset(Texcoord, vec2( 0.5, 0.5));
+	vec2 Texcoord01 = interpolateAtOffset(Texcoord, vec2(-0.5, 0.5));
+	return textureGrad(Sampler, Texcoord, abs(Texcoord10 - Texcoord00), abs(Texcoord01 - Texcoord00));
+}
+
+vec4 textureCoarse(in sampler2D Sampler, in vec2 Texcoord)
+{
+	return texture(Sampler, Texcoord);
+}
+
+void main()
+{
+	if(UseGrad)
+	{
+		Color = textureFine(Diffuse, In.Texcoord);
+	}
+	else
+	{
+		Color = textureCoarse(Diffuse, In.Texcoord);
+	}
+}
+
+#endif//FUNCTION
