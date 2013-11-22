@@ -186,7 +186,7 @@ namespace glf
 			if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 			{
 				strcpy(debSev, "high");
-				//Error = true;
+				Error = true;
 			}
 			else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
 				strcpy(debSev, "medium");
