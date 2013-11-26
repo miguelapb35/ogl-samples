@@ -335,25 +335,27 @@ void display()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 	float Depth(1.0f);
+    glm::u8vec4 ColorClear(255, 127, 0, 255);
+    glm::u8vec4 ColorTex(0, 127, 255, 255);
 	glClearBufferfv(GL_DEPTH , 0, &Depth);
 	glClearTexImage(TextureName[texture::COLORBUFFER], 0, 
-		GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(255, 127,   0, 255));
+		GL_RGBA, GL_UNSIGNED_BYTE, &ColorClear);
 	glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 		64, 64, 0,
 		64, 64, 1,
-		GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
+		GL_RGBA, GL_UNSIGNED_BYTE, &ColorTex);
 	glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 		256, 0, 0,
 		64, 64, 1,
-		GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
+		GL_RGBA, GL_UNSIGNED_BYTE, &ColorTex);
 	glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 		128, 384, 0,
 		64, 64, 1,
-		GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
+		GL_RGBA, GL_UNSIGNED_BYTE, &ColorTex);
 	glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 		512, 256, 0,
 		64, 64, 1,
-		GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
+		GL_RGBA, GL_UNSIGNED_BYTE, &ColorTex);
 
 
 	// Bind rendering objects
