@@ -281,7 +281,7 @@ bool initFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE);
 	if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 		return false;
 

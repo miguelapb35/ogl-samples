@@ -9,7 +9,6 @@
 // www.g-truc.net
 //**********************************
 
-
 #include <glf/glf.hpp>
 #include <glf/compiler.hpp>
 
@@ -283,7 +282,7 @@ bool initFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE); // AMD workaround glDrawBuffer* is not FBO states
 	if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 		return false;
 
