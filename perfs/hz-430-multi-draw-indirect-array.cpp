@@ -52,7 +52,7 @@ namespace
 	struct DrawArraysIndirectCommand
 	{
 		GLuint count;
-		GLuint primCount;
+		GLuint instanceCount;
 		GLuint first;
 		GLuint baseInstance;
 	};
@@ -108,7 +108,7 @@ bool initBuffer()
 	for(std::size_t i = 0; i < Commands.size(); ++i)
 	{
 		Commands[i].count = VertexCount;
-		Commands[i].primCount = 2;
+		Commands[i].instanceCount = 0;
 		Commands[i].first = 0;
 		Commands[i].baseInstance = 0;
 	}

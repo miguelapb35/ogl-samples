@@ -54,7 +54,7 @@ namespace
 		GLuint baseInstance;
 	};
 
-	std::size_t const DrawCount(10000);
+	std::size_t const DrawCount(100000);
 	std::vector<GLuint> VertexArrayName(DrawCount);
 	std::vector<GLuint> ArrayBufferName(DrawCount);
 	GLuint PipelineName(0);

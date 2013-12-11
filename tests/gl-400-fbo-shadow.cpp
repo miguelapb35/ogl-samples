@@ -101,7 +101,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(1024, 1024);
+	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
 bool initProgram()

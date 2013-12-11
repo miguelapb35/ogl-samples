@@ -1,5 +1,5 @@
 //**********************************
-// OpenGL Multi Draw Indirect
+// OpenGL draw array range
 // 25/07/2012 - 15/11/2012
 //**********************************
 // Christophe Riccio
@@ -13,7 +13,7 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Multi draw indirect");
+	char const * SAMPLE_NAME("OpenGL draw array range");
 	char const * VERT_SHADER_SOURCE("hz-430/multi-draw-indirect.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/multi-draw-indirect.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
@@ -24,22 +24,16 @@ namespace
 
 	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
-	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
-	glm::uint32 const ElementData[ElementCount] =
-	{
-		0, 1, 2,
-		0, 2, 3
-	};
-
-	GLsizei const VertexCount(4);
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const VertexData[VertexCount] =
 	{
 		glm::vec2(-1.0f,-1.0f),
 		glm::vec2( 1.0f,-1.0f),
 		glm::vec2( 1.0f, 1.0f),
-		glm::vec2(-1.0f, 1.0f)
+		glm::vec2( 1.0f, 1.0f),
+		glm::vec2(-1.0f, 1.0f),
+		glm::vec2(-1.0f,-1.0f)
 	};
 
 	GLsizei const DrawCount(100000);
@@ -49,27 +43,16 @@ namespace
 		enum type
 		{
 			VERTEX,
-			ELEMENT,
 			TRANSFORM,
-			INDIRECT,
 			MAX
 		};
 	}//namespace buffer
-/*
+
 	struct DrawArraysIndirectCommand
 	{
 		GLuint count;
-		GLuint primCount;
-		GLuint first;
-		GLuint baseInstance;
-	};
-*/
-	struct DrawElementsIndirectCommand
-	{
-		GLuint count;
 		GLuint instanceCount;
-		GLuint firstIndex;
-		GLint  baseVertex;
+		GLuint first;
 		GLuint baseInstance;
 	};
 
@@ -78,7 +61,6 @@ namespace
 	GLuint ProgramName(0);
 	GLuint BufferName[buffer::MAX];
 	GLuint QueryName(0);
-
 }//namespace
 
 bool initProgram()
@@ -115,28 +97,9 @@ bool initBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	std::vector<DrawElementsIndirectCommand> Commands;
-	Commands.resize(DrawCount);
-	for(std::size_t i = 0; i < Commands.size(); ++i)
-	{
-		Commands[i].count = ElementCount;
-		Commands[i].instanceCount = 1;
-		Commands[i].firstIndex = 0;
-		Commands[i].baseVertex = 0;
-		Commands[i].baseInstance = 0;
-	}
-
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawElementsIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	return true;
 }
@@ -150,8 +113,6 @@ bool initVertexArray()
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]); 
 	glBindVertexArray(0);
 
 	return true;
@@ -229,20 +190,20 @@ void display()
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindProgramPipeline(PipelineName);
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, static_cast<GLsizei>(DrawCount), 0);
+	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
+		//glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		glDrawArrays(GL_TRIANGLES, 0, VertexCount);
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;
 	glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &QueryTime);
+
 	double InstantTime = static_cast<double>(QueryTime) / 1000.0 / 1000.0;
-
 	static double ConvergingTime = 0;
-	ConvergingTime = (ConvergingTime + InstantTime) * 0.5;
-
-	fprintf(stdout, "\rConverging Time: %2.5f ms, Instant Time: %2.5f ms", ConvergingTime, InstantTime);
+	ConvergingTime = (ConvergingTime * 0.99 + InstantTime * 0.01);
+	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 
 	glf::swapBuffers();
 }

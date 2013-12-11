@@ -51,27 +51,9 @@ namespace
 			VERTEX,
 			ELEMENT,
 			TRANSFORM,
-			INDIRECT,
 			MAX
 		};
 	}//namespace buffer
-/*
-	struct DrawArraysIndirectCommand
-	{
-		GLuint count;
-		GLuint primCount;
-		GLuint first;
-		GLuint baseInstance;
-	};
-*/
-	struct DrawElementsIndirectCommand
-	{
-		GLuint count;
-		GLuint instanceCount;
-		GLuint firstIndex;
-		GLint  baseVertex;
-		GLuint baseInstance;
-	};
 
 	GLuint VertexArrayName(0);
 	GLuint PipelineName(0);
@@ -122,21 +104,6 @@ bool initBuffer()
 	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	std::vector<DrawElementsIndirectCommand> Commands;
-	Commands.resize(DrawCount);
-	for(std::size_t i = 0; i < Commands.size(); ++i)
-	{
-		Commands[i].count = ElementCount;
-		Commands[i].instanceCount = 1;
-		Commands[i].firstIndex = 0;
-		Commands[i].baseVertex = 0;
-		Commands[i].baseInstance = 0;
-	}
-
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawElementsIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	return true;
 }
@@ -229,10 +196,11 @@ void display()
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 	glBindProgramPipeline(PipelineName);
 	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, static_cast<GLsizei>(DrawCount), 0);
+	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
+		//glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, 1, 0);
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;

@@ -12,6 +12,7 @@ in block
 out vec4 Color;
 
 #ifndef FUNCTION
+
 void main()
 {
 	if(UseGrad)
@@ -28,6 +29,12 @@ void main()
 	}
 }
 
+/*
+void main()
+{
+	Color = vec4(fwidth(interpolateAtCentroid(In.Texcoord)), 0.0, 1.0);
+}
+*/
 #else//FUNCTION
 
 vec4 textureFine(in sampler2D Sampler, in vec2 Texcoord)
