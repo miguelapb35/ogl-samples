@@ -1,7 +1,6 @@
 #ifndef GLF_INCLUDED
 #define GLF_INCLUDED
 
-//#include <glo/glo.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -10,7 +9,6 @@
 #include "compiler.hpp"
 #include "sementics.hpp"
 #include "error.hpp"
-//#include "window.hpp"
 
 #include <glu/glu.hpp>
 
@@ -105,7 +103,7 @@ namespace glf
 		GLvoid* Pointer;
 	};
 
-	bool operator== (vertexattrib const & A, vertexattrib const & B)
+	inline bool operator== (vertexattrib const & A, vertexattrib const & B)
 	{
 		return A.Enabled == B.Enabled && 
 			A.Size == B.Size && 
@@ -116,7 +114,7 @@ namespace glf
 			A.Long == B.Long;
 	}
 
-	bool operator!= (vertexattrib const & A, vertexattrib const & B)
+	inline bool operator!= (vertexattrib const & A, vertexattrib const & B)
 	{
 		return !(A == B);
 	}

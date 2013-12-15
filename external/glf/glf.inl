@@ -4,9 +4,6 @@ bool begin();
 bool end();
 void display();
 
-#define GLF_CONTEXT_CORE_PROFILE_BIT 0x0001
-#define GLF_CONTEXT_COMPATIBILITY_PROFILE_BIT 0x0002
-#define GLF_CONTEXT_ES2_PROFILE_BIT 0x0004
 #define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 namespace glf
@@ -186,7 +183,7 @@ namespace glf
 			if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 			{
 				strcpy(debSev, "high");
-				//Error = true;
+				Error = true;
 			}
 			else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
 				strcpy(debSev, "medium");
@@ -345,8 +342,8 @@ namespace glf
 #					if defined(__APPLE__)
 						glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #					else
-						glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-						glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GL_TRUE : GL_FALSE);
+						glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == CORE ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+						glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
 #					endif
 				}	
 #				if !defined(_DEBUG) || defined(__APPLE__)
@@ -395,7 +392,7 @@ namespace glf
 		return Run ? 0 : 1;
 	}
 
-	bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	inline bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
 #if !defined(__APPLE__)
@@ -424,7 +421,7 @@ namespace glf
 		return Success;
 	}
 
-	bool validateVAO42(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	inline bool validateVAO42(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
 #if !defined(__APPLE__)

@@ -13,7 +13,6 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Vertex Array Object");
 	char const * VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
@@ -55,7 +54,7 @@ namespace
 
 }//namespace
 
-bool initProgram()
+static bool initProgram()
 {
 	bool Validated(true);
 	
@@ -81,7 +80,7 @@ bool initProgram()
 	return Validated;
 }
 
-bool initBuffer()
+static bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
@@ -98,7 +97,7 @@ bool initBuffer()
 	return true;
 }
 
-bool initVertexArray()
+static bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
@@ -112,7 +111,7 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
+static bool initDebugOutput()
 {
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -121,7 +120,7 @@ bool initDebugOutput()
 	return true;
 }
 
-bool begin()
+static bool begin()
 {
 	bool Success(true);
 
@@ -145,7 +144,7 @@ bool begin()
 	return Success;
 }
 
-bool end()
+static bool end()
 {
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -155,7 +154,7 @@ bool end()
 	return true;
 }
 
-void display()
+static void display()
 {
 	// Clear framebuffer
 	float Depth(1.0f);
@@ -200,7 +199,7 @@ void display()
 	glf::swapBuffers();
 }
 
-int main(int argc, char* argv[])
+int base_vertex_old(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,

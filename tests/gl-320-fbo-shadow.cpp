@@ -9,7 +9,6 @@
 // www.g-truc.net
 //**********************************
 
-
 #include <glf/glf.hpp>
 #include <glf/compiler.hpp>
 
@@ -113,7 +112,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(512, 512);
+	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
 bool initProgram()
@@ -283,7 +282,7 @@ bool initFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE); // AMD workaround glDrawBuffer* is not FBO states
 	if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 		return false;
 
@@ -402,7 +401,7 @@ void display()
 
 	// Update of the MVP matrix for the depth pass
 	{
-		glm::mat4 Projection = glm::ortho<float>(-2, 2, -2, 2,-4, 8);
+		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
 		glm::mat4 View = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 DepthMVP = Projection * View * Model;
