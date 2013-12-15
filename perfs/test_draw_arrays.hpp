@@ -1,29 +1,30 @@
-#ifndef TEST_DRAW_RANGE_ELEMENTS_INCLUDED
-#define TEST_DRAW_RANGE_ELEMENTS_INCLUDED
+#ifndef TEST_DRAW_ARRAYS_INCLUDED
+#define TEST_DRAW_ARRAYS_INCLUDED
 
 #include "test.hpp"
 
-class testDrawRangeElements : public test
+class testDrawArrays : public test
 {
+public:
 	enum draw
 	{
-		DRAW_MIN,
-		DRAW_FULL
+		DRAW_PACKED,
+		DRAW_PARAMS
 	};
 
+private:
 	enum buffer
 	{
 		BUFFER_FRAME,
 		BUFFER_ARRAY,
-		BUFFER_ELEMENT,
 		BUFFER_MAX
 	};
 
 public:
-	testDrawRangeElements(
+	testDrawArrays(
 		int argc, char* argv[], profile Profile,
 		draw const DrawType, std::size_t const DrawCount);
-	virtual ~testDrawRangeElements();
+	virtual ~testDrawArrays();
 
 	virtual void render();
 
@@ -41,4 +42,4 @@ private:
 	GLuint QueryName;
 };
 
-#endif//TEST_DRAW_RANGE_ELEMENTS_INCLUDED
+#endif//TEST_DRAW_ARRAYS_INCLUDED

@@ -1,4 +1,4 @@
-#include "test_draw_range_elements.hpp"
+#include "test_draw_elements.hpp"
 
 namespace
 {
@@ -24,7 +24,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 }//namespace
 
-testDrawRangeElements::testDrawRangeElements(
+testDrawElements::testDrawElements(
 	int argc, char* argv[], profile Profile,
 	draw const DrawType, std::size_t const DrawCount
 ) :
@@ -36,7 +36,7 @@ testDrawRangeElements::testDrawRangeElements(
 	ProgramName(0),
 	QueryName(0)
 {
-	bool Success = true;
+	bool Success(true);
 	
 	Success = Success && this->isExtensionSupported("GL_ARB_draw_elements_base_vertex");
 	assert(Success);
@@ -54,7 +54,7 @@ testDrawRangeElements::testDrawRangeElements(
 	glBindVertexArray(this->VertexArrayName);
 }
 
-testDrawRangeElements::~testDrawRangeElements()
+testDrawElements::~testDrawElements()
 {
 	glDeleteQueries(1, &this->QueryName);
 	glDeleteBuffers(static_cast<GLsizei>(BUFFER_MAX), &this->BufferName[0]);
@@ -63,7 +63,7 @@ testDrawRangeElements::~testDrawRangeElements()
 	glDeleteVertexArrays(1, &this->VertexArrayName);
 }
 
-bool testDrawRangeElements::initProgram()
+bool testDrawElements::initProgram()
 {
 	bool Validated(true);
 	
@@ -87,7 +87,7 @@ bool testDrawRangeElements::initProgram()
 	return Validated;
 }
 
-bool testDrawRangeElements::initBuffer()
+bool testDrawElements::initBuffer()
 {
 	glGenBuffers(BUFFER_MAX, &this->BufferName[0]);
 
@@ -108,7 +108,7 @@ bool testDrawRangeElements::initBuffer()
 	return true;
 }
 
-bool testDrawRangeElements::initVertexArray()
+bool testDrawElements::initVertexArray()
 {
 	glGenVertexArrays(1, &this->VertexArrayName);
 	glBindVertexArray(this->VertexArrayName);
@@ -124,14 +124,13 @@ bool testDrawRangeElements::initVertexArray()
 	return true;
 }
 
-void testDrawRangeElements::render()
+void testDrawElements::render()
 {
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	{
-		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::BUFFER_FRAME]);
 		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
@@ -147,14 +146,14 @@ void testDrawRangeElements::render()
 
 	glViewportIndexedfv(0, &glm::vec4(0, 0, this->getWindowSize())[0]);
 
-	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+	this->beginTimer();
 	switch(this->DrawType)
 	{
-	case DRAW_MIN:
+	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
 			glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
 		break;
-	case DRAW_FULL:
+	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
 			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, 1, 0, 0);
 		break;
@@ -162,10 +161,5 @@ void testDrawRangeElements::render()
 		assert(0);
 		break;
 	}
-	glEndQuery(GL_TIME_ELAPSED);
-
-	GLuint QueryTime(0);
-	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
-
-	this->updateTime(static_cast<double>(QueryTime) / 1000000.0);
+	this->endTimer();
 }

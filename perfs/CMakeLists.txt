@@ -48,10 +48,10 @@ add_executable(${PERFS}
 	csv.hpp
 	test.cpp
 	test.hpp
-	test_draw_range_arrays.cpp
-	test_draw_range_arrays.hpp
-	test_draw_range_elements.cpp
-	test_draw_range_elements.hpp
+	test_draw_arrays.cpp
+	test_draw_arrays.hpp
+	test_draw_elements.cpp
+	test_draw_elements.hpp
 	hz-430-base-vertex.cpp 
 	hz-430-draw-range-array.cpp
 	hz-430-draw-range-element.cpp

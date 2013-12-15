@@ -9,11 +9,12 @@ std::size_t const test::DEFAULT_MAX_FRAME(1000);
 test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::ivec2 const & WindowSize) :
 	Window(nullptr),
 	Version(version(3, 2)),
+	QueryName(0),
 	Profile(Profile),
 	FrameNum(0),
 	FrameMax(FrameMax),
 	TimeConvergent(0.0),
-	TimeMin(0.0),
+	TimeMin(std::numeric_limits<double>::max()),
 	TimeMax(0.0)
 {
 	glfwInit();
@@ -66,10 +67,14 @@ test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::i
 		glDebugMessageCallbackARB(&test::debugOutput, NULL);
 	}
 #	endif
+
+	glGenQueries(1, &this->QueryName);
 }
 
 test::~test()
 {
+	glDeleteQueries(1, &this->QueryName);
+
 	glfwDestroyWindow(this->Window);
 	this->Window = 0;
 
@@ -88,8 +93,10 @@ int test::operator()()
 
 		this->swap();
 
-		if(FrameNum < FrameMax)
+		if(FrameNum >= FrameMax)
 			this->stop();
+		else
+			++FrameNum;
 	}
 
 	return 0;
@@ -108,15 +115,6 @@ void test::stop()
 void test::log(csv & CSV, char const * String)
 {
 	CSV.log(String, this->TimeConvergent, this->TimeMin, this->TimeMax);
-}
-
-void test::updateTime(double InstantTime)
-{
-	if(this->TimeConvergent == 0)
-		this->TimeConvergent = InstantTime;
-	else
-		this->TimeConvergent = glm::mix(this->TimeConvergent, InstantTime, 0.01);
-	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms    ", this->TimeConvergent, InstantTime);
 }
 
 bool test::isExtensionSupported(char const * String)
@@ -140,6 +138,31 @@ glm::ivec2 test::getWindowSize() const
 bool test::isKeyPressed(int Key) const
 {
 	return this->KeyPressed[Key];
+}
+
+void test::beginTimer()
+{
+	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+}
+
+void test::endTimer()
+{
+	glEndQuery(GL_TIME_ELAPSED);
+
+	GLuint QueryTime(0);
+	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
+
+	double const InstantTime(static_cast<double>(QueryTime) / 1000000.0);
+
+	if(this->TimeConvergent == 0)
+		this->TimeConvergent = InstantTime;
+	else
+		this->TimeConvergent = glm::mix(this->TimeConvergent, InstantTime, 0.01);
+
+	this->TimeMax = glm::max(this->TimeMax, InstantTime);
+	this->TimeMin = glm::min(this->TimeMin, InstantTime);
+
+	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms    ", this->TimeConvergent, InstantTime);
 }
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)

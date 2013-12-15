@@ -1,4 +1,4 @@
-#include "test_draw_range_arrays.hpp"
+#include "test_draw_arrays.hpp"
 
 namespace
 {
@@ -18,11 +18,11 @@ namespace
 	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 }//namespace
 
-testDrawRangeArrays::testDrawRangeArrays(
+testDrawArrays::testDrawArrays(
 	int argc, char* argv[], profile Profile,
 	draw const DrawType, std::size_t const DrawCount
 ) :
-	test(argc, argv, Profile, FrameMax, DEFAULT_WINDOW_SIZE),
+	test(argc, argv, Profile, DEFAULT_MAX_FRAME, DEFAULT_WINDOW_SIZE),
 	DrawType(DrawType),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
@@ -41,23 +41,21 @@ testDrawRangeArrays::testDrawRangeArrays(
 	Success = Success && this->initVertexArray();
 	assert(Success);
 
-	glGenQueries(1, &this->QueryName);
 	glEnable(GL_DEPTH_TEST);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::PER_FRAME, this->BufferName[buffer::BUFFER_FRAME]);
 	glBindProgramPipeline(this->PipelineName);
 	glBindVertexArray(this->VertexArrayName);
 }
 
-testDrawRangeArrays::~testDrawRangeArrays()
+testDrawArrays::~testDrawArrays()
 {
-	glDeleteQueries(1, &this->QueryName);
 	glDeleteBuffers(static_cast<GLsizei>(BUFFER_MAX), &this->BufferName[0]);
 	glDeleteProgramPipelines(1, &this->PipelineName);
 	glDeleteProgram(this->ProgramName);
 	glDeleteVertexArrays(1, &this->VertexArrayName);
 }
 
-bool testDrawRangeArrays::initProgram()
+bool testDrawArrays::initProgram()
 {
 	bool Validated(true);
 	
@@ -81,7 +79,7 @@ bool testDrawRangeArrays::initProgram()
 	return Validated;
 }
 
-bool testDrawRangeArrays::initBuffer()
+bool testDrawArrays::initBuffer()
 {
 	glGenBuffers(BUFFER_MAX, &this->BufferName[0]);
 
@@ -98,7 +96,7 @@ bool testDrawRangeArrays::initBuffer()
 	return true;
 }
 
-bool testDrawRangeArrays::initVertexArray()
+bool testDrawArrays::initVertexArray()
 {
 	glGenVertexArrays(1, &this->VertexArrayName);
 	glBindVertexArray(this->VertexArrayName);
@@ -112,14 +110,13 @@ bool testDrawRangeArrays::initVertexArray()
 	return true;
 }
 
-void testDrawRangeArrays::render()
+void testDrawArrays::render()
 {
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 	{
-		// Update the transformation matrix
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::BUFFER_FRAME]);
 		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
@@ -135,13 +132,20 @@ void testDrawRangeArrays::render()
 
 	glViewportIndexedfv(0, &glm::vec4(0, 0, this->getWindowSize())[0]);
 
-	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+	this->beginTimer();
+	switch(this->DrawType)
+	{
+	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
 			glDrawArrays(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount);
-	glEndQuery(GL_TIME_ELAPSED);
-
-	GLuint QueryTime(0);
-	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
-
-	this->updateTime(static_cast<double>(QueryTime) / 1000000.0);
+		break;
+	case DRAW_PARAMS:
+		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
+			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount, 1, 0);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+	this->endTimer();
 }
