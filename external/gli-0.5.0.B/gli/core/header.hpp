@@ -21,26 +21,43 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/header.hpp
+/// @date 2012-10-18 / 2012-10-18
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
+#ifndef GLI_CORE_HEADER_INCLUDED
+#define GLI_CORE_HEADER_INCLUDED
+
+#include <cstddef>
+
 namespace gli
 {
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
+/*
+	struct view
 	{
-		//assert(); TODO! genType need to match with internal format size
+		typedef std::size_t size_type;
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
+		view(
+			size_type const & BaseLayer,
+			size_type const & MaxLayer,
+			size_type const & BaseFace,
+			size_type const & MaxFace,
+			size_type const & BaseLevel,
+			size_type const & MaxLevel);
 
+		view & operator=(view const & View);
+
+		size_type BaseLayer; 
+		size_type MaxLayer; 
+		size_type BaseFace;
+		size_type MaxFace;
+		size_type BaseLevel;
+		size_type MaxLevel;
+	};
+*/
 }//namespace gli
+
+#include "header.inl"
+
+#endif//GLI_CORE_HEADER_INCLUDED

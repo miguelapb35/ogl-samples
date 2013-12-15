@@ -21,26 +21,34 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/core/clear.inl
-/// @date 2010-09-27 / 2012-11-19
+/// @file gli/core/comparison.hpp
+/// @date 2013-02-04 / 2013-02-04
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
+#ifndef GLI_CORE_COMPARISON_INCLUDED
+#define GLI_CORE_COMPARISON_INCLUDED
+
+#include "image.hpp"
+#include "texture1d.hpp"
+#include "texture1d_array.hpp"
+#include "texture2d.hpp"
+#include "texture2d_array.hpp"
+#include "texture3d.hpp"
+#include "texture_cube.hpp"
+#include "texture_cube_array.hpp"
+
 namespace gli
 {
-	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
-	{
-		//assert(); TODO! genType need to match with internal format size
+	bool operator==(image const & ImageA, image const & ImageB);
+	bool operator!=(image const & ImageA, image const & ImageB);
 
-		image Result = Image;
-		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
-		return Result;
-	}
-
+	template <typename texture>
+	bool operator==(texture const & TextureA, texture const & TextureB);
+	template <typename texture>
+	bool operator!=(texture const & TextureA, texture const & TextureB);
 }//namespace gli
+
+#include "comparison.inl"
+
+#endif//GLI_CORE_COMPARISON_INCLUDED

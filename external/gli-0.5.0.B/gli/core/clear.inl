@@ -35,11 +35,9 @@ namespace gli
 		genType const & Texel
 	)
 	{
-		//assert(); TODO! genType need to match with internal format size
-
 		image Result = Image;
 		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType const*>(Image.data())[i] = Texel;
+			Image.data<genType>()[i] = Texel;
 		return Result;
 	}
 
