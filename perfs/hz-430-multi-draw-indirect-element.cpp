@@ -42,7 +42,7 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
-	GLsizei const DrawCount(100000);
+	GLsizei const DrawCount(50000);
 
 	namespace buffer
 	{
@@ -55,15 +55,7 @@ namespace
 			MAX
 		};
 	}//namespace buffer
-/*
-	struct DrawArraysIndirectCommand
-	{
-		GLuint count;
-		GLuint primCount;
-		GLuint first;
-		GLuint baseInstance;
-	};
-*/
+
 	struct DrawElementsIndirectCommand
 	{
 		GLuint count;
@@ -81,7 +73,7 @@ namespace
 
 }//namespace
 
-bool initProgram()
+static bool initProgram()
 {
 	bool Validated(true);
 	
@@ -107,7 +99,7 @@ bool initProgram()
 	return Validated;
 }
 
-bool initBuffer()
+static bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
@@ -128,7 +120,7 @@ bool initBuffer()
 	for(std::size_t i = 0; i < Commands.size(); ++i)
 	{
 		Commands[i].count = ElementCount;
-		Commands[i].instanceCount = 1;
+		Commands[i].instanceCount = 0;
 		Commands[i].firstIndex = 0;
 		Commands[i].baseVertex = 0;
 		Commands[i].baseInstance = 0;
@@ -141,7 +133,7 @@ bool initBuffer()
 	return true;
 }
 
-bool initVertexArray()
+static bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
@@ -157,7 +149,7 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
+static bool initDebugOutput()
 {
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -166,7 +158,7 @@ bool initDebugOutput()
 	return true;
 }
 
-bool begin()
+static bool begin()
 {
 	bool Success(true);
 
@@ -191,7 +183,7 @@ bool begin()
 	return Success;
 }
 
-bool end()
+static bool end()
 {
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -201,7 +193,7 @@ bool end()
 	return true;
 }
 
-void display()
+static void display()
 {
 	// Clear framebuffer
 	float Depth(1.0f);
@@ -232,7 +224,9 @@ void display()
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
+	for(int i = 0; i < 2; ++i)
 		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, static_cast<GLsizei>(DrawCount), 0);
+		//glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, DrawCount, 0, 0);
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;
@@ -247,7 +241,7 @@ void display()
 	glf::swapBuffers();
 }
 
-int main(int argc, char* argv[])
+int test_multi_draw_indirect_element(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,

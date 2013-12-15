@@ -63,7 +63,7 @@ namespace
 
 }//namespace
 
-bool initProgram()
+static bool initProgram()
 {
 	bool Validated(true);
 	
@@ -89,7 +89,7 @@ bool initProgram()
 	return Validated;
 }
 
-bool initBuffer()
+static bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
@@ -106,7 +106,7 @@ bool initBuffer()
 	return true;
 }
 
-bool initVertexArray()
+static bool initVertexArray()
 {
 	glGenVertexArrays(static_cast<GLsizei>(VertexArrayName.size()), &VertexArrayName[0]);
 	for(std::size_t i = 0; i < VertexArrayName.size(); ++i)
@@ -123,7 +123,7 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
+static bool initDebugOutput()
 {
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -132,7 +132,7 @@ bool initDebugOutput()
 	return true;
 }
 
-bool begin()
+static bool begin()
 {
 	bool Success(true);
 
@@ -156,7 +156,7 @@ bool begin()
 	return Success;
 }
 
-bool end()
+static bool end()
 {
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -166,7 +166,7 @@ bool end()
 	return true;
 }
 
-void display()
+static void display()
 {
 	// Clear framebuffer
 	float Depth(1.0f);
@@ -213,7 +213,7 @@ void display()
 	glf::swapBuffers();
 }
 
-int main(int argc, char* argv[])
+int test_vertex_array_objects(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,
