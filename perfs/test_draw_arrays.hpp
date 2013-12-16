@@ -6,13 +6,19 @@
 class testDrawArrays : public test
 {
 public:
-	enum draw
+	enum drawType
 	{
 		INSTANCED,
 		MULTI_DISCARD,
 		MULTI_DRAW,
 		DRAW_PACKED,
 		DRAW_PARAMS
+	};
+
+	enum vertexDataType
+	{
+		SEPARATED_VERTEX_DATA,
+		SHARED_VERTEX_DATA
 	};
 
 private:
@@ -27,7 +33,7 @@ private:
 public:
 	testDrawArrays(
 		int argc, char* argv[], profile Profile,
-		draw const DrawType, std::size_t const DrawCount);
+		drawType const DrawType, vertexDataType const VertexDataType, std::size_t const DrawCount);
 	virtual ~testDrawArrays();
 
 	virtual void render();
@@ -37,7 +43,8 @@ public:
 	bool initVertexArray();
 
 private:
-	draw const DrawType;
+	drawType const DrawType;
+	vertexDataType const VertexDataType;
 	std::size_t const DrawCount;
 	GLuint VertexArrayName;
 	GLuint PipelineName;

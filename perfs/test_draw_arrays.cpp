@@ -28,15 +28,19 @@ namespace
 
 testDrawArrays::testDrawArrays(
 	int argc, char* argv[], profile Profile,
-	draw const DrawType, std::size_t const DrawCount
+	drawType const DrawType, vertexDataType const VertexDataType, 
+	std::size_t const DrawCount
 ) :
 	test(argc, argv, Profile, DEFAULT_MAX_FRAME, DEFAULT_WINDOW_SIZE),
 	DrawType(DrawType),
+	VertexDataType(VertexDataType),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
 	ProgramName(0)
 {
+	assert(!(VertexDataType == SHARED_VERTEX_DATA && DrawType == INSTANCED));
+	
 	bool Success = true;
 	
 	Success = Success && this->isExtensionSupported("GL_ARB_draw_elements_base_vertex");
@@ -100,7 +104,26 @@ bool testDrawArrays::initBuffer()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
+	switch(this->VertexDataType)
+	{
+		case SEPARATED_VERTEX_DATA:
+		{
+			glBufferData(GL_ARRAY_BUFFER, VertexSize * this->DrawCount, &VertexData, GL_STATIC_DRAW);
+			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_ARRAY_BUFFER, 
+				0, VertexSize * this->DrawCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			for(std::size_t i = 0; i < this->DrawCount; ++i)
+				memcpy(Pointer + i * VertexSize, &VertexData, VertexSize);
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			break;
+		}
+		case SHARED_VERTEX_DATA:
+		{
+			glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
+			break;
+		}
+		default:
+			assert(0);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	std::vector<drawArraysIndirectCommand> Commands;
@@ -109,7 +132,7 @@ bool testDrawArrays::initBuffer()
 	{
 		Commands[i].count = VertexCount;
 		Commands[i].instanceCount = this->DrawType == MULTI_DISCARD ? 0 : 1;
-		Commands[i].first = 0;
+		Commands[i].first = this->VertexDataType == SEPARATED_VERTEX_DATA ? VertexCount * i : 0 ;
 		Commands[i].baseInstance = 0;
 	}
 
@@ -169,11 +192,11 @@ void testDrawArrays::render()
 		break;
 	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawArrays(GL_TRIANGLES, 0, VertexCount);
+			glDrawArrays(GL_TRIANGLES, this->VertexDataType == SEPARATED_VERTEX_DATA ? VertexCount * DrawIndex : 0, VertexCount);
 		break;
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
+			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, this->VertexDataType == SEPARATED_VERTEX_DATA ? VertexCount * DrawIndex : 0, VertexCount, 1, 0);
 		break;
 	default:
 		assert(0);

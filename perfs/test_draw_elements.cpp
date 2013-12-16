@@ -180,8 +180,8 @@ void testDrawElements::render()
 	case MULTI_DISCARD:
 	case MULTI_DRAW:
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
-		for(int i = 0; i < 2; ++i)
-			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 0, static_cast<GLsizei>(DrawCount / 2), 0);
+		for(int i = 0; i < 100; ++i)
+			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 0, static_cast<GLsizei>(DrawCount / 100), 0);
 		break;
 	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
