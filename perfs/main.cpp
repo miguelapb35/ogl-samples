@@ -5,14 +5,22 @@ std::size_t const TEST_DUPLICATE_COUNT(1);
 
 int drawArrays(int argc, char* argv[], csv & CSV)
 {
-	int Error = 0;
+	int Error(0);
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, 
+			testDrawArrays::DRAW_PACKED, testDrawArrays::SEPARATED_VERTEX_DATA, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawArrays(PACKED, SEPARATED) 100000");
+	}
 
 	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
 	{
 		testDrawArrays Test(argc, argv, test::CORE, 
 			testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, 100000);
 		Error += Test();
-		Test.log(CSV, "DrawArrays(PACKED) 100000");
+		Test.log(CSV, "DrawArrays(PACKED, SHARED) 100000");
 	}
 
 	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)

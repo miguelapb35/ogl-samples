@@ -200,6 +200,9 @@ void display()
 	
 	glBindVertexArray(VertexArrayName);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+	
+	//glDrawElementsBaseVertex(GL_TRIANGLES, Count[0], GL_UNSIGNED_INT, Indexes[0], BaseVertex[0]);
+
 	glMultiDrawElementsBaseVertex(
 		GL_TRIANGLES,
 		Count,
@@ -207,7 +210,7 @@ void display()
 		Indexes,//CONV(Indexes),
 		2,
 		BaseVertex);
-	
+
 	glf::swapBuffers();
 	glf::checkError("display");
 }
