@@ -23,13 +23,14 @@ void csv::log(char const * String, float Convergent, float Min, float Max)
 
 void csv::save(char const * Filename)
 {
-	FILE* File(fopen(Filename, "a+"));
+	FILE* File(fopen(Filename, "w+"));
+	assert(File);
 	for(std::size_t i = 0; i < this->Data.size(); ++i)
 	{
-		fprintf(File, "%s, %2.5f, %2.5f, %2.5f\n",
+		fprintf(File, "%s;%d;%d;%d\n",
 			Data[i].String.c_str(),
-			Data[i].Convergent,
-			Data[i].Min, Data[i].Max);
+			static_cast<int>(Data[i].Convergent),
+			static_cast<int>(Data[i].Min), static_cast<int>(Data[i].Max));
 	}
 	fclose(File);
 }
@@ -41,8 +42,8 @@ void csv::print()
 	{
 		fprintf(stdout, "%s, %2.5f, %2.5f, %2.5f\n",
 			Data[i].String.c_str(),
-			Data[i].Convergent,
-			Data[i].Min, Data[i].Max);
+			Data[i].Convergent / 1000.0,
+			Data[i].Min / 1000.0, Data[i].Max / 1000.0);
 	}
 }
 

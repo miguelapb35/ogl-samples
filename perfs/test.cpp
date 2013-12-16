@@ -1,10 +1,10 @@
-#include "test.hpp"
+﻿#include "test.hpp"
 
 int const MAJOR = 3;
 int const MINOR = 2;
 
 glm::ivec2 const test::DEFAULT_WINDOW_SIZE(640, 480);
-std::size_t const test::DEFAULT_MAX_FRAME(1000);
+std::size_t const test::DEFAULT_MAX_FRAME(100);
 
 test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::ivec2 const & WindowSize) :
 	Window(nullptr),
@@ -13,7 +13,7 @@ test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::i
 	Profile(Profile),
 	FrameNum(0),
 	FrameMax(FrameMax),
-	TimeConvergent(0.0),
+	TimeSum(0.0),
 	TimeMin(std::numeric_limits<double>::max()),
 	TimeMax(0.0)
 {
@@ -114,7 +114,7 @@ void test::stop()
 
 void test::log(csv & CSV, char const * String)
 {
-	CSV.log(String, this->TimeConvergent, this->TimeMin, this->TimeMax);
+	CSV.log(String, this->TimeSum / this->FrameMax, this->TimeMin, this->TimeMax);
 }
 
 bool test::isExtensionSupported(char const * String)
@@ -152,17 +152,13 @@ void test::endTimer()
 	GLuint QueryTime(0);
 	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
 
-	double const InstantTime(static_cast<double>(QueryTime) / 1000000.0);
+	double const InstantTime(static_cast<double>(QueryTime) / 1000.0);
 
-	if(this->TimeConvergent == 0)
-		this->TimeConvergent = InstantTime;
-	else
-		this->TimeConvergent = glm::mix(this->TimeConvergent, InstantTime, 0.01);
-
+	this->TimeSum += InstantTime;
 	this->TimeMax = glm::max(this->TimeMax, InstantTime);
 	this->TimeMin = glm::min(this->TimeMin, InstantTime);
 
-	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms    ", this->TimeConvergent, InstantTime);
+	fprintf(stdout, "\rTime: %2.4f ms    ", InstantTime / 1000.0);
 }
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)

@@ -79,7 +79,7 @@ protected:
 	std::array<bool, 512> KeyPressed;
 
 private:
-	double TimeConvergent, TimeMin, TimeMax;
+	double TimeSum, TimeMin, TimeMax;
 
 private:
 	int version(int Major, int Minor) {return Major * 100 + Minor * 10;}

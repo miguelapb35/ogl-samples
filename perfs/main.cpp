@@ -1,7 +1,7 @@
 #include "test_draw_arrays.hpp"
 #include "test_draw_elements.hpp"
 
-std::size_t const TEST_DUPLICATE_COUNT(5);
+std::size_t const TEST_DUPLICATE_COUNT(1);
 
 int drawArrays(int argc, char* argv[], csv & CSV)
 {
@@ -42,7 +42,7 @@ int drawArrays(int argc, char* argv[], csv & CSV)
 		Test.log(CSV, "DrawArrays(INSTANCED) 100000");
 	}
 
-	return 0;
+	return Error;
 }
 
 int drawElements(int argc, char* argv[], csv & CSV)
@@ -84,7 +84,7 @@ int drawElements(int argc, char* argv[], csv & CSV)
 		Test.log(CSV, "DrawElements(INSTANCED) 100000");
 	}
 
-	return 0;
+	return Error;
 }
 
 int main(int argc, char* argv[])
