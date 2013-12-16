@@ -21,6 +21,27 @@ int drawArrays(int argc, char* argv[], csv & CSV)
 		Test.log(CSV, "DrawArrays(PARAMS) 100000");
 	}
 
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, testDrawArrays::MULTI_DRAW, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawArrays(MULTI) 100000");
+	}
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, testDrawArrays::MULTI_DISCARD, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawArrays(DISCARD) 100000");
+	}
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, testDrawArrays::INSTANCED, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawArrays(INSTANCED) 100000");
+	}
+
 	return 0;
 }
 
@@ -40,6 +61,27 @@ int drawElements(int argc, char* argv[], csv & CSV)
 		testDrawElements Test(argc, argv, test::CORE, testDrawElements::DRAW_PARAMS, 100000);
 		Error += Test();
 		Test.log(CSV, "DrawElements(PARAMS) 100000");
+	}
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawElements Test(argc, argv, test::CORE, testDrawElements::MULTI_DRAW, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawElements(MULTI) 100000");
+	}
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawElements Test(argc, argv, test::CORE, testDrawElements::MULTI_DISCARD, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawElements(DISCARD) 100000");
+	}
+
+	for(std::size_t i = 0; i < TEST_DUPLICATE_COUNT; ++i)
+	{
+		testDrawElements Test(argc, argv, test::CORE, testDrawElements::INSTANCED, 100000);
+		Error += Test();
+		Test.log(CSV, "DrawElements(INSTANCED) 100000");
 	}
 
 	return 0;

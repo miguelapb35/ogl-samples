@@ -14,6 +14,14 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
+	struct drawArraysIndirectCommand
+	{
+		GLuint count;
+		GLuint instanceCount;
+		GLuint first;
+		GLuint baseInstance;
+	};
+
 	char const * VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 }//namespace
@@ -27,12 +35,13 @@ testDrawArrays::testDrawArrays(
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
-	ProgramName(0),
-	QueryName(0)
+	ProgramName(0)
 {
 	bool Success = true;
 	
 	Success = Success && this->isExtensionSupported("GL_ARB_draw_elements_base_vertex");
+	assert(Success);
+	Success = Success && this->isExtensionSupported("GL_ARB_multi_draw_indirect");
 	assert(Success);
 	Success = Success && this->initProgram();
 	assert(Success);
@@ -45,6 +54,9 @@ testDrawArrays::testDrawArrays(
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::PER_FRAME, this->BufferName[buffer::BUFFER_FRAME]);
 	glBindProgramPipeline(this->PipelineName);
 	glBindVertexArray(this->VertexArrayName);
+	
+	if(this->DrawType == MULTI_DISCARD || this->DrawType == MULTI_DRAW)
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
 }
 
 testDrawArrays::~testDrawArrays()
@@ -88,10 +100,22 @@ bool testDrawArrays::initBuffer()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData) * DrawCount, 0, GL_STATIC_DRAW);
-	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
-		glBufferSubData(GL_ARRAY_BUFFER, DrawIndex * sizeof(VertexData), sizeof(VertexData), &VertexData);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	std::vector<drawArraysIndirectCommand> Commands;
+	Commands.resize(this->DrawCount);
+	for(std::size_t i = 0; i < Commands.size(); ++i)
+	{
+		Commands[i].count = VertexCount;
+		Commands[i].instanceCount = this->DrawType == MULTI_DISCARD ? 0 : 1;
+		Commands[i].first = 0;
+		Commands[i].baseInstance = 0;
+	}
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(drawArraysIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	return true;
 }
@@ -135,13 +159,21 @@ void testDrawArrays::render()
 	this->beginTimer();
 	switch(this->DrawType)
 	{
+	case INSTANCED:
+		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, DrawCount, 0);
+		break;
+	case MULTI_DISCARD:
+	case MULTI_DRAW:
+		for(int i = 0; i < 2; ++i)
+			glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount / 2), 0);
+		break;
 	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawArrays(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount);
+			glDrawArrays(GL_TRIANGLES, 0, VertexCount);
 		break;
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, static_cast<GLint>(DrawIndex * sizeof(VertexData)), VertexCount, 1, 0);
+			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 		break;
 	default:
 		assert(0);

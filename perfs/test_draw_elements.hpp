@@ -8,6 +8,9 @@ class testDrawElements : public test
 public:
 	enum draw
 	{
+		INSTANCED,
+		MULTI_DISCARD,
+		MULTI_DRAW,
 		DRAW_PACKED,
 		DRAW_PARAMS
 	};
@@ -18,6 +21,7 @@ private:
 		BUFFER_FRAME,
 		BUFFER_ARRAY,
 		BUFFER_ELEMENT,
+		BUFFER_INDIRECT,
 		BUFFER_MAX
 	};
 
@@ -40,7 +44,6 @@ private:
 	GLuint PipelineName;
 	GLuint ProgramName;
 	std::array<GLuint, BUFFER_MAX> BufferName;
-	GLuint QueryName;
 };
 
 #endif//TEST_DRAW_ELEMENTS_INCLUDED

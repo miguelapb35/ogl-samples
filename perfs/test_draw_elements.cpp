@@ -3,8 +3,8 @@
 namespace
 {
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
-	glm::uint32 const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);
+	glm::uint16 const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		0, 2, 3
@@ -20,6 +20,15 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
+	struct drawElementsIndirectCommand
+	{
+		GLuint count;
+		GLuint instanceCount;
+		GLuint firstIndex;
+		GLint  baseVertex;
+		GLuint baseInstance;
+	};
+
 	char const * VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 }//namespace
@@ -33,12 +42,13 @@ testDrawElements::testDrawElements(
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
-	ProgramName(0),
-	QueryName(0)
+	ProgramName(0)
 {
 	bool Success(true);
 	
 	Success = Success && this->isExtensionSupported("GL_ARB_draw_elements_base_vertex");
+	assert(Success);
+	Success = Success && this->isExtensionSupported("GL_ARB_multi_draw_indirect");
 	assert(Success);
 	Success = Success && this->initProgram();
 	assert(Success);
@@ -47,11 +57,13 @@ testDrawElements::testDrawElements(
 	Success = Success && this->initVertexArray();
 	assert(Success);
 
-	glGenQueries(1, &this->QueryName);
 	glEnable(GL_DEPTH_TEST);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::PER_FRAME, this->BufferName[buffer::BUFFER_FRAME]);
 	glBindProgramPipeline(this->PipelineName);
 	glBindVertexArray(this->VertexArrayName);
+
+	if(this->DrawType == MULTI_DISCARD || this->DrawType == MULTI_DRAW)
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
 }
 
 testDrawElements::~testDrawElements()
@@ -96,14 +108,27 @@ bool testDrawElements::initBuffer()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData) * DrawCount, 0, GL_STATIC_DRAW);
-	for(std::size_t DrawIndex = 0; DrawIndex < DrawCount; ++DrawIndex)
-		glBufferSubData(GL_ARRAY_BUFFER, DrawIndex * sizeof(VertexData), sizeof(VertexData), &VertexData);
+	glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	std::vector<drawElementsIndirectCommand> Commands;
+	Commands.resize(this->DrawCount);
+	for(std::size_t i = 0; i < Commands.size(); ++i)
+	{
+		Commands[i].count = ElementCount;
+		Commands[i].instanceCount = this->DrawType == MULTI_DISCARD ? 0 : 1;
+		Commands[i].firstIndex = 0;
+		Commands[i].baseVertex = 0;
+		Commands[i].baseInstance = 0;
+	}
+
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
+	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(drawElementsIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 	return true;
 }
@@ -149,13 +174,22 @@ void testDrawElements::render()
 	this->beginTimer();
 	switch(this->DrawType)
 	{
+	case INSTANCED:
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, DrawCount, 0, 0);
+		break;
+	case MULTI_DISCARD:
+	case MULTI_DRAW:
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
+		for(int i = 0; i < 2; ++i)
+			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, 0, static_cast<GLsizei>(DrawCount / 2), 0);
+		break;
 	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0);
 		break;
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, 1, 0, 0);
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 		break;
 	default:
 		assert(0);

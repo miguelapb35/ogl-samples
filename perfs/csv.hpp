@@ -3,6 +3,10 @@
 
 #include <vector>
 #include <string>
+#include <cstdarg>
+#include <cassert>
+
+std::string format(const char * Message, ...);
 
 class csv
 {
@@ -23,7 +27,6 @@ class csv
 
 public:
 	void log(char const * String, float Average, float Min, float Max);
-
 	void save(char const * Filename);
 	void print();
 

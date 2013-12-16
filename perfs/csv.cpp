@@ -1,6 +1,21 @@
 #include "csv.hpp"
 #include <cstdio>
 
+std::string format(const char * Message, ...)
+{
+	assert(Message);
+	
+	char Text[1024];
+	std::memset(Text, 0, sizeof(Text));
+
+	va_list ap;
+	va_start(ap, Message);
+		std::vsprintf(Text, Message, ap);
+	va_end(ap);
+
+	return Text;
+}
+
 void csv::log(char const * String, float Convergent, float Min, float Max)
 {
 	this->Data.push_back(data(String, Convergent, Min, Max));
