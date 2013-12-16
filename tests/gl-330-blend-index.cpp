@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Blend Index");
-	char const * VERTEX_SHADER_SOURCE("gl-330/blend-index.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/blend-index.frag");
+	char const * VERT_SHADER_SOURCE("gl-330/blend-index.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/blend-index.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -40,7 +40,7 @@ namespace
 	};
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
-	GLsizei const VertexCount = 6;
+	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
 	vertex const VertexData[VertexCount] =
 	{
@@ -52,15 +52,23 @@ namespace
 		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
-
 	GLuint BufferName = 0;
-	GLuint Texture2DName = 0;
-
+	GLuint TextureName = 0;
 	GLint UniformMVP = 0;
 	GLint UniformDiffuse = 0;
-
 }//namespace
 
 bool initDebugOutput()
@@ -76,21 +84,16 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	// Create program
+	glf::compiler Compiler;
+	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
+	ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+	Validated = Validated && Compiler.check();
+
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);
-
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -104,7 +107,7 @@ bool initProgram()
 	return Validated && glf::checkError("initProgram");
 }
 
-bool initArrayBuffer()
+bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
 
@@ -112,18 +115,17 @@ bool initArrayBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
+	return glf::checkError("initBuffer");;
 }
 
 bool initTexture()
 {
-	glGenTextures(1, &Texture2DName);
+	glGenTextures(1, &TextureName);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 
-	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
@@ -167,7 +169,7 @@ bool begin()
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
-		Validated = initArrayBuffer();
+		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
 	if(Validated)
@@ -178,9 +180,11 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
-	glDeleteTextures(1, &Texture2DName);
+	glDeleteTextures(1, &TextureName);
 	glDeleteVertexArrays(1, &VertexArrayName);
 
 	return glf::checkError("end");
@@ -209,13 +213,12 @@ void display()
 	glUniform1i(UniformDiffuse, 0);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Texture2DName);
+	glBindTexture(GL_TEXTURE_2D, TextureName);
 
 	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
 	glf::swapBuffers();
-	glf::checkError("display");
 }
 
 int main(int argc, char* argv[])
@@ -223,7 +226,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT,
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

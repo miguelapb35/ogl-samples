@@ -394,6 +394,8 @@ int _glfwCreateContext(_GLFWwindow* window,
                     mask |= WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
                 else if (wndconfig->glProfile == GLFW_OPENGL_COMPAT_PROFILE)
                     mask |= WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+                else if (wndconfig->glProfile == GLFW_OPENGL_ES_PROFILE)
+                    mask |= GL_CONTEXT_ES_PROFILE_BIT;
             }
         }
         else

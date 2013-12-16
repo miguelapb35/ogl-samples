@@ -73,6 +73,17 @@ namespace
 		};
 	}//namespace texture
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint ProgramName(0);
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
@@ -102,20 +113,16 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+		ShaderName[shader::VERT] = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+		ShaderName[shader::FRAG] = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
 
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(ShaderName[shader::VERT], VERT_SHADER_SOURCE);
+		Validated = Validated && glf::checkShader(ShaderName[shader::FRAG], FRAG_SHADER_SOURCE);
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
@@ -150,7 +157,7 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
@@ -237,6 +244,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(texture::MAX, &TextureName[0]);
@@ -261,8 +270,6 @@ void renderFBO()
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-
-	glf::checkError("renderFBO");
 }
 
 void renderFB()
@@ -280,8 +287,6 @@ void renderFB()
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-
-	glf::checkError("renderFB");
 }
 
 void display()
@@ -330,7 +335,6 @@ void display()
 	renderFB();
 
 	glf::swapBuffers();
-	glf::checkError("Render");
 }
 
 int main(int argc, char* argv[])
@@ -338,6 +342,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

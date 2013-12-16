@@ -197,7 +197,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, TextureName);
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);
@@ -224,7 +224,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1).c_str()));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);
@@ -339,6 +339,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION,
 		::SAMPLE_MINOR_VERSION);
 }

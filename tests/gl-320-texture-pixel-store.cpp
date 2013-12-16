@@ -149,26 +149,23 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
-	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-	{
-		// Setup the pixel storage to load only a rectangle in the middle of the source texture
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture[Level].dimensions().x);
-		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture[Level].dimensions().x) / 4);
-		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture[Level].dimensions().y) / 4);
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGBA8,
-			GLsizei(Texture[Level].dimensions().x) / 2, 
-			GLsizei(Texture[Level].dimensions().y) / 2, 
-			0,
-			GL_BGRA, 
-			GL_UNSIGNED_BYTE, 
-			Texture[Level].data());
-	}
+	// Setup the pixel storage to load only a rectangle in the middle of the source texture
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture.dimensions().x);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture.dimensions().x) / 4);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture.dimensions().y) / 4);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		static_cast<GLint>(0),
+		GL_RGBA8,
+		static_cast<GLsizei>(Texture.dimensions().x) / 2,
+		static_cast<GLsizei>(Texture.dimensions().y) / 2,
+		0,
+		GL_BGRA, 
+		GL_UNSIGNED_BYTE, 
+		Texture.data());
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
@@ -258,7 +255,6 @@ void display()
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -267,6 +263,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

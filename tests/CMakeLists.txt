@@ -35,6 +35,11 @@ set(GL_VERSION_GTC 200)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
 
+# OpenGL ES 3.0 samples
+set(GL_VERSION_GTC 300)
+set(GL_SHADER_GTC flat-color.vert flat-color.frag)
+glCreateSampleGTC(draw-elements)
+
 # OpenGL 3.0 samples
 set(GL_PROFILE_GTC gl)
 set(GL_VERSION_GTC 300)
@@ -103,6 +108,8 @@ set(GL_SHADER_GTC primitive-shading.vert primitive-shading.geom primitive-shadin
 glCreateSampleGTC(primitive-shading)
 set(GL_SHADER_GTC primitive-sprite.vert primitive-sprite.frag)
 glCreateSampleGTC(primitive-sprite)
+set(GL_SHADER_GTC program.vert program.frag)
+glCreateSampleGTC(program)
 set(GL_SHADER_GTC query-conditional.vert query-conditional.frag)
 glCreateSampleGTC(query-conditional)
 set(GL_SHADER_GTC query-occlusion.vert query-occlusion.frag)
@@ -122,6 +129,8 @@ set(GL_SHADER_GTC texture-compressed.vert texture-compressed.frag)
 glCreateSampleGTC(texture-compressed-ext)
 set(GL_SHADER_GTC texture-cube.vert texture-cube.frag)
 glCreateSampleGTC(texture-cube)
+set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-derivative-y.vert texture-derivative-y.frag)
+glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC texture-integer.vert texture-integer.frag)
 glCreateSampleGTC(texture-integer)
 set(GL_SHADER_GTC texture-fetch.vert texture-fetch.frag)
@@ -135,8 +144,6 @@ glCreateSampleGTC(texture-pixel-store)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback-interleaved)
 glCreateSampleGTC(transform-feedback-separated)
-
-if(NOT APPLE)
 
 # OpenGL 3.3 samples
 set(GL_VERSION_GTC 330)
@@ -175,6 +182,8 @@ set(GL_VERSION_GTC 400)
 
 set(GL_SHADER_GTC mrt.vert mrt.frag image-2d.vert image-2d.frag)
 glCreateSampleGTC(blend-rtt)
+set(GL_SHADER_GTC texture-derivative1.vert texture-derivative1.frag texture-derivative2.vert texture-derivative2.frag)
+glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-indirect)
 set(GL_SHADER_GTC rtt-array.vert rtt-array.frag layer.vert layer.geom layer.frag)
@@ -232,6 +241,8 @@ set(GL_SHADER_GTC binary.vert binary.geom binary.frag)
 glCreateSampleGTC(program-binary)
 set(GL_SHADER_GTC separate.vert separate.frag)
 glCreateSampleGTC(program-separate)
+
+if(NOT APPLE)
 
 # OpenGL 4.2 samples
 set(GL_VERSION_GTC 420)
@@ -354,6 +365,8 @@ set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matc
 glCreateSampleGTC(interface-matching)
 set(GL_SHADER_GTC sampler-wrap.vert sampler-wrap.frag)
 glCreateSampleGTC(sampler-wrap)
+set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
+glCreateSampleGTC(texture-compressed)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
 

@@ -101,7 +101,7 @@ namespace
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(1024, 1024);
+	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
 bool initProgram()
@@ -191,7 +191,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -213,10 +213,10 @@ bool initTexture()
 			GL_TEXTURE_2D,
 			GLint(Level),
 			GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
+			GLsizei(Texture[Level].dimensions().x),
+			GLsizei(Texture[Level].dimensions().y),
 			0, 
-			GLsizei(Texture[Level].size()), 
+			GLsizei(Texture[Level].size()),
 			Texture[Level].data());
 	}
 	
@@ -281,7 +281,7 @@ bool initFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE);
 	if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 		return false;
 
@@ -405,7 +405,7 @@ void display()
 		*(Pointer + 1) = DepthMVP;
 
 		glm::mat4 BiasMatrix(
-			0.5, 0.0, 0.0, 0.0, 
+			0.5, 0.0, 0.0, 0.0,
 			0.0, 0.5, 0.0, 0.0,
 			0.0, 0.0, 0.5, 0.0,
 			0.5, 0.5, 0.5, 1.0);
@@ -428,7 +428,7 @@ int main(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT),
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

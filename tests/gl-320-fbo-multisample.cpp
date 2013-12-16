@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Framebuffer Multisample");
-	char const * VERTEX_SHADER_SOURCE("gl-320/fbo-multisample.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/fbo-multisample.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/fbo-multisample.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -59,6 +59,17 @@ namespace
 		};
 	}//namespace framebuffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
 	GLuint VertexArrayName(0);
@@ -83,24 +94,21 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	glf::compiler Compiler;
-
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 150 --profile core");
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShaderName);
-		glAttachShader(ProgramName, FragShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -128,7 +136,7 @@ bool initTexture()
 {
 	glGenTextures(texture::MAX, &TextureName[0]);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
@@ -207,7 +215,6 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
-	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -222,13 +229,13 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
-
-	return glf::checkError("end");
 }
 
 void renderFBO(GLuint Framebuffer)
@@ -251,8 +258,6 @@ void renderFBO(GLuint Framebuffer)
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-
-	glf::checkError("renderFBO");
 }
 
 void renderFB(GLuint TextureName)
@@ -306,17 +311,15 @@ void display()
 	// Render the colorbuffer from the multisampled framebuffer
 	renderFB(TextureName[texture::COLORBUFFER]);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
+	glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
+		::SAMPLE_MINOR_VERSION);
 }

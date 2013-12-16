@@ -192,8 +192,8 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
     wndconfig.share         = (_GLFWwindow*) share;
 
     // Check the OpenGL bits of the window config
-    if (!_glfwIsValidContextConfig(&wndconfig))
-        return NULL;
+    //if (!_glfwIsValidContextConfig(&wndconfig))
+    //    return NULL;
 
     window = calloc(1, sizeof(_GLFWwindow));
     window->next = _glfw.windowListHead;

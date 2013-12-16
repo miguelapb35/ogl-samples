@@ -11,6 +11,11 @@
 
 #include <glf/glf.hpp>
 #include <thread>
+#include <atomic>
+#include <array>
+#include <cstring>
+#include <forward_list>
+#include <memory>
 
 namespace
 {
@@ -66,6 +71,407 @@ namespace
 
 }//namespace
 
+namespace utl
+{
+	template <typename key, std::size_t N>
+	class buffer
+	{
+	public:
+		buffer() :
+			Size(0)
+		{}
+
+		class const_iterator
+		{
+			friend buffer;
+
+		private:
+			const_iterator
+			(
+				std::uint8_t const * const Pointer,
+				std::ptrdiff_t Offset
+			) :
+				Pointer(Pointer),
+				Offset(Offset)
+			{}
+
+		public:
+			const_iterator& operator++ ()
+			{
+				Offset += *reinterpret_cast<std::ptrdiff_t const * const>(this->Pointer);
+				return *this;
+			}
+
+			inline bool operator== (const_iterator const & it) const
+			{
+				return this->Offset == it.Offset;
+			}
+
+			inline bool operator!= (const_iterator const & it) const
+			{
+				return this->Offset != it.Offset;
+			}
+
+		private:
+			std::uint8_t const * const Pointer;
+			std::ptrdiff_t Offset;
+		};
+
+		typedef std::size_t size_type;
+
+		const_iterator begin() const
+		{
+			return const_iterator(&this->Data[0], 0);
+		}
+
+		const_iterator end() const
+		{
+			return const_iterator(&this->Data[0], this->Size);
+		}
+
+		template <typename chunk>
+		bool push(key const & Key, chunk const & Chunk)
+		{
+			ptrdiff_t WriteSize = sizeof(ptrdiff_t) + sizeof(key) + sizeof(Chunk);
+			if(this->Size + WriteSize > this->capacity())
+				return false;
+
+			struct helper
+			{
+				helper(key Key, std::ptrdiff_t WriteSize, chunk const & Chunk) :
+					Key(Key),
+					WriteSize(WriteSize),
+					Chunk(Chunk)
+				{}
+
+				std::ptrdiff_t const WriteSize;
+				key const Key;
+				chunk const Chunk;
+			};
+
+			helper Helper(Key, WriteSize, Chunk);
+
+			memcpy(&this->Data[this->Size], &Helper, sizeof(Helper));
+			this->Size += WriteSize;
+
+			return true;
+		}
+
+		key const & name(const_iterator const & it) const
+		{
+			return reinterpret_cast<key const &>(this->Data[it.Offset + sizeof(ptrdiff_t)]);
+		}
+
+		template <typename command>
+		command const & data(const_iterator const & it) const
+		{
+			return reinterpret_cast<command const &>(this->Data[it.Offset + sizeof(key) + sizeof(ptrdiff_t)]);
+		}
+
+		void clear()
+		{
+			memset(&Data[0], 0, this->capacity());
+		}
+
+		size_type size() const
+		{
+			return this->Size;
+		}
+
+		size_type capacity() const
+		{
+			return this->Data.size();
+		}
+
+	private:
+		std::array<std::uint8_t, N> Data;
+		size_type Size;
+	};
+
+	template <typename data>
+	class ring
+	{
+	public:
+		class node
+		{
+		public:
+
+
+		private:
+			node* Next;
+			data Data;
+		};
+
+	public:
+		ring() :
+			Head(new node),
+			Tail(new node)
+		{
+			assert(Head && Tail);
+
+			this->Head->Next = Tail;
+			this->Tail->Next = Head;
+		}
+
+		~ring()
+		{
+			node* Node = this->Head;
+			while(&Node != &this->Head)
+			{
+				node* Temp = Node;
+				Node = Node->Next;
+				delete Temp;
+			}
+		}
+
+		void push_head(node* Node);
+		node* pop_head();
+		void push_tail(node* Node);
+		node* pop_tail();
+
+	private:
+		std::atomic<node*> Head;
+		std::atomic<node*> Tail;
+	};
+}//namespapce utl
+
+namespace cmd
+{
+	enum name
+	{
+		CLEAR = 76
+	};
+
+	namespace buffer
+	{
+		struct name
+		{
+
+		};
+
+		struct create
+		{
+
+		};
+
+		struct destroy
+		{
+
+		};
+
+		struct map
+		{
+
+		};
+
+		struct unmap
+		{
+
+		};
+
+		struct copy
+		{
+
+		};
+	}//namespace
+
+	struct clear
+	{
+		enum drawbuffer
+		{
+			DRAWBUFFER0,
+			DRAWBUFFER1,
+			DRAWBUFFER2,
+			DRAWBUFFER3,
+			DRAWBUFFER4,
+			DRAWBUFFER5,
+			DRAWBUFFER6,
+			DRAWBUFFER7
+		};
+
+		enum mode
+		{
+			COLOR = (1 << 0),
+			DEPTH = (1 << 1),
+			STENCIL = (1 << 2),
+			COLOR_DEPTH = COLOR | DEPTH,
+			DEPTH_STENCIL = DEPTH | STENCIL,
+			COLOR_STENCIL = COLOR | STENCIL,
+			COLOR_DEPTH_STENCIL = COLOR | DEPTH | STENCIL
+		};
+
+		clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth) :
+			Drawbuffer(static_cast<GLint>(Drawbuffer)),
+			Mode(Mode),
+			Color(Color),
+			Depth(Depth)
+		{}
+
+		GLint const Drawbuffer;
+		mode const Mode;
+		glm::vec4 const Color;
+		float const Depth;
+	};
+
+	class context;
+
+	static const std::size_t BUFFER_SIZE = 65536;
+	typedef utl::buffer<cmd::name, BUFFER_SIZE> chunk;
+
+	class queue
+	{
+	public:
+		queue(context & Context) :
+			Context(Context)
+		{}
+
+		//void clear(drawbuffer const & Drawbuffer, mode const & Mode, glm::vec4 const & Color, float Depth);
+		//void draw(draw::primitive const & Primitive, std::size_t const & drawOffset, std::size_t const & drawCount);
+		void flush();
+
+	private:
+		typedef std::forward_list<chunk*> list;
+		typedef list::iterator iterator;
+
+		context & Context;
+		list Storage;
+	};
+
+	class context
+	{
+		struct node
+		{
+			node() :
+				Next(nullptr)
+			{}
+
+			node(chunk const & Chunk) :
+				Chunk(Chunk),
+				Next(nullptr)
+			{}
+
+			chunk Chunk;
+			node* Next;
+		};
+
+	public:
+		context(GLFWwindow* Window);
+		~context();
+
+		void push(chunk const & Chunk);
+
+	private:
+		void main();
+
+		std::unique_ptr<std::thread> Thread;
+		std::size_t TotalBufferCount;
+		GLFWwindow* Window;
+		std::atomic<node*> Head;
+		std::atomic<node*> Tail;
+	};
+
+	context::context(GLFWwindow* Window) :
+		Window(Window),
+		Head(nullptr)
+	{
+		this->Thread.reset(new std::thread(&context::main, this));
+	}
+
+	context::~context()
+	{
+		Thread->join();
+	}
+
+	// Multiple thread can sutmit command buffers
+	void context::push(chunk const & Chunk)
+	{
+		if(this->Head.load() == nullptr)
+		{
+			this->Head.store(new node(Chunk));
+			this->Tail.store(this->Head);
+		}
+		else
+		{
+			node* Head(this->Head.load());
+			node* Node(new node(Chunk));
+			Node->Next = this->Head.load();
+
+			while(!std::atomic_compare_exchange_weak_explicit(
+				&this->Head,
+				&Node->Next,
+				Node,
+				std::memory_order_release,
+				std::memory_order_relaxed));
+		}
+	}
+
+	void context::main()
+	{
+		while(this->Tail.load() != nullptr)
+		{
+			node* Node(nullptr);
+
+			while(!std::atomic_compare_exchange_weak_explicit(
+				&this->Tail,
+				&Node,
+				Node,
+				std::memory_order_release,
+				std::memory_order_relaxed));
+	/*
+			for(utl::buffer<cmd::name, 65536>::const_iterator it = Node.Chunk.begin(); it != Node.Chunk.end(); ++it)
+			{
+				switch(Buffer.name(it))
+				{
+					case cmd::CLEAR:
+					{
+						cmd::clear const & Command = Buffer.data<cmd::clear>(it);
+						if(Command.Mode & cmd::clear::COLOR)
+							glClearBufferfv(GL_COLOR, Command.Drawbuffer, &Command.Color[0]);
+						if(Command.Mode & cmd::clear::DEPTH)
+							glClearBufferfv(GL_DEPTH, Command.Drawbuffer, &Command.Depth);
+					}
+					break;
+					default:
+					{
+						// Unknowned command
+						assert(0);
+					}
+				}
+			}
+	*/
+		}
+	}
+
+	void queue::flush()
+	{
+		for(iterator it = Storage.begin(); it != Storage.end(); ++it)
+			Context.push(**it);
+		Storage.clear();
+	}
+
+	struct device
+	{
+
+/*
+	struct buffer
+	{
+		enum flag
+		{
+			MAP_READ_BIT = (1 << 0),
+			MAP_WRITE_BIT = (1 << 1),
+			MAP_PERSISTENT_BIT = (1 << 2),
+			MAP_COHERENT_BIT = (1 << 3),
+			DYNAMIC_STORAGE_BIT = (1 << 4)
+		};
+
+		buffer(std::size_t const & Size, glm::uint const & flags);
+
+		GLsizeiptr const Size;
+		GLbitfield const Flags;
+*/
+	};
+}//cmd
+
 bool initProgram()
 {
 	bool Validated(true);
@@ -92,17 +498,53 @@ bool initProgram()
 	return Validated;
 }
 
+class name
+{
+public:
+	enum type
+	{
+		TEXTURE,
+		BUFFER,
+		FRAMEBUFFER,
+		VERTEX_ARRAY,
+		QUERY,
+		PROGRAM,
+		SHADER,
+		PIPELINE
+	};
+
+	name
+	(
+		type const & Type,
+		std::size_t const & Index
+	) :
+		Type(Type),
+		Index(Index)
+	{}
+
+	type getType() const
+	{
+		return this->Type;
+	}
+
+	std::size_t getIndex() const
+	{
+		return this->Index;
+	}
+
+private:
+	type Type;
+	std::size_t Index;
+};
+
 bool initBuffer()
 {
+	//name BufferName[buffer::VERTEX] = Queue->createBuffer(0, VertexSize, VertexData);
+
 	glGenBuffers(buffer::MAX, BufferName);
 
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	glNamedBufferStorageEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+	glNamedBufferStorageEXT(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), NULL, GL_DYNAMIC_STORAGE_BIT);
 
 	std::vector<DrawArraysIndirectCommand> Commands;
 	Commands.resize(DrawCount);
@@ -114,9 +556,7 @@ bool initBuffer()
 		Commands[i].baseInstance = 0;
 	}
 
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawArraysIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+	glNamedBufferDataEXT(BufferName[buffer::INDIRECT], sizeof(DrawArraysIndirectCommand) * Commands.size(), &Commands[0], GL_STATIC_DRAW);
 
 	return true;
 }
@@ -171,6 +611,9 @@ bool begin()
 
 bool end()
 {
+	//std::vector<name> Names;
+	//Queue->destroy(Names);
+
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
 	glDeleteProgram(ProgramName);
@@ -181,15 +624,42 @@ bool end()
 
 void display()
 {
-	// Clear framebuffer
-	float Depth(1.0f);
-	glClearBufferfv(GL_DEPTH, 0, &Depth);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
+	//queue Queue;
+	
+	utl::buffer<cmd::name, 65536> Buffer;
+	Buffer.push(cmd::CLEAR, cmd::clear(
+		cmd::clear::DRAWBUFFER0, 
+		cmd::clear::COLOR, 
+		glm::vec4(1.0, 0.5, 0.0, 1.0), 1));
+	Buffer.push(cmd::CLEAR, cmd::clear(
+		cmd::clear::DRAWBUFFER0, 
+		cmd::clear::DEPTH, 
+		glm::vec4(0.0, 0.5, 1.0, 1.0), 1));
+
+	for(utl::buffer<cmd::name, 65536>::const_iterator it = Buffer.begin(); it != Buffer.end(); ++it)
+	{
+		switch(Buffer.name(it))
+		{
+			case cmd::CLEAR:
+			{
+				cmd::clear const & Command = Buffer.data<cmd::clear>(it);
+				if(Command.Mode & cmd::clear::COLOR)
+					glClearBufferfv(GL_COLOR, Command.Drawbuffer, &Command.Color[0]);
+				if(Command.Mode & cmd::clear::DEPTH)
+					glClearBufferfv(GL_DEPTH, Command.Drawbuffer, &Command.Depth);
+			}
+			break;
+			default:
+			{
+				// Unknowned command
+				assert(0);
+			}
+		}
+	}
 
 	{
 		// Update the transformation matrix
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRangeEXT(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 2048.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y - 512));
@@ -198,7 +668,7 @@ void display()
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		*Pointer = Projection * View * Model;
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
+		glUnmapNamedBufferEXT(BufferName[buffer::TRANSFORM]);
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -222,14 +692,20 @@ void display()
 	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 }
 
-static volatile GLboolean running = GL_TRUE;
+static volatile GLboolean runningOpenGL = GL_TRUE;
+static volatile GLboolean runningRendering = GL_TRUE;
+static volatile GLboolean runningMain = GL_TRUE;
 
 static void error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Error: %s\n", description);
 }
 
-int thread_main(GLFWwindow* Window)
+std::atomic_uint AtomicCount;
+
+unsigned int OpenGLThreadCount(0);
+
+int opengl_thread(GLFWwindow* Window)
 {
 	glfwMakeContextCurrent(Window);
 	glfwSwapInterval(1);
@@ -240,8 +716,11 @@ int thread_main(GLFWwindow* Window)
 
 	begin();
 
-	while (running)
+	while (runningOpenGL)
 	{
+		++OpenGLThreadCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+
 		display();
 
 		glfwSwapBuffers(Window);
@@ -250,16 +729,41 @@ int thread_main(GLFWwindow* Window)
 	end();
 
 	glfwMakeContextCurrent(nullptr);
+
 	return 0;
 }
 
+unsigned int RenderingThreadCount(0);
+
+int rendering_thread(GLFWwindow* Window)
+{
+	std::thread Thread(opengl_thread, Window);
+
+	while (runningRendering)
+	{
+		++RenderingThreadCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+	}
+
+	runningOpenGL = GL_FALSE;
+	Thread.join();
+
+	return 0;
+}
+
+unsigned int MainCount(0);
+
 int main(int argc, char* argv[])
 {
+	std::atomic_store(&AtomicCount, 0);
+	assert(AtomicCount.is_lock_free());
+
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, SAMPLE_MAJOR_VERSION);
@@ -272,6 +776,20 @@ int main(int argc, char* argv[])
 		argv[0],
 		NULL, NULL);
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+
+	GLFWwindow* WindowES = glfwCreateWindow(
+		SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT,
+		argv[0],
+		NULL, Window);
+
 	if (!Window)
 	{
 		glfwTerminate();
@@ -280,16 +798,20 @@ int main(int argc, char* argv[])
 
 	glfwShowWindow(Window);
 
-	std::thread Thread(thread_main, Window);
+	std::thread Thread(rendering_thread, Window);
 
-	while (running)
+	while (runningMain)
 	{
+		++MainCount;
+		std::atomic_fetch_add(&AtomicCount, 1);
+
 		glfwWaitEvents();
 
 		if (glfwWindowShouldClose(Window))
-			running = GL_FALSE;
+			runningMain = GL_FALSE;
 	}
 
+	runningRendering = GL_FALSE;
 	Thread.join();
 
 	exit(EXIT_SUCCESS);

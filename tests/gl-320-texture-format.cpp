@@ -110,7 +110,19 @@ namespace
 		glm::ivec4(320, 240, 320, 240),
 		glm::ivec4(  0, 240, 320, 240)
 	};
+	
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG_NORMALIZED,
+			FRAG_UINT,
+			MAX
+		};
+	}//namespace shader
 
+	std::vector<GLuint> ShaderName(shader::MAX);
 }//namespace
 
 bool initDebugOutput()
@@ -127,24 +139,23 @@ bool initDebugOutput()
 bool initProgram()
 {
 	bool Validated(true);
-	
+
+	glf::compiler Compiler;
+	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+
+	for(std::size_t i = 0; i < program::MAX; ++i)
+		ShaderName[shader::FRAG_NORMALIZED + i] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i], "--version 150 --profile core");
+	Validated = Validated && Compiler.check();
+
 	for(std::size_t i = 0; (i < program::MAX) && Validated; ++i)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i]);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
-
 		ProgramName[i] = glCreateProgram();
-		glAttachShader(ProgramName[i], VertShaderName);
-		glAttachShader(ProgramName[i], FragShaderName);
+		glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
+		glAttachShader(ProgramName[i], ShaderName[shader::FRAG_NORMALIZED + i]);
+
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		glLinkProgram(ProgramName[i]);
 		Validated = Validated && glf::checkProgram(ProgramName[i]);
 
@@ -160,7 +171,6 @@ bool initProgram()
 bool initBuffer()
 {
 	glGenBuffers(1, &BufferName);
-
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -170,7 +180,7 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -182,20 +192,19 @@ bool initTexture()
 		glBindTexture(GL_TEXTURE_2D, TextureName[i]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-		{
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				TextureInternalFormat[i], 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0,  
-				TextureFormat[i], 
-				GL_UNSIGNED_BYTE, 
-				Texture[Level].data());
-		}
+		glTexImage2D(
+			GL_TEXTURE_2D, 
+			static_cast<GLint>(0), 
+			TextureInternalFormat[i], 
+			static_cast<GLsizei>(Texture.dimensions().x), 
+			static_cast<GLsizei>(Texture.dimensions().y), 
+			0,
+			TextureFormat[i], 
+			GL_UNSIGNED_BYTE, 
+			Texture.data());
 	}
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -240,6 +249,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
@@ -325,7 +336,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

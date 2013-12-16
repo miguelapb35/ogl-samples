@@ -14,8 +14,8 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Texture Streaming");
-	char const * VERTEX_SHADER_SOURCE("gl-320/texture-2d.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/texture-2d.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -62,11 +62,21 @@ namespace
 		};
 	}//namespace buffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint TextureName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
-
 	GLint UniformTransform(0);
 	GLint UniformDiffuse(0);
 }//namespace
@@ -88,21 +98,18 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -150,23 +157,19 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	// Set image
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
-	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-	{
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(Level), 
-			GL_RGB8, 
-			GLsizei(Texture[Level].dimensions().x), 
-			GLsizei(Texture[Level].dimensions().y), 
-			0,
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
-			NULL);
-	}
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+	glTexImage2D(
+		GL_TEXTURE_2D, 
+		GLint(0), 
+		GL_RGB8, 
+		GLsizei(Texture.dimensions().x), 
+		GLsizei(Texture.dimensions().y), 
+		0,
+		GL_BGR, 
+		GL_UNSIGNED_BYTE, 
+		NULL);
 
-	GLsizei TextureSize = GLsizei(Texture[0].dimensions().x) * GLsizei(Texture[0].dimensions().y) * 3;
+	GLsizei TextureSize = GLsizei(Texture.dimensions().x) * GLsizei(Texture.dimensions().y) * 3;
 
 	GLuint PixelBuffer(0);
 	glGenBuffers(1, &PixelBuffer);
@@ -220,6 +223,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(1, &TextureName);
@@ -264,7 +269,6 @@ void display()
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -273,6 +277,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

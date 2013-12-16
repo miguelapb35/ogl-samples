@@ -36,7 +36,7 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	GLsizei const DrawCount(100000);
+	GLsizei const DrawCount(50000);
 
 	namespace buffer
 	{
@@ -52,7 +52,7 @@ namespace
 	struct DrawArraysIndirectCommand
 	{
 		GLuint count;
-		GLuint primCount;
+		GLuint instanceCount;
 		GLuint first;
 		GLuint baseInstance;
 	};
@@ -65,7 +65,7 @@ namespace
 
 }//namespace
 
-bool initProgram()
+static bool initProgram()
 {
 	bool Validated(true);
 	
@@ -91,7 +91,7 @@ bool initProgram()
 	return Validated;
 }
 
-bool initBuffer()
+static bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
 
@@ -108,7 +108,7 @@ bool initBuffer()
 	for(std::size_t i = 0; i < Commands.size(); ++i)
 	{
 		Commands[i].count = VertexCount;
-		Commands[i].primCount = 2;
+		Commands[i].instanceCount = 0;
 		Commands[i].first = 0;
 		Commands[i].baseInstance = 0;
 	}
@@ -120,7 +120,7 @@ bool initBuffer()
 	return true;
 }
 
-bool initVertexArray()
+static bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
 	glBindVertexArray(VertexArrayName);
@@ -134,7 +134,7 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
+static bool initDebugOutput()
 {
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -143,7 +143,7 @@ bool initDebugOutput()
 	return true;
 }
 
-bool begin()
+static bool begin()
 {
 	bool Success(true);
 
@@ -168,7 +168,7 @@ bool begin()
 	return Success;
 }
 
-bool end()
+static bool end()
 {
 	glDeleteBuffers(buffer::MAX, BufferName);
 	glDeleteProgramPipelines(1, &PipelineName);
@@ -178,7 +178,7 @@ bool end()
 	return true;
 }
 
-void display()
+static void display()
 {
 	// Clear framebuffer
 	float Depth(1.0f);
@@ -209,7 +209,9 @@ void display()
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 
 	glBeginQuery(GL_TIME_ELAPSED, QueryName);
-		glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount), 0);
+		for(int i = 0; i < 2; ++i)
+			glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount), 0);
+		//glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, DrawCount, 0);
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime = 0;
@@ -223,12 +225,12 @@ void display()
 	glf::swapBuffers();
 }
 
-int main(int argc, char* argv[])
+int test_multi_draw_indirect_array(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

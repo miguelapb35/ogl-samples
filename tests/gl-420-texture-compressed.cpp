@@ -143,7 +143,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, Texture2DName);
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BPTC));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BPTC).c_str()));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::BPTC]);
@@ -173,7 +173,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str()));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::DXT5]);
@@ -204,7 +204,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGTC));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGTC).c_str()));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGTC]);
@@ -235,7 +235,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8));
+		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
 		assert(!Texture.empty());
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGB8]);
@@ -406,7 +406,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

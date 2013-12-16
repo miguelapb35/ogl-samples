@@ -59,6 +59,18 @@ namespace
 		};
 	}//namespace texture
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG_TEXTURE,
+			FRAG_BOX,
+			FRAG_NEAR,
+			MAX
+		};
+	}//namespace shader
+
 	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample-explicit.vert");
 	char const * FRAG_SHADER_SOURCE[program::MAX] = 
 	{
@@ -67,6 +79,7 @@ namespace
 		"gl-320/fbo-multisample-explicit-near.frag",
 	};
 
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint BufferName(0);
 	GLuint FramebufferRenderName(0);
@@ -92,21 +105,23 @@ bool initProgram()
 {
 	bool Validated = true;
 	
-	// Create program
+	glf::compiler Compiler;
+
+	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+
 	for(int i = 0; i < program::MAX; ++i)
 	{
-		GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i]);
-
-		Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE[i]);
+		ShaderName[shader::FRAG_TEXTURE + i] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i], "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
+		if(!Validated)
+			return false;
 
 		ProgramName[i] = glCreateProgram();
-		glAttachShader(ProgramName[i], VertShaderName);
-		glAttachShader(ProgramName[i], FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
+		glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
+		glAttachShader(ProgramName[i], ShaderName[shader::FRAG_TEXTURE + i]);
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
+		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
+		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[i]);
 		Validated = Validated && glf::checkProgram(ProgramName[i]);
 
@@ -133,10 +148,10 @@ bool initTexture()
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glTexImage2D(
@@ -153,19 +168,19 @@ bool initTexture()
 
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_COLORBUFFER]);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
-
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_DEPTHBUFFER]);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return glf::checkError("initTexture");
 }
 
 bool initFramebuffer()
 {
-
 	glGenFramebuffers(1, &FramebufferRenderName);
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE_COLORBUFFER], 0);
@@ -225,6 +240,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	for(int i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
@@ -238,13 +255,6 @@ bool end()
 
 void renderFBO(GLuint Framebuffer)
 {
-	//glm::mat4 Perspective = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
-	//glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f,-1.0f, 1.0f));
-	//glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
-	//glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
-	//glm::mat4 Model = glm::mat4(1.0f);
-	//glm::mat4 MVP = Perspective * View * Model;
-
 	glm::mat4 Perspective = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
 	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0 - 4.0));
 	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
@@ -272,20 +282,10 @@ void renderFBO(GLuint Framebuffer)
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 
 	glDisable(GL_DEPTH_TEST);
-
-	glf::checkError("renderFBO");
 }
 
 void resolveMultisampling()
 {
-	////glm::mat4 Projection(glm::ortho(-8.0f, 8.0f, -6.0f, 6.0f));
-	//glm::mat4 Perspective = glm::perspective(45.0f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
-	//glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
-	//glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	//glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	//glm::mat4 Model = glm::mat4(1.0f);
-	//glm::mat4 MVP = Perspective * View * Model;
-
 	glm::mat4 Perspective = glm::perspective(45.0f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
 	glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f,-1.0f, 1.0f));
 	glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
@@ -326,8 +326,6 @@ void resolveMultisampling()
 	}
 
 	glDisable(GL_SCISSOR_TEST);
-
-	glf::checkError("renderFB");
 }
 
 void display()
@@ -346,7 +344,6 @@ void display()
 	// Resolved and render the colorbuffer from the multisampled framebuffer
 	resolveMultisampling();
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -355,7 +352,7 @@ int main(int argc, char* argv[])
 	if(glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION))
 		return 0;
 	return 1;

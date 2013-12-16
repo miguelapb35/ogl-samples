@@ -151,7 +151,9 @@ bool initTexture()
 	glGenTextures(1, &TextureName);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-	gli::textureCube Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::storage Storage = gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str());
+
+	gli::textureCube Texture(Storage);
 	assert(!Texture.empty());
 
 	glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
@@ -265,7 +267,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, 
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

@@ -19,7 +19,7 @@ namespace
 	char const * VERT_SHADER_SOURCE2("gl-320/texture-integer.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-320/texture-integer.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
+	int const FRAMEBUFFER_SIZE(4);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -71,8 +71,21 @@ namespace
 		};
 	}//namespace framebuffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT1,
+			FRAG1,
+			VERT2,
+			FRAG2,
+			MAX
+		};
+	}//namespace shader
+
 	GLuint VertexArrayName(0);
 	GLuint BufferName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
@@ -100,18 +113,16 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::RENDER] = glCreateProgram();
-		glAttachShader(ProgramName[program::RENDER], VertShaderName);
-		glAttachShader(ProgramName[program::RENDER], FragShaderName);
+		glAttachShader(ProgramName[program::RENDER], ShaderName[shader::VERT1]);
+		glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG1]);
 		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::RENDER]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
@@ -126,18 +137,16 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::SPLASH] = glCreateProgram();
-		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
-		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT2]);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG2]);
 		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::SPLASH]);
 		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
@@ -164,7 +173,17 @@ bool initBuffer()
 
 bool initTexture()
 {
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	GLint MaxSampleMaskWords(0);
+	GLint MaxColorTextureSamples(0);
+	GLint MaxDepthTextureSamples(0);
+	GLint MaxIntegerSamples(0);
+
+	glGetIntegerv(GL_MAX_SAMPLE_MASK_WORDS, &MaxSampleMaskWords); 
+	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &MaxColorTextureSamples); 
+	glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
+	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
+
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 
 	glGenTextures(texture::MAX, &TextureName[0]);
 	glActiveTexture(GL_TEXTURE0);
@@ -185,25 +204,23 @@ bool initTexture()
 			GL_BGR_INTEGER, GL_UNSIGNED_BYTE,
 			Texture[Level].data());
 	}
-
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	GLint MaxSampleMaskWords(0);
-	GLint MaxColorTextureSamples(0);
-	GLint MaxDepthTextureSamples(0);
-	GLint MaxIntegerSamples(0);
-
-	glGetIntegerv(GL_MAX_SAMPLE_MASK_WORDS, &MaxSampleMaskWords); 
-	glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &MaxColorTextureSamples); 
-	glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
-	glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
-
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE]);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, MaxIntegerSamples, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, MaxIntegerSamples, GL_RGBA8UI,
+		Window.Size.x / FRAMEBUFFER_SIZE,
+		Window.Size.y / FRAMEBUFFER_SIZE,
+		GL_TRUE);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI,
+		Window.Size.x / FRAMEBUFFER_SIZE,
+		Window.Size.y / FRAMEBUFFER_SIZE,
+		0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	return glf::checkError("initTexture");
@@ -268,6 +285,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName[program::RENDER]);
 	glDeleteProgram(ProgramName[program::SPLASH]);
@@ -280,7 +299,7 @@ bool end()
 
 void renderFBO(GLuint Framebuffer)
 {
-	glm::mat4 Perspective = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
+	glm::mat4 Perspective = glm::perspective(45.0f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
 	glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f,-1.0f, 1.0f));
 	glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
 	glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
@@ -291,7 +310,9 @@ void renderFBO(GLuint Framebuffer)
 	glUniform1i(UniformDiffuse[program::RENDER], 0);
 	glUniformMatrix4fv(UniformMVP[program::RENDER], 1, GL_FALSE, &MVP[0][0]);
 
-	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	glViewport(0, 0,
+		Window.Size.x / FRAMEBUFFER_SIZE,
+		Window.Size.y / FRAMEBUFFER_SIZE);
 	glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
 	glClearBufferuiv(GL_COLOR, 0, &glm::uvec4(0, 128, 255, 255)[0]);
 
@@ -345,8 +366,12 @@ void display()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
 	glBlitFramebuffer(
-		0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 
-		0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 
+		0, 0,
+		Window.Size.x / FRAMEBUFFER_SIZE,
+		Window.Size.y / FRAMEBUFFER_SIZE,
+		0, 0,
+		Window.Size.x / FRAMEBUFFER_SIZE,
+		Window.Size.y / FRAMEBUFFER_SIZE,
 		GL_COLOR_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -360,11 +385,9 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
+	return glf::run(
 		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT),
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

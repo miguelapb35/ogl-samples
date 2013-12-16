@@ -185,6 +185,7 @@ namespace glf
 		commandline CommandLine(Filename, Arguments);
 
 		std::string PreprocessedSource = parser()(CommandLine, Filename);
+		assert(!PreprocessedSource.empty());
 		char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
 		fprintf(stdout, "%s\n", PreprocessedSource.c_str());

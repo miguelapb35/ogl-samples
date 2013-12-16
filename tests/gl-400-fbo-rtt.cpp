@@ -16,7 +16,7 @@ namespace
 	char const * SAMPLE_NAME = "OpenGL Render to texture";
 	char const * VERTEX_SHADER_SOURCE("gl-400/fbo-rtt.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/fbo-rtt.frag");
-	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
+	int const FRAMEBUFFER_SIZE(2);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -104,8 +104,8 @@ bool initTexture2D()
 			GL_TEXTURE_2D, 
 			0, 
 			GL_RGBA8,
-			GLsizei(FRAMEBUFFER_SIZE.x), 
-			GLsizei(FRAMEBUFFER_SIZE.y), 
+			GLsizei(Window.Size.x / FRAMEBUFFER_SIZE),
+			GLsizei(Window.Size.y / FRAMEBUFFER_SIZE),
 			0,  
 			GL_RGB, 
 			GL_UNSIGNED_BYTE, 
@@ -141,9 +141,11 @@ bool initVertexArray()
 
 bool begin()
 {
-	Viewport[TEXTURE_R] = glm::vec4(Window.Size.x >> 1, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[TEXTURE_G] = glm::vec4(Window.Size.x >> 1, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[TEXTURE_B] = glm::vec4(0, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	glm::ivec2 const FramebufferSize(Window.Size / FRAMEBUFFER_SIZE);
+	
+	Viewport[TEXTURE_R] = glm::vec4(Window.Size.x >> 1, 0, FramebufferSize);
+	Viewport[TEXTURE_G] = glm::vec4(Window.Size.x >> 1, Window.Size.y >> 1, FramebufferSize);
+	Viewport[TEXTURE_B] = glm::vec4(0, Window.Size.y >> 1, FramebufferSize);
 
 	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
@@ -173,8 +175,9 @@ bool end()
 void display()
 {
 	GLint const Border(16);
+	glm::ivec2 const FramebufferSize(Window.Size / FRAMEBUFFER_SIZE);
 
-	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	glViewport(0, 0, FramebufferSize.x, FramebufferSize.y);
 
 	// Pass 1
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -208,7 +211,6 @@ void display()
 
 	glUseProgram(0);
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -217,6 +219,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

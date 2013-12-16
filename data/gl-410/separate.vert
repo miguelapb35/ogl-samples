@@ -18,7 +18,7 @@ out gl_PerVertex
 };
 
 void main()
-{	
+{
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
 	VertTexcoord = Texcoord;
 	VertColor = vec3(1.0, 0.9, 0.8);

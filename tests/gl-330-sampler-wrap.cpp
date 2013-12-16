@@ -13,10 +13,10 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Sampler Wrap";	
-	char const * VERTEX_SHADER_SOURCE("gl-330/texture-2d.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-330/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE_DXT5("kueken1-dxt5.dds");
+	char const * SAMPLE_NAME("OpenGL Sampler Wrap");
+	char const * VERT_SHADER_SOURCE("gl-330/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/texture-2d.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-dxt5.dds");
 	int const SAMPLE_SIZE_WIDTH(1024);
 	int const SAMPLE_SIZE_HEIGHT(768);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -64,15 +64,23 @@ namespace
 		};
 	}//namespace viewport
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName;
 	GLuint ProgramName;
-
 	GLuint BufferName;
 	GLuint Texture2DName;
-
 	GLint UniformMVP;
 	GLint UniformDiffuse;
-
 	GLuint SamplerName[viewport::MAX];
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
@@ -94,18 +102,14 @@ bool initProgram()
 	
 	if(Validated)
 	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -127,7 +131,7 @@ bool initArrayBuffer()
 	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initArrayBuffer");;
+	return glf::checkError("initArrayBuffer");
 }
 
 #define GL_MIRROR_CLAMP_TO_EDGE			0x8743
@@ -165,7 +169,7 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture2DName);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 	{
 		glCompressedTexImage2D(
@@ -225,6 +229,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(1, &BufferName);
 	glDeleteProgram(ProgramName);
 	glDeleteTextures(1, &Texture2DName);
@@ -262,7 +268,6 @@ void display()
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
 
-	glf::checkError("display");
 	glf::swapBuffers();
 }
 
@@ -271,6 +276,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

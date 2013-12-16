@@ -9,7 +9,6 @@
 // www.g-truc.net
 //**********************************
 
-
 #include <glf/glf.hpp>
 #include <glf/compiler.hpp>
 
@@ -94,14 +93,26 @@ namespace
 		};
 	}//namespace framebuffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT_RENDER,
+			FRAG_RENDER,
+			VERT_DEPTH,
+			MAX
+		};
+	}//namespace shader
+
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLint> UniformTransform(program::MAX);
 	GLint UniformShadow(0);
-	glm::ivec2 const ShadowSize(512, 512);
+	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
 bool initProgram()
@@ -111,21 +122,17 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_RENDER, 
-			"--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_RENDER,
-			"--version 150 --profile core");
+		ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_RENDER, "--version 150 --profile core");
+		ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_RENDER, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::RENDER] = glCreateProgram();
-		glAttachShader(ProgramName[program::RENDER], VertShaderName);
-		glAttachShader(ProgramName[program::RENDER], FragShaderName);
+		glAttachShader(ProgramName[program::RENDER], ShaderName[shader::VERT_RENDER]);
+		glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG_RENDER]);
 		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::COLOR, "Color");
 		glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::RENDER]);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
 	}
@@ -139,15 +146,13 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_DEPTH, 
-			"--version 150 --profile core");
+		ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_DEPTH, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::DEPTH] = glCreateProgram();
-		glAttachShader(ProgramName[program::DEPTH], VertShaderName);
+		glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::VERT_DEPTH]);
 		glBindAttribLocation(ProgramName[program::DEPTH], glf::semantic::attr::POSITION, "Position");
 		glLinkProgram(ProgramName[program::DEPTH]);
-		glDeleteShader(VertShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::DEPTH]);
 	}
@@ -189,7 +194,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -277,7 +282,7 @@ bool initFramebuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE); // AMD workaround glDrawBuffer* is not FBO states
 	if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 		return false;
 
@@ -319,8 +324,8 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
@@ -328,7 +333,7 @@ bool end()
 	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-	return Validated;
+	return glf::checkError("end");
 }
 
 void renderShadow()
@@ -396,7 +401,7 @@ void display()
 
 	// Update of the MVP matrix for the depth pass
 	{
-		glm::mat4 Projection = glm::ortho<float>(-2, 2, -2, 2,-4, 8);
+		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
 		glm::mat4 View = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 DepthMVP = Projection * View * Model;
@@ -426,6 +431,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT,
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

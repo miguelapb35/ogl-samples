@@ -19,7 +19,7 @@ namespace
 	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-layer.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-layer.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
+	int const FRAMEBUFFER_SIZE(2);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -61,6 +61,19 @@ namespace
 		};
 	}//namespace program
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT_MULTIPLE,
+			FRAG_MULTIPLE,
+			VERT_SPLASH,
+			FRAG_SPLASH,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint FramebufferName(0);
 	GLuint BufferName(0);
 	GLuint TextureName(0);
@@ -91,19 +104,17 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::VERT_MULTIPLE] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+		ShaderName[shader::FRAG_MULTIPLE] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::MULTIPLE] = glCreateProgram();
-		glAttachShader(ProgramName[program::MULTIPLE], VertShaderName);
-		glAttachShader(ProgramName[program::MULTIPLE], FragShaderName);
+		glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::VERT_MULTIPLE]);
+		glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::FRAG_MULTIPLE]);
 		glBindAttribLocation(ProgramName[program::MULTIPLE], glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::RED, "Red");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::GREEN, "Green");
 		glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::BLUE, "Blue");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::MULTIPLE]);
 		Validated = glf::checkProgram(ProgramName[program::MULTIPLE]);
@@ -116,18 +127,16 @@ bool initProgram()
 
 	if(Validated)
 	{
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+		ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::SPLASH] = glCreateProgram();
-		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
-		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
 		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		glLinkProgram(ProgramName[program::SPLASH]);
 		Validated = glf::checkProgram(ProgramName[program::SPLASH]);
@@ -169,8 +178,8 @@ bool initTexture()
 		GL_TEXTURE_2D_ARRAY, 
 		0,
 		GL_RGB8,
-		GLsizei(FRAMEBUFFER_SIZE.x),
-		GLsizei(FRAMEBUFFER_SIZE.y),
+		GLsizei(Window.Size.x / FRAMEBUFFER_SIZE),
+		GLsizei(Window.Size.y / FRAMEBUFFER_SIZE),
 		GLsizei(3),//depth
 		0,
 		GL_BGR,
@@ -229,9 +238,9 @@ bool initVertexArray()
 
 bool begin()
 {
-	Viewport[texture::RED] = glm::ivec4(Window.Size.x >> 1, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[texture::GREEN] = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[texture::BLUE] = glm::ivec4(0, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	Viewport[texture::RED] = glm::ivec4(Window.Size.x >> 1, 0, Window.Size / FRAMEBUFFER_SIZE);
+	Viewport[texture::GREEN] = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size / FRAMEBUFFER_SIZE);
+	Viewport[texture::BLUE] = glm::ivec4(0, Window.Size.y >> 1, Window.Size / FRAMEBUFFER_SIZE);
 
 	bool Validated = true;
 	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
@@ -240,7 +249,6 @@ bool begin()
 		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
-	glf::checkError("initProgram Apple workaround");
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -255,6 +263,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	for(std::size_t i = 0; i < program::MAX; ++i)
 		glDeleteProgram(ProgramName[i]);
 	glDeleteBuffers(1, &BufferName);
@@ -277,7 +287,7 @@ void display()
 		glm::mat4 MVP = Projection * View * Model;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+		glViewport(0, 0, Window.Size.x * FRAMEBUFFER_SIZE, Window.Size.y * FRAMEBUFFER_SIZE);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName[program::MULTIPLE]);
@@ -322,12 +332,10 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
+	return glf::run(
 		argc, argv,
-		glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT,
-		SAMPLE_MAJOR_VERSION, 
-		SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+		glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT),
+		glf::CORE,
+		SAMPLE_MAJOR_VERSION,
+		SAMPLE_MINOR_VERSION);
 }

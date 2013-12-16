@@ -300,6 +300,9 @@ void display()
 		GLint Border = 2;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0)[0]);
+		
 		glViewportIndexedfv(0, &glm::vec4(Border, Border, Window.Size / 2 - 2 * Border)[0]);
 		glViewportIndexedfv(1, &glm::vec4((Window.Size.x >> 1) + Border, Border, Window.Size / 2 - 2 * Border)[0]);
 		glViewportIndexedfv(2, &glm::vec4((Window.Size.x >> 1) + Border, (Window.Size.y >> 1) + 1, Window.Size / 2 - 2 * Border)[0]);
@@ -324,6 +327,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

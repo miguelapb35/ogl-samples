@@ -14,9 +14,9 @@
 namespace
 {
 	char const * SAMPLE_NAME("OpenGL Primitive Shading");
-	char const * SAMPLE_VERT_SHADER2("gl-320/primitive-shading.vert");
-	char const * SAMPLE_GEOM_SHADER2("gl-320/primitive-shading.geom");
-	char const * SAMPLE_FRAG_SHADER2("gl-320/primitive-shading.frag");
+	char const * SAMPLE_VERT_SHADER("gl-320/primitive-shading.vert");
+	char const * SAMPLE_GEOM_SHADER("gl-320/primitive-shading.geom");
+	char const * SAMPLE_FRAG_SHADER("gl-320/primitive-shading.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
@@ -53,6 +53,18 @@ namespace
 		};
 	}//namespace buffer
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			GEOM,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+
+	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -77,25 +89,20 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER2);
-
-		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
-		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
-		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER, "--version 150 --profile core");
+		ShaderName[shader::GEOM] = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertShader);
-		glAttachShader(ProgramName, GeomShader);
-		glAttachShader(ProgramName, FragShader);
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::GEOM]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glDeleteShader(VertShader);
-		glDeleteShader(GeomShader);
-		glDeleteShader(FragShader);
-
 		glLinkProgram(ProgramName);
 		Validated = Validated && glf::checkProgram(ProgramName);
 	}
@@ -171,6 +178,8 @@ bool begin()
 
 bool end()
 {
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteBuffers(buffer::MAX, &BufferName[0]);
 	glDeleteVertexArrays(1, &VertexArrayName);
 	glDeleteProgram(ProgramName);
@@ -220,6 +229,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

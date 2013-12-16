@@ -16,7 +16,7 @@ namespace
 	char const * SAMPLE_NAME("OpenGL FBO texture array");
 	char const * VERT_SHADER_SOURCE("gl-400/rtt-array.vert");
 	char const * FRAG_SHADER_SOURCE("gl-400/rtt-array.frag");
-	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
+	int const FRAMEBUFFER_SIZE(2);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
@@ -101,12 +101,14 @@ bool initTexture()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+	glm::ivec2 const FramebufferSize(Window.Size / FRAMEBUFFER_SIZE);
+	
 	glTexImage3D(
-		GL_TEXTURE_2D_ARRAY, 
+		GL_TEXTURE_2D_ARRAY,
 		0, 
 		GL_RGBA8, 
-		GLsizei(FRAMEBUFFER_SIZE.x), 
-		GLsizei(FRAMEBUFFER_SIZE.y), 
+		GLsizei(FramebufferSize.x),
+		GLsizei(FramebufferSize.y),
 		GLsizei(3), //depth
 		0,  
 		GL_RGB, 
@@ -139,7 +141,7 @@ bool initFramebuffer()
 bool initVertexArray()
 {
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexArray(VertexArrayName);
+	glBindVertexArray(VertexArrayName);
 	glBindVertexArray(0);
 
 	return glf::checkError("initVertexArray");
@@ -147,9 +149,11 @@ bool initVertexArray()
 
 bool begin()
 {
-	Viewport[TEXTURE_R] = glm::vec4(Window.Size.x >> 1, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[TEXTURE_G] = glm::vec4(Window.Size.x >> 1, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-	Viewport[TEXTURE_B] = glm::vec4(0, Window.Size.y >> 1, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	glm::ivec2 const FramebufferSize(Window.Size / FRAMEBUFFER_SIZE);
+	
+	Viewport[TEXTURE_R] = glm::vec4(Window.Size.x >> 1, 0, FramebufferSize);
+	Viewport[TEXTURE_G] = glm::vec4(Window.Size.x >> 1, Window.Size.y >> 1, FramebufferSize);
+	Viewport[TEXTURE_B] = glm::vec4(0, Window.Size.y >> 1, FramebufferSize);
 
 	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
@@ -178,9 +182,11 @@ bool end()
 
 void display()
 {
+	glm::ivec2 const FramebufferSize(Window.Size / FRAMEBUFFER_SIZE);
+	
 	// Pass 1
 	glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+	glViewport(0, 0, FramebufferSize.x, FramebufferSize.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)[0]);
 	glClearBufferfv(GL_COLOR, 1, &glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)[0]);
 	glClearBufferfv(GL_COLOR, 2, &glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)[0]);
@@ -188,7 +194,7 @@ void display()
 
 	// Pass 2
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT);
+	glViewport(0, 0, Window.Size.x, Window.Size.y);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	glUseProgram(ProgramName);
@@ -201,7 +207,7 @@ void display()
 	for(GLint i = 0; i < TEXTURE_MAX; ++i)
 	{
 		glViewport(
-			GLint(Viewport[i].x), GLint(Viewport[i].y), 
+			GLint(Viewport[i].x), GLint(Viewport[i].y),
 			GLsizei(Viewport[i].z), GLsizei(Viewport[i].w));
 		glUniform1i(UniformLayer, i);
 
@@ -217,6 +223,7 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT, ::SAMPLE_MAJOR_VERSION, 
+		glf::CORE,
+		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);
 }

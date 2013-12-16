@@ -4,13 +4,17 @@ bool begin();
 bool end();
 void display();
 
-#define GLF_CONTEXT_CORE_PROFILE_BIT 0x0001
-#define GLF_CONTEXT_COMPATIBILITY_PROFILE_BIT 0x0002
-#define GLF_CONTEXT_ES2_PROFILE_BIT 0x0004
 #define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 namespace glf
 {
+	enum profile
+	{
+		CORE = GLFW_OPENGL_CORE_PROFILE,
+		COMPATIBILITY = GLFW_OPENGL_COMPAT_PROFILE,
+		ES = GLFW_OPENGL_ES_PROFILE
+	};
+
 	static GLFWwindow* glf_window = NULL;
 	inline void logImplementationDependentLimit(GLenum Value, std::string const & String)
 	{
@@ -317,36 +321,44 @@ namespace glf
 	(
 		int argc, char* argv[], 
 		glm::ivec2 const & Size, 
-		int Profile,
+		profile Profile,
 		int Major, int Minor
 	)
 	{
 		glfwInit();
 
+		glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
 
-		if(version(Major, Minor) >= version(3, 2))
+		if(version(Major, Minor) >= version(3, 2) || (Profile == ES))
 		{
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, Major);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, Minor);
-
 #			if defined(__APPLE__)
 				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#			elif defined(__INTEL__)
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+				glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #			else
-				glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-				glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == GLF_CONTEXT_CORE_PROFILE_BIT ? GL_TRUE : GL_FALSE);
-#			endif
-
-#			if defined(NDEBUG)
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-#			else
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+				if(Profile != ES)
+				{
+#					if defined(__APPLE__)
+						glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#					else
+						glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == CORE ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+						glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
+#					endif
+				}	
+#				if !defined(_DEBUG) || defined(__APPLE__)
+					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+#				else
+					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#				endif
 #			endif
 		}
+
 		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 
+		glfwGetFramebufferSize(glf_window, &Window.Size.x, &Window.Size.y);
+		
 		glfwSetMouseButtonCallback(glf_window,mouse_button_callback);
 		glfwSetCursorPosCallback(glf_window,cursor_position_callback);
 		glfwSetKeyCallback(glf_window,key_callback);
@@ -380,7 +392,7 @@ namespace glf
 		return Run ? 0 : 1;
 	}
 
-	bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	inline bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
 #if !defined(__APPLE__)
@@ -409,7 +421,7 @@ namespace glf
 		return Success;
 	}
 
-	bool validateVAO42(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
+	inline bool validateVAO42(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)
 	{
 		bool Success = true;
 #if !defined(__APPLE__)

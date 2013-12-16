@@ -76,7 +76,20 @@ namespace
 		};
 	}//namespace program
 
+	namespace shader
+	{
+		enum type
+		{
+			VERT_TEXTURE,
+			FRAG_TEXTURE,
+			VERT_SPLASH,
+			FRAG_SPLASH,
+			MAX
+		};
+	}//namespace shader
+
 	GLuint FramebufferName(0);
+	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -91,21 +104,18 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, 
-			"--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE,
-			"--version 150 --profile core");
+		ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+		ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::TEXTURE] = glCreateProgram();
-		glAttachShader(ProgramName[program::TEXTURE], VertShaderName);
-		glAttachShader(ProgramName[program::TEXTURE], FragShaderName);
+		glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
+		glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::FRAG_TEXTURE]);
+
 		glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::TEXTURE]);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::TEXTURE]);
 	}
@@ -116,19 +126,16 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, 
-			"--version 150 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH,
-			"--version 150 --profile core");
+		ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+		ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName[program::SPLASH] = glCreateProgram();
-		glAttachShader(ProgramName[program::SPLASH], VertShaderName);
-		glAttachShader(ProgramName[program::SPLASH], FragShaderName);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
+		glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
+
 		glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
 		glLinkProgram(ProgramName[program::SPLASH]);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
 
 		Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 	}
@@ -167,7 +174,7 @@ bool initTexture()
 {
 	bool Validated(true);
 
-	gli::texture2D Texture(gli::loadStorageDDS(glf::DATA_DIRECTORY + TEXTURE_DIFFUSE));
+	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
 	assert(!Texture.empty());
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -275,8 +282,8 @@ bool begin()
 
 bool end()
 {
-	bool Validated(true);
-
+	for(std::size_t i = 0; 0 < shader::MAX; ++i)
+		glDeleteShader(ShaderName[i]);
 	glDeleteFramebuffers(1, &FramebufferName);
 	glDeleteProgram(ProgramName[program::SPLASH]);
 	glDeleteProgram(ProgramName[program::TEXTURE]);
@@ -284,7 +291,7 @@ bool end()
 	glDeleteTextures(texture::MAX, &TextureName[0]);
 	glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-	return Validated;
+	return glf::checkError("end");
 }
 
 void display()
@@ -346,6 +353,6 @@ int main(int argc, char* argv[])
 	return glf::run(
 		argc, argv,
 		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		GLF_CONTEXT_CORE_PROFILE_BIT,
+		glf::CORE,
 		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
