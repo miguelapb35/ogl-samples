@@ -16,7 +16,7 @@ std::string format(const char * Message, ...)
 	return Text;
 }
 
-void csv::log(char const * String, float Convergent, float Min, float Max)
+void csv::log(char const * String, double Convergent, double Min, double Max)
 {
 	this->Data.push_back(data(String, Convergent, Min, Max));
 }

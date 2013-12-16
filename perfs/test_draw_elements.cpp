@@ -175,7 +175,7 @@ void testDrawElements::render()
 	switch(this->DrawType)
 	{
 	case INSTANCED:
-		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, DrawCount, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, static_cast<GLsizei>(DrawCount), 0, 0);
 		break;
 	case MULTI_DISCARD:
 	case MULTI_DRAW:

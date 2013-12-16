@@ -46,6 +46,8 @@ add_executable(${PERFS}
 	main.cpp
 	csv.cpp
 	csv.hpp
+	caps.cpp
+	caps.hpp
 	test.cpp
 	test.hpp
 	test_draw_arrays.cpp

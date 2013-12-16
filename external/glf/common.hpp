@@ -15,7 +15,7 @@
 #include <gli/gli.hpp>
 
 // GLI
-#include <glu/glu.hpp>
+//#include <glu/glu.hpp>
 
 // STL
 #include <vector>
