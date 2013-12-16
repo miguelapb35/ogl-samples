@@ -357,4 +357,10 @@ glCreateSampleGTC(sampler-wrap)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
 
+# OpenGL 5.0 my ideas samples
+set(GL_VERSION_GTC 500)
+
+set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matching.eval interface-matching.geom interface-matching.frag)
+glCreateSampleGTC(interface-matching)
+
 endif(NOT APPLE)
