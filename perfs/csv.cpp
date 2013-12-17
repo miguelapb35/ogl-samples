@@ -25,12 +25,14 @@ void csv::save(char const * Filename)
 {
 	FILE* File(fopen(Filename, "w+"));
 	assert(File);
+	fprintf(File, "%s;%s;%s;%s\n", "Tests", "average", "max", "min");
+
 	for(std::size_t i = 0; i < this->Data.size(); ++i)
 	{
 		fprintf(File, "%s;%d;%d;%d\n",
 			Data[i].String.c_str(),
 			static_cast<int>(Data[i].Convergent),
-			static_cast<int>(Data[i].Min), static_cast<int>(Data[i].Max));
+			static_cast<int>(Data[i].Max), static_cast<int>(Data[i].Min));
 	}
 	fclose(File);
 }

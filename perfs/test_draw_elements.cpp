@@ -35,10 +35,11 @@ namespace
 
 testDrawElements::testDrawElements(
 	int argc, char* argv[], profile Profile,
-	draw const DrawType, std::size_t const DrawCount
+	drawType const DrawType, vertexDataType const VertexDataType, std::size_t const DrawCount
 ) :
 	test(argc, argv, Profile, DEFAULT_MAX_FRAME, DEFAULT_WINDOW_SIZE),
 	DrawType(DrawType),
+	VertexDataType(VertexDataType),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
@@ -108,22 +109,60 @@ bool testDrawElements::initBuffer()
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
+	switch(this->VertexDataType)
+	{
+		case SEPARATED_VERTEX_DATA:
+		{
+			glBufferData(GL_ARRAY_BUFFER, VertexSize * this->DrawCount, NULL, GL_STATIC_DRAW);
+			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_ARRAY_BUFFER, 
+				0, VertexSize * this->DrawCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			for(std::size_t i = 0; i < this->DrawCount; ++i)
+				memcpy(Pointer + i * VertexSize, &VertexData, VertexSize);
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			break;
+		}
+		case SHARED_VERTEX_DATA:
+		{
+			glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
+			break;
+		}
+		default:
+			assert(0);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+	switch(this->VertexDataType)
+	{
+		case SEPARATED_VERTEX_DATA:
+		{
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize * this->DrawCount, NULL, GL_STATIC_DRAW);
+			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 
+				0, ElementSize * this->DrawCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			for(std::size_t i = 0; i < this->DrawCount; ++i)
+				memcpy(Pointer + i * ElementSize, &ElementData, ElementSize);
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+			break;
+		}
+		case SHARED_VERTEX_DATA:
+		{
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, &ElementData, GL_STATIC_DRAW);
+			break;
+		}
+		default:
+			assert(0);
+	}
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	std::vector<drawElementsIndirectCommand> Commands;
 	Commands.resize(this->DrawCount);
-	for(std::size_t i = 0; i < Commands.size(); ++i)
+	for(std::size_t DrawIndex = 0; DrawIndex < Commands.size(); ++DrawIndex)
 	{
-		Commands[i].count = ElementCount;
-		Commands[i].instanceCount = this->DrawType == MULTI_DISCARD ? 0 : 1;
-		Commands[i].firstIndex = 0;
-		Commands[i].baseVertex = 0;
-		Commands[i].baseInstance = 0;
+		Commands[DrawIndex].count = ElementCount;
+		Commands[DrawIndex].instanceCount = this->DrawType == MULTI_DISCARD ? 0 : 1;
+		Commands[DrawIndex].firstIndex = 0;
+		Commands[DrawIndex].baseVertex = static_cast<GLint>(DrawIndex * VertexCount);
+		Commands[DrawIndex].baseInstance = 0;
 	}
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
@@ -189,7 +228,7 @@ void testDrawElements::render()
 		break;
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
-			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, static_cast<GLint>(DrawIndex * VertexCount), 0);
 		break;
 	default:
 		assert(0);
