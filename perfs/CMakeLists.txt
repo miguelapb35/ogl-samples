@@ -33,9 +33,8 @@ set(PERFS perfs)
 set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../data/${GL_PROFILE_GTC}-${GL_VERSION_GTC})
 
 set(GL_SHADER_GTC
-	draw-range.vert draw-range.frag
-	 vertex-array-object.vert vertex-array-object.frag
-	 multi-draw-indirect.vert multi-draw-indirect.frag)
+	draw-uniform.vert draw-uniform.frag
+	draw-range.vert draw-range.frag)
 
 foreach(FILE ${GL_SHADER_GTC})
 	set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})

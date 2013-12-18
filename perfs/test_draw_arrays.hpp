@@ -21,6 +21,16 @@ public:
 		SHARED_VERTEX_DATA
 	};
 
+	enum uniformUpdate
+	{
+		PER_DRAW_UNIFORM_DSA,
+		REDUNDANT_UNIFORM_DSA,
+		PER_DRAW_UNIFORM_B2E,
+		REDUNDANT_UNIFORM_B2E,
+		CONSTANT_UNIFORM,
+		NO_UNIFORM
+	};
+
 private:
 	enum buffer
 	{
@@ -33,7 +43,10 @@ private:
 public:
 	testDrawArrays(
 		int argc, char* argv[], profile Profile,
-		drawType const DrawType, vertexDataType const VertexDataType, std::size_t const DrawCount);
+		drawType const DrawType,
+		vertexDataType const VertexDataType,
+		uniformUpdate const UniformUpdate,
+		std::size_t const DrawCount);
 	virtual ~testDrawArrays();
 
 	virtual void render();
@@ -45,6 +58,7 @@ public:
 private:
 	drawType const DrawType;
 	vertexDataType const VertexDataType;
+	uniformUpdate const UniformUpdate;
 	std::size_t const DrawCount;
 	GLuint VertexArrayName;
 	GLuint PipelineName;

@@ -11,38 +11,41 @@ int drawArrays(int argc, char* argv[], csv & CSV)
 			std::string const & String,
 			testDrawArrays::drawType const & DrawType,
 			testDrawArrays::vertexDataType const & VertexDataType,
+			testDrawArrays::uniformUpdate const & UniformUpdate,
 			std::size_t const & DrawCount
 		) :
 			String(String),
 			DrawType(DrawType),
 			VertexDataType(VertexDataType),
+			UniformUpdate(UniformUpdate),
 			DrawCount(DrawCount)
 		{}
 
 		std::string const String;
 		testDrawArrays::drawType const DrawType;
 		testDrawArrays::vertexDataType const VertexDataType;
+		testDrawArrays::uniformUpdate const UniformUpdate;
 		std::size_t const DrawCount;
 	};
 
 	int Error(0);
 
 	std::vector<entry> Entries;
-	Entries.push_back(entry("DrawArrays(PACKED, SEPARATED)", testDrawArrays::DRAW_PACKED, testDrawArrays::SEPARATED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(PACKED, SHARED)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(PARAMS, SEPARATED)", testDrawArrays::DRAW_PARAMS, testDrawArrays::SEPARATED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(PARAMS, SHARED)", testDrawArrays::DRAW_PARAMS, testDrawArrays::SHARED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(MULTI, SEPARATED)", testDrawArrays::MULTI_DRAW, testDrawArrays::SEPARATED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(MULTI, SHARED)", testDrawArrays::MULTI_DRAW, testDrawArrays::SHARED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(DISCARD, SEPARATED)", testDrawArrays::MULTI_DISCARD, testDrawArrays::SEPARATED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(DISCARD, SHARED)", testDrawArrays::MULTI_DISCARD, testDrawArrays::SHARED_VERTEX_DATA, 100000));
-	Entries.push_back(entry("DrawArrays(INSTANCED, SHARED)", testDrawArrays::INSTANCED, testDrawArrays::SHARED_VERTEX_DATA, 100000));
+	Entries.push_back(entry("DrawArrays(PACKED, SEPARATED)", testDrawArrays::DRAW_PACKED, testDrawArrays::SEPARATED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(PACKED, SHARED)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(PARAMS, SEPARATED)", testDrawArrays::DRAW_PARAMS, testDrawArrays::SEPARATED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(PARAMS, SHARED)", testDrawArrays::DRAW_PARAMS, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(MULTI, SEPARATED)", testDrawArrays::MULTI_DRAW, testDrawArrays::SEPARATED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(MULTI, SHARED)", testDrawArrays::MULTI_DRAW, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(DISCARD, SEPARATED)", testDrawArrays::MULTI_DISCARD, testDrawArrays::SEPARATED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(DISCARD, SHARED)", testDrawArrays::MULTI_DISCARD, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(INSTANCED, SHARED)", testDrawArrays::INSTANCED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
 		testDrawArrays Test(argc, argv, test::CORE, 
-			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].DrawCount);
+			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
@@ -97,14 +100,64 @@ int drawElements(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int drawArraysUniform(int argc, char* argv[], csv & CSV)
+{
+	struct entry
+	{
+		entry(
+			std::string const & String,
+			testDrawArrays::drawType const & DrawType,
+			testDrawArrays::vertexDataType const & VertexDataType,
+			testDrawArrays::uniformUpdate const & UniformUpdate,
+			std::size_t const & DrawCount
+		) :
+			String(String),
+			DrawType(DrawType),
+			VertexDataType(VertexDataType),
+			UniformUpdate(UniformUpdate),
+			DrawCount(DrawCount)
+		{}
+
+		std::string const String;
+		testDrawArrays::drawType const DrawType;
+		testDrawArrays::vertexDataType const VertexDataType;
+		testDrawArrays::uniformUpdate const UniformUpdate;
+		std::size_t const DrawCount;
+	};
+
+	int Error(0);
+
+	std::vector<entry> Entries;
+	Entries.push_back(entry("MultiDrawArrays(NO_UNIFORM)", testDrawArrays::MULTI_DRAW, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::NO_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(NO_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::NO_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(CONSTANT_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_DSA, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_DSA, 100000));
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, 
+			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	return Error;
+}
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
 
 	csv CSV;
 
-	Error += drawArrays(argc, argv, CSV);
-	Error += drawElements(argc, argv, CSV);
+	//Error += drawArrays(argc, argv, CSV);
+	//Error += drawElements(argc, argv, CSV);
+	
+	Error += drawArraysUniform(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

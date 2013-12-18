@@ -22,18 +22,23 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
-	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
+	char const * VERT_SHADER_SOURCE[2] = {"hz-430/draw-range.vert", "hz-430/draw-uniform.vert"};
+	char const * FRAG_SHADER_SOURCE[2] = {"hz-430/draw-range.frag", "hz-430/draw-uniform.frag"};
+
+	GLint UniformDiffuse(-1);
 }//namespace
 
 testDrawArrays::testDrawArrays(
 	int argc, char* argv[], profile Profile,
-	drawType const DrawType, vertexDataType const VertexDataType, 
+	drawType const DrawType,
+	vertexDataType const VertexDataType,
+	uniformUpdate const UniformUpdate,
 	std::size_t const DrawCount
 ) :
 	test(argc, argv, Profile, DEFAULT_MAX_FRAME, DEFAULT_WINDOW_SIZE),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
+	UniformUpdate(UniformUpdate),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
@@ -78,8 +83,10 @@ bool testDrawArrays::initProgram()
 	glGenProgramPipelines(1, &this->PipelineName);
 
 	glf::compiler Compiler;
-	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
-	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
+		glf::DATA_DIRECTORY + VERT_SHADER_SOURCE[this->UniformUpdate == NO_UNIFORM ? 0 : 1], "--version 420 --profile core");
+	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER,
+		glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[this->UniformUpdate == NO_UNIFORM ? 0 : 1], "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
 	this->ProgramName = glCreateProgram();
@@ -89,8 +96,15 @@ bool testDrawArrays::initProgram()
 	glLinkProgram(this->ProgramName);
 	Validated = Validated && glf::checkProgram(this->ProgramName);
 
+	UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+
 	if(Validated)
 		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+
+	if(this->UniformUpdate == testDrawArrays::PER_DRAW_UNIFORM_B2E || this->UniformUpdate == testDrawArrays::REDUNDANT_UNIFORM_B2E)
+		glActiveShaderProgram(this->PipelineName, this->ProgramName);
+	if(this->UniformUpdate == testDrawArrays::CONSTANT_UNIFORM)
+		glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
 
 	return Validated;
 }
@@ -157,6 +171,41 @@ bool testDrawArrays::initVertexArray()
 	return true;
 }
 
+void updateUniform(GLuint ProgramName, std::size_t DrawIndex, testDrawArrays::uniformUpdate const & UniformUpdate)
+{
+	switch(UniformUpdate)
+	{
+		case testDrawArrays::PER_DRAW_UNIFORM_DSA:
+		{
+			if(DrawIndex % 2)
+				glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			else
+				glProgramUniform4f(ProgramName, UniformDiffuse, 0.0f, 0.5f, 1.0f, 1.0f);
+		}
+		break;
+		case testDrawArrays::REDUNDANT_UNIFORM_DSA:
+		{
+			glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+		}
+		break;
+		case testDrawArrays::PER_DRAW_UNIFORM_B2E:
+		{
+			if(DrawIndex % 2)
+				glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			else
+				glUniform4f(UniformDiffuse, 0.0f, 0.5f, 1.0f, 1.0f);
+		}
+		break;
+		case testDrawArrays::REDUNDANT_UNIFORM_B2E:
+		{
+			glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+		}
+		break;
+		default:
+			break;
+	}
+}
+
 void testDrawArrays::render()
 {
 	float Depth(1.0f);
@@ -192,11 +241,19 @@ void testDrawArrays::render()
 		break;
 	case DRAW_PACKED:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
+		{
+			if(this->UniformUpdate != testDrawArrays::CONSTANT_UNIFORM && this->UniformUpdate != testDrawArrays::NO_UNIFORM)
+				::updateUniform(this->ProgramName, DrawIndex, this->UniformUpdate);
 			glDrawArrays(GL_TRIANGLES, static_cast<GLint>(this->VertexDataType == SEPARATED_VERTEX_DATA ? VertexCount * DrawIndex : 0), VertexCount);
+		}
 		break;
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
+		{
+			if(this->UniformUpdate != testDrawArrays::CONSTANT_UNIFORM && this->UniformUpdate != testDrawArrays::NO_UNIFORM)
+				::updateUniform(this->ProgramName, DrawIndex, this->UniformUpdate);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, static_cast<GLint>(this->VertexDataType == SEPARATED_VERTEX_DATA ? VertexCount * DrawIndex : 0), VertexCount, 1, 0);
+		}
 		break;
 	default:
 		assert(0);
