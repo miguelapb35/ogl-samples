@@ -1,5 +1,6 @@
 #include "test_draw_arrays.hpp"
 #include "test_draw_elements.hpp"
+#include "test_draw_arrays_vao.hpp"
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
 
@@ -152,6 +153,47 @@ int drawArraysUniform(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int drawArraysVAOs(int argc, char* argv[], csv & CSV)
+{
+	struct entry
+	{
+		entry(
+			std::string const & String,
+			testDrawArraysVAO::drawType const & DrawType,
+			testDrawArraysVAO::vaoMode const & VAOMode,
+			std::size_t const & DrawCount
+		) :
+			String(String),
+			DrawType(DrawType),
+			VAOMode(VAOMode),
+			DrawCount(DrawCount)
+		{}
+
+		std::string const String;
+		testDrawArraysVAO::drawType const DrawType;
+		testDrawArraysVAO::vaoMode const VAOMode;
+		std::size_t const DrawCount;
+	};
+
+	int Error(0);
+
+	std::vector<entry> Entries;
+	Entries.push_back(entry("MultiDrawArrays(NO_UNIFORM)", testDrawArraysVAO::MULTI_DRAW, testDrawArraysVAO::SHARED_VAO, 100000));
+	Entries.push_back(entry("DrawArrays(SHARED_VAO)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::SHARED_VAO, 100000));
+	Entries.push_back(entry("DrawArrays(SEPARATED_VAO)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::SEPARATED_VAO, 100000));
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
+	{
+		testDrawArraysVAO Test(argc, argv, test::CORE, 
+			Entries[EntryIndex].DrawType, Entries[EntryIndex].VAOMode, Entries[EntryIndex].DrawCount);
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	return Error;
+}
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
@@ -160,8 +202,8 @@ int main(int argc, char* argv[])
 
 	//Error += drawArrays(argc, argv, CSV);
 	//Error += drawElements(argc, argv, CSV);
-	
-	Error += drawArraysUniform(argc, argv, CSV);
+	//Error += drawArraysUniform(argc, argv, CSV);
+	Error += drawArraysVAOs(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");
