@@ -53,6 +53,8 @@ add_executable(${PERFS}
 	test_draw_arrays.hpp
 	test_draw_elements.cpp
 	test_draw_elements.hpp
+	test_draw_arrays_vao.cpp
+	test_draw_arrays_vao.hpp
 	hz-430-base-vertex.cpp 
 	hz-430-draw-range-array.cpp
 	hz-430-draw-range-element.cpp
