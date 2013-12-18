@@ -3,8 +3,9 @@
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 uniform vec4 Diffuse0;
+uniform vec4 Diffuse1;
 
 void main()
 {
-	Color = Diffuse0;
+	Color = (Diffuse0 + Diffuse1) * 0.5;
 }

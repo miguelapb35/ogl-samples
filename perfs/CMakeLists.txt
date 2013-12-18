@@ -34,6 +34,7 @@ set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../data/${GL_PROFILE_GTC}-${GL_VERSIO
 
 set(GL_SHADER_GTC
 	draw-uniform.vert draw-uniform.frag
+	draw-uniform2.vert draw-uniform2.frag
 	draw-range.vert draw-range.frag)
 
 foreach(FILE ${GL_SHADER_GTC})

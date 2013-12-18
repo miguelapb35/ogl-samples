@@ -22,10 +22,11 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE[2] = {"hz-430/draw-range.vert", "hz-430/draw-uniform.vert"};
-	char const * FRAG_SHADER_SOURCE[2] = {"hz-430/draw-range.frag", "hz-430/draw-uniform.frag"};
+	char const * VERT_SHADER_SOURCE[3] = {"hz-430/draw-range.vert", "hz-430/draw-uniform.vert", "hz-430/draw-uniform2.vert"};
+	char const * FRAG_SHADER_SOURCE[3] = {"hz-430/draw-range.frag", "hz-430/draw-uniform.frag", "hz-430/draw-uniform2.frag"};
 
-	GLint UniformDiffuse(-1);
+	GLint UniformDiffuse0(-1);
+	GLint UniformDiffuse1(-1);
 }//namespace
 
 testDrawArrays::testDrawArrays(
@@ -80,13 +81,35 @@ bool testDrawArrays::initProgram()
 {
 	bool Validated(true);
 	
+	std::size_t ShaderIndex(0);
+	switch(this->UniformUpdate)
+	{
+	case CONSTANT_UNIFORM:
+	case PER_DRAW_UNIFORM_DSA:
+	case REDUNDANT_UNIFORM_DSA:
+	case PER_DRAW_UNIFORM_B2E:
+	case REDUNDANT_UNIFORM_B2E:
+		ShaderIndex = 1;
+		break;
+	case PER_DRAW_UNIFORM2_DSA:
+	case REDUNDANT_UNIFORM2_DSA:
+	case PER_DRAW_UNIFORM2_B2E:
+	case REDUNDANT_UNIFORM2_B2E:
+		ShaderIndex = 2;
+		break;
+	case NO_UNIFORM:
+	default:
+		ShaderIndex = 0;
+		break;
+	}
+
 	glGenProgramPipelines(1, &this->PipelineName);
 
 	glf::compiler Compiler;
 	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
-		glf::DATA_DIRECTORY + VERT_SHADER_SOURCE[this->UniformUpdate == NO_UNIFORM ? 0 : 1], "--version 420 --profile core");
+		glf::DATA_DIRECTORY + VERT_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
 	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER,
-		glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[this->UniformUpdate == NO_UNIFORM ? 0 : 1], "--version 420 --profile core");
+		glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
 	this->ProgramName = glCreateProgram();
@@ -96,15 +119,26 @@ bool testDrawArrays::initProgram()
 	glLinkProgram(this->ProgramName);
 	Validated = Validated && glf::checkProgram(this->ProgramName);
 
-	UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+	UniformDiffuse0 = glGetUniformLocation(ProgramName, "Diffuse0");
+	UniformDiffuse1 = glGetUniformLocation(ProgramName, "Diffuse1");
 
 	if(Validated)
 		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-	if(this->UniformUpdate == testDrawArrays::PER_DRAW_UNIFORM_B2E || this->UniformUpdate == testDrawArrays::REDUNDANT_UNIFORM_B2E)
+	if(
+		this->UniformUpdate == testDrawArrays::CONSTANT_UNIFORM ||
+		this->UniformUpdate == testDrawArrays::PER_DRAW_UNIFORM_B2E ||
+		this->UniformUpdate == testDrawArrays::REDUNDANT_UNIFORM_B2E ||
+		this->UniformUpdate == testDrawArrays::PER_DRAW_UNIFORM2_B2E ||
+		this->UniformUpdate == testDrawArrays::REDUNDANT_UNIFORM2_B2E)
 		glActiveShaderProgram(this->PipelineName, this->ProgramName);
+
 	if(this->UniformUpdate == testDrawArrays::CONSTANT_UNIFORM)
-		glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+	{
+		glProgramUniform4f(this->ProgramName, UniformDiffuse0, 1.0f, 0.5f, 0.0f, 1.0f);
+		if(UniformDiffuse1 != -1)
+			glProgramUniform4f(this->ProgramName, UniformDiffuse1, 0.0f, 0.5f, 1.0f, 1.0f);
+	}
 
 	return Validated;
 }
@@ -176,29 +210,53 @@ void updateUniform(GLuint ProgramName, std::size_t DrawIndex, testDrawArrays::un
 	switch(UniformUpdate)
 	{
 		case testDrawArrays::PER_DRAW_UNIFORM_DSA:
+		case testDrawArrays::PER_DRAW_UNIFORM2_DSA:
 		{
 			if(DrawIndex % 2)
-				glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			{
+				glProgramUniform4f(ProgramName, UniformDiffuse0, 1.0f, 0.5f, 0.0f, 1.0f);
+				if(UniformDiffuse1 != -1)
+					glProgramUniform4f(ProgramName, UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
+			}
 			else
-				glProgramUniform4f(ProgramName, UniformDiffuse, 0.0f, 0.5f, 1.0f, 1.0f);
+			{
+				glProgramUniform4f(ProgramName, UniformDiffuse0, 0.0f, 0.5f, 1.0f, 1.0f);
+				if(UniformDiffuse1 != -1)
+					glProgramUniform4f(ProgramName, UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
+			}
 		}
 		break;
 		case testDrawArrays::REDUNDANT_UNIFORM_DSA:
+		case testDrawArrays::REDUNDANT_UNIFORM2_DSA:
 		{
-			glProgramUniform4f(ProgramName, UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			glProgramUniform4f(ProgramName, UniformDiffuse0, 1.0f, 0.5f, 0.0f, 1.0f);
+			if(UniformDiffuse1 != -1)
+				glProgramUniform4f(ProgramName, UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
 		}
 		break;
 		case testDrawArrays::PER_DRAW_UNIFORM_B2E:
+		case testDrawArrays::PER_DRAW_UNIFORM2_B2E:
 		{
 			if(DrawIndex % 2)
-				glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			{
+				glUniform4f(UniformDiffuse0, 1.0f, 0.5f, 0.0f, 1.0f);
+				if(UniformDiffuse1 != -1)
+					glUniform4f(UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
+			}
 			else
-				glUniform4f(UniformDiffuse, 0.0f, 0.5f, 1.0f, 1.0f);
+			{
+				glUniform4f(UniformDiffuse0, 0.0f, 0.5f, 1.0f, 1.0f);
+				if(UniformDiffuse1 != -1)
+					glUniform4f(UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
+			}
 		}
 		break;
 		case testDrawArrays::REDUNDANT_UNIFORM_B2E:
+		case testDrawArrays::REDUNDANT_UNIFORM2_B2E:
 		{
-			glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			glUniform4f(UniformDiffuse0, 1.0f, 0.5f, 0.0f, 1.0f);
+			if(UniformDiffuse1 != -1)
+				glUniform4f(UniformDiffuse1, 0.9f, 0.7f, 0.5f, 1.0f);
 		}
 		break;
 		default:

@@ -135,6 +135,10 @@ int drawArraysUniform(int argc, char* argv[], csv & CSV)
 	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_B2E, 100000));
 	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_DSA, 100000));
 	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_DSA, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM2_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM2_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM2_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM2_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM2_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM2_DSA, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM2_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM2_DSA, 100000));
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
