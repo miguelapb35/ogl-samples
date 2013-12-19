@@ -29,7 +29,7 @@ set(GL_VERSION_GTC 430)
 
 if(NOT APPLE)
 
-set(PERFS perfs)
+set(MICRO micro)
 set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../data/${GL_PROFILE_GTC}-${GL_VERSION_GTC})
 
 set(GL_SHADER_GTC
@@ -42,7 +42,7 @@ foreach(FILE ${GL_SHADER_GTC})
 endforeach(FILE)
 
 source_group("Shader Files" FILES ${SHADER_PATH})
-add_executable(${PERFS}
+add_executable(${MICRO}
 	main.cpp
 	csv.cpp
 	csv.hpp
@@ -65,13 +65,13 @@ add_executable(${PERFS}
 	hz-430-vertex-array-objects.cpp
 	${SHADER_PATH})
 add_custom_command(
-	TARGET ${PERFS} POST_BUILD
+	TARGET ${MICRO} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 if(WIN32)
-	add_dependencies(${PERFS} ${TARGET_DATA_COPY})
+	add_dependencies(${MICRO} ${TARGET_DATA_COPY})
 endif(WIN32)
-target_link_libraries(${PERFS} ${BINARY_FILES})
-add_dependencies(${PERFS} GLEW glfw)
+target_link_libraries(${MICRO} ${BINARY_FILES})
+add_dependencies(${MICRO} GLEW glfw)
 
 endif(NOT APPLE)
