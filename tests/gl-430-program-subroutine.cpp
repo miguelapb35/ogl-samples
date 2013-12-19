@@ -329,6 +329,8 @@ void display()
 	Index[1] = sementics::sampling::DXT1;
 	glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(Index.size()), &Index[0]);
 
+	glProgramUniformSubroutines(ProgramName, GL_FRAGMENT_SHADER, GLintptr offset, GLsizeiptr size, GLsizei stride);
+
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 2, 0);
 
 	glf::swapBuffers();
