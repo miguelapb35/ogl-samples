@@ -70,7 +70,10 @@ testDrawArraysVAO::~testDrawArraysVAO()
 	glDeleteBuffers(static_cast<GLsizei>(BUFFER_MAX), &this->BufferName[0]);
 	glDeleteProgramPipelines(1, &this->PipelineName);
 	glDeleteProgram(this->ProgramName);
-	glDeleteVertexArrays(static_cast<GLuint>(this->VertexArrayName.size()), &this->VertexArrayName[0]);
+
+	glDeleteVertexArrays(static_cast<GLsizei>(this->VertexArrayName.size()), &this->VertexArrayName[0]);
+	if(this->VAOMode == VABS_SEPARATED_BUFFER || this->VAOMode == VAOS_SEPARATED_BUFFER)
+		glDeleteBuffers(static_cast<GLsizei>(this->ArrayBufferName.size()), &this->ArrayBufferName[0]);
 }
 
 bool testDrawArraysVAO::initProgram()
@@ -114,6 +117,18 @@ bool testDrawArraysVAO::initBuffer()
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	if(this->VAOMode == VAOS_SEPARATED_BUFFER || this->VAOMode == VABS_SEPARATED_BUFFER)
+	{
+		this->ArrayBufferName.resize(this->DrawCount);
+		glGenBuffers(static_cast<GLuint>(this->ArrayBufferName.size()), &this->ArrayBufferName[0]);
+		for(std::size_t DrawIndex = 0; DrawIndex < this->DrawCount; ++DrawIndex)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, this->ArrayBufferName[DrawIndex]);
+			glBufferData(GL_ARRAY_BUFFER, VertexSize, &VertexData, GL_STATIC_DRAW);
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
 	std::vector<drawArraysIndirectCommand> Commands;
 	Commands.resize(this->DrawCount);
 	for(std::size_t i = 0; i < Commands.size(); ++i)
@@ -135,7 +150,7 @@ bool testDrawArraysVAO::initVertexArray()
 {
 	switch(this->VAOMode)
 	{
-		case SHARED_VAO:
+		case UNIQUE_VAO:
 		{
 			this->VertexArrayName.resize(1);
 
@@ -149,7 +164,38 @@ bool testDrawArraysVAO::initVertexArray()
 			glBindVertexArray(0);
 		}
 		break;
-		case SEPARATED_VAO:
+		case VABS_SEPARATED_BUFFER:
+		case VABS_UNIQUE_BUFFER:
+		{
+			this->VertexArrayName.resize(1);
+
+			glGenVertexArrays(1, &this->VertexArrayName[0]);
+			glBindVertexArray(this->VertexArrayName[0]);
+				glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+				glVertexAttribBinding(glf::semantic::attr::POSITION, 0);
+
+				glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glBindVertexArray(0);
+		}
+		break;
+		case VAOS_SEPARATED_BUFFER:
+		{
+			this->VertexArrayName.resize(this->DrawCount);
+			glGenVertexArrays(static_cast<GLuint>(this->DrawCount), &this->VertexArrayName[0]);
+
+			for(std::size_t DrawIndex = 0; DrawIndex < this->VertexArrayName.size(); ++DrawIndex)
+			{
+				glBindVertexArray(this->VertexArrayName[DrawIndex]);
+					glBindBuffer(GL_ARRAY_BUFFER, this->ArrayBufferName[DrawIndex]);
+					glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+					glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+				glBindVertexArray(0);
+			}
+		}
+		break;
+		case VAOS_UNIQUE_BUFFER:
 		{
 			this->VertexArrayName.resize(this->DrawCount);
 			glGenVertexArrays(static_cast<GLuint>(this->DrawCount), &this->VertexArrayName[0]);
@@ -194,7 +240,7 @@ void testDrawArraysVAO::render()
 	}
 
 	glViewportIndexedfv(0, &glm::vec4(0, 0, this->getWindowSize())[0]);
-	if(this->VAOMode == SHARED_VAO)
+	if(this->VAOMode == UNIQUE_VAO || this->VAOMode == VABS_SEPARATED_BUFFER || this->VAOMode == VABS_UNIQUE_BUFFER)
 		glBindVertexArray(this->VertexArrayName[0]);
 
 	this->beginTimer();
@@ -210,8 +256,21 @@ void testDrawArraysVAO::render()
 	case DRAW_PARAMS:
 		for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
 		{
-			if(this->VAOMode == SEPARATED_VAO)
+			switch(this->VAOMode)
+			{
+			case VAOS_SEPARATED_BUFFER:
+			case VAOS_UNIQUE_BUFFER:
 				glBindVertexArray(this->VertexArrayName[DrawIndex]);
+				break;
+			case VABS_SEPARATED_BUFFER:
+				glBindVertexBuffer(0, this->ArrayBufferName[DrawIndex], 0, sizeof(glm::vec2));
+				break;
+			case VABS_UNIQUE_BUFFER:
+				glBindVertexBuffer(0, this->BufferName[BUFFER_ARRAY], DrawIndex * VertexSize, sizeof(glm::vec2));
+				break;
+			default:
+				break;
+			}
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, static_cast<GLint>(VertexCount * DrawIndex), VertexCount, 1, 0);
 		}
 		break;

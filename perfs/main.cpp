@@ -132,14 +132,55 @@ int drawArraysUniform(int argc, char* argv[], csv & CSV)
 	Entries.push_back(entry("MultiDrawArrays(NO_UNIFORM)", testDrawArrays::MULTI_DRAW, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::NO_UNIFORM, 100000));
 	Entries.push_back(entry("DrawArrays(NO_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::NO_UNIFORM, 100000));
 	Entries.push_back(entry("DrawArrays(CONSTANT_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::CONSTANT_UNIFORM, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM2)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM2_B2E, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM2)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM2_B2E, 100000));
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
+	{
+		testDrawArrays Test(argc, argv, test::CORE, 
+			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	return Error;
+}
+
+int drawArraysDSA(int argc, char* argv[], csv & CSV)
+{
+	struct entry
+	{
+		entry(
+			std::string const & String,
+			testDrawArrays::drawType const & DrawType,
+			testDrawArrays::vertexDataType const & VertexDataType,
+			testDrawArrays::uniformUpdate const & UniformUpdate,
+			std::size_t const & DrawCount
+		) :
+			String(String),
+			DrawType(DrawType),
+			VertexDataType(VertexDataType),
+			UniformUpdate(UniformUpdate),
+			DrawCount(DrawCount)
+		{}
+
+		std::string const String;
+		testDrawArrays::drawType const DrawType;
+		testDrawArrays::vertexDataType const VertexDataType;
+		testDrawArrays::uniformUpdate const UniformUpdate;
+		std::size_t const DrawCount;
+	};
+
+	int Error(0);
+
+	std::vector<entry> Entries;
 	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_B2E, 100000));
-	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_B2E, 100000));
 	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM_DSA, 100000));
+	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_B2E, 100000));
 	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM_DSA, 100000));
-	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM2_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM2_B2E, 100000));
-	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM2_B2E)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM2_B2E, 100000));
-	Entries.push_back(entry("DrawArrays(PER_DRAW_UNIFORM2_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::PER_DRAW_UNIFORM2_DSA, 100000));
-	Entries.push_back(entry("DrawArrays(REDUNDANT_UNIFORM2_DSA)", testDrawArrays::DRAW_PACKED, testDrawArrays::SHARED_VERTEX_DATA, testDrawArrays::REDUNDANT_UNIFORM2_DSA, 100000));
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
@@ -178,9 +219,12 @@ int drawArraysVAOs(int argc, char* argv[], csv & CSV)
 	int Error(0);
 
 	std::vector<entry> Entries;
-	Entries.push_back(entry("MultiDrawArrays(NO_UNIFORM)", testDrawArraysVAO::MULTI_DRAW, testDrawArraysVAO::SHARED_VAO, 100000));
-	Entries.push_back(entry("DrawArrays(SHARED_VAO)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::SHARED_VAO, 100000));
-	Entries.push_back(entry("DrawArrays(SEPARATED_VAO)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::SEPARATED_VAO, 100000));
+	Entries.push_back(entry("MultiDrawArrays(UNIQUE_VAO)", testDrawArraysVAO::MULTI_DRAW, testDrawArraysVAO::UNIQUE_VAO, 100000));
+	Entries.push_back(entry("DrawArrays(UNIQUE_VAO)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::UNIQUE_VAO, 100000));
+	Entries.push_back(entry("DrawArrays(VAOS_UNIQUE_BUFFER)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::VAOS_UNIQUE_BUFFER, 100000));
+	Entries.push_back(entry("DrawArrays(VAOS_SEPARATED_BUFFERS)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::VAOS_SEPARATED_BUFFER, 100000));
+	Entries.push_back(entry("DrawArrays(VABS_UNIQUE_BUFFER)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::VAOS_UNIQUE_BUFFER, 100000));
+	Entries.push_back(entry("DrawArrays(VABS_SEPARATED_BUFFERS)", testDrawArraysVAO::DRAW_PARAMS, testDrawArraysVAO::VABS_SEPARATED_BUFFER, 100000));
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
@@ -202,8 +246,8 @@ int main(int argc, char* argv[])
 
 	//Error += drawArrays(argc, argv, CSV);
 	//Error += drawElements(argc, argv, CSV);
-	//Error += drawArraysUniform(argc, argv, CSV);
-	Error += drawArraysVAOs(argc, argv, CSV);
+	Error += drawArraysUniform(argc, argv, CSV);
+	//Error += drawArraysVAOs(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

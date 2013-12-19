@@ -15,8 +15,11 @@ public:
 
 	enum vaoMode
 	{
-		SEPARATED_VAO,
-		SHARED_VAO
+		VABS_SEPARATED_BUFFER,
+		VABS_UNIQUE_BUFFER,
+		VAOS_SEPARATED_BUFFER,
+		VAOS_UNIQUE_BUFFER,
+		UNIQUE_VAO
 	};
 
 private:
@@ -47,6 +50,7 @@ private:
 	vaoMode const VAOMode;
 	std::size_t const DrawCount;
 	std::vector<GLuint> VertexArrayName;
+	std::vector<GLuint> ArrayBufferName;
 	GLuint PipelineName;
 	GLuint ProgramName;
 	std::array<GLuint, BUFFER_MAX> BufferName;
