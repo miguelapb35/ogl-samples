@@ -68,6 +68,10 @@ set(GL_SHADER_GTC draw-instanced.vert draw-instanced.frag)
 glCreateSampleGTC(draw-instanced)
 set(GL_SHADER_GTC draw-multiple.vert draw-multiple.frag)
 glCreateSampleGTC(draw-multiple)
+set(GL_SHADER_GTC draw-range-arrays.vert draw-range-arrays.frag)
+glCreateSampleGTC(draw-range-arrays)
+set(GL_SHADER_GTC draw-range-elements.vert draw-range-elements.frag)
+glCreateSampleGTC(draw-range-elements)
 set(GL_SHADER_GTC draw-without-vertex-attrib.vert draw-without-vertex-attrib.frag)
 glCreateSampleGTC(draw-without-vertex-attrib)
 set(GL_SHADER_GTC fbo.vert fbo.frag texture-2d.vert texture-2d.frag)
@@ -369,5 +373,11 @@ set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-compressed)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
+
+# OpenGL 5.0 my ideas samples
+set(GL_VERSION_GTC 500)
+
+set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matching.eval interface-matching.geom interface-matching.frag)
+glCreateSampleGTC(interface-matching)
 
 endif(NOT APPLE)

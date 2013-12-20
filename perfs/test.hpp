@@ -56,7 +56,8 @@ public:
 	bool isKeyPressed(int Key) const;
 
 protected:
-	void updateTime(double InstantTime);
+	void beginTimer();
+	void endTimer();
 
 protected:
 	static glm::ivec2 const DEFAULT_WINDOW_SIZE;
@@ -65,6 +66,7 @@ protected:
 	GLFWwindow* Window;
 	profile Profile;
 	int Version;
+	GLuint QueryName;
 	std::size_t FrameNum;
 	std::size_t FrameMax;
 	glm::vec2 MouseOrigin;
@@ -77,7 +79,7 @@ protected:
 	std::array<bool, 512> KeyPressed;
 
 private:
-	double TimeConvergent, TimeMin, TimeMax;
+	double TimeSum, TimeMin, TimeMax;
 
 private:
 	int version(int Major, int Minor) {return Major * 100 + Minor * 10;}

@@ -1,19 +1,20 @@
-#include "test.hpp"
+﻿#include "test.hpp"
 
 int const MAJOR = 3;
 int const MINOR = 2;
 
 glm::ivec2 const test::DEFAULT_WINDOW_SIZE(640, 480);
-std::size_t const test::DEFAULT_MAX_FRAME(1000);
+std::size_t const test::DEFAULT_MAX_FRAME(100);
 
 test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::ivec2 const & WindowSize) :
 	Window(nullptr),
 	Version(version(3, 2)),
+	QueryName(0),
 	Profile(Profile),
 	FrameNum(0),
 	FrameMax(FrameMax),
-	TimeConvergent(0.0),
-	TimeMin(0.0),
+	TimeSum(0.0),
+	TimeMin(std::numeric_limits<double>::max()),
 	TimeMax(0.0)
 {
 	glfwInit();
@@ -66,10 +67,14 @@ test::test(int argc, char* argv[], profile Profile, std::size_t FrameMax, glm::i
 		glDebugMessageCallbackARB(&test::debugOutput, NULL);
 	}
 #	endif
+
+	glGenQueries(1, &this->QueryName);
 }
 
 test::~test()
 {
+	glDeleteQueries(1, &this->QueryName);
+
 	glfwDestroyWindow(this->Window);
 	this->Window = 0;
 
@@ -88,8 +93,10 @@ int test::operator()()
 
 		this->swap();
 
-		if(FrameNum < FrameMax)
+		if(FrameNum >= FrameMax)
 			this->stop();
+		else
+			++FrameNum;
 	}
 
 	return 0;
@@ -107,16 +114,7 @@ void test::stop()
 
 void test::log(csv & CSV, char const * String)
 {
-	CSV.log(String, this->TimeConvergent, this->TimeMin, this->TimeMax);
-}
-
-void test::updateTime(double InstantTime)
-{
-	if(this->TimeConvergent == 0)
-		this->TimeConvergent = InstantTime;
-	else
-		this->TimeConvergent = glm::mix(this->TimeConvergent, InstantTime, 0.01);
-	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms    ", this->TimeConvergent, InstantTime);
+	CSV.log(String, this->TimeSum / this->FrameMax, this->TimeMin, this->TimeMax);
 }
 
 bool test::isExtensionSupported(char const * String)
@@ -140,6 +138,27 @@ glm::ivec2 test::getWindowSize() const
 bool test::isKeyPressed(int Key) const
 {
 	return this->KeyPressed[Key];
+}
+
+void test::beginTimer()
+{
+	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+}
+
+void test::endTimer()
+{
+	glEndQuery(GL_TIME_ELAPSED);
+
+	GLuint QueryTime(0);
+	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
+
+	double const InstantTime(static_cast<double>(QueryTime) / 1000.0);
+
+	this->TimeSum += InstantTime;
+	this->TimeMax = glm::max(this->TimeMax, InstantTime);
+	this->TimeMin = glm::min(this->TimeMin, InstantTime);
+
+	fprintf(stdout, "\rTime: %2.4f ms    ", InstantTime / 1000.0);
 }
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)
@@ -233,65 +252,59 @@ void APIENTRY test::debugOutput
 	GLvoid* userParam
 )
 {
-	//FILE* f;
-	//f = fopen("debug_output.txt","a");
-	//if(f)
+	char debSource[32], debType[32], debSev[32];
+	bool Error(false);
+
+	if(source == GL_DEBUG_SOURCE_API_ARB)
+		strcpy(debSource, "OpenGL");
+	else if(source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)
+		strcpy(debSource, "Windows");
+	else if(source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
+		strcpy(debSource, "Shader Compiler");
+	else if(source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)
+		strcpy(debSource, "Third Party");
+	else if(source == GL_DEBUG_SOURCE_APPLICATION_ARB)
+		strcpy(debSource, "Application");
+	else if (source == GL_DEBUG_SOURCE_OTHER_ARB)
+		strcpy(debSource, "Other");
+	else
+		assert(0);
+ 
+	if(type == GL_DEBUG_TYPE_ERROR)
+		strcpy(debType, "error");
+	else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
+		strcpy(debType, "deprecated behavior");
+	else if(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
+		strcpy(debType, "undefined behavior");
+	else if(type == GL_DEBUG_TYPE_PORTABILITY)
+		strcpy(debType, "portability");
+	else if(type == GL_DEBUG_TYPE_PERFORMANCE)
+		strcpy(debType, "performance");
+	else if(type == GL_DEBUG_TYPE_OTHER)
+		strcpy(debType, "message");
+	else if(type == GL_DEBUG_TYPE_MARKER)
+		strcpy(debType, "marker");
+	else if(type == GL_DEBUG_TYPE_PUSH_GROUP)
+		strcpy(debType, "push group");
+	else if(type == GL_DEBUG_TYPE_POP_GROUP)
+		strcpy(debType, "pop group");
+	else
+		assert(0);
+ 
+	if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 	{
-		char debSource[32], debType[32], debSev[32];
-		bool Error(false);
-
-		if(source == GL_DEBUG_SOURCE_API_ARB)
-			strcpy(debSource, "OpenGL");
-		else if(source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)
-			strcpy(debSource, "Windows");
-		else if(source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
-			strcpy(debSource, "Shader Compiler");
-		else if(source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)
-			strcpy(debSource, "Third Party");
-		else if(source == GL_DEBUG_SOURCE_APPLICATION_ARB)
-			strcpy(debSource, "Application");
-		else if (source == GL_DEBUG_SOURCE_OTHER_ARB)
-			strcpy(debSource, "Other");
-		else
-			assert(0);
- 
-		if(type == GL_DEBUG_TYPE_ERROR)
-			strcpy(debType, "error");
-		else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
-			strcpy(debType, "deprecated behavior");
-		else if(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
-			strcpy(debType, "undefined behavior");
-		else if(type == GL_DEBUG_TYPE_PORTABILITY)
-			strcpy(debType, "portability");
-		else if(type == GL_DEBUG_TYPE_PERFORMANCE)
-			strcpy(debType, "performance");
-		else if(type == GL_DEBUG_TYPE_OTHER)
-			strcpy(debType, "message");
-		else if(type == GL_DEBUG_TYPE_MARKER)
-			strcpy(debType, "marker");
-		else if(type == GL_DEBUG_TYPE_PUSH_GROUP)
-			strcpy(debType, "push group");
-		else if(type == GL_DEBUG_TYPE_POP_GROUP)
-			strcpy(debType, "pop group");
-		else
-			assert(0);
- 
-		if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
-		{
-			strcpy(debSev, "high");
-			Error = true;
-		}
-		else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
-			strcpy(debSev, "medium");
-		else if(severity == GL_DEBUG_SEVERITY_LOW_ARB)
-			strcpy(debSev, "low");
-		else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-			strcpy(debSev, "notification");
-		else
-			assert(0);
-
-			fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
-			assert(!Error);
-			//fclose(f);
+		strcpy(debSev, "high");
+		Error = true;
 	}
+	else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
+		strcpy(debSev, "medium");
+	else if(severity == GL_DEBUG_SEVERITY_LOW_ARB)
+		strcpy(debSev, "low");
+	else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+		strcpy(debSev, "notification");
+	else
+		assert(0);
+
+	fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
+	assert(!Error);
 }

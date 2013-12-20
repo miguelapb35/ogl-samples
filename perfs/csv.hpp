@@ -3,6 +3,10 @@
 
 #include <vector>
 #include <string>
+#include <cstdarg>
+#include <cassert>
+
+std::string format(const char * Message, ...);
 
 class csv
 {
@@ -10,20 +14,19 @@ class csv
 	{
 		data(
 			std::string const & String,
-			float Convergent, float Min, float Max) :
+			double Convergent, double Min, double Max) :
 			String(String),
 			Convergent(Convergent), Min(Min), Max(Max)
 		{}
 
 		std::string String;
-		float Convergent;
-		float Min;
-		float Max;
+		double Convergent;
+		double Min;
+		double Max;
 	};
 
 public:
-	void log(char const * String, float Average, float Min, float Max);
-
+	void log(char const * String, double Average, double Min, double Max);
 	void save(char const * Filename);
 	void print();
 
