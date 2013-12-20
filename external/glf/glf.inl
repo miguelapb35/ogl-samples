@@ -123,7 +123,6 @@ namespace glf
 		return Result;
 	}
 
-	#if !defined(__APPLE__)
 	static void APIENTRY debugOutput
 	(
 		GLenum source,
@@ -197,39 +196,7 @@ namespace glf
 			 //fclose(f);
 		}
 	}
-/*
-	void checkDebugOutput()
-	{
-			unsigned int count = 10; // max. num. of messages that will be read from the log
-			int bufsize = 2048;
-	 
-			unsigned int* sources      = new unsigned int[count];
-			unsigned int* types        = new unsigned int[count];
-			unsigned int* ids   = new unsigned int[count];
-			unsigned int* severities = new unsigned int[count];
-			int* lengths = new int[count];
-	 
-			char* messageLog = new char[bufsize];
-	 
-			unsigned int retVal = glGetDebugMessageLogARB(count, bufsize, sources, types, ids, severities, lengths, messageLog);
-			if(retVal > 0)
-			{
-					unsigned int pos = 0;
-					for(unsigned int i=0; i<retVal; i++)
-					{
-						debugOutput(sources[i], types[i], ids[i], severities[i], NULL, &messageLog[pos], NULL);
-						pos += lengths[i];
-					}
-			}
-			delete [] sources;
-			delete [] types;
-			delete [] ids;
-			delete [] severities;
-			delete [] lengths;
-			delete [] messageLog;
-	}
-*/
-#endif
+
 	static void cursor_position_callback(GLFWwindow* pWindow,double x, double y)
 	{
 		Window.MouseCurrent = glm::ivec2(x, y);
