@@ -53,7 +53,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/inclu
 ################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.5.D)
+set(GLM_DIRECTORY glm-0.9.5.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################
