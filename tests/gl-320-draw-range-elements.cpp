@@ -191,7 +191,7 @@ void display()
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-		glm::mat4 Projection = glm::perspective(45.0f, 1.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 1.0f / 3.0f, 0.1f, 100.0f);
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		glm::mat4 ViewTranslateA = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));

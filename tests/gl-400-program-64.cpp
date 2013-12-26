@@ -162,7 +162,7 @@ bool end()
 void display()
 {
 	// Compute the MVP (Model View Projection matrix)
-    glm::dmat4 Projection = glm::perspective(45.0, 4.0 / 3.0, 0.1, 100.0);
+    glm::dmat4 Projection = glm::perspective(glm::pi<double>() * 0.25, 4.0 / 3.0, 0.1, 100.0);
 	glm::dmat4 ViewTranslateZ = glm::translate(glm::dmat4(1.0), glm::dvec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 	glm::dmat4 ViewRotateX = glm::rotate(ViewTranslateZ, double(Window.RotationCurrent.y), glm::dvec3(1.f, 0.f, 0.f));
 	glm::dmat4 ViewRotateY = glm::rotate(ViewRotateX, double(Window.RotationCurrent.x), glm::dvec3(0.f, 1.f, 0.f));

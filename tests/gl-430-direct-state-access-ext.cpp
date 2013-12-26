@@ -263,7 +263,7 @@ void renderFBO()
 			BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-		glm::mat4 Perspective = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
+		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0 - 4.0));
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
@@ -303,10 +303,10 @@ void resolveMultisampling()
 			BufferName[buffer::BLIT], 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 
-		glm::mat4 Perspective = glm::perspective(45.0f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
+		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(Window.Size.x) / Window.Size.y, 0.1f, 100.0f);
 		glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f,-1.0f, 1.0f));
 		glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
-		glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 View = glm::rotate(ViewTranslate,-glm::pi<float>() * 0.1f, glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Perspective * View * Model;
 

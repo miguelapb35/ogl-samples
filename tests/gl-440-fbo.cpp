@@ -321,7 +321,7 @@ void display()
 	{
 		// Compute the MVP (Model View Projection matrix)
 		float Aspect = (Window.Size.x * 0.50f) / (Window.Size.y * 0.50f);
-		glm::mat4 Projection = glm::perspective(45.0f, Aspect, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
 		glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
 		glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
 		glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));

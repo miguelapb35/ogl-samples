@@ -137,106 +137,68 @@ namespace glf
 		GLvoid* userParam
 	)
 	{
-		//FILE* f;
-		//f = fopen("debug_output.txt","a");
-		//if(f)
+		char debSource[32], debType[32], debSev[32];
+		bool Error(false);
+
+		if(source == GL_DEBUG_SOURCE_API_ARB)
+			strcpy(debSource, "OpenGL");
+		else if(source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)
+			strcpy(debSource, "Windows");
+		else if(source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
+			strcpy(debSource, "Shader Compiler");
+		else if(source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)
+			strcpy(debSource, "Third Party");
+		else if(source == GL_DEBUG_SOURCE_APPLICATION_ARB)
+			strcpy(debSource, "Application");
+		else if (source == GL_DEBUG_SOURCE_OTHER_ARB)
+			strcpy(debSource, "Other");
+		else
+			assert(0);
+ 
+		if(type == GL_DEBUG_TYPE_ERROR)
+			strcpy(debType, "error");
+		else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
+			strcpy(debType, "deprecated behavior");
+		else if(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
+			strcpy(debType, "undefined behavior");
+		else if(type == GL_DEBUG_TYPE_PORTABILITY)
+			strcpy(debType, "portability");
+		else if(type == GL_DEBUG_TYPE_PERFORMANCE)
+			strcpy(debType, "performance");
+		else if(type == GL_DEBUG_TYPE_OTHER)
+			strcpy(debType, "message");
+		else if(type == GL_DEBUG_TYPE_MARKER)
+			strcpy(debType, "marker");
+		else if(type == GL_DEBUG_TYPE_PUSH_GROUP)
+			strcpy(debType, "push group");
+		else if(type == GL_DEBUG_TYPE_POP_GROUP)
+			strcpy(debType, "pop group");
+		else
+			assert(0);
+ 
+		if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 		{
-			char debSource[32], debType[32], debSev[32];
-			bool Error(false);
-
-			if(source == GL_DEBUG_SOURCE_API_ARB)
-				strcpy(debSource, "OpenGL");
-			else if(source == GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB)
-				strcpy(debSource, "Windows");
-			else if(source == GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
-				strcpy(debSource, "Shader Compiler");
-			else if(source == GL_DEBUG_SOURCE_THIRD_PARTY_ARB)
-				strcpy(debSource, "Third Party");
-			else if(source == GL_DEBUG_SOURCE_APPLICATION_ARB)
-				strcpy(debSource, "Application");
-			else if (source == GL_DEBUG_SOURCE_OTHER_ARB)
-				strcpy(debSource, "Other");
-			else
-				assert(0);
- 
-			if(type == GL_DEBUG_TYPE_ERROR)
-				strcpy(debType, "error");
-			else if(type == GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR)
-				strcpy(debType, "deprecated behavior");
-			else if(type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR)
-				strcpy(debType, "undefined behavior");
-			else if(type == GL_DEBUG_TYPE_PORTABILITY)
-				strcpy(debType, "portability");
-			else if(type == GL_DEBUG_TYPE_PERFORMANCE)
-				strcpy(debType, "performance");
-			else if(type == GL_DEBUG_TYPE_OTHER)
-				strcpy(debType, "message");
-			else if(type == GL_DEBUG_TYPE_MARKER)
-				strcpy(debType, "marker");
-			else if(type == GL_DEBUG_TYPE_PUSH_GROUP)
-				strcpy(debType, "push group");
-			else if(type == GL_DEBUG_TYPE_POP_GROUP)
-				strcpy(debType, "pop group");
-			else
-				assert(0);
- 
-			if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
-			{
-				strcpy(debSev, "high");
-				Error = true;
-			}
-			else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
-				strcpy(debSev, "medium");
-			else if(severity == GL_DEBUG_SEVERITY_LOW_ARB)
-				strcpy(debSev, "low");
-			else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
-				strcpy(debSev, "notification");
-			else
-				assert(0);
-
-			 fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
-			 assert(!Error);
-			 //fclose(f);
+			strcpy(debSev, "high");
+			Error = true;
 		}
+		else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
+			strcpy(debSev, "medium");
+		else if(severity == GL_DEBUG_SEVERITY_LOW_ARB)
+			strcpy(debSev, "low");
+		else if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+			strcpy(debSev, "notification");
+		else
+			assert(0);
+
+		fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
+		assert(!Error);
 	}
-/*
-	void checkDebugOutput()
-	{
-			unsigned int count = 10; // max. num. of messages that will be read from the log
-			int bufsize = 2048;
-	 
-			unsigned int* sources      = new unsigned int[count];
-			unsigned int* types        = new unsigned int[count];
-			unsigned int* ids   = new unsigned int[count];
-			unsigned int* severities = new unsigned int[count];
-			int* lengths = new int[count];
-	 
-			char* messageLog = new char[bufsize];
-	 
-			unsigned int retVal = glGetDebugMessageLogARB(count, bufsize, sources, types, ids, severities, lengths, messageLog);
-			if(retVal > 0)
-			{
-					unsigned int pos = 0;
-					for(unsigned int i=0; i<retVal; i++)
-					{
-						debugOutput(sources[i], types[i], ids[i], severities[i], NULL, &messageLog[pos], NULL);
-						pos += lengths[i];
-					}
-			}
-			delete [] sources;
-			delete [] types;
-			delete [] ids;
-			delete [] severities;
-			delete [] lengths;
-			delete [] messageLog;
-	}
-*/
 
 	static void cursor_position_callback(GLFWwindow* pWindow,double x, double y)
 	{
 		Window.MouseCurrent = glm::ivec2(x, y);
 		Window.TranlationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_LEFT ? Window.TranlationOrigin + (Window.MouseCurrent - Window.MouseOrigin) / 10.f : Window.TranlationOrigin;
-		Window.RotationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_RIGHT ? Window.RotationOrigin + (Window.MouseCurrent - Window.MouseOrigin) : Window.RotationOrigin;
+		Window.RotationCurrent = Window.MouseButtonFlags & glf::MOUSE_BUTTON_RIGHT ? Window.RotationOrigin + glm::radians(Window.MouseCurrent - Window.MouseOrigin) : Window.RotationOrigin;
 	}
 
 	static void mouse_button_callback (GLFWwindow* pWindow, int Button, int Action, int mods)
@@ -285,7 +247,7 @@ namespace glf
 					break;
 					case GLFW_MOUSE_BUTTON_RIGHT:
 					{
-						Window.RotationOrigin += Window.MouseCurrent - Window.MouseOrigin;
+						Window.RotationOrigin += glm::radians(Window.MouseCurrent - Window.MouseOrigin);
 						Window.MouseButtonFlags &= ~glf::MOUSE_BUTTON_RIGHT;
 					}
 					break;

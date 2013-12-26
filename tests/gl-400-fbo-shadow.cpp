@@ -388,10 +388,10 @@ void display()
 
 	// Update of the MVP matrix for the render pass
 	{
-		glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.01f, 5.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.01f, 5.0f);
 		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y + 3.0f));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - 60.f, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + 30.f, glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y - glm::pi<float>() * 0.33f, glm::vec3(1.f, 0.f, 0.f));
+		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x + glm::pi<float>() * 0.16f, glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 Model = glm::mat4(1.0f);
 		*(Pointer + 0) = Projection * View * Model;
 	}

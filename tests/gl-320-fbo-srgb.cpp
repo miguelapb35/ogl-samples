@@ -249,7 +249,7 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 	{
-		glm::mat4 Projection = glm::perspective(45.0f, float(FRAMEBUFFER_SIZE.x) / float(FRAMEBUFFER_SIZE.y), 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / float(FRAMEBUFFER_SIZE.y), 0.1f, 100.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
 		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
@@ -262,7 +262,7 @@ void display()
 	}
 
 	{
-		glm::mat4 Projection = glm::perspective(45.0f, float(Window.Size.x) / float(Window.Size.y), 0.1f, 100.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, float(Window.Size.x) / float(Window.Size.y), 0.1f, 100.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
 		glViewport(0, 0, Window.Size.x, Window.Size.y);
