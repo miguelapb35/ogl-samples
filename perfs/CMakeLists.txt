@@ -35,7 +35,8 @@ set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../data/${GL_PROFILE_GTC}-${GL_VERSIO
 set(GL_SHADER_GTC
 	draw-uniform.vert draw-uniform.frag
 	draw-uniform2.vert draw-uniform2.frag
-	draw-range.vert draw-range.frag)
+	draw-range.vert draw-range.frag
+	screenspace_coherence.vert screenspace_coherence.frag)
 
 foreach(FILE ${GL_SHADER_GTC})
 	set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})
@@ -56,6 +57,8 @@ add_executable(${MICRO}
 	test_draw_elements.hpp
 	test_draw_arrays_vao.cpp
 	test_draw_arrays_vao.hpp
+	test_screenspace_coherence.cpp
+	test_screenspace_coherence.hpp
 	hz-430-base-vertex.cpp 
 	hz-430-draw-range-array.cpp
 	hz-430-draw-range-element.cpp

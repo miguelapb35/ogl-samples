@@ -1,6 +1,7 @@
 #include "test_draw_arrays.hpp"
 #include "test_draw_elements.hpp"
 #include "test_draw_arrays_vao.hpp"
+#include "test_screenspace_coherence.hpp"
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
 
@@ -238,6 +239,137 @@ int drawArraysVAOs(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int drawScreenspaceCoherence(int argc, char* argv[], csv & CSV)
+{
+	struct entry
+	{
+		entry(
+			std::string const & String,
+			glm::uvec2 const & WindowSize,
+			glm::uvec2 const & TileSize,
+			std::size_t const ViewportDrawCount,
+			std::size_t const TileDrawCount
+		) :
+			String(String),
+			WindowSize(WindowSize),
+			TileSize(TileSize),
+			ViewportDrawCount(ViewportDrawCount),
+			TileDrawCount(TileDrawCount)
+		{}
+
+		std::string const String;
+		glm::uvec2 const WindowSize;
+		glm::uvec2 const TileSize;
+		std::size_t const ViewportDrawCount;
+		std::size_t const TileDrawCount;
+	};
+
+	int Error(0);
+
+	std::vector<entry> Entries;
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 100));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 10, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 10, 10));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 100, 1));
+
+/*
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 1));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 10));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 10));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 10, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 10x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 10, 1));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 100));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 100, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 100, 1));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 100));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 1000x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 100));
+
+	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1000, 1));
+	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1000x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1000, 1));
+*/
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
+	{
+		testScreenspaceCoherence Test(argc, argv, test::CORE, Entries[EntryIndex].WindowSize, Entries[EntryIndex].TileSize, Entries[EntryIndex].ViewportDrawCount, Entries[EntryIndex].TileDrawCount);
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	return Error;
+}
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
@@ -246,8 +378,9 @@ int main(int argc, char* argv[])
 
 	//Error += drawArrays(argc, argv, CSV);
 	//Error += drawElements(argc, argv, CSV);
-	Error += drawArraysUniform(argc, argv, CSV);
+	//Error += drawArraysUniform(argc, argv, CSV);
 	//Error += drawArraysVAOs(argc, argv, CSV);
+	Error += drawScreenspaceCoherence(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

@@ -164,6 +164,8 @@ void display()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindVertexArray(VertexArrayName);
 
+	glViewport(0, 0, SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT);
+
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
 	glf::swapBuffers();
