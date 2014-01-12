@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -55,8 +55,6 @@ namespace detail
 		GLM_FUNC_DECL GLM_CONSTEXPR length_t length() const;
 
 		template <typename U, precision Q>
-		friend tmat4x4<U, Q> inverse(tmat4x4<U, Q> const & m);
-		template <typename U, precision Q>
 		friend tvec4<U, Q> operator/(tmat4x4<U, Q> const & m, tvec4<U, Q> const & v);
 		template <typename U, precision Q>
 		friend tvec4<U, Q> operator/(tvec4<U, Q> const & v, tmat4x4<U, Q> const & m);
@@ -64,9 +62,6 @@ namespace detail
 	private:
 		/// @cond DETAIL
 		col_type value[4];
-		
-		GLM_FUNC_DECL tmat4x4<T, P> _inverse() const;
-		/// @endcond
 
 	public:
 		// Constructors
@@ -99,10 +94,7 @@ namespace detail
 
 		//////////////////////////////////////
 		// Conversions
-		template <typename U> 
-		GLM_FUNC_DECL explicit tmat4x4(
-			U const & x);
-			
+
 		template <
 			typename X1, typename Y1, typename Z1, typename W1,
 			typename X2, typename Y2, typename Z2, typename W2,
@@ -167,6 +159,9 @@ namespace detail
 		GLM_FUNC_DECL tmat4x4<T, P> operator++(int);
 		GLM_FUNC_DECL tmat4x4<T, P> operator--(int);
 	};
+
+	template <typename T, precision P>
+	GLM_FUNC_DECL tmat4x4<T, P> compute_inverse_mat4(tmat4x4<T, P> const & m);
 
 	// Binary operators
 	template <typename T, precision P>

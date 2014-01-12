@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// OpenGL Mathematics Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+// OpenGL Mathematics Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Created : 2008-08-31
 // Updated : 2011-05-31
@@ -7,8 +7,10 @@
 // File    : test/core/type_vec2.cpp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define GLM_FORCE_RADIANS
 #include <glm/vector_relational.hpp>
 #include <glm/vec2.hpp>
+#include <vector>
 
 int test_vec2_operators()
 {
@@ -198,6 +200,24 @@ int test_vec2_operators()
 int test_vec2_ctor()
 {
 	int Error = 0;
+
+#if(GLM_HAS_INITIALIZER_LISTS)
+	{
+		glm::vec2 a{ 0, 1 };
+		std::vector<glm::vec2> v = {
+			{0, 1},
+			{4, 5},
+			{8, 9}};
+	}
+
+	{
+		glm::dvec2 a{ 0, 1 };
+		std::vector<glm::dvec2> v = {
+			{0, 1},
+			{4, 5},
+			{8, 9}};
+	}
+#endif
 
 	{
 		glm::vec2 A = glm::vec2(2.0f);

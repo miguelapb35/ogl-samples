@@ -156,6 +156,8 @@ namespace glf
 			Text += Line + "\n";
 		}
 
+		Text += glf::format("\nconst float G_TRUC_GNI = %f;\n", glm::linearRand(0.0f, 1.0f));
+
 		return Text;
 	}
 
@@ -185,10 +187,11 @@ namespace glf
 		commandline CommandLine(Filename, Arguments);
 
 		std::string PreprocessedSource = parser()(CommandLine, Filename);
+		PreprocessedSource += glf::format("\n/*\n%f*/\n", glm::linearRand(0.0f, 1.0f));
 		assert(!PreprocessedSource.empty());
 		char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
-		fprintf(stdout, "%s\n", PreprocessedSource.c_str());
+		//fprintf(stdout, "%s\n", PreprocessedSource.c_str());
 
 		GLuint Name = glCreateShader(Type);
 		glShaderSource(Name, 1, &PreprocessedSourcePointer, NULL);
@@ -249,7 +252,7 @@ namespace glf
 				{
 					std::vector<char> Buffer(InfoLogLength);
 					glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
-					fprintf(stdout, "%s\n", &Buffer[0]);
+					//fprintf(stdout, "%s\n", &Buffer[0]);
 				}
 			}
 
@@ -366,7 +369,7 @@ namespace glf
 		GLint Result = GL_FALSE;
 		glGetProgramiv(ProgramName, GL_LINK_STATUS, &Result);
 
-		fprintf(stdout, "Linking program\n");
+		//fprintf(stdout, "Linking program\n");
 		int InfoLogLength;
 		glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if(InfoLogLength > 0)

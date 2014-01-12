@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// OpenGL Mathematics Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+// OpenGL Mathematics Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Created : 2008-08-31
 // Updated : 2013-08-27
@@ -7,6 +7,7 @@
 // File    : test/core/type_vec3.cpp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define GLM_FORCE_RADIANS
 #define GLM_SWIZZLE
 #include <glm/vector_relational.hpp>
 #include <glm/geometric.hpp>
@@ -20,6 +21,24 @@ int test_vec3_ctor()
 {
 	int Error = 0;
 	
+#if(GLM_HAS_INITIALIZER_LISTS)
+	{
+		glm::vec3 a{ 0, 1, 2 };
+		std::vector<glm::vec3> v = {
+			{0, 1, 2},
+			{4, 5, 6},
+			{8, 9, 0}};
+	}
+
+	{
+		glm::dvec3 a{ 0, 1, 2 };
+		std::vector<glm::dvec3> v = {
+			{0, 1, 2},
+			{4, 5, 6},
+			{8, 9, 0}};
+	}
+#endif
+
 	{
 		glm::vec3 A(1);
 		glm::vec3 B(1, 1, 1);

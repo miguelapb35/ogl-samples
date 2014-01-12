@@ -7,7 +7,7 @@ glm@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,17 @@ More informations in GLM manual:
 http://glm.g-truc.net/glm.pdf
 
 ================================================================================
-GLM 0.9.5.1: 2014-XX-XX
+GLM 0.9.5.1: 2014-01-11
 --------------------------------------------------------------------------------
 - Fixed angle and orientedAngle that sometimes return NaN values (#145)
-- Deprecated degrees for function parameters and display a message.
+- Deprecated degrees for function parameters and display a message
+- Added possible static_cast conversion of GLM types (#72)
+- Fixed error 'inverse' is not a member of 'glm' from glm::unProject (#146)
+- Fixed mismatch between some declarations and definitions
+- Fixed inverse link error when using namespace glm; (#147)
+- Optimized matrix inverse and division code (#149)
+- Added intersectRayPlane function (#153)
+- Fixed outerProduct return type (#155)
 
 ================================================================================
 GLM 0.9.5.0: 2013-12-25

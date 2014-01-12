@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -225,7 +225,7 @@ namespace detail
 	GLM_FUNC_QUALIFIER float unpackUnorm1x8(uint8 const & p)
 	{
 		float Unpack(static_cast<float>(p));
-		return Unpack * float(0.0039215686274509803921568627451); // 1 / 255
+		return Unpack * static_cast<float>(0.0039215686274509803921568627451); // 1 / 255
 	}
 	
 	GLM_FUNC_QUALIFIER uint16 packUnorm2x8(vec2 const & v)

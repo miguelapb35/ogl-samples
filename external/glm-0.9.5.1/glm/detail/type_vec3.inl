@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -117,17 +117,6 @@ namespace detail
 
 	//////////////////////////////////////
 	// Conversion scalar constructors
-		
-	template <typename T, precision P>
-	template <typename U>
-	GLM_FUNC_QUALIFIER tvec3<T, P>::tvec3
-	(
-		U const & s
-	) :
-		x(static_cast<T>(s)),
-		y(static_cast<T>(s)),
-		z(static_cast<T>(s))
-	{}
 
 	template <typename T, precision P>
 	template <typename A, typename B, typename C>

@@ -119,6 +119,11 @@ bool initProgram()
 	// Get variables locations
 	if(Validated)
 	{
+		GLint ProgramVertSubroutine(0);
+		glGetProgramStageiv(ProgramName, GL_VERTEX_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &ProgramVertSubroutine);
+		GLint ProgramFragSubroutine(0);
+		glGetProgramStageiv(ProgramName, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &ProgramFragSubroutine);
+
 		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
 		UniformDXT1 = glGetUniformLocation(ProgramName, "DiffuseDXT1");
 		UniformRGB8 = glGetUniformLocation(ProgramName, "DiffuseRGB8");

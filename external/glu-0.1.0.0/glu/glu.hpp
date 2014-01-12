@@ -1,7 +1,8 @@
 #ifndef GLU_INCLUDED
 #define GLU_INCLUDED
 
-#include "core/texture2d.hpp"
+#include "texture2d.hpp"
+#include "caps.hpp"
 
 namespace glu
 {

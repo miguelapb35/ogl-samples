@@ -1,6 +1,8 @@
+#include "test_compiler.hpp"
 #include "test_draw_arrays.hpp"
 #include "test_draw_elements.hpp"
 #include "test_draw_arrays_vao.hpp"
+#include "test_draw_indexing.hpp"
 #include "test_screenspace_coherence.hpp"
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
@@ -268,32 +270,44 @@ int drawScreenspaceCoherence(int argc, char* argv[], csv & CSV)
 
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 100));
-	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 100));
+	Entries.push_back(entry("Forward(1024x1024 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 100));
+	Entries.push_back(entry("Forward(512x512 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 1, 100));
+	Entries.push_back(entry("Forward(256x256 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 1, 100));
+	Entries.push_back(entry("Forward(128x128 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 1, 100));
+	Entries.push_back(entry("Forward(64x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 1, 100));
+	Entries.push_back(entry("Forward(32x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 1, 100));
+	Entries.push_back(entry("Forward(16x16 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, 100));
+	Entries.push_back(entry("Forward(8x8 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, 100));
+	Entries.push_back(entry("Forward(512x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 64), 1, 100));
+	Entries.push_back(entry("Forward(512x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 32), 1, 100));
+	Entries.push_back(entry("Forward(256x64 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 64), 1, 100));
+	Entries.push_back(entry("Forward(256x32 - 1x viewport 100x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 32), 1, 100));
 
-	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 10, 10));
-	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 10, 10));
+	Entries.push_back(entry("Forward(1024x1024 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 10, 10));
+	Entries.push_back(entry("Forward(512x512 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 10, 10));
+	Entries.push_back(entry("Forward(256x256 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 10, 10));
+	Entries.push_back(entry("Forward(128x128 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 10, 10));
+	Entries.push_back(entry("Forward(64x64 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 10, 10));
+	Entries.push_back(entry("Forward(32x32 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 10, 10));
+	Entries.push_back(entry("Forward(16x16 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 10, 10));
+	Entries.push_back(entry("Forward(8x8 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 10, 10));
+	Entries.push_back(entry("Forward(512x64 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 64), 10, 10));
+	Entries.push_back(entry("Forward(512x32 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 32), 10, 10));
+	Entries.push_back(entry("Forward(256x64 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 64), 10, 10));
+	Entries.push_back(entry("Forward(256x32 - 10x viewport 10x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 32), 10, 10));
 
-	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(512x512 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(256x256 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(128x128 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(64x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(32x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(16x16 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 100, 1));
-	Entries.push_back(entry("ScreenspaceCoherence(8x8 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 100, 1));
+	Entries.push_back(entry("Forward(1024x1024 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 100, 1));
+	Entries.push_back(entry("Forward(512x512 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 512), 100, 1));
+	Entries.push_back(entry("Forward(256x256 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 256), 100, 1));
+	Entries.push_back(entry("Forward(128x128 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(128, 128), 100, 1));
+	Entries.push_back(entry("Forward(64x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(64, 64), 100, 1));
+	Entries.push_back(entry("Forward(32x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(32, 32), 100, 1));
+	Entries.push_back(entry("Forward(16x16 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 100, 1));
+	Entries.push_back(entry("Forward(8x8 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 100, 1));
+	Entries.push_back(entry("Forward(512x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 64), 100, 1));
+	Entries.push_back(entry("Forward(512x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(512, 32), 100, 1));
+	Entries.push_back(entry("Forward(256x64 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 64), 100, 1));
+	Entries.push_back(entry("Forward(256x32 - 100x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(256, 32), 100, 1));
 
 /*
 	Entries.push_back(entry("ScreenspaceCoherence(1024x1024 - 1x viewport 1x tile)", glm::uvec2(1024, 1024), glm::uvec2(1024, 1024), 1, 1));
@@ -370,6 +384,31 @@ int drawScreenspaceCoherence(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int compiler(int argc, char* argv[], csv & CSV)
+{
+	int Error(0);
+
+	{
+		testCompiler Test(argc, argv, test::CORE, testCompiler::MULTITHREADED);
+		Error += Test();
+		Test.log(CSV, "Multithreaded GLSL compiler");
+	}
+
+	{
+		testCompiler Test(argc, argv, test::CORE, testCompiler::DUALTHREADED);
+		Error += Test();
+		Test.log(CSV, "Dualthreaded GLSL compiler");
+	}
+
+	{
+		testCompiler Test(argc, argv, test::CORE, testCompiler::SINGLETHREADED);
+		Error += Test();
+		Test.log(CSV, "Singlethreaded GLSL compiler");
+	}
+
+	return Error;
+}
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
@@ -380,7 +419,8 @@ int main(int argc, char* argv[])
 	//Error += drawElements(argc, argv, CSV);
 	//Error += drawArraysUniform(argc, argv, CSV);
 	//Error += drawArraysVAOs(argc, argv, CSV);
-	Error += drawScreenspaceCoherence(argc, argv, CSV);
+	//Error += drawScreenspaceCoherence(argc, argv, CSV);
+	Error += compiler(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -28,6 +28,7 @@
 
 #include "../geometric.hpp"
 #include "../trigonometric.hpp"
+#include "../matrix.hpp"
 
 namespace glm
 {
@@ -81,9 +82,8 @@ namespace glm
 		T c = cos(a);
 		T s = sin(a);
 
-		detail::tvec3<T, P> axis = normalize(v);
-
-		detail::tvec3<T, P> temp = (T(1) - c) * axis;
+		detail::tvec3<T, P> axis(normalize(v));
+		detail::tvec3<T, P> temp((T(1) - c) * axis);
 
 		detail::tmat4x4<T, P> Rotate(detail::tmat4x4<T, P>::_null);
 		Rotate[0][0] = c + temp[0] * axis[0];
@@ -383,14 +383,14 @@ namespace glm
 		detail::tvec4<U, P> const & viewport
 	)
 	{
-		detail::tmat4x4<T, P> inverse = glm::inverse(proj * model);
+		detail::tmat4x4<T, P> Inverse = inverse(proj * model);
 
 		detail::tvec4<T, P> tmp = detail::tvec4<T, P>(win, T(1));
 		tmp.x = (tmp.x - T(viewport[0])) / T(viewport[2]);
 		tmp.y = (tmp.y - T(viewport[1])) / T(viewport[3]);
 		tmp = tmp * T(2) - T(1);
 
-		detail::tvec4<T, P> obj = inverse * tmp;
+		detail::tvec4<T, P> obj = Inverse * tmp;
 		obj /= obj.w;
 
 		return detail::tvec3<T, P>(obj);

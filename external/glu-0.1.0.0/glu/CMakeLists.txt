@@ -1,4 +1,4 @@
-set(NAME glu)
+set(NAME dummy)
 
 file(GLOB ROOT_SOURCE *.cpp)
 file(GLOB ROOT_INLINE *.inl)

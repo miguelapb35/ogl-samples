@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// OpenGL Mathematics Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+// OpenGL Mathematics Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Created : 2008-08-31
 // Updated : 2013-12-24
@@ -7,6 +7,7 @@
 // File    : test/core/type_vec4.cpp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define GLM_FORCE_RADIANS
 #include <glm/vector_relational.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -45,6 +46,14 @@ int test_vec4_ctor()
 	{
 		glm::vec4 a{ 0, 1, 2, 3 };
 		std::vector<glm::vec4> v = {
+			{0, 1, 2, 3},
+			{4, 5, 6, 7},
+			{8, 9, 0, 1}};
+	}
+
+	{
+		glm::dvec4 a{ 0, 1, 2, 3 };
+		std::vector<glm::dvec4> v = {
 			{0, 1, 2, 3},
 			{4, 5, 6, 7},
 			{8, 9, 0, 1}};

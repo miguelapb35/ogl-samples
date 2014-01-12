@@ -36,6 +36,9 @@ set(GL_SHADER_GTC
 	draw-uniform.vert draw-uniform.frag
 	draw-uniform2.vert draw-uniform2.frag
 	draw-range.vert draw-range.frag
+	draw-indexing-id.vert draw-indexing-id.frag
+	draw-indexing-attrib.vert draw-indexing-attrib.frag
+	draw-indexing-uniform.vert draw-indexing-uniform.frag
 	screenspace_coherence.vert screenspace_coherence.frag)
 
 foreach(FILE ${GL_SHADER_GTC})
@@ -51,6 +54,10 @@ add_executable(${MICRO}
 	caps.hpp
 	test.cpp
 	test.hpp
+	test_compiler.cpp
+	test_compiler.hpp
+	test_draw_indexing.cpp
+	test_draw_indexing.hpp
 	test_draw_arrays.cpp
 	test_draw_arrays.hpp
 	test_draw_elements.cpp

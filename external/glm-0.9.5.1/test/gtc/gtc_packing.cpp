@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Mathematics (glm.g-truc.net)
 ///
-/// Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -26,7 +26,7 @@
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include <glm/glm.hpp>
+#define GLM_FORCE_RADIANS
 #include <glm/gtc/packing.hpp>
 #include <cstdio>
 #include <vector>
@@ -112,12 +112,12 @@ int test_Half4x16()
 	int Error = 0;
 
 	std::vector<glm::vec4> Tests;
-	Tests.push_back(glm::vec4(1.0));
-	Tests.push_back(glm::vec4(0.0));
-	Tests.push_back(glm::vec4(2.0));
-	Tests.push_back(glm::vec4(0.1));
-	Tests.push_back(glm::vec4(0.5));
-	Tests.push_back(glm::vec4(-0.9));
+	Tests.push_back(glm::vec4(1.0f));
+	Tests.push_back(glm::vec4(0.0f));
+	Tests.push_back(glm::vec4(2.0f));
+	Tests.push_back(glm::vec4(0.1f));
+	Tests.push_back(glm::vec4(0.5f));
+	Tests.push_back(glm::vec4(-0.9f));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
@@ -184,12 +184,12 @@ int test_Snorm3x10_1x2()
 	int Error = 0;
 
 	std::vector<glm::vec4> Tests;
-	Tests.push_back(glm::vec4(1.0));
-	Tests.push_back(glm::vec4(0.0));
-	Tests.push_back(glm::vec4(2.0));
-	Tests.push_back(glm::vec4(0.1));
-	Tests.push_back(glm::vec4(0.5));
-	Tests.push_back(glm::vec4(0.9));
+	Tests.push_back(glm::vec4(1.0f));
+	Tests.push_back(glm::vec4(0.0f));
+	Tests.push_back(glm::vec4(2.0f));
+	Tests.push_back(glm::vec4(0.1f));
+	Tests.push_back(glm::vec4(0.5f));
+	Tests.push_back(glm::vec4(0.9f));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
@@ -208,12 +208,12 @@ int test_Unorm3x10_1x2()
 	int Error = 0;
 
 	std::vector<glm::vec4> Tests;
-	Tests.push_back(glm::vec4(1.0));
-	Tests.push_back(glm::vec4(0.0));
-	Tests.push_back(glm::vec4(2.0));
-	Tests.push_back(glm::vec4(0.1));
-	Tests.push_back(glm::vec4(0.5));
-	Tests.push_back(glm::vec4(0.9));
+	Tests.push_back(glm::vec4(1.0f));
+	Tests.push_back(glm::vec4(0.0f));
+	Tests.push_back(glm::vec4(2.0f));
+	Tests.push_back(glm::vec4(0.1f));
+	Tests.push_back(glm::vec4(0.5f));
+	Tests.push_back(glm::vec4(0.9f));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
@@ -232,12 +232,12 @@ int test_F2x11_1x10()
 	int Error = 0;
 
 	std::vector<glm::vec3> Tests;
-	Tests.push_back(glm::vec3(1.0));
-	Tests.push_back(glm::vec3(0.0));
-	Tests.push_back(glm::vec3(2.0));
-	Tests.push_back(glm::vec3(0.1));
-	Tests.push_back(glm::vec3(0.5));
-	Tests.push_back(glm::vec3(0.9));
+	Tests.push_back(glm::vec3(1.0f));
+	Tests.push_back(glm::vec3(0.0f));
+	Tests.push_back(glm::vec3(2.0f));
+	Tests.push_back(glm::vec3(0.1f));
+	Tests.push_back(glm::vec3(0.5f));
+	Tests.push_back(glm::vec3(0.9f));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
