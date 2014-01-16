@@ -33,6 +33,7 @@ set(MICRO micro)
 set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../data/${GL_PROFILE_GTC}-${GL_VERSION_GTC})
 
 set(GL_SHADER_GTC
+	draw.vert draw.frag
 	draw-uniform.vert draw-uniform.frag
 	draw-uniform2.vert draw-uniform2.frag
 	draw-range.vert draw-range.frag
@@ -73,6 +74,7 @@ add_executable(${MICRO}
 	hz-430-multi-draw-indirect-element.cpp
 	hz-430-vertex-array-object.cpp
 	hz-430-vertex-array-objects.cpp
+	buffer.hpp buffer.cpp
 	${SHADER_PATH})
 add_custom_command(
 	TARGET ${MICRO} POST_BUILD

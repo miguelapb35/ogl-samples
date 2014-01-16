@@ -22,8 +22,8 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw-indexing-uniform.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-id.vert"};
-	char const * FRAG_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw-indexing-uniform.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-id.frag"};
+	char const * VERT_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.vert", "hz-430/draw-indexing-uniform.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-id.vert"};
+	char const * FRAG_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.frag", "hz-430/draw-indexing-uniform.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-id.frag"};
 
 	GLint UniformDrawIndex(-1);
 }//namespace
@@ -40,12 +40,8 @@ testDrawIndexing::testDrawIndexing(
 	PipelineName(0),
 	ProgramName(0)
 {
-	assert(!(VertexDataType == SEPARATED_VERTEX_DATA && DrawType == INSTANCED));
-	
 	bool Success = true;
 	
-	Success = Success && this->isExtensionSupported("GL_ARB_draw_elements_base_vertex");
-	assert(Success);
 	Success = Success && this->isExtensionSupported("GL_ARB_multi_draw_indirect");
 	assert(Success);
 	Success = Success && this->initProgram();
@@ -60,7 +56,7 @@ testDrawIndexing::testDrawIndexing(
 	glBindProgramPipeline(this->PipelineName);
 	glBindVertexArray(this->VertexArrayName);
 	
-	if(this->Indexing == ID_INDEXING || this->Indexing == DIVISOR_INDEXING)
+	if(this->Indexing == DRAW || this->Indexing == ID_INDEXING || this->Indexing == DIVISOR_INDEXING || this->Indexing == DIVISOR_MULTI_INDEXING)
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
 }
 
@@ -76,25 +72,30 @@ bool testDrawIndexing::initProgram()
 {
 	bool Validated(true);
 	
-	glGenProgramPipelines(1, &this->PipelineName);
-
 	glf::compiler Compiler;
 	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE[this->Indexing], "--version 420 --profile core");
 	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[this->Indexing], "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
-	this->ProgramName = glCreateProgram();
-	glProgramParameteri(this->ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
-	glAttachShader(this->ProgramName, VertShaderName);
-	glAttachShader(this->ProgramName, FragShaderName);
-	glLinkProgram(this->ProgramName);
-	Validated = Validated && glf::checkProgram(this->ProgramName);
-
-	if(this->Indexing == UNIFORM_INDEXING)
-		UniformDrawIndex = glGetUniformLocation(ProgramName, "DrawID");
+	if(Validated)
+	{
+		this->ProgramName = glCreateProgram();
+		glProgramParameteri(this->ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+		glAttachShader(this->ProgramName, VertShaderName);
+		glAttachShader(this->ProgramName, FragShaderName);
+		glLinkProgram(this->ProgramName);
+		Validated = Validated && glf::checkProgram(this->ProgramName);
+	}
 
 	if(Validated)
-		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	{
+		if(this->Indexing == UNIFORM_INDEXING)
+			UniformDrawIndex = glGetUniformLocation(this->ProgramName, "DrawID");
+	}
+
+	glGenProgramPipelines(1, &this->PipelineName);
+	if(Validated)
+		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, this->ProgramName);
 
 	return Validated;
 }
@@ -126,7 +127,10 @@ bool testDrawIndexing::initBuffer()
 		Commands[i].count = static_cast<GLuint>(VertexCount);
 		Commands[i].instanceCount = static_cast<GLuint>(1);
 		Commands[i].first = static_cast<GLuint>(0);
-		Commands[i].baseInstance = 0;
+		if(this->Indexing == DIVISOR_MULTI_INDEXING)
+			Commands[i].baseInstance = static_cast<GLuint>(i % 2 ? 0 : 1);
+		else
+			Commands[i].baseInstance = 0;
 	}
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
@@ -183,13 +187,14 @@ void testDrawIndexing::render()
 	this->beginTimer();
 	switch(this->Indexing)
 	{
+		case DRAW:
+		case DIVISOR_MULTI_INDEXING:
 		case ID_INDEXING:
 		{
-			int const DrawChunk = 1;
+			int const DrawChunk = 2;
 			for(int i = 0; i < DrawChunk; ++i)
 				glMultiDrawArraysIndirect(GL_TRIANGLES, 0, static_cast<GLsizei>(DrawCount / DrawChunk), 0);
 		}
-		break;
 		case DIVISOR_INDEXING:
 		{
 			for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
@@ -209,7 +214,7 @@ void testDrawIndexing::render()
 		{
 			for(std::size_t DrawIndex(0); DrawIndex < DrawCount; ++DrawIndex)
 			{
-				glUniform1i(UniformDrawIndex, DrawIndex % 2 ? 0 : 1);
+				glProgramUniform1i(this->ProgramName, UniformDrawIndex, DrawIndex % 2 ? 0 : 1);
 				glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 			}
 		}

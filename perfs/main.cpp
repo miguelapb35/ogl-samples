@@ -409,6 +409,47 @@ int compiler(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int drawIndexing(int argc, char* argv[], csv & CSV)
+{
+	struct entry
+	{
+		entry(
+			std::string const & String,
+			testDrawIndexing::indexing const & Indexing,
+			std::size_t const & DrawCount
+		) :
+			String(String),
+			Indexing(Indexing),
+			DrawCount(DrawCount)
+		{}
+
+		std::string const String;
+		testDrawIndexing::indexing const Indexing;
+		std::size_t const DrawCount;
+	};
+
+	int Error(0);
+
+	std::vector<entry> Entries;
+
+	Entries.push_back(entry("DrawIndexed(UNIFORM_INDEXING, 100000)", testDrawIndexing::UNIFORM_INDEXING, 100000));
+	Entries.push_back(entry("DrawIndexed(ATTRIB_INDEXING, 100000)", testDrawIndexing::ATTRIB_INDEXING, 100000));
+	Entries.push_back(entry("DrawIndexed(DIVISOR_INDEXING, 100000)", testDrawIndexing::DIVISOR_INDEXING, 100000));
+	Entries.push_back(entry("DrawIndexed(DIVISOR_MULTI_INDEXING, 100000)", testDrawIndexing::DIVISOR_MULTI_INDEXING, 100000));
+	Entries.push_back(entry("DrawIndexed(ID_INDEXING, 100000)", testDrawIndexing::ID_INDEXING, 100000));
+	Entries.push_back(entry("DrawIndexed(NO_INDEXING, 100000)", testDrawIndexing::DRAW, 100000));
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
+	{
+		testDrawIndexing Test(argc, argv, test::CORE, Entries[EntryIndex].Indexing, Entries[EntryIndex].DrawCount);
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	return Error;
+}
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
@@ -420,7 +461,8 @@ int main(int argc, char* argv[])
 	//Error += drawArraysUniform(argc, argv, CSV);
 	//Error += drawArraysVAOs(argc, argv, CSV);
 	//Error += drawScreenspaceCoherence(argc, argv, CSV);
-	Error += compiler(argc, argv, CSV);
+	//Error += compiler(argc, argv, CSV);
+	Error += drawIndexing(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

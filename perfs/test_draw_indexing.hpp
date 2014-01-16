@@ -8,9 +8,11 @@ class testDrawIndexing : public test
 public:
 	enum indexing
 	{
+		DRAW,
 		UNIFORM_INDEXING,
 		ATTRIB_INDEXING,
 		DIVISOR_INDEXING,
+		DIVISOR_MULTI_INDEXING,
 		ID_INDEXING,
 		INDEXING_MAX
 	};

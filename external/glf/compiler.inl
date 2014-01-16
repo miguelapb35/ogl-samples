@@ -244,16 +244,16 @@ namespace glf
 			GLint Result = GL_FALSE;
 			glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
 
-			if(Result == GL_FALSE)
+			if(Result == GL_TRUE)
+				continue;
+
+			int InfoLogLength;
+			glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if(InfoLogLength > 0)
 			{
-				int InfoLogLength;
-				glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
-				if(InfoLogLength > 0)
-				{
-					std::vector<char> Buffer(InfoLogLength);
-					glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
-					//fprintf(stdout, "%s\n", &Buffer[0]);
-				}
+				std::vector<char> Buffer(InfoLogLength);
+				glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
+				fprintf(stdout, "%s\n", &Buffer[0]);
 			}
 
 			Success = Success && Result == GL_TRUE;
@@ -345,17 +345,17 @@ namespace glf
 		GLint Result = GL_FALSE;
 		glGetProgramiv(ProgramName, GL_VALIDATE_STATUS, &Result);
 
-		if(Result == GL_FALSE)
+		if(Result == GL_TRUE)
+			return true;
+
+		fprintf(stdout, "Validate program\n");
+		int InfoLogLength;
+		glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if(InfoLogLength > 0)
 		{
-			fprintf(stdout, "Validate program\n");
-			int InfoLogLength;
-			glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
-			if(InfoLogLength > 0)
-			{
-				std::vector<char> Buffer(InfoLogLength);
-				glGetProgramInfoLog(ProgramName, InfoLogLength, NULL, &Buffer[0]);
-				fprintf(stdout, "%s\n", &Buffer[0]);
-			}
+			std::vector<char> Buffer(InfoLogLength);
+			glGetProgramInfoLog(ProgramName, InfoLogLength, NULL, &Buffer[0]);
+			fprintf(stdout, "%s\n", &Buffer[0]);
 		}
 
 		return Result == GL_TRUE;
@@ -368,6 +368,9 @@ namespace glf
 
 		GLint Result = GL_FALSE;
 		glGetProgramiv(ProgramName, GL_LINK_STATUS, &Result);
+
+		if(Result == GL_TRUE)
+			return true;
 
 		//fprintf(stdout, "Linking program\n");
 		int InfoLogLength;
@@ -393,6 +396,9 @@ namespace glf
 
 		GLint Result = GL_FALSE;
 		glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
+
+		if(Result == GL_TRUE)
+			return true;
 
 		fprintf(stdout, "Compiling shader\n%s...\n", File.c_str());
 		int InfoLogLength;
