@@ -211,7 +211,7 @@ void display()
 		2,
 		BaseVertex);
 
-	glf::swapBuffers();
+
 	glf::checkError("display");
 }
 

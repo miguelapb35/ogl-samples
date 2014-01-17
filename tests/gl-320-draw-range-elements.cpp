@@ -225,7 +225,7 @@ void display()
 	glUniform4f(UniformDiffuse, 1.0f, 1.0f, 0.0f, 1.0f);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount / 2, GL_UNSIGNED_SHORT, GLF_BUFFER_OFFSET(0), 1, VertexCount / 2);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

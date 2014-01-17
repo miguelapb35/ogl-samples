@@ -296,7 +296,7 @@ void display()
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 4, 0);
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

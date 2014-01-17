@@ -380,7 +380,7 @@ void display()
 	renderFB(TextureName[texture::COLORBUFFER]);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

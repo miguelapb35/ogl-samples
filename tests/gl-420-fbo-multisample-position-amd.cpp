@@ -396,7 +396,7 @@ void display()
 	glViewportIndexedfv(0, &glm::vec4(0, 0, Window.Size)[0]);
 	renderFB();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

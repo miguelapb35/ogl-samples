@@ -218,7 +218,7 @@ void display()
 	glDrawElementsInstanced(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

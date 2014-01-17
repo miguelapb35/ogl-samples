@@ -284,7 +284,7 @@ void display()
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 2, 0);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

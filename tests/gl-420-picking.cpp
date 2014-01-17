@@ -293,7 +293,7 @@ void display()
 	glDrawElementsInstancedBaseVertexBaseInstance(
 		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 5, 0, 0);
 
-	glf::swapBuffers();
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::PICKING]);
 	float* Pointer = (float*)glMapBufferRange(GL_ARRAY_BUFFER, 0,	sizeof(float), GL_MAP_READ_BIT);

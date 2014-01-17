@@ -446,7 +446,7 @@ void display()
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

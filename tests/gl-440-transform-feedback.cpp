@@ -278,7 +278,7 @@ void display()
 	
 	glDrawTransformFeedback(GL_TRIANGLES, FeedbackName);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -368,7 +368,7 @@ void display()
 	resolveMultisampling();
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

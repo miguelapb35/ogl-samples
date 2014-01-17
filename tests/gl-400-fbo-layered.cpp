@@ -329,7 +329,7 @@ void display()
 		}
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

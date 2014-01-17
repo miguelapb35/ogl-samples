@@ -368,7 +368,7 @@ void display()
 	assert(!validate(ProgramName[program::VERT]));
 	glDrawArraysInstancedBaseInstance(GL_PATCHES, 0, VertexCount, 1, 0);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -337,7 +337,7 @@ void display()
 	// Step 4: Render the colorbuffer from the multisampled framebuffer
 	renderFB();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -266,7 +266,7 @@ void display()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glDrawTransformFeedbackStream(GL_TRIANGLES, FeedbackName, 0);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

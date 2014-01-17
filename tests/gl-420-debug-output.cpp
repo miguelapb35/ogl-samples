@@ -285,7 +285,7 @@ void display()
 			GL_QUADS, ElementCount, GL_FLOAT, 0, 1, 0,-1);
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

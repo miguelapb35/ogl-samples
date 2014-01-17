@@ -282,7 +282,7 @@ void display()
 
 	glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT);
 	glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
-	glf::swapBuffers();
+
 
 	FrameIndex = (FrameIndex + 1) % 256;
 }

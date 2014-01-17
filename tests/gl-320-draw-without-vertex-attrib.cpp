@@ -173,7 +173,7 @@ void display()
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 
-	glf::swapBuffers();
+
 	glf::checkError("display");
 }
 

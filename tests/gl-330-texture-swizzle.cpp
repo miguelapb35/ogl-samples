@@ -272,7 +272,7 @@ void display()
 	}
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

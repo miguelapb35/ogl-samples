@@ -252,7 +252,7 @@ void display()
 	GLenum Result = glClientWaitSync(SyncName, GL_SYNC_FLUSH_COMMANDS_BIT, (GLuint64)MaxTimeout);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -291,7 +291,7 @@ void display()
 	renderFB(ColorTextureName);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

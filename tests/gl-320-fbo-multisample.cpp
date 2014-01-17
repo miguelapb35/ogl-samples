@@ -311,7 +311,7 @@ void display()
 	// Render the colorbuffer from the multisampled framebuffer
 	renderFB(TextureName[texture::COLORBUFFER]);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

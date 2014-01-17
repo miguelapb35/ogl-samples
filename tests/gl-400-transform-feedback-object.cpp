@@ -247,7 +247,7 @@ void display()
 	glBindVertexArray(FeedbackVertexArrayName);
 	glDrawTransformFeedback(GL_TRIANGLES, FeedbackName);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

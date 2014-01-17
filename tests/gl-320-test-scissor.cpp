@@ -268,7 +268,7 @@ void display()
 	glDisable(GL_SCISSOR_TEST);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

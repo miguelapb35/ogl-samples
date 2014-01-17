@@ -353,7 +353,7 @@ void display()
 
 	glPopDebugGroup();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

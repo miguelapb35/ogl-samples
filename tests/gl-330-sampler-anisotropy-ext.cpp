@@ -276,7 +276,7 @@ void display()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

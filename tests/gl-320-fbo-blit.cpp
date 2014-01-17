@@ -334,7 +334,7 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 	renderFB();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

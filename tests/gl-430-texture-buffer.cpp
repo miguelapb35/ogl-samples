@@ -268,7 +268,7 @@ void display()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 5, 0);
 	
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -230,7 +230,7 @@ void display()
 		glDisable(GL_SCISSOR_TEST);
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

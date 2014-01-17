@@ -285,7 +285,7 @@ void display()
 	glUseProgram(0);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

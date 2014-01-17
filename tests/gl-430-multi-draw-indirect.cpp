@@ -441,7 +441,7 @@ void display()
 	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0, DrawCount[IndirectBufferIndex], sizeof(DrawElementsIndirectCommand));
 
 	// Swap framebuffers
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

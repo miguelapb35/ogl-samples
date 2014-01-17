@@ -202,7 +202,7 @@ void display()
 	fprintf(stdout, "Time: %f ms   \r", Time / 1000.f / 1000.f);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -312,7 +312,7 @@ void display()
 
 	glDrawTransformFeedbackStreamInstanced(GL_TRIANGLE_STRIP, FeedbackName, 0, 5);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

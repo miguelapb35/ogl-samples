@@ -517,7 +517,7 @@ void display()
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
-	glf::swapBuffers();
+
 
 	::Monitor->end();
 	::Monitor->log();

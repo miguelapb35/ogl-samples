@@ -214,7 +214,7 @@ void display()
 	glDrawArraysInstanced(GL_TRIANGLES, 6, VertexCount / 2, 1);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

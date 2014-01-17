@@ -211,7 +211,7 @@ void display()
 
 	glUseProgram(0);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

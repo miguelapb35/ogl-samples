@@ -287,7 +287,7 @@ void display()
 		glDrawArraysInstanced(GL_TRIANGLES, 0, PrimitivesWritten * 3, 1);
 	}
 
-	glf::swapBuffers();
+
 	glf::checkError("display");
 }
 

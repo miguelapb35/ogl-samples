@@ -203,7 +203,7 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 10);
 
-	glf::swapBuffers();
+
 	glf::checkError("display");
 }
 

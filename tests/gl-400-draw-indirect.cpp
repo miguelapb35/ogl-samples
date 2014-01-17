@@ -208,7 +208,7 @@ void display()
 	glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

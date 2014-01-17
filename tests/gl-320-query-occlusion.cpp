@@ -202,7 +202,7 @@ void display()
 	fprintf(stdout, "Samples count: %d\r", SamplesCount);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

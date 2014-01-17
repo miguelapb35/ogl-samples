@@ -323,7 +323,7 @@ void display()
 		glDisable(GL_FRAMEBUFFER_SRGB);
 	}
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

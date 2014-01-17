@@ -225,7 +225,7 @@ void display()
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, 1, 0);
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0, 1, 4);
 
-	glf::swapBuffers();
+
 	glf::checkError("display");
 }
 

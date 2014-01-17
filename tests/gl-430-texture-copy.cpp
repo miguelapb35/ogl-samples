@@ -270,7 +270,7 @@ void display()
 
 	glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -202,7 +202,7 @@ void display()
 	glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

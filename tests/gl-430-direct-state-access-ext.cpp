@@ -353,7 +353,7 @@ void display()
 	// Pass 2: Resolved and render the colorbuffer from the multisampled framebuffer
 	resolveMultisampling();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

@@ -421,7 +421,7 @@ void display()
 	renderFramebuffer();
 	//renderSplash();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])

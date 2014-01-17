@@ -229,7 +229,7 @@ void display()
 	glDrawArrays(GL_TRIANGLES, 0, VertexCount);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
