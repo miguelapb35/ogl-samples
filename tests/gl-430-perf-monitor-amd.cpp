@@ -425,8 +425,11 @@ bool begin()
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 
-	Monitor = new monitor();
-	Monitor->record("CP", 1);
+	if(Validated)
+	{
+		::Monitor = new monitor();
+		::Monitor->record("CP", 1);
+	}
 
 	if(Validated)
 		Validated = initProgram();
