@@ -13,16 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Sampler Wrap");	
+	glf::window Window("gl-440-sampler-wrap");
+
 	char const * VERT_SHADER_SOURCE("gl-440/sampler-wrap.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/sampler-wrap.frag");
 	char const * TEXTURE_DIFFUSE_DXT5("kueken1-dxt5.dds");
-	int const SAMPLE_SIZE_WIDTH(1024);
-	int const SAMPLE_SIZE_HEIGHT(768);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(4);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	struct vertex
 	{
@@ -109,12 +104,8 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
-			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-			"--version 440 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-			"--version 440 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 440 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -244,7 +235,7 @@ bool begin()
 	Viewport[viewport::VIEWPORT4] = glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
 	Viewport[viewport::VIEWPORT5] = glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
 
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	if(Validated)
 		Validated = initDebugOutput();
@@ -315,16 +306,9 @@ void display()
 		glBindSamplers(0, 1, &SamplerName[Index]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
-
-	glf::checkError("display");
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 4);
 }

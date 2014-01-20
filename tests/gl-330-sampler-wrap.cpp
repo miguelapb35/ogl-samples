@@ -13,16 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Sampler Wrap");
+	glf::window Window("gl-330-sampler-wrap");
+
 	char const * VERT_SHADER_SOURCE("gl-330/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/texture-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt5.dds");
-	int const SAMPLE_SIZE_WIDTH(1024);
-	int const SAMPLE_SIZE_HEIGHT(768);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	struct vertex
 	{
@@ -209,7 +204,7 @@ bool begin()
 	Viewport[viewport::V11] = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size >> 1);
 	Viewport[viewport::V01] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
 
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -267,16 +262,9 @@ void display()
 		glBindSampler(0, SamplerName[Index]);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 	}
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 3);
 }

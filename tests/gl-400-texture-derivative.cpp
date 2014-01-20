@@ -13,7 +13,6 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Object");
 	char const * VERT_SHADER_SOURCE_TEXTURE("gl-400/texture-derivative2.vert");
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-400/texture-derivative2.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-400/texture-derivative1.vert");
@@ -22,10 +21,8 @@ namespace
 	int const FRAMEBUFFER_SIZE(8);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(0);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-400-texture-derivative");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -299,7 +296,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	float MinFragmentInterpolationOffset(0);
 	float MaxFragmentInterpolationOffset(0);
@@ -408,15 +404,9 @@ void display()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 0);
 }

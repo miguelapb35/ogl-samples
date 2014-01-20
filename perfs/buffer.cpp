@@ -10,7 +10,7 @@ namespace
 
 	GLenum make_usage(std::uint32_t Flags)
 	{
-
+		return 0;
 	}
 
 	class manager
@@ -53,7 +53,7 @@ namespace gl
 
 	void* buffer::map(std::uintptr_t Offset, std::size_t Size, std::uint32_t Flags)
 	{
-
+		return 0;
 	}
 
 	void buffer::unmap(void* memory)

@@ -13,7 +13,8 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Program binary");
+	glf::window Window("gl-410-program-binary");
+
 	char const * VERT_SHADER_SOURCE("gl-410/binary.vert");
 	char const * GEOM_SHADER_SOURCE("gl-410/binary.geom");
 	char const * FRAG_SHADER_SOURCE("gl-410/binary.frag");
@@ -21,12 +22,6 @@ namespace
 	char const * GEOM_PROGRAM_BINARY("gl-410/binary.geom.bin");
 	char const * FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
 	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(1);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -274,7 +269,7 @@ bool initVertexArray()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	GLint NumProgramBinaryFormats(0);
 	glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
@@ -345,10 +340,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 1);
 }

@@ -12,6 +12,8 @@
 
 #include <glu/glu.hpp>
 
+#include <string>
+
 namespace glf
 {
 	enum mouse_button
@@ -24,7 +26,8 @@ namespace glf
 
 	struct window
 	{
-		window(glm::ivec2 const & Size) :
+		window(char const * Title, glm::ivec2 const & Size = glm::ivec2(640, 480)) :
+			Title(Title),
 			Size(Size),
 			MouseOrigin(Size >> 1),
 			MouseCurrent(Size >> 1),
@@ -34,9 +37,10 @@ namespace glf
 			RotationCurrent(0),
 			MouseButtonFlags(0)
 		{
-			memset(KeyPressed, 0, sizeof(KeyPressed));	
+			memset(KeyPressed, 0, sizeof(KeyPressed));
 		}
 
+		std::string Title;
 		glm::ivec2 Size;
 		glm::vec2 MouseOrigin;
 		glm::vec2 MouseCurrent;

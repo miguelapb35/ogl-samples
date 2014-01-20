@@ -13,14 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Transform Feedback Object";
+	glf::window Window("gl-400-transform-feedback-object");
+
 	char const * VERT_SHADER_SOURCE_TRANSFORM("gl-400/transform.vert");
 	char const * VERT_SHADER_SOURCE_FEEDBACK("gl-400/feedback.vert");
 	char const * FRAG_SHADER_SOURCE_FEEDBACK("gl-400/feedback.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(0);
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec4);
@@ -33,8 +30,6 @@ namespace
 		glm::vec4(-1.0f, 1.0f, 0.0f, 1.0f),
 		glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f)
 	};
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLuint FeedbackName(0);
 
@@ -172,7 +167,7 @@ bool initArrayBuffer()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	glGenQueries(1, &Query);
 
@@ -246,16 +241,9 @@ void display()
 
 	glBindVertexArray(FeedbackVertexArrayName);
 	glDrawTransformFeedback(GL_TRIANGLES, FeedbackName);
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 0);
 }

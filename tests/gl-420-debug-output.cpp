@@ -16,15 +16,9 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Debug Output");
+	glf::window Window("gl-420-debug-output");
 	char const * VERT_SHADER_SOURCE("gl-420/debug-output.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/debug-output.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -204,7 +198,7 @@ bool initDebugOutput()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	glGetIntegerv(
 		GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
@@ -284,16 +278,9 @@ void display()
 		glDrawElementsInstancedBaseVertexBaseInstance(
 			GL_QUADS, ElementCount, GL_FLOAT, 0, 1, 0,-1);
 	}
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }

@@ -13,16 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Multi draw indirect");
 	char const * VERT_SHADER_SOURCE("hz-430/multi-draw-indirect.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/multi-draw-indirect.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("hz-430-multi-draw-indirect-element");
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
@@ -162,8 +157,6 @@ static bool begin()
 {
 	bool Success(true);
 
-	// Validate OpenGL support
-	Success = Success && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
 
 	glGenQueries(1, &QueryName);
@@ -237,16 +230,9 @@ static void display()
 	ConvergingTime = (ConvergingTime + InstantTime) * 0.5;
 
 	fprintf(stdout, "\rConverging Time: %2.5f ms, Instant Time: %2.5f ms", ConvergingTime, InstantTime);
-
-	glf::swapBuffers();
 }
 
 int test_multi_draw_indirect_element(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }

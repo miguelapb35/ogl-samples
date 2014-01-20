@@ -9,13 +9,11 @@
 // www.g-truc.net
 //**********************************
 
-
 #include <glf/glf.hpp>
 #include <glf/compiler.hpp>
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Object");
 	char const * VERT_SHADER_SOURCE_TEXTURE("gl-430/fbo-texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-430/fbo-texture-2d.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-430/fbo-splash.vert");
@@ -23,10 +21,8 @@ namespace
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-430-fbo", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 	//glf::window Window(glm::ivec2(256, 256));
 
 	GLsizei const VertexCount(4);
@@ -85,169 +81,6 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
 	std::vector<GLuint> PipelineName(pipeline::MAX);
-
-	class monitor
-	{
-		struct group
-		{
-			group
-			(
-				std::string const & Name,
-				std::vector<GLuint>	const Counters
-			) :
-				Name(Name),
-				Counters(Counters)
-			{}
-
-			std::string const Name;
-			std::vector<GLuint>	const Counters;
-		};
-
-	public:
-		monitor() :
-			Name(0)
-		{
-			GLsizei const GROUP_NAME_SIZE(256);
-
-			GLint GroupSize(0);
-			glGetPerfMonitorGroupsAMD(&GroupSize, 0, NULL);
-
-			std::vector<GLuint> Groups(static_cast<std::size_t>(GroupSize));
-			glGetPerfMonitorGroupsAMD(NULL, GroupSize, &Groups[0]);
-
-			for (std::size_t GroupIndex(0); GroupIndex < Groups.size(); ++GroupIndex)
-			{
-				char GroupName[GROUP_NAME_SIZE];
-				memset(GroupName, 0, sizeof(GroupName));
-				glGetPerfMonitorGroupStringAMD(Groups[GroupIndex], GROUP_NAME_SIZE, NULL, GroupName);
-
-				GLint NumCounters(0);
-				GLint MaxActiveCounters(0);
-				glGetPerfMonitorCountersAMD(Groups[GroupIndex], &NumCounters, &MaxActiveCounters, 0, NULL);
-
-				std::vector<GLuint>	Counters(static_cast<std::size_t>(NumCounters));
-				glGetPerfMonitorCountersAMD(Groups[GroupIndex], NULL, NULL, NumCounters, &Counters[0]);
-
-				for (std::size_t CounterIndex(0); CounterIndex < Counters.size(); ++CounterIndex)
-				{
-					char CounterName[GROUP_NAME_SIZE];
-					memset(CounterName, 0, sizeof(CounterName));
-
-					glGetPerfMonitorCounterStringAMD(Groups[GroupIndex], Counters[CounterIndex], GROUP_NAME_SIZE, NULL, CounterName);
-				}
-
-				std::string GroupString;
-				for (std::size_t i = 0; i < sizeof(GroupName); ++i)
-				{
-					if(GroupName[i] == '\0')
-						break;
-					else
-						GroupString += GroupName[i];
-				}
-
-				this->Groups.insert(std::pair<GLuint, group>(Groups[GroupIndex], group(GroupString, Counters)));
-				this->StringToGroup.insert(std::pair<std::string, GLuint>(GroupString, Groups[GroupIndex]));
-			}
-
-			glGenPerfMonitorsAMD(1, &this->Name);
-		}
-
-		~monitor()
-		{
-			glDeletePerfMonitorsAMD(1, &this->Name);
-		}
-
-		void begin()
-		{
-			glBeginPerfMonitorAMD(this->Name);
-		}
-
-		void end()
-		{
-			glEndPerfMonitorAMD(this->Name);
-		}
-
-		void record(std::string const & GroupString, std::size_t CounterCount)
-		{
-			std::map<std::string, GLuint>::iterator NameIt = this->StringToGroup.find(GroupString);
-			assert(NameIt != this->StringToGroup.end());
-
-			std::map<GLuint, group>::iterator GroupIt = this->Groups.find(NameIt->second);
-			assert(GroupIt != this->Groups.end());
-
-			//glSelectPerfMonitorCountersAMD(this->Name, GL_TRUE, GroupIt->first, static_cast<GLint>(GroupIt->second.Counters.size()), const_cast<GLuint*>(&GroupIt->second.Counters[0]));
-			glSelectPerfMonitorCountersAMD(this->Name, GL_TRUE, GroupIt->first, static_cast<GLint>(glm::min(CounterCount, GroupIt->second.Counters.size())), const_cast<GLuint*>(&GroupIt->second.Counters[0]));
-		}
-
-		void log()
-		{
-			// read the counters
-			GLuint resultSize;
-			glGetPerfMonitorCounterDataAMD(this->Name, GL_PERFMON_RESULT_SIZE_AMD, sizeof(GLint), &resultSize, NULL);
-
-			std::vector<GLuint> Result;
-			Result.resize(resultSize);
-
-			GLsizei resultWritten;
-			glGetPerfMonitorCounterDataAMD(this->Name, GL_PERFMON_RESULT_AMD, resultSize, &Result[0], &resultWritten);
-
-			GLsizei wordCount = 0;
-
-			while ((4 * wordCount) < resultWritten)
-			{
-				GLuint GroupId = Result[wordCount];
-				GLuint CounterId = Result[wordCount + 1];
-
-				std::map<GLuint, group>::iterator GroupIt = this->Groups.find(GroupId);
-				assert(GroupIt != this->Groups.end());
-
-				// Determine the counter type
-				GLuint CounterType;
-				glGetPerfMonitorCounterInfoAMD(GroupId, CounterId, GL_COUNTER_TYPE_AMD, &CounterType);
-
-				switch(CounterType)
-				{
-					case GL_UNSIGNED_INT64_AMD:
-					{
-						unsigned __int64 counterResult = *reinterpret_cast<unsigned __int64*>(&Result[wordCount + 2]);
-						printf("%s(%d): %ld\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
-						wordCount += 4;
-						break;
-					}
-					case GL_FLOAT:
-					{
-						float counterResult = *reinterpret_cast<float*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
-						wordCount += 3;
-						break;
-					}
-					case GL_UNSIGNED_INT:
-					{
-						unsigned int counterResult = *reinterpret_cast<unsigned int*>(&Result[wordCount + 2]);
-						printf("%s(%d): %d\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
-						wordCount += 3;
-						break;
-					}
-					case GL_PERCENTAGE_AMD:
-					{
-						unsigned int counterResult = *reinterpret_cast<unsigned int*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
-						wordCount += 3;
-						break;
-					}
-					default:
-						assert(0);
-				}
-			}
-		}
-
-	private:
-		GLuint Name;
-		std::map<std::string , GLuint> StringToGroup;
-		std::map<GLuint, group> Groups;
-	};
-
-	monitor* Monitor(0);
 }//namespace
 
 bool initProgram()
@@ -424,10 +257,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
-
-	Monitor = new monitor();
-	Monitor->record("CP", 1);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -449,9 +278,6 @@ bool end()
 {
 	bool Validated(true);
 
-	delete Monitor;
-	Monitor = 0;
-
 	glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 	glDeleteProgram(ProgramName[pipeline::SPLASH]);
 	glDeleteProgram(ProgramName[pipeline::TEXTURE]);
@@ -465,8 +291,6 @@ bool end()
 
 void display()
 {
-	::Monitor->begin();
-
 	// Update of the uniform buffer
 	{
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -516,18 +340,9 @@ void display()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
-
-
-
-	::Monitor->end();
-	::Monitor->log();
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 3);
 }

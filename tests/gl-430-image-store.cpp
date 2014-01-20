@@ -16,17 +16,12 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Image Store");
+	glf::window Window("gl-430-image-store");
+
 	char const * VERT_SHADER_SOURCE_SAVE("gl-430/image-store-write.vert");
 	char const * FRAG_SHADER_SOURCE_SAVE("gl-430/image-store-write.frag");
 	char const * VERT_SHADER_SOURCE_READ("gl-430/image-store-read.vert");
 	char const * FRAG_SHADER_SOURCE_READ("gl-430/image-store-read.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	namespace pipeline
 	{
@@ -140,7 +135,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_ARB_shader_image_size");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -193,15 +187,9 @@ void display()
 		glBindVertexArray(VertexArrayName);
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 	}
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 3);
 }

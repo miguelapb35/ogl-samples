@@ -14,7 +14,6 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Draw Elements");	
 	char const * VERTEX_SHADER_SOURCE("es-200/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
@@ -22,7 +21,7 @@ namespace
 	int const SAMPLE_MAJOR_VERSION(2);
 	int const SAMPLE_MINOR_VERSION(0);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("es-200-draw-elements", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
@@ -179,7 +178,7 @@ int main(int argc, char* argv[])
 {
 	return !glf::run(
 		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
+
 		glf::ES,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);

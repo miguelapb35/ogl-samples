@@ -13,15 +13,10 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Buffer Type");
+	glf::window Window("gl-440-buffer-type");
+
 	char const * VERT_SHADER_SOURCE("gl-440/buffer-type.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/buffer-type.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(4);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSizeF16 = VertexCount * sizeof(glm::uint16) * 2;
@@ -287,7 +282,6 @@ bool begin()
 	Viewport[viewport::VIEWPORT5] = view(glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::RG11B10F);
 
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated)
 		Validated = initDebugOutput();
@@ -359,15 +353,10 @@ void display()
 	}
 
 	glf::checkError("display");
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 4);
 }
 

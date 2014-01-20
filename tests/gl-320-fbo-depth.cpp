@@ -14,18 +14,13 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Depth Render");
+	glf::window Window("gl-320-fbo-depth");
+
 	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-depth.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-depth.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -262,7 +257,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -344,15 +338,9 @@ void display()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
-
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

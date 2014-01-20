@@ -13,17 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Alpha test";
 	char const * VERTEX_SHADER_SOURCE("gl-300/image-2d.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-300/image-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(0);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-300-test-alpha");
 
 	struct vertex
 	{
@@ -175,7 +169,7 @@ bool initTest()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -234,11 +228,6 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::COMPATIBILITY,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::COMPATIBILITY, 3, 0);
 }
 

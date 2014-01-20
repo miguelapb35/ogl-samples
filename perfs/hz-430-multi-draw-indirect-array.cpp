@@ -13,16 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Multi draw indirect");
+	glf::window Window("hz-430-multi-draw-indirect-array");
+
 	char const * VERT_SHADER_SOURCE("hz-430/multi-draw-indirect.vert");
 	char const * FRAG_SHADER_SOURCE("hz-430/multi-draw-indirect.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
@@ -72,10 +67,8 @@ static bool initProgram()
 	glGenProgramPipelines(1, &PipelineName);
 
 	glf::compiler Compiler;
-	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-		"--version 420 --profile core");
-	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-		"--version 420 --profile core");
+	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
+	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
 	ProgramName = glCreateProgram();
@@ -148,7 +141,6 @@ static bool begin()
 	bool Success(true);
 
 	// Validate OpenGL support
-	Success = Success && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
 
 	glGenQueries(1, &QueryName);
@@ -222,15 +214,10 @@ static void display()
 	ConvergingTime = (ConvergingTime * 0.99 + InstantTime * 0.01);
 	fprintf(stdout, "\rConverging Time: %2.4f ms, Instant Time: %2.4f ms", ConvergingTime, InstantTime);
 
-	glf::swapBuffers();
+
 }
 
 int test_multi_draw_indirect_array(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 3);
 }

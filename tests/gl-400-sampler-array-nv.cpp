@@ -13,16 +13,10 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Sampler Array";
+	glf::window Window("gl-400-sampler-array-nv");
 	char const * VERTEX_SHADER_SOURCE("gl-400/sampler-array-nv.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/sampler-array-nv.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
-	int const SAMPLE_SIZE_WIDTH = 640;
-	int const SAMPLE_SIZE_HEIGHT = 480;
-	int const SAMPLE_MAJOR_VERSION = 4;
-	int const SAMPLE_MINOR_VERSION = 0;
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -220,7 +214,6 @@ bool initVertexArray()
 bool begin()
 {
 	bool Validated(true);
-	Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_NV_gpu_shader5");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -286,10 +279,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 0);
 }

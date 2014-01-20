@@ -13,7 +13,7 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Render to texture blending");
+	glf::window Window("gl-330-blend-rtt");
 	char const * VERT_SHADER_SOURCE1("gl-330/mrt.vert");
 	char const * FRAG_SHADER_SOURCE1("gl-330/mrt.frag");
 	char const * VERT_SHADER_SOURCE2("gl-330/image-2d.vert");
@@ -22,10 +22,6 @@ namespace
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(3);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	struct vertex
 	{
@@ -295,7 +291,6 @@ bool begin()
 	Viewport[TEXTURE_B] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
 
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -392,10 +387,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 3);
 }

@@ -13,18 +13,15 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Shader Interface Matching");	
 	char const * SAMPLE_VERT_SHADER("gl-500/interface-matching.vert");
 	char const * SAMPLE_CONT_SHADER("gl-500/interface-matching.cont");
 	char const * SAMPLE_EVAL_SHADER("gl-500/interface-matching.eval");
 	char const * SAMPLE_GEOM_SHADER("gl-500/interface-matching.geom");
 	char const * SAMPLE_FRAG_SHADER("gl-500/interface-matching.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
 	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-500-interface-matching", glm::ivec2(640, 480));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4d);
@@ -405,9 +402,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE, ::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, ::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

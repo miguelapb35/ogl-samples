@@ -13,7 +13,6 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Memory barrier";
 	char const * SHADER_VERT_SOURCE_UPDATE("gl-420/memory-barrier-update.vert");
 	char const * SHADER_FRAG_SOURCE_UPDATE("gl-420/memory-barrier-update.frag");
 	char const * SHADER_VERT_SOURCE_BLIT("gl-420/memory-barrier-blit.vert");
@@ -22,10 +21,8 @@ namespace
 	glm::ivec2 FRAMEBUFFER_SIZE(0);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-420-memory-barrier");
 
 	GLsizei const VertexCount(3);
 
@@ -221,7 +218,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -289,10 +285,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }

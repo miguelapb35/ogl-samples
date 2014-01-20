@@ -16,18 +16,15 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Primitive Line AA");
 	char const * VERT_SHADER_SOURCE_AA("gl-420/primitive-line-aa.vert");
 	char const * FRAG_SHADER_SOURCE_AA("gl-420/primitive-line-aa.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-420/primitive-line-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-420/primitive-line-splash.frag");
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
 	glm::uvec2 const FRAMEBUFFER_SIZE(80, 60);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-420-primitive-line-aa", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	std::vector<glm::vec2> VertexData;
 
@@ -243,7 +240,6 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -335,15 +331,9 @@ void display()
 	glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
 
 	glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
-	
-
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }

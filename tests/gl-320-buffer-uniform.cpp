@@ -13,15 +13,12 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Buffer Uniform");
 	char const * VERT_SHADER_SOURCE("gl-320/buffer-uniform.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/buffer-uniform.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(3);
 	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-320-buffer-uniform", glm::ivec2(640, 480));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -284,9 +281,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, ::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }

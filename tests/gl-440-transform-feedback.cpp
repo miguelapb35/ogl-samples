@@ -13,14 +13,13 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Transform Feedback Object");
 	char const * VERT_SHADER_SOURCE_TRANSFORM("gl-440/transform-feedback-transform.vert");
 	char const * VERT_SHADER_SOURCE_FEEDBACK("gl-440/transform-feedback-feedback.vert");
 	char const * FRAG_SHADER_SOURCE_FEEDBACK("gl-440/transform-feedback-feedback.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
 	int const SAMPLE_MAJOR_VERSION(4);
 	int const SAMPLE_MINOR_VERSION(4);
+
+	glf::window Window("gl-440-transform-feedback", glm::ivec2(640, 480));
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec4);
@@ -54,8 +53,6 @@ namespace
 			MAX
 		};
 	}//namespace program
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint FeedbackName(0);
@@ -283,9 +280,5 @@ void display()
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, ::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
 }
