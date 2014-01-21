@@ -188,8 +188,6 @@ bool begin()
 {
 	bool Validated = true;
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

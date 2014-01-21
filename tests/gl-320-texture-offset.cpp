@@ -81,17 +81,6 @@ namespace
 	std::vector<glm::vec4> Viewport(program::MAX);
 }//namespace
 
-bool initDebugOutput()
-{
-#	ifdef GL_ARB_debug_output
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-#	endif
-
-	return true;
-}
-
 bool initProgram()
 {
 	bool Validated = true;
@@ -196,8 +185,6 @@ bool begin()
 	Viewport[program::OFFSET] = glm::vec4(Border, Border, Window.Size.x / 2 - Border * 2, Window.Size.y - Border * 2);
 	Viewport[program::BICUBIC] = glm::vec4(Border + Window.Size.x / 2, Border, Window.Size.x / 2 - Border * 2, Window.Size.y - Border * 2);
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

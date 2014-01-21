@@ -318,9 +318,11 @@ namespace glf
 
 	inline void initDebugOutput()
 	{
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallbackARB(&debugOutput, NULL);
+#		ifdef GL_ARB_debug_output
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+			glDebugMessageCallbackARB(&debugOutput, NULL);
+#		endif
 	}
 
 	inline int run
