@@ -15,8 +15,8 @@ namespace
 {
 	glf::window Window("gl-320-draw-without-vertex-attrib");
 
-	char const * VERT_SHADER_SOURCE("gl-330/draw-without-vertex-attrib.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/draw-without-vertex-attrib.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
 
 	namespace shader
 	{
@@ -32,7 +32,6 @@ namespace
 	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	GLuint BufferName(0);
-	GLint UniformTransform(-1);
 }//namespace
 
 bool initDebugOutput()
@@ -71,7 +70,7 @@ bool initProgram()
 	// Get variables locations
 	if(Validated)
 	{
-		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+		glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), glf::semantic::uniform::TRANSFORM0);
 	}
 
 	return Validated && glf::checkError("initProgram");
@@ -160,14 +159,11 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 	glUseProgram(ProgramName);
-	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
 
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-	glf::checkError("display");
 }
 
 int main(int argc, char* argv[])

@@ -340,15 +340,6 @@ bool initTexture()
 	return Validated;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Success(true);
@@ -357,8 +348,6 @@ bool begin()
 	Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
 
 	// Create and initialize objects
-	if(Success && glf::checkExtension("GL_ARB_debug_output"))
-		Success = initDebugOutput();
 	if(Success)
 		Success = initProgram();
 	if(Success)

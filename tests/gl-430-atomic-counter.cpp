@@ -16,9 +16,7 @@
 
 namespace
 {
-	glf::window Window("gl-430-atomic-counter");
-
-	char const * SAMPLE_NAME("OpenGL Atomic Counter");
+	glf::window Window("gl-430-atomic-counter", glf::window::TEMPLATE_TEST_IGNORE);
 	char const * VERT_SHADER_SOURCE("gl-430/atomic-counter.vert");
 	char const * FRAG_SHADER_SOURCE("gl-430/atomic-counter.frag");
 
@@ -146,22 +144,11 @@ bool initVertexArray()
 	return Validated;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Validated(true);
 	Validated = Validated && glf::checkExtension("GL_ARB_clear_buffer_object");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)

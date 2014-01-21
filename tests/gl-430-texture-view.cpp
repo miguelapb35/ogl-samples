@@ -186,15 +186,6 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Validated(true);
@@ -202,8 +193,6 @@ bool begin()
 	Validated = Validated && glf::checkExtension("GL_ARB_texture_view");
 	Validated = Validated && glf::checkExtension("GL_ARB_fragment_layer_viewport");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

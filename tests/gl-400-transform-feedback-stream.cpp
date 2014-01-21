@@ -54,17 +54,6 @@ namespace
 
 }//namespace
 
-bool initDebugOutput()
-{
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
-}
-
 bool initProgram()
 {
 	bool Validated = true;
@@ -188,8 +177,6 @@ bool begin()
 	glGenQueries(1, &Query);
 	glPointSize(64);
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

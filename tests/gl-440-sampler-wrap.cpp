@@ -84,17 +84,6 @@ namespace
 	glm::mat4* UniformPointer(NULL);
 }//namespace
 
-bool initDebugOutput()
-{
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
-}
-
 bool initProgram()
 {
 	bool Validated(true);
@@ -237,8 +226,6 @@ bool begin()
 
 	bool Validated = true;
 
-	if(Validated)
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

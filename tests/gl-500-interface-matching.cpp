@@ -61,15 +61,6 @@ namespace
 	GLint UniformMVP(0);
 }//namespace
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, BufferName);
@@ -199,8 +190,6 @@ bool begin()
 	Validated = Validated && glf::checkExtension("GL_ARB_arrays_of_arrays");
 	Validated = Validated && glf::checkExtension("GL_ARB_program_interface_query");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initMax();;
 	if(Validated)

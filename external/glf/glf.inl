@@ -286,7 +286,7 @@ namespace glf
 
 		if(String.find("NVIDIA") != std::string::npos)
 			return "nvidia/";
-		else if(String.find("AMD") != std::string::npos)
+		else if(String.find("ATI") != std::string::npos || String.find("AMD") != std::string::npos)
 			return "amd/";
 		else if(String.find("Intel") != std::string::npos)
 			return "intel/";
@@ -314,6 +314,13 @@ namespace glf
 		return Template == Texture;
 //		gli::texture2D FlipTexture = gli::flip(Texture);
 //		gli::save_dds(FlipTexture, (std::string(SampleName) + vendor() + ".dds").c_str());
+	}
+
+	inline void initDebugOutput()
+	{
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&debugOutput, NULL);
 	}
 
 	inline int run
@@ -378,7 +385,11 @@ namespace glf
 
 		if(version(Major, Minor) >= version(3, 0))
 			Result = glf::checkGLVersion(Major, Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
-		
+
+		if(Result == EXIT_SUCCESS && Profile != ES)
+			if(glf::checkExtension("GL_ARB_debug_output"))
+				initDebugOutput();
+
 		if(Result == EXIT_SUCCESS)
 			Result = begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
@@ -389,8 +400,9 @@ namespace glf
 			glfwPollEvents();
 			if(glfwWindowShouldClose(glf_window) || (FrameNum >= FrameMax && FrameMax != 0))
 			{
-				if(!checkFramebuffer(glf_window, argv[0]))
-					Result = EXIT_FAILURE;
+				if(Window.TemplateTest == window::TEMPLATE_TEST_EXECUTE)
+					if(!checkFramebuffer(glf_window, argv[0]))
+						Result = EXIT_FAILURE;
 				break;
 			}
 

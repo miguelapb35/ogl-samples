@@ -13,12 +13,10 @@
 
 namespace
 {
+	glf::window Window("es-300-draw-elements", glm::ivec2(640, 480));
+
 	char const * VERTEX_SHADER_SOURCE("es-300/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("es-300/flat-color.frag");
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(0);
-
-	glf::window Window("es-300-draw-elements", glm::ivec2(640, 480));
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
@@ -162,32 +160,24 @@ void display()
 
 	// Set the display viewport
 	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glf::checkError("display");
 
 	// Clear color buffer with black
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepthf(1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glf::checkError("display");
 
 	// Bind program
 	glUseProgram(ProgramName);
-	glf::checkError("display");
 
 	// Set the value of MVP uniform.
 	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glf::checkError("display");
 
 	glBindVertexArray(VertexArrayName);
-	glf::checkError("display");
 
 	glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
-
-	glf::checkError("display");
-
 }
 
 int main(int argc, char* argv[])
 {
-	return !glf::run(argc, argv, glf::ES, ::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::ES, 3, 0);
 }

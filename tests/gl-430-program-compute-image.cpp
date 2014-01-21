@@ -311,11 +311,11 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
+bool begin()
 {
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+	bool Validated(true);
+	Validated = Validated && glf::checkExtension("GL_ARB_compute_shader");
+	Validated = Validated && glf::checkExtension("GL_ARB_texture_buffer_range");
 
 	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_UNIFORM_BLOCKS, "GL_MAX_COMPUTE_UNIFORM_BLOCKS");
 	glf::logImplementationDependentLimit(GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS, "GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS");
@@ -329,17 +329,6 @@ bool initDebugOutput()
 	
 	glf::logImplementationDependentLimit(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, "GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT");
 
-	return true;
-}
-
-bool begin()
-{
-	bool Validated(true);
-	Validated = Validated && glf::checkExtension("GL_ARB_compute_shader");
-	Validated = Validated && glf::checkExtension("GL_ARB_texture_buffer_range");
-
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

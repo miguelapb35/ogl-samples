@@ -144,15 +144,6 @@ static bool initVertexArray()
 	return true;
 }
 
-static bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 static bool begin()
 {
 	bool Success(true);
@@ -160,11 +151,6 @@ static bool begin()
 	Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
 
 	glGenQueries(1, &QueryName);
-
-#	if _DEBUG
-	if(Success && glf::checkExtension("GL_ARB_debug_output"))
-		Success = initDebugOutput();
-#	endif
 
 	if(Success)
 		Success = initProgram();

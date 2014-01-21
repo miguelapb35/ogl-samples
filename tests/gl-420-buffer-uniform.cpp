@@ -159,13 +159,9 @@ bool initBuffer()
 	return Validated;
 }
 
-bool initDebugOutput()
+bool begin()
 {
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+	bool Validated = true;
 
 	glf::logImplementationDependentLimit(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, "GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT");
 	glf::logImplementationDependentLimit(GL_MAX_UNIFORM_BUFFER_BINDINGS, "GL_MAX_UNIFORM_BUFFER_BINDINGS");
@@ -176,15 +172,6 @@ bool initDebugOutput()
 	glf::logImplementationDependentLimit(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, "GL_MAX_GEOMETRY_UNIFORM_BLOCKS");
 	glf::logImplementationDependentLimit(GL_MAX_FRAGMENT_UNIFORM_BLOCKS, "GL_MAX_FRAGMENT_UNIFORM_BLOCKS");
 
-	return Validated;
-}
-
-bool begin()
-{
-	bool Validated = true;
-
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

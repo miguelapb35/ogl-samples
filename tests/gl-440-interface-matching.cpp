@@ -59,15 +59,6 @@ namespace
 	glm::mat4* UniformPointer(NULL);
 }//namespace
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool initBuffer()
 {
 	glGenBuffers(buffer::MAX, &BufferName[0]);
@@ -194,8 +185,6 @@ bool begin()
 {
 	bool Validated(true);
 
-	if(Validated)
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initMax();;
 	if(Validated)

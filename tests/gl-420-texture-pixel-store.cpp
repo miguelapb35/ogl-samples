@@ -209,8 +209,6 @@ bool begin()
 	bool Validated(true);
 	Validated = Validated && glf::checkExtension("GL_EXT_texture_compression_s3tc");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initTexture();
 	if(Validated)
