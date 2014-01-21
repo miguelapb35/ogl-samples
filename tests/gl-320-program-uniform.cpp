@@ -57,7 +57,8 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
 	GLint UniformTransform(0);
-	GLint UniformDiffuse(0);
+	GLint UniformDiffuse0(0);
+	GLint UniformDiffuse1(0);
 }//namespace
 
 bool initDebugOutput()
@@ -87,8 +88,8 @@ bool initProgram()
 		ProgramName = glCreateProgram();
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
+		//glDeleteShader(VertShaderName);
+		//glDeleteShader(FragShaderName);
 
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
@@ -99,7 +100,8 @@ bool initProgram()
 	// Get variables locations
 	if(Validated)
 	{
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		UniformDiffuse0 = glGetUniformLocation(ProgramName, "Diffuse[0]");
+		UniformDiffuse1 = glGetUniformLocation(ProgramName, "Diffuse[1]");
 		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
 	}
 	
@@ -210,9 +212,10 @@ void display()
 
 	glm::vec4 Diffuse[2] = {glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), glm::vec4(0.7f, 0.7f, 0.7f, 1.0f)};
 
-	//glUniform4fv(UniformDiffuse, 2, &Diffuse[0][0]);
-	glUniform4fv(UniformDiffuse + 0, 1, &Diffuse[0][0]);
-	glUniform4fv(UniformDiffuse + 1, 1, &Diffuse[1][0]);
+	glUniform4fv(UniformDiffuse0, 1, &Diffuse[0][0]);
+	glUniform4fv(UniformDiffuse1, 1, &Diffuse[1][0]);
+	//glUniform4fv(UniformDiffuse + 0, 1, &Diffuse[0][0]);
+	//glUniform4fv(UniformDiffuse + 1, 1, &Diffuse[1][0]);
 
 	glBindVertexArray(VertexArrayName);
 	glDrawElementsInstanced(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1);
