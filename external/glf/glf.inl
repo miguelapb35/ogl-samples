@@ -41,7 +41,7 @@ namespace glf
 		glGetIntegerv(GL_MINOR_VERSION, &MinorVersionContext);
 		printf("OpenGL Version Needed %d.%d ( %d.%d Found )\n",
 			MajorVersionRequire, MinorVersionRequire,
-			MajorVersionContext,MinorVersionContext);
+			MajorVersionContext, MinorVersionContext);
 		return glf::version(MajorVersionContext, MinorVersionContext) 
 			>= glf::version(MajorVersionRequire, MinorVersionRequire);
 	}
@@ -374,7 +374,10 @@ namespace glf
 		glewInit();
 		glGetError();
 
-		int Result = glf::checkGLVersion(3, 2) ? EXIT_SUCCESS : EXIT_FAILURE;
+		int Result = EXIT_SUCCESS;
+
+		if(version(Major, Minor) >= version(3, 0))
+			Result = glf::checkGLVersion(Major, Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
 		
 		if(Result == EXIT_SUCCESS)
 			Result = begin() ? EXIT_SUCCESS : EXIT_FAILURE;

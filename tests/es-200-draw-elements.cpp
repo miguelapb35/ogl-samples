@@ -171,15 +171,9 @@ void display()
 	glUseProgram(0);
 
 	glf::checkError("display");
-
 }
 
 int main(int argc, char* argv[])
 {
-	return !glf::run(
-		argc, argv,
-
-		glf::ES,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::ES, 2, 0);
 }
