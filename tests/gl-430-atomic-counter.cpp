@@ -16,15 +16,9 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Atomic Counter");
+	glf::window Window("gl-430-atomic-counter", glf::window::TEMPLATE_TEST_IGNORE);
 	char const * VERT_SHADER_SOURCE("gl-430/atomic-counter.vert");
 	char const * FRAG_SHADER_SOURCE("gl-430/atomic-counter.frag");
-	int const SAMPLE_SIZE_WIDTH(1024);
-	int const SAMPLE_SIZE_HEIGHT(768);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -150,23 +144,11 @@ bool initVertexArray()
 	return Validated;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_ARB_clear_buffer_object");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initBuffer();
 	if(Validated)
@@ -227,16 +209,9 @@ void display()
 
 	glDrawElementsInstancedBaseVertexBaseInstance(
 		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 5, 0, 0);
-
-	glf::swapBuffers();
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 3);
 }

@@ -16,16 +16,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Point Sprite");
+	glf::window Window("gl-320-primitive-sprite");
+
 	char const * VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4f);
@@ -176,15 +171,7 @@ bool initTexture()
 bool begin()
 {
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	glEnable(GL_POINT_SPRITE);
-	//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
-	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
-	
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
 	if(Validated)
@@ -195,6 +182,12 @@ bool begin()
 		Validated = initBuffer();
 	if(Validated)
 		Validated = initVertexArray();
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glEnable(GL_PROGRAM_POINT_SIZE);
+	//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
 
 	return Validated && glf::checkError("begin");
 }
@@ -245,16 +238,9 @@ void display()
 	glBindVertexArray(VertexArrayName);
 
 	glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
-
-	glf::swapBuffers();
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION,
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

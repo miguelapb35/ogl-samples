@@ -49,6 +49,8 @@ endforeach(FILE)
 source_group("Shader Files" FILES ${SHADER_PATH})
 add_executable(${MICRO}
 	main.cpp
+	png.cpp
+	png.hpp
 	csv.cpp
 	csv.hpp
 	caps.cpp

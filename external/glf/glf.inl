@@ -1,3 +1,4 @@
+#include "png.hpp"
 
 bool check();
 bool begin();
@@ -40,7 +41,7 @@ namespace glf
 		glGetIntegerv(GL_MINOR_VERSION, &MinorVersionContext);
 		printf("OpenGL Version Needed %d.%d ( %d.%d Found )\n",
 			MajorVersionRequire, MinorVersionRequire,
-			MajorVersionContext,MinorVersionContext);
+			MajorVersionContext, MinorVersionContext);
 		return glf::version(MajorVersionContext, MinorVersionContext) 
 			>= glf::version(MajorVersionRequire, MinorVersionRequire);
 	}
@@ -279,10 +280,52 @@ namespace glf
 		}
 	}
 
+	inline std::string vendor()
+	{
+		std::string String(reinterpret_cast<char const *>(glGetString(GL_VENDOR)));
+
+		if(String.find("NVIDIA") != std::string::npos)
+			return "nvidia/";
+		else if(String.find("ATI") != std::string::npos || String.find("AMD") != std::string::npos)
+			return "amd/";
+		else if(String.find("Intel") != std::string::npos)
+			return "intel/";
+		else
+			return "unknown/";
+	}
+
+	inline bool checkFramebuffer(GLFWwindow* pWindow, char* SampleName)
+	{
+		GLint WindowSizeX(0);
+		GLint WindowSizeY(0);
+		glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
+
+		gli::texture2D Texture(1, gli::RGB8_UNORM, gli::texture2D::dimensions_type(WindowSizeX, WindowSizeY));
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
+
+		save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Window.Title + ".png").c_str());
+
+		gli::texture2D Template(load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Window.Title + ".png").c_str()));
+		if(Template.empty())
+			return false;
+
+		return Template == Texture;
+//		gli::texture2D FlipTexture = gli::flip(Texture);
+//		gli::save_dds(FlipTexture, (std::string(SampleName) + vendor() + ".dds").c_str());
+	}
+
+	inline void initDebugOutput()
+	{
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallbackARB(&debugOutput, NULL);
+	}
+
 	inline int run
 	(
 		int argc, char* argv[], 
-		glm::ivec2 const & Size, 
 		profile Profile,
 		int Major, int Minor
 	)
@@ -316,7 +359,7 @@ namespace glf
 #			endif
 		}
 
-		glf_window = glfwCreateWindow(Size.x, Size.y, argv[0], NULL,NULL);
+		glf_window = glfwCreateWindow(Window.Size.x, Window.Size.y, argv[0], NULL,NULL);
 		assert(glf_window!= NULL);
 
 		glfwGetFramebufferSize(glf_window, &Window.Size.x, &Window.Size.y);
@@ -326,32 +369,52 @@ namespace glf
 		glfwSetKeyCallback(glf_window,key_callback);
 		glfwMakeContextCurrent(glf_window);
 
+		std::size_t FrameNum = 0;
+
+#		ifdef GLF_AUTO_STATUS
+			std::size_t FrameMax = 2;
+#		else
+			std::size_t FrameMax = 0;
+#		endif
+
 		glewExperimental = GL_TRUE;
 		glewInit();
 		glGetError();
 
-		bool Run = begin();
-		printf("Running Test\n");
-		if(Run)
-		{
-			while(true)
-			{
-				display();
-				// Wait for new events
-				glfwPollEvents();
-				if(glfwWindowShouldClose(glf_window))
-					break;
-			}
-		}
-		printf("Test Ended\n");
+		int Result = EXIT_SUCCESS;
 
-		if(Run) {
-				printf("Test Began Correctly.\n");
+		if(version(Major, Minor) >= version(3, 0))
+			Result = glf::checkGLVersion(Major, Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
+
+		if(Result == EXIT_SUCCESS && Profile != ES)
+			if(glf::checkExtension("GL_ARB_debug_output"))
+				initDebugOutput();
+
+		if(Result == EXIT_SUCCESS)
+			Result = begin() ? EXIT_SUCCESS : EXIT_FAILURE;
+
+		while(Result == EXIT_SUCCESS)
+		{
+			display();
+
+			glfwPollEvents();
+			if(glfwWindowShouldClose(glf_window) || (FrameNum >= FrameMax && FrameMax != 0))
+			{
+				if(Window.TemplateTest == window::TEMPLATE_TEST_EXECUTE)
+					if(!checkFramebuffer(glf_window, argv[0]))
+						Result = EXIT_FAILURE;
+				break;
+			}
+
+			swapBuffers();
+			++FrameNum;
 		}
-		// Also Exits Program
+
+//		if(Result == EXIT_SUCCESS)
+//			Result = end() ? EXIT_SUCCESS : EXIT_FAILURE;
+
 		glfwTerminate();
-		exit(EXIT_SUCCESS);
-		return Run ? 0 : 1;
+		return Result;
 	}
 
 	inline bool validateVAO43(GLuint VertexArrayName, std::vector<glf::vertexattrib> const & Expected)

@@ -13,7 +13,6 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Render to texture");
 	char const * VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
 	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
 	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-layer.vert");
@@ -22,10 +21,8 @@ namespace
 	int const FRAMEBUFFER_SIZE(2);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-320-fbo-rtt-texture-array", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -243,7 +240,6 @@ bool begin()
 	Viewport[texture::BLUE] = glm::ivec4(0, Window.Size.y >> 1, Window.Size / FRAMEBUFFER_SIZE);
 
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -327,15 +323,10 @@ void display()
 	}
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT),
-		glf::CORE,
-		SAMPLE_MAJOR_VERSION,
-		SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

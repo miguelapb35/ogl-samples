@@ -15,18 +15,13 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Object");
+	glf::window Window("gl-440-fbo");
+
 	char const * VERT_SHADER_SOURCE_TEXTURE("gl-440/fbo-texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-440/fbo-texture-2d.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-440/fbo-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-440/fbo-splash.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(4);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -266,22 +261,10 @@ bool initFramebuffer()
 	return true;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
-	if(Validated)
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -383,15 +366,9 @@ void display()
 	glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
-
-	glf::swapBuffers();
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 4);
 }

@@ -13,15 +13,12 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Framebuffer Explicit Multisample");
+	glf::window Window("gl-320-fbo-multisample-explicit");
+
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -220,7 +217,6 @@ bool initVertexArray()
 bool begin()
 {
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -344,16 +340,10 @@ void display()
 	// Resolved and render the colorbuffer from the multisampled framebuffer
 	resolveMultisampling();
 
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

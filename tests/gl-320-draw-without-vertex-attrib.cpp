@@ -13,15 +13,10 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Draw Without Vertex Attribute";
-	char const * VERT_SHADER_SOURCE("gl-330/draw-without-vertex-attrib.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/draw-without-vertex-attrib.frag");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
+	glf::window Window("gl-320-draw-without-vertex-attrib");
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	char const * VERT_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
 
 	namespace shader
 	{
@@ -37,7 +32,6 @@ namespace
 	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	GLuint BufferName(0);
-	GLint UniformTransform(-1);
 }//namespace
 
 bool initDebugOutput()
@@ -76,7 +70,7 @@ bool initProgram()
 	// Get variables locations
 	if(Validated)
 	{
-		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+		glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), glf::semantic::uniform::TRANSFORM0);
 	}
 
 	return Validated && glf::checkError("initProgram");
@@ -113,7 +107,6 @@ bool initVertexArray()
 bool begin()
 {
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -166,22 +159,14 @@ void display()
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 	glUseProgram(ProgramName);
-	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
 
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName);
 
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-	glf::swapBuffers();
-	glf::checkError("display");
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

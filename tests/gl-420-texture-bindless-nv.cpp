@@ -16,16 +16,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Texture Bindless");
+	glf::window Window("gl-420-texture-bindless-nv");
+
 	char const * VERT_SHADER_SOURCE("gl-420/texture-bindless-nv.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/texture-bindless-nv.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -62,22 +57,18 @@ namespace
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	GLuint TextureName(0);
 	GLuint64 TextureHandle(0);
-	GLuint TextureLocation(0);
+	GLint TextureLocation(0);
 }//namespace
 
 bool initProgram()
 {
 	bool Validated(true);
 	
-	glGenProgramPipelines(1, &PipelineName);
-
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-			"--version 420 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -89,9 +80,16 @@ bool initProgram()
 	}
 
 	if(Validated)
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	{
+		TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
+		Validated = Validated && (TextureLocation != -1);
+	}
 
-	TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
+	if(Validated)
+	{
+		glGenProgramPipelines(1, &PipelineName);
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	}
 
 	return Validated;
 }
@@ -132,8 +130,6 @@ bool initTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	glBindBuffer(GL_PIXEL_PACK_BUFFER, BufferName[buffer::VERTEX]);
-
 	glGenTextures(1, &TextureName);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
@@ -172,6 +168,7 @@ bool initTexture()
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+
 	return Validated;
 }
 
@@ -193,23 +190,11 @@ bool initVertexArray()
 	return true;
 }
 
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return true;
-}
-
 bool begin()
 {
 	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_NV_bindless_texture");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -258,7 +243,6 @@ void display()
 	glViewportIndexedf(0, 0, 0, GLfloat(Window.Size.x), GLfloat(Window.Size.y));
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-	// Bind rendering objects
 	glBindProgramPipeline(PipelineName);
 
 	glProgramUniformHandleui64NV(ProgramName, TextureLocation, TextureHandle);
@@ -266,17 +250,11 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
-
-	glf::swapBuffers();
+	glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }
+

@@ -18,10 +18,8 @@ namespace
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(4);
-	int const SAMPLE_MINOR_VERSION(2);
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-430-direct-state-access-ext", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -192,26 +190,16 @@ bool initVertexArray()
 	GLuint Bindingindex(0);
 
 	glGenVertexArrays(1, &VertexArrayName);
-    glBindVertexBuffer( Bindingindex, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
+	glBindVertexBuffer( Bindingindex, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
-    glVertexAttribBinding( glf::semantic::attr::POSITION, Bindingindex);
-    glVertexAttribFormat( glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+	glVertexAttribBinding( glf::semantic::attr::POSITION, Bindingindex);
+	glVertexAttribFormat( glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
 
-    glVertexAttribBinding( glf::semantic::attr::TEXCOORD, Bindingindex);
-    glVertexAttribFormat( glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+	glVertexAttribBinding( glf::semantic::attr::TEXCOORD, Bindingindex);
+	glVertexAttribFormat( glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
-    glEnableVertexAttribArray( glf::semantic::attr::POSITION);
-    glEnableVertexAttribArray( glf::semantic::attr::TEXCOORD);
-
-
-	return true;
-}
-
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+	glEnableVertexAttribArray( glf::semantic::attr::POSITION);
+	glEnableVertexAttribArray( glf::semantic::attr::TEXCOORD);
 
 	return true;
 }
@@ -219,13 +207,10 @@ bool initDebugOutput()
 bool begin()
 {
 	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
 	Validated = Validated && glf::checkExtension("GL_EXT_direct_state_access");
 	Validated = Validated && glf::checkExtension("GL_ARB_texture_storage_multisample");
 	Validated = Validated && glf::checkExtension("GL_ARB_vertex_attrib_binding");
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -352,18 +337,9 @@ void display()
 
 	// Pass 2: Resolved and render the colorbuffer from the multisampled framebuffer
 	resolveMultisampling();
-
-	glf::swapBuffers();
 }
 
 int main(int argc, char* argv[])
 {
-	if(glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION))
-		return 0;
-	return 1;
+	return glf::run(argc, argv, glf::CORE, 4, 2);
 }

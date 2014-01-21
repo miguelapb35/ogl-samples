@@ -10,6 +10,10 @@ if(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 	message(FATAL_ERROR "Source and binary directories must be different")
 endif(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 
+if(MSVC)
+	set(BINARY_DIRECTORY build)
+endif()
+
 ################################
 # Add GLEXT 
 
@@ -51,6 +55,24 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 
 ################################
+# Add freeimage 
+
+if(MSVC AND NOT CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "win32")
+endif(MSVC AND NOT CMAKE_CL_64)
+
+if(MSVC AND CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "win64")
+endif(MSVC AND CMAKE_CL_64)
+
+add_definitions(-DFREEIMAGE_LIB)
+set(FREEIMAGE_DIRECTORY FreeImage-3.15.4)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY})
+set(FREEIMAGE_LIBRARY FreeImage.lib)
+set(FREEIMAGE_BINARY_FILE FreeImage.dll)
+
+################################
 # Add GLM 
 
 set(GLM_DIRECTORY glm-0.9.5.1)
@@ -59,7 +81,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 ################################
 # Add GLI 
 
-set(GLI_DIRECTORY gli-0.5.0.B)
+set(GLI_DIRECTORY gli-0.5.1.A)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
 
 ################################
@@ -123,7 +145,7 @@ set(EGL_LIBRARY libEGL)
 ################################
 # Add libraries to executables
 
-set(BINARY_FILES GLEW glfw ${GLFW_LIBRARIES})
+set(BINARY_FILES GLEW glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
 
 ################################
 # Add output directory
@@ -148,6 +170,7 @@ if(APPLE)
 
 else(APPLE)
 	set(TARGET_DATA_COPY DATA_COPY)
+
 	if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
 		add_custom_target(
 			${TARGET_DATA_COPY}
@@ -155,7 +178,9 @@ else(APPLE)
 	else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
 		add_custom_target(
 			${TARGET_DATA_COPY}
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_DIRECTORY}/debug
+			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_DIRECTORY}/release)
 	endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
 endif(APPLE)
 
@@ -249,7 +274,7 @@ install (
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
 set (CPACK_PACKAGE_VERSION_MINOR "4")
-set (CPACK_PACKAGE_VERSION_PATCH "0")
+set (CPACK_PACKAGE_VERSION_PATCH "1")
 # Use current date in YYYYMMDD format as patch number
 
 # cpack mistakenly detects Mingw-w64 as win32

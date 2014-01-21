@@ -13,19 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Texture 2D Compressed");
+	glf::window Window("gl-320-texture-compressed-ext");
+
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-compressed.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-compressed.frag");
 	char const * TEXTURE_DIFFUSE_BC1("kueken2-dxt1.dds");
 	char const * TEXTURE_DIFFUSE_BC3("kueken2-dxt5.dds");
 	char const * TEXTURE_DIFFUSE_BC4("kueken2-bc4.dds");
 	char const * TEXTURE_DIFFUSE_BC5("kueken2-bc5.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	struct vertex
 	{
@@ -255,7 +250,7 @@ bool begin()
 	Viewport[TEXTURE_BC4] = glm::ivec4(Window.Size.x >> 1, Window.Size.y >> 1, Window.Size >> 1);
 	Viewport[TEXTURE_BC5] = glm::ivec4(0, Window.Size.y >> 1, Window.Size >> 1);
 
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 	Validated = Validated && glf::checkExtension("GL_EXT_texture_compression_s3tc");
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
@@ -312,15 +307,10 @@ void display()
 	}
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

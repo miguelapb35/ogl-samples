@@ -7,7 +7,7 @@ function(glCreateSampleGTC NAME)
 	endforeach(FILE)
 
 	source_group("Shader Files" FILES ${SHADER_PATH})
-	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${SHADER_PATH})
+	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp png.cpp png.hpp ${SHADER_PATH})
 	add_custom_command(
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
@@ -343,6 +343,8 @@ set(GL_SHADER_GTC image-store-write.vert image-store-write.frag image-store-read
 glCreateSampleGTC(image-store)
 set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matching.eval interface-matching.geom interface-matching.frag)
 glCreateSampleGTC(interface-matching)
+set(GL_SHADER_GTC fbo-texture-2d.vert fbo-texture-2d.glsl fbo-texture-2d.frag fbo-splash.vert fbo-splash.frag fbo-splash.glsl)
+glCreateSampleGTC(perf-monitor-amd)
 set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
 glCreateSampleGTC(multi-draw-indirect)
 set(GL_SHADER_GTC program-subroutine.vert program-subroutine.geom program-subroutine.frag)

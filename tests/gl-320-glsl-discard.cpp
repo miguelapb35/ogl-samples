@@ -13,16 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL GLSL discard");
+	glf::window Window("gl-320-glsl-discard");
+
 	char const * VERT_SHADER_SOURCE("gl-320/glsl-discard.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/glsl-discard.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	struct vertex
 	{
@@ -169,7 +164,7 @@ bool initVertexArray()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
 	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
 		Validated = initDebugOutput();
@@ -222,15 +217,10 @@ void display()
 	glDrawArrays(GL_TRIANGLES, 0, VertexCount);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 3, 2);
 }

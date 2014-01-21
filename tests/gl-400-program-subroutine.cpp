@@ -13,17 +13,11 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Subroutine";	
+	glf::window Window("gl-400-program-subroutine");
 	char const * VERTEX_SHADER_SOURCE("gl-400/subroutine.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/subroutine.frag");
 	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
 	char const * TEXTURE_DIFFUSE_DXT1("kueken1-dxt1.dds");
-	int const SAMPLE_SIZE_WIDTH = 640;
-	int const SAMPLE_SIZE_HEIGHT = 480;
-	int const SAMPLE_MAJOR_VERSION = 4;
-	int const SAMPLE_MINOR_VERSION = 0;
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -75,17 +69,6 @@ namespace
 	GLuint IndexDXT1 = 0;
 	GLuint IndexRGB8 = 0;
 }//namespace
-
-bool initDebugOutput()
-{
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
-}
 
 bool initTest()
 {
@@ -227,10 +210,8 @@ bool initTexture()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initTest();
 	if(Validated)
@@ -293,15 +274,10 @@ void display()
 	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 1, 0);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, 
-		::SAMPLE_MINOR_VERSION);
+	return glf::run(argc, argv, glf::CORE, 4, 0);
 }

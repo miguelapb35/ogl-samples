@@ -13,17 +13,14 @@
 
 namespace
 {
-	char const * SAMPLE_NAME = "OpenGL Framebuffer Multisample";	
 	char const * VERTEX_SHADER_SOURCE("gl-300/image-2d.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-300/image-2d.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
-	int const SAMPLE_SIZE_WIDTH = 640;
-	int const SAMPLE_SIZE_HEIGHT = 480;
 	int const SAMPLE_MAJOR_VERSION = 3;
 	int const SAMPLE_MINOR_VERSION = 0;
 
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
+	glf::window Window("gl-300-fbo-multisample", glm::ivec2(640, 480));
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount = 6;
@@ -54,15 +51,6 @@ namespace
 	GLint UniformDiffuse = 0;	
 
 }//namespace
-
-bool initDebugOutput()
-{
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return glf::checkError("initDebugOutput");
-}
 
 bool initProgram()
 {
@@ -291,14 +279,14 @@ void display()
 	renderFB(ColorTextureName);
 
 	glf::checkError("display");
-	glf::swapBuffers();
+
 }
 
 int main(int argc, char* argv[])
 {
 	return glf::run(
 		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
+
 		glf::COMPATIBILITY,
 		::SAMPLE_MAJOR_VERSION, 
 		::SAMPLE_MINOR_VERSION);

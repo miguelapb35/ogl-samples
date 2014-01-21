@@ -156,7 +156,7 @@ namespace glf
 			Text += Line + "\n";
 		}
 
-		Text += glf::format("\nconst float G_TRUC_GNI = %f;\n", glm::linearRand(0.0f, 1.0f));
+		//Text += glf::format("\nconst float G_TRUC_GNI = %f;\n", glm::linearRand(0.0f, 1.0f));
 
 		return Text;
 	}
