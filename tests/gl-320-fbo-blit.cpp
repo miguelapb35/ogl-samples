@@ -105,16 +105,19 @@ bool initProgram()
 {
 	bool Validated = true;
 	
+	glf::compiler Compiler;
+
 	// Create program
 	if(Validated)
 	{
-		ShaderName[shader::VERT] = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		ShaderName[shader::FRAG] = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
-
-		Validated = Validated && glf::checkShader(ShaderName[shader::VERT], VERT_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(ShaderName[shader::FRAG], FRAG_SHADER_SOURCE);
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
+		glAttachShader(ProgramName, ShaderName[shader::VERT]);
+		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+
 		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 		glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");

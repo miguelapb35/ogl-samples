@@ -391,10 +391,9 @@ void display()
 		glViewportIndexedfv(0, &glm::vec4(Viewport[Index])[0]);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, Texture2DName[Index]);
+		glBindTexture(GL_TEXTURE_2D, Texture2DName[Index]);
 
-		glDrawElementsInstancedBaseVertexBaseInstance(
-			GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 	}
 }
 

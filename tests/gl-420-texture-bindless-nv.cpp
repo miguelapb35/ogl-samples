@@ -57,22 +57,18 @@ namespace
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 	GLuint TextureName(0);
 	GLuint64 TextureHandle(0);
-	GLuint TextureLocation(0);
+	GLint TextureLocation(0);
 }//namespace
 
 bool initProgram()
 {
 	bool Validated(true);
 	
-	glGenProgramPipelines(1, &PipelineName);
-
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-			"--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-			"--version 420 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -84,9 +80,16 @@ bool initProgram()
 	}
 
 	if(Validated)
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	{
+		TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
+		Validated = Validated && (TextureLocation != -1);
+	}
 
-	TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
+	if(Validated)
+	{
+		glGenProgramPipelines(1, &PipelineName);
+		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+	}
 
 	return Validated;
 }
@@ -127,8 +130,6 @@ bool initTexture()
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	glBindBuffer(GL_PIXEL_PACK_BUFFER, BufferName[buffer::VERTEX]);
-
 	glGenTextures(1, &TextureName);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureName);
@@ -166,6 +167,7 @@ bool initTexture()
 	glMakeTextureHandleResidentNV(TextureHandle);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+
 
 	return Validated;
 }
@@ -252,7 +254,6 @@ void display()
 	glViewportIndexedf(0, 0, 0, GLfloat(Window.Size.x), GLfloat(Window.Size.y));
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-	// Bind rendering objects
 	glBindProgramPipeline(PipelineName);
 
 	glProgramUniformHandleui64NV(ProgramName, TextureLocation, TextureHandle);
@@ -260,8 +261,7 @@ void display()
 	glBindVertexArray(VertexArrayName);
 	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-	glDrawElementsInstancedBaseVertexBaseInstance(
-		GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
+	glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 }
 
 int main(int argc, char* argv[])
