@@ -35,7 +35,7 @@ namespace glf
 #	if defined(WIN32)
 		static std::string const DATA_DIRECTORY("../data/");
 #	elif defined(__APPLE__)
-		static std::string const DATA_DIRECTORY("../../../data/");
+		static std::string const DATA_DIRECTORY("../data/");
 #	else
 		// For packages.
 		static std::string const DATA_DIRECTORY("data/");
