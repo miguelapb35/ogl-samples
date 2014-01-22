@@ -19,11 +19,8 @@ namespace
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-430/fbo-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-430/fbo-splash.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
 
-	glf::window Window("gl-430-perf-monitor-amd", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
-	//glf::window Window(glm::ivec2(256, 256));
+	glf::window Window("gl-430-perf-monitor-amd");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

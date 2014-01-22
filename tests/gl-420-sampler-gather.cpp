@@ -1,6 +1,6 @@
 //**********************************
 // OpenGL Gather
-// 27/05/2010
+// 27/05/2010 - 22/01/2014
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -13,10 +13,10 @@
 
 namespace
 {
-	glf::window Window("gl-400-sampler-gather");
+	glf::window Window("gl-420-sampler-gather");
 
-	char const * VERTEX_SHADER_SOURCE("gl-400/gather.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-400/gather.frag");
+	char const * VERTEX_SHADER_SOURCE("gl-420/gather.vert");
+	char const * FRAGMENT_SHADER_SOURCE("gl-420/gather.frag");
 	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
 
 	GLsizei const VertexCount = 4;
@@ -126,7 +126,7 @@ bool initTexture2D()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Image2DName);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1000);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
