@@ -137,11 +137,11 @@ int test::operator()()
 		Result = glf::checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
+		Result = this->begin();
 
 	std::size_t FrameNum = 0;
 
-	while(true)
+	while(true && Result == EXIT_SUCCESS)
 	{
 		this->render();
 		glf::checkError("render");
@@ -167,7 +167,7 @@ int test::operator()()
 	}
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->end() ? EXIT_SUCCESS : EXIT_FAILURE;
+		Result = this->end();
 
 	return Result;
 }
