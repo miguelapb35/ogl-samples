@@ -294,7 +294,7 @@ namespace glf
 			return "unknown/";
 	}
 
-	inline bool checkFramebuffer(GLFWwindow* pWindow, char* SampleName)
+	inline bool checkFramebuffer(GLFWwindow* pWindow)
 	{
 		GLint WindowSizeX(0);
 		GLint WindowSizeY(0);
@@ -372,8 +372,7 @@ namespace glf
 		glfwMakeContextCurrent(glf_window);
 
 		std::size_t FrameNum = 0;
-
-#		ifdef GLF_AUTO_STATUS
+#		ifdef AUTOMATION_TESTS
 			std::size_t FrameMax = 2;
 #		else
 			std::size_t FrameMax = 0;
@@ -403,7 +402,7 @@ namespace glf
 			if(glfwWindowShouldClose(glf_window) || (FrameNum >= FrameMax && FrameMax != 0))
 			{
 				if(Window.TemplateTest == window::TEMPLATE_TEST_EXECUTE)
-					if(!checkFramebuffer(glf_window, argv[0]))
+					if(!checkFramebuffer(glf_window))
 						Result = EXIT_FAILURE;
 				break;
 			}

@@ -189,9 +189,9 @@ set(OGL_DATA_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
 ################################
 # Add options
 
-option(OGL_SAMPLES_STATUS "OGL_SAMPLES_STATUS" OFF)
-if(OGL_SAMPLES_STATUS)
-	add_definitions(-DGLF_AUTO_STATUS)
+option(AUTOMATED_TESTS "AUTOMATED_TESTS" OFF)
+if(AUTOMATED_TESTS)
+	add_definitions(-AUTOMATED_TESTS)
 endif()
 
 
