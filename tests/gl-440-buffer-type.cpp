@@ -148,8 +148,8 @@ namespace
 class gl_440_buffer_type : public test
 {
 public:
-	gl_320_texture2d(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-type", test::CORE, 3, 2)
+	gl_440_buffer_type(int argc, char* argv[]) :
+		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 4)
 	{}
 
 private:
@@ -269,7 +269,7 @@ private:
 
 	virtual int begin()
 	{
-		glm::vec2 ViewportSize(Window.Size.x * 0.33f, Window.Size.y * 0.50f);
+		glm::vec2 ViewportSize = glm::vec2(this->getWindowSize()) * glm::vec2(0.33f, 0.50f);
 
 		Viewport[viewport::VIEWPORT0] = view(glm::vec4(ViewportSize.x * 0.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::F16);
 		Viewport[viewport::VIEWPORT1] = view(glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::I32);
@@ -313,13 +313,15 @@ private:
 
 	virtual void render()
 	{
+		glm::ivec2 WindowSize = this->getWindowSize();
+
 		{
 			// Compute the MVP (Model View Projection matrix)
-			float Aspect = (Window.Size.x * 0.33f) / (Window.Size.y * 0.50f);
+			float Aspect = (WindowSize.x * 0.33f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
+			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 			glm::mat4 View = ViewRotateY;
 			glm::mat4 Model = glm::mat4(1.0f);
 			glm::mat4 MVP = Projection * View * Model;

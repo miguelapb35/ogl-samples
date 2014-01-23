@@ -42,11 +42,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class es_300_draw_elements : public test
+class es_200_draw_elements : public test
 {
 public:
-	es_300_draw_elements(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2)
+	es_200_draw_elements(int argc, char* argv[]) :
+		test(argc, argv, "es-200-draw-elements", test::ES, 2, 0)
 	{}
 
 private:
@@ -138,14 +138,15 @@ private:
 	{
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
+		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+		glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 
 		// Set the display viewport
-		glViewport(0, 0, Window.Size.x, Window.Size.y);
+		glm::ivec2 WindowSize = this->getWindowSize();
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
 		// Clear color buffer with black
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
