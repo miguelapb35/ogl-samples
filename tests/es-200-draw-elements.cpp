@@ -17,8 +17,8 @@ namespace
 	char const * FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
 
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
-	glm::uint32 const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);
+	glm::uint16 const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		0, 2, 3
@@ -34,10 +34,18 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
-	GLuint VertexArrayName = 0;
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			ELEMENT,
+			MAX
+		};
+	}//namespace buffer
+
+	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint ProgramName = 0;
-	GLuint ArrayBufferName = 0;
-	GLuint ElementBufferName = 0;
 	GLint UniformMVP = 0;
 	GLint UniformDiffuse = 0;
 }//namespace
@@ -96,13 +104,13 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(1, &ArrayBufferName);
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glGenBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glGenBuffers(1, &ElementBufferName);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -121,14 +129,12 @@ private:
 		if(Validated)
 			Validated = initBuffer();
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated && glf::checkError("begin") ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
 	virtual int end()
 	{
-		// Delete objects
-		glDeleteBuffers(1, &ArrayBufferName);
-		glDeleteBuffers(1, &ElementBufferName);
+		glDeleteBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
 		glDeleteProgram(ProgramName);
 
 		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -159,19 +165,19 @@ private:
 		// Set the value of MVP uniform.
 		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-
-		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
-
+			glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0);
 		glDisableVertexAttribArray(glf::semantic::attr::POSITION);
 
 		// Unbind program
 		glUseProgram(0);
+
+		glf::checkError("render");
 	}
 };
 

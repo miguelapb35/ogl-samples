@@ -1,12 +1,6 @@
 ﻿#include "test.hpp"
 #include "png.hpp"
 
-int const MAJOR = 3;
-int const MINOR = 2;
-
-glm::ivec2 const test::DEFAULT_WINDOW_SIZE(640, 480);
-std::size_t const test::DEFAULT_MAX_FRAME(100);
-
 namespace 
 {
 	inline std::string vendor()
@@ -25,6 +19,8 @@ namespace
 
 	inline bool checkFramebuffer(GLFWwindow* pWindow, char const * Title)
 	{
+		//glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &Params); // For ES 2 this is actually necessary
+
 		GLint WindowSizeX(0);
 		GLint WindowSizeY(0);
 		glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
@@ -33,6 +29,9 @@ namespace
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
+
+		if(!glf::checkError("checkFramebuffer"))
+			return false;
 
 		glf::save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Title + ".png").c_str());
 
@@ -147,12 +146,10 @@ int test::operator()()
 		glf::checkError("render");
 
 		glfwPollEvents();
-		if(glfwWindowShouldClose(this->Window))
-			break;
-
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
 		{
-			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE)
+			//if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && (this->Profile == CORE || (this->Profile == ES && version(this->Major, this->Minor) >= version(3, 0))))
+			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && this->Profile == CORE)
 				if(!checkFramebuffer(this->Window, this->Title.c_str()))
 					Result = EXIT_FAILURE;
 			break;

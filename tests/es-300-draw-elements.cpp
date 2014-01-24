@@ -48,7 +48,7 @@ class es_300_draw_elements : public test
 {
 public:
 	es_300_draw_elements(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-2d", test::ES, 3, 0)
+		test(argc, argv, "es-300-draw-elements", test::ES, 3, 0)
 	{}
 
 private:
@@ -143,9 +143,8 @@ private:
 			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
-		return Validated && glf::checkError("begin");
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated && glf::checkError("begin") ? EXIT_SUCCESS : EXIT_FAILURE;
 	}
 
 	virtual int end()

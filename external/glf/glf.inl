@@ -305,6 +305,9 @@ namespace glf
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
 
+		if(!glf::checkError("checkFramebuffer"))
+			return false;
+
 		save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Window.Title + ".png").c_str());
 
 		gli::texture2D Template(load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Window.Title + ".png").c_str()));
