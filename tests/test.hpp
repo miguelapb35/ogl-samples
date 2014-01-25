@@ -34,6 +34,46 @@ public:
 	int operator()();
 
 protected:
+	struct DrawArraysIndirectCommand
+	{
+		GLuint count;
+		GLuint primCount;
+		GLuint first;
+		GLuint baseInstance;
+	};
+
+	struct DrawElementsIndirectCommand
+	{
+		DrawElementsIndirectCommand() :
+			primitiveCount(0),
+			instanceCount(0),
+			firstIndex(0),
+			baseVertex(0),
+			baseInstance(0)
+		{}
+
+		DrawElementsIndirectCommand
+		(
+			GLuint primitiveCount,
+			GLuint instanceCount,
+			GLuint firstIndex,
+			GLint  baseVertex,
+			GLuint baseInstance
+		) :
+			primitiveCount(primitiveCount),
+			instanceCount(instanceCount),
+			firstIndex(firstIndex),
+			baseVertex(baseVertex),
+			baseInstance(baseInstance)
+		{}
+
+		GLuint primitiveCount;
+		GLuint instanceCount;
+		GLuint firstIndex;
+		GLint  baseVertex;
+		GLuint baseInstance;
+	};
+
 	enum template_test
 	{
 		TEMPLATE_TEST_IGNORE,
@@ -55,7 +95,13 @@ protected:
 		KEY_REPEAT = GLFW_REPEAT
 	};
 
-	test(int argc, char* argv[], char const * Title, profile Profile, int Major, int Minor, glm::ivec2 const & WindowSize = glm::ivec2(640, 480), std::size_t FrameCount = 2);
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
+		glm::ivec2 const & WindowSize = glm::ivec2(640, 480),
+		glm::vec2 const & Orientation = glm::vec2(0, 0),
+		glm::vec2 const & Position = glm::vec2(0, 4),
+		std::size_t FrameCount = 2);
 	virtual ~test();
 
 	virtual bool begin() = 0;
@@ -69,15 +115,13 @@ protected:
 	bool isExtensionSupported(char const * String);
 	glm::ivec2 getWindowSize() const;
 	bool isKeyPressed(int Key) const;
+	glm::mat4 view() const;
 
 protected:
 	void beginTimer();
 	void endTimer();
 
-protected:
-	static glm::ivec2 const DEFAULT_WINDOW_SIZE;
-	static std::size_t const DEFAULT_MAX_FRAME;
-
+private:
 	GLFWwindow* Window;
 	template_test const TemplateTest;
 	std::string const Title;

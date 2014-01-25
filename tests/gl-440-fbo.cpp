@@ -307,18 +307,12 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			// Compute the MVP (Model View Projection matrix)
 			float Aspect = (WindowSize.x * 0.50f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 View = ViewRotateY;
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 MVP = Projection * this->view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}
@@ -328,7 +322,7 @@ private:
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 
-		glViewportIndexedf(0, 0, 0, GLfloat(WindowSize.x), GLfloat(WindowSize.y));
+		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		float Depth(1.0f);
@@ -361,8 +355,7 @@ private:
 		glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, GLsizei(sizeof(glf::vertex_v2fv2f)));
 		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawElementsInstancedBaseVertexBaseInstance(
-			GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0, 0);
 
 		glDisable(GL_DEPTH_TEST);
 

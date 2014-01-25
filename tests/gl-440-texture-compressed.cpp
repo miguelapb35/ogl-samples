@@ -119,7 +119,7 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, BufferName);
+		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
@@ -148,13 +148,13 @@ private:
 		return Validated;
 	*/
 		glActiveTexture(GL_TEXTURE0);
-		glGenTextures(texture::MAX, Texture2DName);
+		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
 			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BPTC).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::BPTC]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::BPTC]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -184,7 +184,7 @@ private:
 			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::DXT5]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT5]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -214,7 +214,7 @@ private:
 			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGTC).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGTC]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGTC]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -244,7 +244,7 @@ private:
 			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D, Texture2DName[texture::RGB8]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -361,12 +361,9 @@ private:
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 1000.0f);
-			glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 			glm::mat4 Model = glm::mat4(1.0f);
 
-			*Pointer = Projection * View * Model;
+			*Pointer = Projection * this->view() * Model;
 
 			// Make sure the uniform buffer is uploaded
 			glUnmapBuffer(GL_UNIFORM_BUFFER);

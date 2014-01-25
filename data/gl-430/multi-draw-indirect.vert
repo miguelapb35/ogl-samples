@@ -34,7 +34,7 @@ out gl_PerVertex
 out block
 {
 	vec2 Texcoord;
-	flat uint DrawID;
+	flat int DrawID;
 } Out;
 
 void main()

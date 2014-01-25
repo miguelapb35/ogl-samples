@@ -269,18 +269,12 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			// Compute the MVP (Model View Projection matrix)
 			float Aspect = (WindowSize.x * 0.33f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 View = ViewRotateY;
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 MVP = Projection * this->view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}

@@ -93,8 +93,8 @@ namespace glf
 		FIBITMAP* Bitmap = FreeImage_ConvertFromRawBits(
 			Copy.data<BYTE>(),
 			Copy.dimensions().x, Copy.dimensions().y,
-			Copy.dimensions().x * gli::component_count(Copy.format()),
-			gli::component_count(Copy.format()) * 8, 0x0000FF, 0x00FF00, 0xFF0000, false);
+			static_cast<int>(Copy.dimensions().x * gli::component_count(Copy.format())),
+			static_cast<unsigned int>(gli::component_count(Copy.format()) * 8), 0x0000FF, 0x00FF00, 0xFF0000, false);
 
 		BOOL Result = FreeImage_Save(FIF_PNG, Bitmap, Filename, 0);
 		assert(Result);

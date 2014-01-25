@@ -224,18 +224,12 @@ private:
 
 	bool render()
 	{
-		glm::vec2 ViewportSize = glm::vec2(this->getWindowSize()) * glm::vec2(0.33f, 0.50f);
+		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			// Compute the MVP (Model View Projection matrix)
-			float Aspect = (ViewportSize.x * 0.50f) / (ViewportSize.y * 0.50f);
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 View = ViewRotateY;
 			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 MVP = Projection * this->view() * Model;
 
 			*UniformPointer = MVP;
 		}
@@ -243,7 +237,7 @@ private:
 		glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
 
 		// Set the display viewport
-		glViewportIndexedf(0, 0.0f, 0.0f, float(ViewportSize.x), float(ViewportSize.y));
+		glViewportIndexedf(0, 0.0f, 0.0f, WindowSize.x, WindowSize.y);
 
 		// Clear color buffer
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);

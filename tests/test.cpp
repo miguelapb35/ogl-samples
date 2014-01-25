@@ -43,7 +43,12 @@ namespace
 	}
 }
 
-test::test(int argc, char* argv[], char const * Title, profile Profile, int Major, int Minor, glm::ivec2 const & WindowSize, std::size_t FrameCount) :
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
+	glm::ivec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position, std::size_t FrameCount
+) :
 	Window(nullptr),
 	TemplateTest(TEMPLATE_TEST_EXECUTE),
 	Title(Title),
@@ -57,14 +62,15 @@ test::test(int argc, char* argv[], char const * Title, profile Profile, int Majo
 	TimeMax(0.0),
 	MouseOrigin(WindowSize >> 1),
 	MouseCurrent(WindowSize >> 1),
-	TranlationOrigin(0, 4),
-	TranlationCurrent(0, 4),
-	RotationOrigin(0), 
-	RotationCurrent(0),
+	TranlationOrigin(Position),
+	TranlationCurrent(Position),
+	RotationOrigin(Orientation), 
+	RotationCurrent(Orientation),
 	MouseButtonFlags(0)
 {
-	glfwInit();
+	memset(&KeyPressed[0], 0, sizeof(KeyPressed));
 
+	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
 
 	if(version(this->Major, this->Minor) >= version(3, 2) || (Profile == ES))
@@ -207,6 +213,14 @@ bool test::isKeyPressed(int Key) const
 	return this->KeyPressed[Key];
 }
 
+glm::mat4 test::view() const
+{
+	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
+	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+	glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+	return View;
+}
+
 void test::beginTimer()
 {
 	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
@@ -302,7 +316,7 @@ void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, in
 	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
-	Test->KeyPressed[Key] = Action != KEY_RELEASE;
+	Test->KeyPressed[Key] = Action == KEY_PRESS;
 
 	if(Test->isKeyPressed(GLFW_KEY_ESCAPE))
 		Test->stop();

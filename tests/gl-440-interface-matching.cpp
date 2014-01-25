@@ -358,26 +358,20 @@ private:
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		glm::vec2 WindowSize(this->getWindowSize());
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
 				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-			glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
-		
-			*Pointer = MVP;
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			*Pointer = Projection * this->view() * glm::mat4(1.0f);
 
 			// Make sure the uniform buffer is uploaded
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
-		glm::ivec2 WindowSize = this->getWindowSize();
 		glViewportIndexedfv(0, &glm::vec4(0, 0, WindowSize)[0]);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 

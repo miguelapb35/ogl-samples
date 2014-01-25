@@ -159,17 +159,11 @@ private:
 	{
 		bool Validated(true);
 		
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
-				glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-				"--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-				glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-				"--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -184,7 +178,10 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated && glf::checkError("initProgram");
 	}
@@ -318,12 +315,7 @@ private:
 			// Compute the MVP (Model View Projection matrix)
 			float Aspect = (WindowSize.x * 0.33f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 View = ViewRotateY;
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 MVP = Projection * this->test::view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}

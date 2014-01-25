@@ -347,7 +347,7 @@ set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matc
 glCreateSampleGTC(interface-matching)
 set(GL_SHADER_GTC fbo-texture-2d.vert fbo-texture-2d.glsl fbo-texture-2d.frag fbo-splash.vert fbo-splash.frag fbo-splash.glsl)
 glCreateSampleGTC(perf-monitor-amd)
-set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
+set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.geom multi-draw-indirect.frag)
 glCreateSampleGTC(multi-draw-indirect)
 set(GL_SHADER_GTC program-subroutine.vert program-subroutine.geom program-subroutine.frag)
 glCreateSampleGTC(program-subroutine)
