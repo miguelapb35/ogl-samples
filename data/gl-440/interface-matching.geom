@@ -21,7 +21,8 @@ in gl_PerVertex
 
 layout(location = 0) in vertex st_In[][2];
 
-layout(location = 0 + 1 * st_In[0].length()) in block
+/*layout(location = 0 + 1 * st_In[0].length()) in block*/
+layout(location = 0 + 1 * 2) in block
 {
 	vec4 Color;
 } bl_In[]; 

@@ -191,7 +191,7 @@ private:
 		return glf::checkError("initVertexArray");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated = true;
 
@@ -204,10 +204,10 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteShader(ShaderName[shader::FRAG]);
@@ -216,10 +216,10 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -253,6 +253,8 @@ private:
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+
+		return true;
 	}
 };
 

@@ -58,9 +58,9 @@ protected:
 	test(int argc, char* argv[], char const * Title, profile Profile, int Major, int Minor, glm::ivec2 const & WindowSize = glm::ivec2(640, 480), std::size_t FrameCount = 2);
 	virtual ~test();
 
-	virtual int begin() = 0;
-	virtual int end() = 0;
-	virtual void render() = 0;
+	virtual bool begin() = 0;
+	virtual bool end() = 0;
+	virtual bool render() = 0;
 
 	void swap();
 	void stop();

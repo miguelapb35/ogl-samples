@@ -117,7 +117,7 @@ private:
 		return glf::checkError("initBuffer");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated(true);
 
@@ -129,18 +129,18 @@ private:
 		if(Validated)
 			Validated = initBuffer();
 
-		return Validated && glf::checkError("begin") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		glDeleteBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -177,7 +177,7 @@ private:
 		// Unbind program
 		glUseProgram(0);
 
-		glf::checkError("render");
+		return true;
 	}
 };
 

@@ -68,24 +68,26 @@ namespace
 			MAX
 		};
 	}//namespace pipeline
-
-	GLuint FramebufferName(0);
-	std::vector<GLuint> ProgramName(pipeline::MAX);
-	std::vector<GLuint> VertexArrayName(pipeline::MAX);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	std::vector<GLuint> TextureName(texture::MAX);
-	std::vector<GLuint> PipelineName(pipeline::MAX);
-	glm::mat4* UniformPointer(NULL);
 }//namespace
 
 class gl_440_fbo : public test
 {
 public:
 	gl_440_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo", test::CORE, 4, 4)
+		test(argc, argv, "gl-440-fbo", test::CORE, 4, 4),
+		UniformPointer(nullptr),
+		FramebufferName(0)
 	{}
 
 private:
+	glm::mat4* UniformPointer;
+	GLuint FramebufferName;
+	std::array<GLuint, pipeline::MAX> ProgramName;
+	std::array<GLuint, pipeline::MAX> VertexArrayName;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, texture::MAX> TextureName;
+	std::array<GLuint, pipeline::MAX> PipelineName;
+
 	bool initProgram()
 	{
 		bool Validated(true);
@@ -267,7 +269,7 @@ private:
 		return true;
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated(true);
 
@@ -287,10 +289,10 @@ private:
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 		glDeleteProgram(ProgramName[pipeline::SPLASH]);
@@ -300,10 +302,10 @@ private:
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		glm::ivec2 WindowSize = this->getWindowSize();
 
@@ -372,6 +374,8 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
+
+		return true;
 	}
 };
 

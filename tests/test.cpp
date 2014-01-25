@@ -136,14 +136,14 @@ int test::operator()()
 		Result = glf::checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->begin();
+		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	std::size_t FrameNum = 0;
 
 	while(true && Result == EXIT_SUCCESS)
 	{
-		this->render();
-		glf::checkError("render");
+		Result = this->render() ? EXIT_SUCCESS : EXIT_FAILURE;
+		Result = Result && glf::checkError("render");
 
 		glfwPollEvents();
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
@@ -160,11 +160,11 @@ int test::operator()()
 #		ifdef AUTOMATED_TESTS
 			if(FrameCount > 0)
 				++FrameNum;
-#		endif
+#		endif//AUTOMATED_TESTS
 	}
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->end();
+		Result = this->end() ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	return Result;
 }

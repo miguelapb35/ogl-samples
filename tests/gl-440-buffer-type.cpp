@@ -120,12 +120,19 @@ namespace
 			MAX
 		};
 	}//namespace viewport
+}//namespace
 
-	GLuint PipelineName(0);
-	GLuint ProgramName(0);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	std::vector<GLuint> VertexArrayName(vertex_format::MAX);
+class gl_440_buffer_type : public test
+{
+public:
+	gl_440_buffer_type(int argc, char* argv[]) :
+		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 4),
+		PipelineName(0),
+		ProgramName(0),
+		UniformPointer(nullptr)
+	{}
 
+private:
 	struct view
 	{
 		view(){}
@@ -141,18 +148,13 @@ namespace
 		vertex_format::type VertexFormat;
 	};
 
-	std::vector<view> Viewport(viewport::MAX);
-	glm::mat4* UniformPointer(NULL);
-}//namespace
+	std::array<view, viewport::MAX> Viewport;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, vertex_format::MAX> VertexArrayName;
+	GLuint PipelineName;
+	GLuint ProgramName;
+	glm::mat4* UniformPointer;
 
-class gl_440_buffer_type : public test
-{
-public:
-	gl_440_buffer_type(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 4)
-	{}
-
-private:
 	bool initProgram()
 	{
 		bool Validated(true);
@@ -212,11 +214,7 @@ private:
 		glBufferStorage(GL_ARRAY_BUFFER, GLsizeiptr(Data.size()), &Data[0], 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -267,7 +265,7 @@ private:
 		return glf::checkError("initVertexArray");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		glm::vec2 ViewportSize = glm::vec2(this->getWindowSize()) * glm::vec2(0.33f, 0.50f);
 
@@ -292,26 +290,27 @@ private:
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		if(!UniformPointer)
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
-			UniformPointer = NULL;
+			UniformPointer = nullptr;
 		}
 
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteVertexArrays(vertex_format::MAX, &VertexArrayName[0]);
 		glDeleteProgramPipelines(1, &PipelineName);
 		glDeleteProgram(ProgramName);
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		glm::ivec2 WindowSize = this->getWindowSize();
 
@@ -347,6 +346,8 @@ private:
 			glBindVertexArray(VertexArrayName[Viewport[Index].VertexFormat]);
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		}
+
+		return true;
 	}
 };
 

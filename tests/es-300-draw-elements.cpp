@@ -130,7 +130,7 @@ private:
 		return glf::checkError("initVertexArray");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated(true);
 
@@ -144,20 +144,20 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		// Delete objects
 		glDeleteBuffers(1, &ArrayBufferName);
 		glDeleteBuffers(1, &ElementBufferName);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -185,6 +185,8 @@ private:
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
+
+		return true;
 	}
 };
 
