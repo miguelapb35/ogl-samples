@@ -61,7 +61,7 @@ namespace
 	GLuint FramebufferResolveName = 0;
 
 	GLint UniformMVP = 0;
-	GLint UniformDiffuse = 0;	
+	GLint UniformDiffuse = 0;
 }//namespace
 
 bool initProgram()
@@ -209,9 +209,6 @@ bool begin()
 {
 	bool Validated = true;
 
-	//glEnable(GL_SAMPLE_MASK);
-	//glSampleMaski(0, 0xFF);
-
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)
@@ -224,6 +221,9 @@ bool begin()
 		Validated = initTexture2D();
 	if(Validated)
 		Validated = initFramebuffer();
+
+	//glEnable(GL_SAMPLE_MASK);
+	//glSampleMaski(0, 0xFF);
 
 	return Validated && glf::checkError("begin");
 }
