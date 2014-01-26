@@ -16,7 +16,7 @@ namespace
 	char const * VERTEX_SHADER_SOURCE("gl-400/multisample.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/multisample.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
+	glm::ivec2 const FRAMEBUFFER_SIZE(80, 60);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
 
@@ -246,7 +246,7 @@ bool end()
 void renderFBO(GLuint Framebuffer)
 {
 	glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
-	glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f,-1.0f, 1.0f));
+	glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 	glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y * 2.0));
 	glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
 	glm::mat4 Model = glm::mat4(1.0f);

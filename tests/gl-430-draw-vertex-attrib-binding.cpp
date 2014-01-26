@@ -2,8 +2,8 @@
 // OpenGL Samples Pack 
 // ogl-samples.g-truc.net
 //**********************************
-// OpenGL Debug
-// 23/10/2012 - 23/10/2012
+// OpenGL draw vertex attrib binding
+// 23/10/2012 - 26/02/2014
 //**********************************
 // Christophe Riccio
 // ogl-samples@g-truc.net
@@ -16,8 +16,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-430/debug.vert");
-	char const * FRAG_SHADER_SOURCE("gl-430/debug.frag");
+	char const * VERT_SHADER_SOURCE("gl-430/draw-vertex-attrib-binding.vert");
+	char const * FRAG_SHADER_SOURCE("gl-430/draw-vertex-attrib-binding.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
@@ -60,11 +60,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_debug : public test
+class gl_430_draw_vertex_attrib_binding : public test
 {
 public:
-	gl_430_debug(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-debug", test::CORE, 4, 3),
+	gl_430_draw_vertex_attrib_binding(int argc, char* argv[]) :
+		test(argc, argv, "gl-430-draw-vertex-attrib-binding", test::CORE, 4, 3),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -80,9 +80,6 @@ private:
 	bool initProgram()
 	{
 		bool Validated(true);
-	
-		glGenProgramPipelines(1, &PipelineName);
-		glObjectLabel(GL_PROGRAM_PIPELINE, PipelineName, -1, "Pipeline Program object");
 
 		if(Validated)
 		{
@@ -92,18 +89,12 @@ private:
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::VERTEX] = glCreateProgram();
-
-			glObjectLabel(GL_PROGRAM, PipelineName, -1, "Vertex Program object");
-
 			glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::VERTEX], VertShaderName);
 			glLinkProgram(ProgramName[program::VERTEX]);
 			glDeleteShader(VertShaderName);
 
 			ProgramName[program::FRAGMENT] = glCreateProgram();
-
-			glObjectLabel(GL_PROGRAM, PipelineName, -1, "Fragment Program object");
-
 			glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
 			glLinkProgram(ProgramName[program::FRAGMENT]);
@@ -115,6 +106,7 @@ private:
 
 		if(Validated)
 		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
 		}
@@ -128,30 +120,20 @@ private:
 
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		glObjectLabel(GL_BUFFER, BufferName[buffer::ELEMENT], -1, "Element Array Buffer object");
-
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glObjectLabel(GL_BUFFER, BufferName[buffer::VERTEX], -1, "Array Buffer object");
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
-		glObjectLabel(GL_BUFFER, BufferName[buffer::TRANSFORM], -1, "Uniform Buffer object");
-	
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return Validated;
@@ -168,16 +150,10 @@ private:
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
-
-		glObjectLabel(GL_TEXTURE, TextureName, -1, "Texture object");
-
-		glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glTexParameteri");
-
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_LINEAR); // Generates an error GL_LINEAR instead of GL_ALPHA 
-
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -187,13 +163,12 @@ private:
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				GL_BGR, GL_UNSIGNED_BYTE, 
+			glTexSubImage2D(GL_TEXTURE_2D,
+				GLint(Level),
+				0, 0,
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
+				GL_BGR, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
 		}
 	
@@ -208,61 +183,18 @@ private:
 
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glObjectLabel(GL_VERTEX_ARRAY, VertexArrayName, -1, "Vertex array object");
+			glVertexAttribBinding(glf::semantic::attr::POSITION, 0);
+			glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
 
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glVertexAttribBinding(glf::semantic::attr::TEXCOORD, 0);
+			glVertexAttribFormat(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+			glBindVertexBuffer(0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 		glBindVertexArray(0);
-
-		return Validated;
-	}
-
-	bool initDebug()
-	{
-		bool Validated(true);
-
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallback(&glf::debugOutput, NULL);
-
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Messafge test: Begin");
-
-			GLuint MessageId(4);
-			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_FALSE);
-			glDebugMessageControlARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, GL_DONT_CARE, 0, NULL, GL_TRUE);
-			glDebugMessageControlARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, GL_DONT_CARE, 1, &MessageId, GL_FALSE);
-			std::string Message1("Message 1");
-			glDebugMessageInsertARB(
-				GL_DEBUG_SOURCE_APPLICATION_ARB,
-				GL_DEBUG_TYPE_OTHER_ARB, 1,
-				GL_DEBUG_SEVERITY_MEDIUM_ARB,
-				GLsizei(Message1.size()), Message1.c_str());
-			std::string Message2("Message 2");
-			glDebugMessageInsertARB(
-				GL_DEBUG_SOURCE_THIRD_PARTY_ARB,
-				GL_DEBUG_TYPE_OTHER_ARB, 2,
-				GL_DEBUG_SEVERITY_MEDIUM_ARB,
-				GLsizei(Message2.size()), Message2.c_str());
-			glDebugMessageInsertARB(
-				GL_DEBUG_SOURCE_APPLICATION_ARB,
-				GL_DEBUG_TYPE_OTHER_ARB, 2,
-				GL_DEBUG_SEVERITY_MEDIUM_ARB,
-				-1, "Message 3");
-			glDebugMessageInsertARB(
-				GL_DEBUG_SOURCE_APPLICATION_ARB,
-				GL_DEBUG_TYPE_OTHER_ARB, MessageId,
-				GL_DEBUG_SEVERITY_MEDIUM_ARB,
-				-1, "Message 4");
-
-		glPopDebugGroup();
 
 		return Validated;
 	}
@@ -271,8 +203,6 @@ private:
 	{
 		bool Validated(true);
 
-		if(Validated && glf::checkExtension("GL_KHR_debug"))
-			Validated = initDebug();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -281,14 +211,6 @@ private:
 			Validated = initVertexArray();
 		if(Validated)
 			Validated = initTexture();
-
-		glDebugMessageInsert(
-			GL_DEBUG_SOURCE_APPLICATION,
-			GL_DEBUG_TYPE_MARKER,
-			1,
-			GL_DEBUG_SEVERITY_NOTIFICATION,
-			-1, 
-			"End initialization");
 
 		return Validated;
 	}
@@ -309,11 +231,6 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glPushDebugGroup(
-			GL_DEBUG_SOURCE_APPLICATION, 
-			1, 
-			-1, "Frame");
-
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
@@ -331,10 +248,7 @@ private:
 
 		glViewportIndexedf(0, 0, 0, GLfloat(WindowSize.x), GLfloat(WindowSize.y));
 
-		glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glClearBufferfv");
-	
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-		//glClearBufferfv(GL_TEXTURE_2D, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]); // Add an error for testing: GL_TEXTURE_2D instead of GL_COLOR
 
 		glBindProgramPipeline(PipelineName);
 		glActiveTexture(GL_TEXTURE0);
@@ -342,11 +256,7 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 1, GL_DEBUG_SEVERITY_NOTIFICATION, -1, "Throwing an error on glDrawElementsInstancedBaseVertexBaseInstance");
-		//glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_FLOAT, 0, 1, 0, 0); // Add an error for testing: GL_FLOAT instead of GL_UNSIGNED_SHORT
-		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0); // Add an error for testing: GL_FLOAT instead of GL_UNSIGNED_SHORT
-
-		glPopDebugGroup();
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 
 		return true;
 	}
@@ -356,7 +266,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_debug Test(argc, argv);
+	gl_430_draw_vertex_attrib_binding Test(argc, argv);
 	Error += Test();
 
 	return Error;
