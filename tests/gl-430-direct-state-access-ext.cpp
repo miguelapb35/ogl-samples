@@ -1,20 +1,32 @@
-//**********************************
-// OpenGL Direct State Access
-// 20/02/2011 - 05/07/2012
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-430/direct-state-access.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-430/direct-state-access.frag");
+	char const * VERT_SHADER_SOURCE("gl-430/direct-state-access.vert");
+	char const * FRAG_SHADER_SOURCE("gl-430/direct-state-access.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(80, 60);
 
@@ -83,12 +95,12 @@ class gl_430_direct_state_access_ext : public test
 {
 public:
 	gl_430_direct_state_access_ext(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-direct-state-access-ext", test::CORE, 4, 3, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.1f)),
+		test(argc, argv, "gl-430-direct-state-access-ext", test::CORE, 4, 3, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
 		VertexArrayName(0),
+		PipelineName(0),
 		ProgramName(0),
 		SamplerName(0),
-		UniformMVP(0),
-		UniformDiffuse(0)
+		UniformBlockSize(0)
 	{}
 
 private:
@@ -96,37 +108,36 @@ private:
 	std::array<GLuint, texture::MAX> TextureName;
 	std::array<GLuint, framebuffer::MAX> FramebufferName;
 	GLuint VertexArrayName;
+	GLuint PipelineName;
 	GLuint ProgramName;
 	GLuint SamplerName;
-	GLint UniformMVP;
-	GLint UniformDiffuse;
+	GLint UniformBlockSize;
 
 	bool initProgram()
 	{
 		bool Validated = true;
 
-		// Create program
 		if(Validated)
 		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertShader, VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragShader, FRAGMENT_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 430 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertShader);
-			glAttachShader(ProgramName, FragShader);
+			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			glDeleteShader(VertShader);
-			glDeleteShader(FragShader);
+			glDeleteShader(VertShaderName);
+			glDeleteShader(FragShaderName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
 
 		if(Validated)
 		{
-			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+			glGenProgramPipelines(1, &PipelineName);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
 		return Validated && glf::checkError("initProgram");
@@ -134,9 +145,14 @@ private:
 
 	bool initBuffer()
 	{
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 		glNamedBufferDataEXT(BufferName[buffer::ELEMENT], ElementSize, ElementData, GL_STATIC_DRAW);
 		glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
+		glNamedBufferDataEXT(BufferName[buffer::TRANSFORM], UniformBlockSize * 2, nullptr, GL_DYNAMIC_DRAW);
 
 		return glf::checkError("initBuffer");
 	}
@@ -194,12 +210,11 @@ private:
 	bool initFramebuffer()
 	{
 		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
-
 		glNamedFramebufferTextureEXT(FramebufferName[framebuffer::RENDER], GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE], 0);
+		glNamedFramebufferTextureEXT(FramebufferName[framebuffer::RESOLVE], GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
+
 		if(glCheckNamedFramebufferStatusEXT(FramebufferName[framebuffer::RENDER], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
-
-		glNamedFramebufferTextureEXT(FramebufferName[framebuffer::RESOLVE], GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		if(glCheckNamedFramebufferStatusEXT(FramebufferName[framebuffer::RESOLVE], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
@@ -254,22 +269,26 @@ private:
 
 	void renderFBO()
 	{
-		glm::mat4 Perspective = glm::scale(glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f), glm::vec3(1, -1, 1));
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Perspective * this->view() * Model;
-		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		//glEnable(GL_SAMPLE_MASK);
+		//glSampleMaski(0, 0xFF);
 
-		glViewportIndexedf(0, 0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_SAMPLE_SHADING);
+		glMinSampleShading(4.0f);
+
+		glViewportIndexedf(0, 0, 0, static_cast<float>(FRAMEBUFFER_SIZE.x), static_cast<float>(FRAMEBUFFER_SIZE.y));
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
+		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
 		glBindSampler(0, SamplerName);
 		glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::TEXTURE]);
-
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
+
+		glDisable(GL_MULTISAMPLE);
 
 		glf::checkError("renderFBO");
 	}
@@ -278,13 +297,12 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Perspective * this->view() * Model;
-		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
+		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
 		glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
@@ -297,32 +315,32 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		{
+			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRangeEXT(
+				BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-		glUseProgram(ProgramName);
-		glUniform1i(UniformDiffuse, 0);
+			glm::mat4 ProjectionA = glm::scale(glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f), glm::vec3(1, -1, 1));
+			*reinterpret_cast<glm::mat4*>(Pointer + 0) = ProjectionA * this->view() * glm::mat4(1);
+
+			glm::mat4 ProjectionB = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			*reinterpret_cast<glm::mat4*>(Pointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::mat4(1);
+
+			// Make sure the uniform buffer is uploaded
+			glUnmapNamedBufferEXT(BufferName[buffer::TRANSFORM]);
+		}
+
+		glBindProgramPipeline(PipelineName);
 
 		// Pass 1, render the scene in a multisampled framebuffer
-		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_SAMPLE_SHADING);
-		glMinSampleShading(2.0f);
-
-		//glEnable(GL_SAMPLE_MASK);
-		//glSampleMaski(0, 0xFF);
-
 		renderFBO();
-		glDisable(GL_MULTISAMPLE);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
 		glBlitFramebuffer(
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		// Pass 2, render the colorbuffer from the multisampled framebuffer
-		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		renderFB();
 
 		return true;

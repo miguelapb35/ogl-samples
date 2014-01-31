@@ -1,3 +1,26 @@
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
+
 #ifndef TEST_INCLUDED
 #define TEST_INCLUDED
 
@@ -5,14 +28,6 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-/*
-#include "glf/common.hpp"
-#include "glf/vertex.hpp"
-#include "glf/compiler.hpp"
-#include "glf/sementics.hpp"
-#include "glf/error.hpp"
-*/
 #include <glf/glf.hpp>
 #include <glu/glu.hpp>
 
@@ -101,7 +116,13 @@ protected:
 		glm::ivec2 const & WindowSize = glm::ivec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
-		std::size_t FrameCount = 2);
+		std::size_t FrameCount = 2,
+		template_test TemplateTest = TEMPLATE_TEST_EXECUTE);
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
+		template_test TemplateTest,
+		glm::vec2 const & Orientation);
 	virtual ~test();
 
 	virtual bool begin() = 0;

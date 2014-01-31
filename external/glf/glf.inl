@@ -70,7 +70,7 @@ namespace glf
 		GLint const & Size
 	)
 	{
-		FILE* File = fopen(Filename.c_str(), "wb");
+		FILE* File = fopen(Filename.c_str(), "w");
 
 		if(File)
 		{
@@ -91,7 +91,7 @@ namespace glf
 		GLint & Size
 	)
 	{
-		FILE* File = fopen(Filename.c_str(), "rb");
+		FILE* File = fopen(Filename.c_str(), "r");
 
 		if(File)
 		{

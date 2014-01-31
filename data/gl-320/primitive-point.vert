@@ -15,5 +15,5 @@ void main()
 {
 	Out.Color = Color;
 	gl_Position = MVP * Position;
-	gl_PointSize = 1.f / -(MV * Position).z;
+	gl_PointSize = 256.f / -(MV * Position).z;
 }
