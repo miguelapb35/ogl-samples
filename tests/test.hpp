@@ -121,8 +121,8 @@ protected:
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
-		template_test TemplateTest,
-		glm::vec2 const & Orientation);
+		glm::vec2 const & Orientation,
+		template_test TemplateTest = TEMPLATE_TEST_EXECUTE);
 	virtual ~test();
 
 	virtual bool begin() = 0;

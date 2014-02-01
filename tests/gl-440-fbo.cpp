@@ -86,7 +86,7 @@ class gl_440_fbo : public test
 {
 public:
 	gl_440_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-fbo", test::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f)),
 		UniformPointer(nullptr),
 		FramebufferName(0)
 	{}
@@ -109,12 +109,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
-				glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, 
-				"--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-				glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE,
-				"--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::TEXTURE] = glCreateProgram();
@@ -134,12 +130,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
-				glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, 
-				"--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-				glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH,
-				"--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::SPLASH] = glCreateProgram();
@@ -172,11 +164,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -347,7 +335,7 @@ private:
 			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
 		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 			256, 0, 0,
-			64, 64, 1,
+			128, 128, 1,
 			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
 		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
 			128, 384, 0,

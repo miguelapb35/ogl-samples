@@ -70,8 +70,8 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
-	template_test TemplateTest,
-	glm::vec2 const & Orientation
+	glm::vec2 const & Orientation,
+	template_test TemplateTest
 ) :
 	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, TemplateTest)
 {}
