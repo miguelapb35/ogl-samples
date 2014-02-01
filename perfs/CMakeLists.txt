@@ -69,13 +69,6 @@ add_executable(${MICRO}
 	test_draw_arrays_vao.hpp
 	test_screenspace_coherence.cpp
 	test_screenspace_coherence.hpp
-	hz-430-base-vertex.cpp 
-	hz-430-draw-range-array.cpp
-	hz-430-draw-range-element.cpp
-	hz-430-multi-draw-indirect-array.cpp
-	hz-430-multi-draw-indirect-element.cpp
-	hz-430-vertex-array-object.cpp
-	hz-430-vertex-array-objects.cpp
 	buffer.hpp buffer.cpp
 	${SHADER_PATH})
 add_custom_command(
