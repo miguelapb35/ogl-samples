@@ -105,52 +105,6 @@ bool initProgram()
 
 	return Validated && glf::checkError("initProgram");
 }
-/*
-// Buffer update using glBufferSubData
-bool initArrayBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(1, &BufferName);
-
-	// Bind the buffer for use
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-
-	// Reserve buffer memory but don't copy the values
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, NULL, GL_STATIC_DRAW);
-
-	// Copy the vertex data in the buffer, in this sample for the whole range of data.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, PositionSize, &PositionData[0][0]);
-
-	// Unbind the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initArrayBuffer");
-}
-*/
-/*
-// Buffer update using glMapBuffer
-bool initArrayBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(1, &BufferName);
-
-	// Bind the buffer for use
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-
-	// Reserve buffer memory but don't copy the values
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, 0, GL_STATIC_DRAW);
-
-	// Copy the vertex data in the buffer, in this sample for the whole range of data.
-	GLvoid* Data = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	memcpy(Data, PositionData, PositionSize);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	// Unbind the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initArrayBuffer");
-}
-*/
 
 // Buffer update using glMapBufferRange
 bool initBuffer()
