@@ -262,7 +262,7 @@ endfunction(createSampleWGL)
 # Add subdirectory
 
 add_subdirectory(tests)
-add_subdirectory(micro)
+#add_subdirectory(micro)
 
 ################################
 # Add install
