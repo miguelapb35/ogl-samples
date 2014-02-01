@@ -25,8 +25,6 @@
 
 namespace
 {
-	glf::window Window("es-300-draw-elements", glm::ivec2(640, 480));
-
 	char const * VERTEX_SHADER_SOURCE("es-300/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("es-300/flat-color.frag");
 
@@ -208,6 +206,9 @@ int main(int argc, char* argv[])
 
 	return Error;
 }
+
+
+
 
 
 

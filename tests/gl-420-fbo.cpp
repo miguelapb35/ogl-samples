@@ -35,7 +35,6 @@ namespace
 	int const SAMPLE_SIZE_HEIGHT(480);
 
 	glf::window Window("gl-420-fbo", glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
-	//glf::window Window(glm::ivec2(256, 256));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
