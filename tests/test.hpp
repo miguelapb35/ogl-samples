@@ -137,6 +137,7 @@ protected:
 	glm::ivec2 getWindowSize() const;
 	bool isKeyPressed(int Key) const;
 	glm::mat4 view() const;
+	float cameraDistance() const {return this->TranlationCurrent.y;}
 
 protected:
 	void beginTimer();

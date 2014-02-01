@@ -25,8 +25,6 @@
 
 namespace
 {
-	glf::window Window("gl-420-transform-feedback-instanced");
-
 	char const * VERT_SHADER_SOURCE_TRANSFORM("gl-420/transform-stream.vert");
 	char const * GEOM_SHADER_SOURCE_TRANSFORM("gl-420/transform-stream.geom");
 	char const * VERT_SHADER_SOURCE_FEEDBACK("gl-420/feedback-stream.vert");

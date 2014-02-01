@@ -262,7 +262,27 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return true;
 	}
+/*
+	bool initFramebuffer()
+	{
+		bool Validated(true);
 
+		glm::ivec2 WindowSize(this->getWindowSize());
+
+		glGenFramebuffers(1, &FramebufferName);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH, WindowSize.x);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT, WindowSize.y);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_LAYERS, 1);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_SAMPLES, 1);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_FIXED_SAMPLE_LOCATIONS, GL_TRUE);
+		if(glf::checkFramebuffer(FramebufferName))
+			return false;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		return true;
+	}
+*/
 	bool begin()
 	{
 		bool Validated(true);
