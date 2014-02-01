@@ -190,11 +190,7 @@ private:
 		GLint UniformBlockSize = 0;
 
 		{
-			glGetActiveUniformBlockiv(
-				ProgramName, 
-				UniformTransform,
-				GL_UNIFORM_BLOCK_DATA_SIZE,
-				&UniformBlockSize);
+			glGetActiveUniformBlockiv(ProgramName, UniformTransform, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, 0, GL_DYNAMIC_DRAW);

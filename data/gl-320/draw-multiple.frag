@@ -1,11 +1,9 @@
 #version 150 core
 
-uniform vec4 Diffuse;
-
 out vec4 Color;
 
 void main()
 {
-	Color = Diffuse;
+	Color = vec4(1.0, 0.5, 0.0, 1.0);
 }
 

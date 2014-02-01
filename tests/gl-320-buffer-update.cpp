@@ -21,12 +21,10 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-320-buffer-update");
-
 	char const * VERT_SHADER_SOURCE("gl-320/buffer-update.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/buffer-update.frag");
 
@@ -63,208 +61,228 @@ namespace
 			MAX
 		};
 	}//namespace shader
-
-	GLuint VertexArrayName(0);
-	GLuint ProgramName(0);
-	std::vector<GLuint> ShaderName(shader::MAX);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	GLint UniformTransform(0);
-	GLint UniformMaterial(0);
 }//namespace
 
-bool initProgram()
+class gl_320_buffer_update : public test
 {
-	bool Validated = true;
+public:
+	gl_320_buffer_update(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-buffer-update", test::CORE, 3, 2),
+		VertexArrayName(0),
+		ProgramName(0),
+		UniformTransform(0),
+		UniformMaterial(0)
+	{}
+
+private:
+	std::array<GLuint, shader::MAX> ShaderName;
+	std::array<GLuint, buffer::MAX> BufferName;
+	GLuint ProgramName;
+	GLuint VertexArrayName;
+	GLint UniformTransform;
+	GLint UniformMaterial;
+
+	bool initProgram()
+	{
+		bool Validated = true;
 	
-	glf::compiler Compiler;
+		glf::compiler Compiler;
 
-	// Create program
-	if(Validated)
-	{
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
-		Validated = Validated && Compiler.check();
+		// Create program
+		if(Validated)
+		{
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			Validated = Validated && Compiler.check();
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, ShaderName[shader::VERT]);
-		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			ProgramName = glCreateProgram();
+			glAttachShader(ProgramName, ShaderName[shader::VERT]);
+			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 		
-		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glLinkProgram(ProgramName);
+			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName);
 
-		Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && glf::checkProgram(ProgramName);
+		}
+
+		// Get variables locations
+		if(Validated)
+		{
+			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
+
+			glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
+			glUniformBlockBinding(ProgramName, UniformMaterial, glf::semantic::uniform::MATERIAL);
+		}
+
+		return Validated && glf::checkError("initProgram");
 	}
 
-	// Get variables locations
-	if(Validated)
+	// Buffer update using glMapBufferRange
+	bool initBuffer()
 	{
-		UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
-		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
-	}
+		// Generate a buffer object
+		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-	return Validated && glf::checkError("initProgram");
-}
+		// Bind the buffer for use
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::ARRAY]);
 
-// Buffer update using glMapBufferRange
-bool initBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(buffer::MAX, &BufferName[0]);
+		// Reserve buffer memory but don't copy the values
+		glBufferData(
+			GL_ARRAY_BUFFER, 
+			PositionSize, 
+			0, 
+			GL_STATIC_DRAW);
 
-	// Bind the buffer for use
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::ARRAY]);
+		// Copy the vertex data in the buffer, in this sample for the whole range of data.
+		// It doesn't required to be the buffer size but pointers require no memory overlapping.
+		GLvoid* Data = glMapBufferRange(
+			GL_ARRAY_BUFFER, 
+			0,				// Offset
+			PositionSize,	// Size,
+			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+		memcpy(Data, PositionData, PositionSize);
 
-	// Reserve buffer memory but don't copy the values
-	glBufferData(
-		GL_ARRAY_BUFFER, 
-		PositionSize, 
-		0, 
-		GL_STATIC_DRAW);
+		// Explicitly send the data to the graphic card.
+		glFlushMappedBufferRange(GL_ARRAY_BUFFER, 0, PositionSize);
 
-	// Copy the vertex data in the buffer, in this sample for the whole range of data.
-	// It doesn't required to be the buffer size but pointers require no memory overlapping.
-	GLvoid* Data = glMapBufferRange(
-		GL_ARRAY_BUFFER, 
-		0,				// Offset
-		PositionSize,	// Size,
-		GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
-	memcpy(Data, PositionData, PositionSize);
+		glUnmapBuffer(GL_ARRAY_BUFFER);
 
-	// Explicitly send the data to the graphic card.
-	glFlushMappedBufferRange(GL_ARRAY_BUFFER, 0, PositionSize);
-
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-
-	// Unbind the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Copy buffer
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, 0, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_COPY_READ_BUFFER, BufferName[buffer::ARRAY]);
-	glBindBuffer(GL_COPY_WRITE_BUFFER, BufferName[buffer::COPY]);
-
-	glCopyBufferSubData(
-		GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
-		0, 0,
-		PositionSize);
-
-	glBindBuffer(GL_COPY_READ_BUFFER, 0);
-	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
-
-	GLint UniformBlockSize = 0;
-
-	{
-		glGetActiveUniformBlockiv(
-			ProgramName, 
-			UniformTransform,
-			GL_UNIFORM_BLOCK_DATA_SIZE,
-			&UniformBlockSize);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, 0, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
-
-	{
-		glm::vec4 Diffuse(1.0f, 0.5f, 0.0f, 1.0f);
-
-		glGetActiveUniformBlockiv(
-			ProgramName, 
-			UniformMaterial,
-			GL_UNIFORM_BLOCK_DATA_SIZE,
-			&UniformBlockSize);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, &Diffuse[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
-
-	return glf::checkError("initBuffer");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-	glBindVertexArray(0);
+		// Copy buffer
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
+		glBufferData(GL_ARRAY_BUFFER, PositionSize, 0, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initVertexArray");
-}
+		glBindBuffer(GL_COPY_READ_BUFFER, BufferName[buffer::ARRAY]);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, BufferName[buffer::COPY]);
 
-bool begin()
-{
-	bool Validated = true;
+		glCopyBufferSubData(
+			GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER,
+			0, 0,
+			PositionSize);
 
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initBuffer();
-	if(Validated)
-		Validated = initVertexArray();
+		glBindBuffer(GL_COPY_READ_BUFFER, 0);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 
-	return Validated && glf::checkError("begin");
-}
+		GLint UniformBlockSize = 0;
 
-bool end()
-{
-	for(std::size_t i = 0; 0 < shader::MAX; ++i)
-		glDeleteShader(ShaderName[i]);
-	glDeleteBuffers(buffer::MAX, &BufferName[0]);
-	glDeleteProgram(ProgramName);
-	glDeleteVertexArrays(1, &VertexArrayName);
+		{
+			glGetActiveUniformBlockiv(
+				ProgramName, 
+				UniformTransform,
+				GL_UNIFORM_BLOCK_DATA_SIZE,
+				&UniformBlockSize);
 
-	return glf::checkError("end");
-}
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, 0, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		}
 
-void display()
-{
-	// Update of the uniform buffer
-	{
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		{
+			glm::vec4 Diffuse(1.0f, 0.5f, 0.0f, 1.0f);
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
-		
-		*Pointer = MVP;
+			glGetActiveUniformBlockiv(
+				ProgramName, 
+				UniformMaterial,
+				GL_UNIFORM_BLOCK_DATA_SIZE,
+				&UniformBlockSize);
 
-		// Make sure the uniform buffer is uploaded
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
+			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, &Diffuse[0], GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		}
+
+		return glf::checkError("initBuffer");
 	}
 
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+	bool initVertexArray()
+	{
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COPY]);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glUseProgram(ProgramName);
-	glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
-	glUniformBlockBinding(ProgramName, UniformMaterial, glf::semantic::uniform::MATERIAL);
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+		glBindVertexArray(0);
 
-	// Attach the buffer to UBO binding point glf::semantic::uniform::TRANSFORM0
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-	// Attach the buffer to UBO binding point glf::semantic::uniform::MATERIAL
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
+		return glf::checkError("initVertexArray");
+	}
 
-	glBindVertexArray(VertexArrayName);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-}
+	bool begin()
+	{
+		bool Validated = true;
+
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
+
+		return Validated && glf::checkError("begin");
+	}
+
+	bool end()
+	{
+		for(std::size_t i = 0; 0 < shader::MAX; ++i)
+			glDeleteShader(ShaderName[i]);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
+		glDeleteProgram(ProgramName);
+		glDeleteVertexArrays(1, &VertexArrayName);
+
+		return true;
+	}
+
+	bool render()
+	{
+		glm::vec2 WindowSize(this->getWindowSize());
+
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 MVP = Projection * this->view() * Model;
+		
+			*Pointer = MVP;
+
+			// Make sure the uniform buffer is uploaded
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		}
+
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+
+		glUseProgram(ProgramName);
+
+		// Attach the buffer to UBO binding point glf::semantic::uniform::TRANSFORM0
+		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		// Attach the buffer to UBO binding point glf::semantic::uniform::MATERIAL
+		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
+
+		glBindVertexArray(VertexArrayName);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 3, 2);
+	int Error(0);
+
+	gl_320_buffer_update Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

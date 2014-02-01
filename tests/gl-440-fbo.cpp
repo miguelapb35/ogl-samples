@@ -346,8 +346,6 @@ private:
 			64, 64, 1,
 			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
 
-
-		// Bind rendering objects
 		glBindProgramPipeline(PipelineName[pipeline::TEXTURE]);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
