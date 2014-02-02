@@ -21,12 +21,10 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-400-draw-indirect");
-
 	char const * VERTEX_SHADER_SOURCE("gl-400/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/flat-color.frag");
 
@@ -74,138 +72,145 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-bool initProgram()
+class gl_400_draw_indirect : public test
 {
-	bool Validated = true;
+public:
+	gl_400_draw_indirect(int argc, char* argv[]) :
+		test(argc, argv, "gl-400-draw-indirect", test::CORE, 4, 0)
+	{}
+
+private:
+	bool initProgram()
+	{
+		bool Validated = true;
 	
-	if(Validated)
-	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+		if(Validated)
+		{
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
 
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+			ProgramName = glCreateProgram();
+			glAttachShader(ProgramName, VertexShaderName);
+			glAttachShader(ProgramName, FragmentShaderName);
+			glDeleteShader(VertexShaderName);
+			glDeleteShader(FragmentShaderName);
+			glLinkProgram(ProgramName);
+			Validated = Validated && glf::checkProgram(ProgramName);
+		}
+
+		// Get variables locations
+		if(Validated)
+		{
+			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
+			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		}
+
+		return Validated && glf::checkError("initProgram");
 	}
 
-	// Get variables locations
-	if(Validated)
+	bool initIndirectBuffer()
 	{
-		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		DrawElementsIndirectCommand Command(ElementCount, 1, 0, 0, 0);
+
+		glGenBuffers(1, &IndirectBufferName);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IndirectBufferName);
+		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(Command), &Command, GL_STATIC_READ);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+
+		return glf::checkError("initIndirectBuffer");
 	}
 
-	return Validated && glf::checkError("initProgram");
-}
-
-bool initIndirectBuffer()
-{
-	DrawElementsIndirectCommand Command;
-	Command.count = ElementCount;
-	Command.primCount = 1;
-	Command.firstIndex = 0;
-	Command.baseVertex = 0;
-	Command.reservedMustBeZero = 0;
-
-	glGenBuffers(1, &IndirectBufferName);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IndirectBufferName);
-	glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(Command), &Command, GL_STATIC_READ);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
-
-	return glf::checkError("initIndirectBuffer");
-}
-
-bool initArrayBuffer()
-{
-	glGenBuffers(1, &ArrayBufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &ElementBufferName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initArrayBuffer");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+	bool initArrayBuffer()
+	{
+		glGenBuffers(1, &ArrayBufferName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
+		glGenBuffers(1, &ElementBufferName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-	glBindVertexArray(0);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	return glf::checkError("initVertexArray");
-}
+		return glf::checkError("initArrayBuffer");
+	}
 
-bool begin()
-{
-	bool Validated = true;
+	bool initVertexArray()
+	{
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+				glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initArrayBuffer();
-	if(Validated)
-		Validated = initIndirectBuffer();
-	if(Validated)
-		Validated = initVertexArray();
-	return Validated && glf::checkError("begin");
-}
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindVertexArray(0);
 
-bool end()
-{
-	// Delete objects
-	glDeleteBuffers(1, &ArrayBufferName);
-	glDeleteBuffers(1, &IndirectBufferName);
-	glDeleteBuffers(1, &ElementBufferName);
-	glDeleteProgram(ProgramName);
-	glDeleteVertexArrays(1, &VertexArrayName);
+		return glf::checkError("initVertexArray");
+	}
 
-	return glf::checkError("end");
-}
+	bool begin()
+	{
+		bool Validated = true;
 
-void display()
-{
-	glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initArrayBuffer();
+		if(Validated)
+			Validated = initIndirectBuffer();
+		if(Validated)
+			Validated = initVertexArray();
+		return Validated && glf::checkError("begin");
+	}
 
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
+	bool end()
+	{
+		glDeleteBuffers(1, &ArrayBufferName);
+		glDeleteBuffers(1, &IndirectBufferName);
+		glDeleteBuffers(1, &ElementBufferName);
+		glDeleteProgram(ProgramName);
+		glDeleteVertexArrays(1, &VertexArrayName);
 
-	glUseProgram(ProgramName);
-	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glUniform4fv(UniformDiffuse, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		return glf::checkError("end");
+	}
 
-	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IndirectBufferName);
+	bool render()
+	{
+		glm::ivec2 WindowSize(this->getWindowSize());
 
-	glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * this->view() * Model;
 
-	glf::checkError("display");
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 
-}
+		glUseProgram(ProgramName);
+		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		glUniform4fv(UniformDiffuse, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+
+		glBindVertexArray(VertexArrayName);
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IndirectBufferName);
+
+		glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, 0);
+
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 4, 0);
+	int Error(0);
+
+	gl_400_draw_indirect Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+
