@@ -1,4 +1,4 @@
-#version 400 core
+#version 150 core
 
 uniform sampler2D Diffuse;
 
@@ -26,10 +26,7 @@ float textureLevel(in sampler2D Sampler, in vec2 Texcoord)
 
 void main()
 {
-	//vec2 Level = textureQueryLod(Diffuse, In.Texcoord);
-	//float Level = textureLevel(Diffuse, In.Texcoord);
+	float Level = textureLevel(Diffuse, In.Texcoord);
 
-	//Color = texture(Diffuse, In.Texcoord);
-	//Color = vec4(vec3(Level) * 0.125, 1.0);//texture(Diffuse, In.Texcoord);
-	Color = vec4(fwidth(In.Texcoord), 0.0, 1.0);
+	Color = textureLod(Diffuse, In.Texcoord, Level);
 }

@@ -112,7 +112,7 @@ class gl_400_texture_derivative : public test
 {
 public:
 	gl_400_texture_derivative(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-texture-derivative", test::CORE, 4, 0)
+		test(argc, argv, "gl-400-texture-derivative", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.45f))
 	{}
 
 private:
@@ -369,7 +369,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName[program::TEXTURE]);
 		glUniform1i(UniformDiffuse[program::TEXTURE], 0);
