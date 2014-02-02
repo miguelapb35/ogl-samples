@@ -53,16 +53,26 @@ namespace
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
 
+		bool Success = true;
+
 		if(!glf::checkError("checkFramebuffer"))
-			return false;
+			Success = false;
 
-		glf::save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Title + ".png").c_str());
+		if(Success)
+		{
+			gli::texture2D Template(glf::load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Title + ".png").c_str()));
 
-		gli::texture2D Template(glf::load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Title + ".png").c_str()));
-		if(Template.empty())
-			return false;
+			if(Success)
+				Success = Success && (!Template.empty());
 
-		return Template == Texture;
+			if(Success)
+				Success = Success && (Template == Texture);
+		}
+
+		if(!Success)
+			glf::save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Title + ".png").c_str());
+
+		return Success;
 	}
 }
 
