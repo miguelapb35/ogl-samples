@@ -183,6 +183,11 @@ private:
 	{
 		bool Validated = true;
 
+		GLint MaxVaryingOutputComp(0);
+		glGetIntegerv(GL_MAX_VARYING_COMPONENTS, &MaxVaryingOutputComp);
+		GLint MaxVaryingOutputVec(0);
+		glGetIntegerv(GL_MAX_VARYING_VECTORS, &MaxVaryingOutputVec);
+
 		if(Validated)
 			Validated = initTest();
 		if(Validated)
