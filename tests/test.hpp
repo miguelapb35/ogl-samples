@@ -150,7 +150,7 @@ private:
 	profile const Profile;
 	int const Major;
 	int const Minor;
-	GLuint QueryName;
+	GLuint TimerQueryName;
 	std::size_t const FrameCount;
 	glm::vec2 MouseOrigin;
 	glm::vec2 MouseCurrent;

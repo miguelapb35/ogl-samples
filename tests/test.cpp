@@ -89,7 +89,7 @@ test::test
 	Profile(Profile),
 	Major(Major),
 	Minor(Minor),
-	QueryName(0),
+	TimerQueryName(0),
 	FrameCount(FrameCount),
 	TimeSum(0.0),
 	TimeMin(std::numeric_limits<double>::max()),
@@ -155,12 +155,12 @@ test::test
 		}
 #	endif
 
-	glGenQueries(1, &this->QueryName);
+	glGenQueries(1, &this->TimerQueryName);
 }
 
 test::~test()
 {
-	glDeleteQueries(1, &this->QueryName);
+	glDeleteQueries(1, &this->TimerQueryName);
 
 	glfwDestroyWindow(this->Window);
 	this->Window = 0;
@@ -257,7 +257,7 @@ glm::mat4 test::view() const
 
 void test::beginTimer()
 {
-	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+	glBeginQuery(GL_TIME_ELAPSED, this->TimerQueryName);
 }
 
 void test::endTimer()
@@ -265,7 +265,7 @@ void test::endTimer()
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime(0);
-	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
+	glGetQueryObjectuiv(this->TimerQueryName, GL_QUERY_RESULT, &QueryTime);
 
 	double const InstantTime(static_cast<double>(QueryTime) / 1000.0);
 
