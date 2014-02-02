@@ -21,12 +21,10 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-410-primitive-tessellation-2");
-
 	std::string const SAMPLE_VERT_SHADER("gl-410/tess.vert");
 	std::string const SAMPLE_CONT_SHADER("gl-410/tess.cont");
 	std::string const SAMPLE_EVAL_SHADER("gl-410/tess.eval");
@@ -60,140 +58,151 @@ namespace
 	GLint UniformMVP(0);
 }//namespace
 
-bool initProgram()
+class gl_410_primitive_tessellation2 : public test
 {
-	bool Validated = true;
+public:
+	gl_410_primitive_tessellation2(int argc, char* argv[]) :
+		test(argc, argv, "gl-410-primitive-tessellation2", test::CORE, 4, 1)
+	{}
+
+private:
+	bool initProgram()
+	{
+		bool Validated = true;
 	
-	glGenProgramPipelines(1, &PipelineName);
-	glBindProgramPipeline(PipelineName);
-	glBindProgramPipeline(0);
+		if(Validated)
+		{
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER, "--version 410 --profile core");
+			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER, "--version 410 --profile core");
+			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER, "--version 410 --profile core");
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER, "--version 410 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER, "--version 410 --profile core");
+			Validated = Validated && Compiler.check();
 
-	if(Validated)
-	{
-		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER, "--version 410 --profile core");
-		GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER, "--version 410 --profile core");
-		GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER, "--version 410 --profile core");
-		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER, "--version 410 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER, "--version 410 --profile core");
-		Validated = Validated && Compiler.check();
+			ProgramName[program::VERT] = glCreateProgram();
+			ProgramName[program::FRAG] = glCreateProgram();
+			glProgramParameteri(ProgramName[program::VERT], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glProgramParameteri(ProgramName[program::FRAG], GL_PROGRAM_SEPARABLE, GL_TRUE);
 
-		ProgramName[program::VERT] = glCreateProgram();
-		ProgramName[program::FRAG] = glCreateProgram();
-		glProgramParameteri(ProgramName[program::VERT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-		glProgramParameteri(ProgramName[program::FRAG], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName[program::VERT], VertShaderName);
+			glAttachShader(ProgramName[program::VERT], ContShaderName);
+			glAttachShader(ProgramName[program::VERT], EvalShaderName);
+			glAttachShader(ProgramName[program::VERT], GeomShaderName);
+			glLinkProgram(ProgramName[program::VERT]);
 
-		glAttachShader(ProgramName[program::VERT], VertShaderName);
-		glAttachShader(ProgramName[program::VERT], ContShaderName);
-		glAttachShader(ProgramName[program::VERT], EvalShaderName);
-		glAttachShader(ProgramName[program::VERT], GeomShaderName);
-		glLinkProgram(ProgramName[program::VERT]);
+			glAttachShader(ProgramName[program::FRAG], FragShaderName);
+			glLinkProgram(ProgramName[program::FRAG]);
 
-		glAttachShader(ProgramName[program::FRAG], FragShaderName);
-		glLinkProgram(ProgramName[program::FRAG]);
+			glDeleteShader(VertShaderName);
+			glDeleteShader(ContShaderName);
+			glDeleteShader(EvalShaderName);
+			glDeleteShader(GeomShaderName);
+			glDeleteShader(FragShaderName);
 
-		glDeleteShader(VertShaderName);
-		glDeleteShader(ContShaderName);
-		glDeleteShader(EvalShaderName);
-		glDeleteShader(GeomShaderName);
-		glDeleteShader(FragShaderName);
+			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
+			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+		}
 
-		Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
-		Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+		if(Validated)
+		{
+			UniformMVP = glGetUniformLocation(ProgramName[program::VERT], "MVP");
+			Validated = Validated && (UniformMVP != -1);
+		}
+
+		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT | GL_GEOMETRY_SHADER_BIT, ProgramName[program::VERT]);
+			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
+		}
+
+		return Validated && glf::checkError("initProgram");
 	}
 
-	if(Validated)
+	bool initVertexArray()
 	{
-		glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_TESS_CONTROL_SHADER_BIT | GL_TESS_EVALUATION_SHADER_BIT | GL_GEOMETRY_SHADER_BIT, ProgramName[program::VERT]);
-		glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+		glBindVertexArray(0);
+
+		return glf::checkError("initVertexArray");
 	}
 
-	if(Validated)
+	bool initArrayBuffer()
 	{
-		UniformMVP = glGetUniformLocation(ProgramName[program::VERT], "MVP");
-	}
-
-	return Validated && glf::checkError("initProgram");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+		// Generate a buffer object
+		glGenBuffers(1, &ArrayBufferName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
-	glBindVertexArray(0);
+		return glf::checkError("initArrayBuffer");
+	}
 
-	return glf::checkError("initVertexArray");
-}
+	bool begin()
+	{
+		bool Validated = true;
 
-bool initArrayBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(1, &ArrayBufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initArrayBuffer();
+		if(Validated)
+			Validated = initVertexArray();
 
-	return glf::checkError("initArrayBuffer");
-}
+		return Validated && glf::checkError("begin");
+	}
 
-bool begin()
-{
-	bool Validated = true;
+	bool end()
+	{
+		glDeleteVertexArrays(1, &VertexArrayName);
+		glDeleteBuffers(1, &ArrayBufferName);
+		for(std::size_t i = 0; i < program::MAX; ++i)
+			glDeleteProgram(ProgramName[i]);
 
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initArrayBuffer();
-	if(Validated)
-		Validated = initVertexArray();
+		return glf::checkError("end");
+	}
 
-	return Validated && glf::checkError("begin");
-}
+	bool render()
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-bool end()
-{
-	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteBuffers(1, &ArrayBufferName);
-	for(std::size_t i = 0; i < program::MAX; ++i)
-		glDeleteProgram(ProgramName[i]);
+		glm::vec2 WindowSize(this->getWindowSize());
 
-	return glf::checkError("end");
-}
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * this->view() * Model;
 
-void display()
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glProgramUniformMatrix4fv(ProgramName[program::VERT], UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
-	glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+		glViewportIndexedfv(0, &glm::vec4(0, 0, WindowSize)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 
-	glProgramUniformMatrix4fv(ProgramName[program::VERT], UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		glBindProgramPipeline(PipelineName);
 
-	glViewportIndexedfv(0, &glm::vec4(0, 0, Window.Size)[0]);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
+		glBindVertexArray(VertexArrayName);
+		glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
+		glDrawArraysInstancedBaseInstance(GL_PATCHES, 0, VertexCount, 1, 0);
 
-	glBindProgramPipeline(PipelineName);
-
-	glBindVertexArray(VertexArrayName);
-	glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
-	glDrawArraysInstanced(GL_PATCHES, 0, VertexCount, 1);
-
-	glf::checkError("display");
-
-}
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 4, 1);
+	int Error(0);
+
+	gl_410_primitive_tessellation2 Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+
