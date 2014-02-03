@@ -91,8 +91,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -109,7 +109,7 @@ private:
 		if(Validated)
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 
-		return glf::checkError("initProgram");
+		return this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -128,7 +128,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), 0, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initSampler()
@@ -150,12 +150,12 @@ private:
 
 		glBindSampler(0, SamplerName);
 
-		return glf::checkError("initSampler");
+		return this->checkError("initSampler");
 	}
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
 
@@ -184,7 +184,7 @@ private:
 				Texture[Level].data());
 		}
 
-		return glf::checkError("initTexture2D");
+		return this->checkError("initTexture2D");
 	}
 
 	bool initFramebuffer()
@@ -226,7 +226,7 @@ private:
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -244,13 +244,13 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
 	{
 		bool Validated = true;
-		Validated = Validated && glf::checkExtension("GL_AMD_sample_positions");
+		Validated = Validated && this->checkExtension("GL_AMD_sample_positions");
 
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
@@ -268,7 +268,7 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -283,7 +283,7 @@ private:
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteSamplers(1, &SamplerName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	void renderFBO()

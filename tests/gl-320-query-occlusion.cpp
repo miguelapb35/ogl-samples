@@ -71,7 +71,7 @@ private:
 	{
 		glGenQueries(1, &QueryName);
 
-		return glf::checkError("initQuery");
+		return this->checkError("initQuery");
 	}
 
 	bool initProgram()
@@ -81,8 +81,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -102,7 +102,7 @@ private:
 			UniformColor = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	// Buffer update using glBufferSubData
@@ -120,7 +120,7 @@ private:
 		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool initVertexArray()
@@ -135,7 +135,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -151,7 +151,7 @@ private:
 		if(Validated)
 			Validated = initQuery();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -162,7 +162,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

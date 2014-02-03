@@ -21,7 +21,7 @@ namespace
 	PFNGLNAMEDTEXSTORAGEPROC glNamedTexStorageGTC = 0;
 
 	std::string const SAMPLE_NAME = "OpenGL Framebuffer Multisample";	
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken320-rgb8.tga");
+	std::string const TEXTURE_DIFFUSE(getDataDirectory() + "kueken320-rgb8.tga");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
@@ -75,12 +75,12 @@ namespace
 		};
 	}//namespace buffer
 
-	std::string const VERT_SHADER_SOURCE(glf::DATA_DIRECTORY + "420/instanced-image-2d.vert");
+	std::string const VERT_SHADER_SOURCE(getDataDirectory() + "420/instanced-image-2d.vert");
 	std::string const FRAG_SHADER_SOURCE[program::MAX] = 
 	{
-		glf::DATA_DIRECTORY + "420/instanced-image-2d.frag",
-		glf::DATA_DIRECTORY + "420/multisample-box.frag",
-		glf::DATA_DIRECTORY + "420/multisample-near.frag",
+		getDataDirectory() + "420/instanced-image-2d.frag",
+		getDataDirectory() + "420/multisample-box.frag",
+		getDataDirectory() + "420/multisample-near.frag",
 	};
 
 	GLname PipelineName[program::MAX] = {0, 0, 0};
@@ -124,12 +124,12 @@ bool initProgram()
 		glGenNames(1, GL_VERTEX_SHADER, &VertShaderName);
 		glGenNames(1, GL_FRAGMENT_SHADER, &FragShaderName);
 
-		std::string VertSourceContent = glf::loadFile(VERT_SHADER_SOURCE);
+		std::string VertSourceContent = this->loadFile(VERT_SHADER_SOURCE);
 		char const * VertSourcePointer = VertSourceContent.c_str();
 		glNamedShaderSource(VertShaderName, 1, &VertSourcePointer, NULL);
 		glCompileNamedShader(VertShaderName)
 
-		std::string FragSourceContent = glf::loadFile(FRAG_SHADER_SOURCE[i]);
+		std::string FragSourceContent = this->loadFile(FRAG_SHADER_SOURCE[i]);
 		char const * FragSourcePointer = FragSourceContent.c_str();
 		glNamedShaderSource(FragShaderName, 1, &FragSourcePointer, NULL);
 		glCompileNamedShader(FragShaderName)

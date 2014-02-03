@@ -73,11 +73,11 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER, "--version 410 --profile core");
-			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER, "--version 410 --profile core");
-			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER, "--version 410 --profile core");
-			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER, "--version 410 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER, "--version 410 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER, "--version 410 --profile core");
+			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER, "--version 410 --profile core");
+			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER, "--version 410 --profile core");
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 410 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER, "--version 410 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::VERT] = glCreateProgram();
@@ -117,7 +117,7 @@ private:
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -133,7 +133,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initArrayBuffer()
@@ -144,7 +144,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool begin()
@@ -158,7 +158,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -168,7 +168,7 @@ private:
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

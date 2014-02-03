@@ -89,8 +89,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -158,7 +158,7 @@ private:
 		glGenTextures(1, &TextureName);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-		gli::storage Storage = gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str());
+		gli::storage Storage = gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str());
 
 		gli::textureCube Texture(Storage);
 		assert(!Texture.empty());

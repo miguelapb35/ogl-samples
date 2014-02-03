@@ -95,9 +95,9 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 410 --profile core");
-			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE, "--version 410 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 410 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 410 --profile core");
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE, "--version 410 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 410 --profile core");
 			Validated = Validated && Compiler.check();
 		
 			ProgramName[program::VERT] = glCreateProgram();
@@ -132,7 +132,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -148,7 +148,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initVertexBuffer()
@@ -163,7 +163,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool begin()

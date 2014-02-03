@@ -68,8 +68,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_READ, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_READ, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_READ, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_READ, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::READ] = glCreateProgram();
@@ -85,8 +85,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SAVE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SAVE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SAVE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SAVE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::SAVE] = glCreateProgram();
@@ -135,9 +135,9 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && glf::checkExtension("GL_ARB_shader_image_size");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_image_size");
 
-		glf::logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
+		this->logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
 
 		if(Validated)
 			Validated = initTexture();

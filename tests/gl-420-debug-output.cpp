@@ -87,9 +87,9 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
 				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
 				"--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
@@ -181,7 +181,7 @@ private:
 		bool Validated(true);
 
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
+		glDebugMessageCallbackARB(&test::debugOutput, NULL);
 		GLuint MessageId(4);
 		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_FALSE);
 		glDebugMessageControlARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -220,7 +220,7 @@ private:
 			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
 			&UniformBufferOffset);
 
-		if(Validated && glf::checkExtension("GL_ARB_debug_output"))
+		if(Validated && this->checkExtension("GL_ARB_debug_output"))
 			Validated = initDebugOutput();
 		if(Validated)
 			Validated = initProgram();

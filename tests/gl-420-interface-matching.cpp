@@ -78,11 +78,11 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER);
-			GLuint ContShaderName = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER);
-			GLuint EvalShaderName = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER);
-			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER);
+			GLuint ContShaderName = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER);
+			GLuint EvalShaderName = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER);
+			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER);
 
 			ProgramName[program::VERT] = glCreateProgram();
 			ProgramName[program::FRAG] = glCreateProgram();
@@ -137,12 +137,11 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		std::vector<glf::vertexattrib> Valid(16); 
-		Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
-		Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
-		Valid[glf::semantic::attr::COLOR] = glf::vertexattrib(GL_TRUE, 0, 4, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-
-		glf::validateVAO42(VertexArrayName, Valid);
+		std::vector<vertexattrib> Valid(16); 
+		Valid[glf::semantic::attr::POSITION + 0] = vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+		Valid[glf::semantic::attr::POSITION + 1] = vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
+		Valid[glf::semantic::attr::COLOR] = vertexattrib(GL_TRUE, 0, 4, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+		this->test::validate(VertexArrayName, Valid);
 
 		return true;
 	}
@@ -236,7 +235,7 @@ private:
 
 			GLint AttribLocation = glGetAttribLocation(ProgramName, NameString.c_str());
 
-			glf::vertexattrib VertexAttrib;
+			vertexattrib VertexAttrib;
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &VertexAttrib.Enabled);
 			//glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
 			glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &VertexAttrib.Size);

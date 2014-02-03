@@ -124,8 +124,8 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, "--version 400 --profile core");
-			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE, "--version 400 --profile core");
+			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 400 --profile core");
+			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 400 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
@@ -149,8 +149,8 @@ private:
 		
 		if(Validated)
 		{
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, "--version 400 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH, "--version 400 --profile core");
+			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 400 --profile core");
+			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 400 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
@@ -169,7 +169,7 @@ private:
 			UniformFramebufferSize = glGetUniformLocation(ProgramName[program::SPLASH], "FramebufferSize");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -295,7 +295,7 @@ private:
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
-		if(glf::checkFramebuffer(FramebufferName))
+		if(this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -329,8 +329,6 @@ private:
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);

@@ -86,8 +86,8 @@ private:
 	
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -108,7 +108,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initIndirectBuffer()
@@ -120,7 +120,7 @@ private:
 		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(Command), &Command, GL_STATIC_READ);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
-		return glf::checkError("initIndirectBuffer");
+		return this->checkError("initIndirectBuffer");
 	}
 
 	bool initArrayBuffer()
@@ -135,7 +135,7 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool initVertexArray()
@@ -151,7 +151,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -166,7 +166,7 @@ private:
 			Validated = initIndirectBuffer();
 		if(Validated)
 			Validated = initVertexArray();
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -177,7 +177,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

@@ -94,19 +94,6 @@ namespace
 	GLuint VertexArrayName(0);
 }//namespace
 
-bool initDebugOutput()
-{
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	glf::logImplementationDependentLimit(GL_MAX_SUBROUTINES, "GL_MAX_SUBROUTINES");
-
-	return Validated;
-}
-
 bool initTest()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -124,9 +111,9 @@ bool initProgram()
 	if(Validated)
 	{
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE);
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
+		GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE);
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 		Validated = Validated && Compiler.check();
 
 		if(Validated)
@@ -197,7 +184,7 @@ bool initTexture()
 	glGenTextures(texture::MAX, TextureName);
 
 	{
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);
@@ -224,7 +211,7 @@ bool initTexture()
 	}
 
 	{
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);

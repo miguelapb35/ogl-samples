@@ -100,8 +100,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -121,7 +121,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -131,14 +131,14 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");;
+		return this->checkError("initBuffer");;
 	}
 
 	bool initTexture()
 	{
 		glGenTextures(texture::MAX, &TextureName[0]);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
@@ -168,7 +168,7 @@ private:
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE); // The second parameter is the number of samples.
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
@@ -189,7 +189,7 @@ private:
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -205,7 +205,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -223,18 +223,20 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG]);
+		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
+
+		return true;
 	}
 
 	void renderFBO(GLuint Framebuffer)
@@ -278,7 +280,7 @@ private:
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		
-		glf::checkError("renderFB");
+		this->checkError("renderFB");
 	}
 
 	bool render()

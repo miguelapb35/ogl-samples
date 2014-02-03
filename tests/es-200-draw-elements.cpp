@@ -77,8 +77,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertexShaderName);
@@ -111,7 +111,7 @@ private:
 			glUseProgram(0);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -126,7 +126,7 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()

@@ -81,8 +81,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
 			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);

@@ -25,8 +25,6 @@
 
 namespace
 {
-	glf::window Window("gl-320-fbo-depth");
-
 	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-depth.vert");
@@ -118,8 +116,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
@@ -140,8 +138,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
@@ -188,7 +186,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -257,7 +255,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
-		if(glf::checkFramebuffer(FramebufferName))
+		if(this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -284,8 +282,10 @@ private:
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
+		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
+		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
+		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);
@@ -293,7 +293,7 @@ private:
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

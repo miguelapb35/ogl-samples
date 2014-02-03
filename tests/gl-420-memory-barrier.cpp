@@ -92,8 +92,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT_SOURCE_UPDATE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG_SOURCE_UPDATE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_UPDATE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_UPDATE);
 
 			ProgramName[program::UPDATE] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::UPDATE], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -108,13 +108,13 @@ private:
 		if(Validated)
 		{
 			glUseProgramStages(PipelineName[pipeline::UPDATE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::UPDATE]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SHADER_VERT_SOURCE_BLIT);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SHADER_FRAG_SOURCE_BLIT);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_BLIT);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_BLIT);
 
 			ProgramName[program::BLIT] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::BLIT], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -129,7 +129,7 @@ private:
 		if(Validated)
 		{
 			glUseProgramStages(PipelineName[pipeline::BLIT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::BLIT]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		return Validated;
@@ -152,7 +152,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		this->FrameBufferSize = Texture.dimensions();
 
 		glGenTextures(texture::MAX, &TextureName[0]);

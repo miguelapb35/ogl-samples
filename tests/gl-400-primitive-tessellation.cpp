@@ -61,11 +61,11 @@ private:
 	
 		if(Validated)
 		{
-			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERTEX_SHADER);
-			GLuint ControlShader = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONTROL_SHADER);
-			GLuint EvaluationShader = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVALUATION_SHADER);
-			GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOMETRY_SHADER);
-			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAGMENT_SHADER);
+			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERTEX_SHADER);
+			GLuint ControlShader = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONTROL_SHADER);
+			GLuint EvaluationShader = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVALUATION_SHADER);
+			GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOMETRY_SHADER);
+			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAGMENT_SHADER);
 
 			Validated = Validated && glf::checkShader(VertexShader, SAMPLE_VERTEX_SHADER);
 			Validated = Validated && glf::checkShader(ControlShader, SAMPLE_CONTROL_SHADER);
@@ -93,7 +93,7 @@ private:
 			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -110,7 +110,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBuffer()
@@ -120,7 +120,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
@@ -134,7 +134,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -143,7 +143,7 @@ private:
 		glDeleteBuffers(1, &ArrayBufferName);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

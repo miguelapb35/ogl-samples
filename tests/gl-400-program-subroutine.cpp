@@ -93,7 +93,7 @@ private:
 	{
 		glEnable(GL_DEPTH_TEST);
 
-		return glf::checkError("initTest");
+		return this->checkError("initTest");
 	}
 
 	bool initProgram()
@@ -103,8 +103,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -135,7 +135,7 @@ private:
 			IndexRGB8 = glGetSubroutineIndex(ProgramName, GL_FRAGMENT_SHADER, "diffuseHQ");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -150,7 +150,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
@@ -166,7 +166,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initTexture()
@@ -174,7 +174,7 @@ private:
 		glGenTextures(texture::MAX, TextureName);
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
@@ -200,7 +200,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT1).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
@@ -224,7 +224,7 @@ private:
 			}
 		}
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool begin()
@@ -242,7 +242,9 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
-		return Validated && glf::checkError("begin");
+		this->logImplementationDependentLimit(GL_MAX_SUBROUTINES, "GL_MAX_SUBROUTINES");
+
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -252,7 +254,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(texture::MAX, TextureName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

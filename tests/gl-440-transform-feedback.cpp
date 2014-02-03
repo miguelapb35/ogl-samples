@@ -86,11 +86,11 @@ private:
 
 		glf::compiler Compiler;
 		GLuint VertTransformShaderName = Compiler.create(GL_VERTEX_SHADER, 
-			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TRANSFORM, "--version 440 --profile core");
+			getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 440 --profile core");
 		GLuint VertFeedbackShaderName = Compiler.create(GL_VERTEX_SHADER, 
-			glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
+			getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
 		GLuint FragFeedbackShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-			glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
+			getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
 
 		Validated = Validated && Compiler.check();
 
@@ -127,7 +127,7 @@ private:
 			glUseProgramStages(PipelineName[program::FEEDBACK], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::FEEDBACK]);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -151,7 +151,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initFeedback()
@@ -162,7 +162,7 @@ private:
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, BufferName[buffer::FEEDBACK]); 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
-		return glf::checkError("initFeedback");
+		return this->checkError("initFeedback");
 	}
 
 	bool initBuffer()
@@ -191,7 +191,7 @@ private:
 
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool begin()

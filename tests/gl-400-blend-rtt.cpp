@@ -96,8 +96,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE1);
-			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE1);
+			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE1);
+			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE1);
 
 			Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE1);
 			Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE1);
@@ -119,8 +119,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE2);
-			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE2);
+			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE2);
+			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE2);
 
 			Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE2);
 			Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE2);
@@ -140,7 +140,7 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexBuffer()
@@ -155,7 +155,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool initTexture2D()
@@ -163,7 +163,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		// Load image
 		glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_RGB8]);
@@ -244,7 +244,7 @@ private:
 				0);
 		}
 
-		return glf::checkError("initTexture2D");
+		return this->checkError("initTexture2D");
 	}
 
 	bool initFramebuffer()
@@ -283,7 +283,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBlend()
@@ -311,7 +311,7 @@ private:
 		glBlendEquationSeparatei(3, GL_FUNC_ADD, GL_FUNC_ADD);
 		glBlendFuncSeparatei(3, GL_SRC_COLOR, GL_SRC_COLOR, GL_ZERO, GL_ZERO);
 
-		return glf::checkError("initBlend");
+		return this->checkError("initBlend");
 	}
 
 	bool begin()
@@ -338,7 +338,7 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -349,7 +349,7 @@ private:
 		glDeleteProgram(ProgramNameSingle);
 		glDeleteFramebuffers(1, &FramebufferName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

@@ -107,9 +107,9 @@ bool testDrawArrays::initProgram()
 
 	glf::compiler Compiler;
 	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER,
-		glf::DATA_DIRECTORY + VERT_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
+		getDataDirectory() + VERT_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
 	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER,
-		glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
+		getDataDirectory() + FRAG_SHADER_SOURCE[ShaderIndex], "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
 
 	this->ProgramName = glCreateProgram();

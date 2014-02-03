@@ -83,11 +83,11 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER1);
-			GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER1);
-			GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER1);
-			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER1);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER1);
+			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER1);
+			GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER1);
+			GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER1);
+			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER1);
+			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER1);
 
 			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
 			Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
@@ -120,9 +120,9 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER2);
-			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER2);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER2);
+			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER2);
+			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER2);
+			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER2);
 
 			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
 			Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
@@ -146,7 +146,7 @@ private:
 			UniformMVP[1] = glGetUniformLocation(ProgramName[1], "MVP");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -162,7 +162,7 @@ private:
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBuffer()
@@ -178,7 +178,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
@@ -192,7 +192,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -203,7 +203,7 @@ private:
 		glDeleteProgram(ProgramName[0]);
 		glDeleteProgram(ProgramName[1]);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

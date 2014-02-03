@@ -61,8 +61,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -81,7 +81,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initTexture()
@@ -113,7 +113,7 @@ private:
 				0);
 		}
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
@@ -128,7 +128,7 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -137,7 +137,7 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -161,7 +161,7 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 	
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -170,7 +170,7 @@ private:
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

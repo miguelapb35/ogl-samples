@@ -134,8 +134,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_RENDER, "--version 150 --profile core");
-			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_RENDER, "--version 150 --profile core");
+			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER, "--version 150 --profile core");
+			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::RENDER] = glCreateProgram();
@@ -158,7 +158,7 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_DEPTH, "--version 150 --profile core");
+			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::DEPTH] = glCreateProgram();
@@ -206,7 +206,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -291,13 +291,13 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
-		if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
+		if(this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
 		//glDrawBuffer(GL_NONE); // AMD workaround glDrawBuffer* is not FBO states
-		if(glf::checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
+		if(this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -324,8 +324,10 @@ private:
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG_RENDER]);
+		glDeleteShader(ShaderName[shader::VERT_DEPTH]);
+		glDeleteShader(ShaderName[shader::VERT_RENDER]);
+
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
@@ -333,7 +335,7 @@ private:
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	void renderShadow()

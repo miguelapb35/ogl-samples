@@ -111,8 +111,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -132,7 +132,7 @@ private:
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -156,7 +156,7 @@ private:
 		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initBuffer");;
+		return this->checkError("initBuffer");;
 	}
 
 	bool initSampler()
@@ -176,22 +176,22 @@ private:
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_EDGE);
-		if(glf::checkExtension("GL_EXT_texture_mirror_clamp"))
+		if(this->checkExtension("GL_EXT_texture_mirror_clamp"))
 			glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_BORDER_EXT);
 		else
-			glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT0], GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT1], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_EDGE);
-		if(glf::checkExtension("GL_EXT_texture_mirror_clamp"))
+		if(this->checkExtension("GL_EXT_texture_mirror_clamp"))
 			glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_BORDER_EXT);
 		else
-			glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-		return glf::checkError("initSampler");
+		return this->checkError("initSampler");
 	}
 
 	bool initTexture()
@@ -201,7 +201,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -215,7 +215,7 @@ private:
 				Texture[Level].data());
 		}
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -231,7 +231,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()

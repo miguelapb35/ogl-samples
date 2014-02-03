@@ -75,8 +75,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TRANSFORM);
-			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE_TRANSFORM);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM);
+			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE_TRANSFORM);
 
 			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE_TRANSFORM);
 			Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE_TRANSFORM);
@@ -104,8 +104,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_FEEDBACK);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_FEEDBACK);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK);
 
 			Validated = Validated && glf::checkShader(VertexShaderName, VERT_SHADER_SOURCE_FEEDBACK);
 			Validated = Validated && glf::checkShader(FragmentShaderName, FRAG_SHADER_SOURCE_FEEDBACK);
@@ -119,12 +119,12 @@ private:
 			Validated = Validated && glf::checkProgram(FeedbackProgramName);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
 	{
-		glf::checkError("initVertexArray 0");
+		this->checkError("initVertexArray 0");
 
 		// Build a vertex array object
 		glGenVertexArrays(1, &TransformVertexArrayName);
@@ -136,7 +136,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		glf::checkError("initVertexArray 1");
+		this->checkError("initVertexArray 1");
 
 		// Build a vertex array object
 		glGenVertexArrays(1, &FeedbackVertexArrayName);
@@ -150,7 +150,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initFeedback()
@@ -161,7 +161,7 @@ private:
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, FeedbackArrayBufferName); 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
-		return glf::checkError("initFeedback");
+		return this->checkError("initFeedback");
 	}
 
 	bool initArrayBuffer()
@@ -181,7 +181,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glf::vertex_v4fc4f) * 6, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool begin()
@@ -200,7 +200,7 @@ private:
 		if(Validated)
 			Validated = initFeedback();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -216,7 +216,7 @@ private:
 		glDeleteQueries(1, &Query);
 		glDeleteTransformFeedbacks(1, &FeedbackName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

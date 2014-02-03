@@ -122,8 +122,8 @@ private:
 		bool Validated(true);
 	
 		glf::compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -236,7 +236,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -342,7 +342,7 @@ private:
 	bool begin()
 	{
 		bool Success(true);
-		Success = Success && glf::checkExtension("GL_ARB_multi_draw_indirect");
+		Success = Success && this->checkExtension("GL_ARB_multi_draw_indirect");
 
 		if(Success)
 			Success = initProgram();

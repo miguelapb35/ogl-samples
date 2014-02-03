@@ -84,20 +84,20 @@ private:
 		bool Validated = true;
 		glEnable(GL_DEPTH_TEST);
 
-		return Validated && glf::checkError("initTest");
+		return Validated && this->checkError("initTest");
 	}
 
 	bool initProgram()
 	{
 		bool Validated = true;
 	
-		glf::checkError("initProgram 0");
+		this->checkError("initProgram 0");
 
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
@@ -111,7 +111,7 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
 
-		glf::checkError("initProgram 5");
+		this->checkError("initProgram 5");
 
 		// Get variables locations
 		if(Validated)
@@ -121,7 +121,7 @@ private:
 			UniformDisplacement = glGetUniformLocation(ProgramName, "Displacement");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -162,7 +162,7 @@ private:
 		glBufferData(GL_TEXTURE_BUFFER, sizeof(Diffuse), Diffuse, GL_STATIC_DRAW);
 		glBindBuffer(GL_TEXTURE_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initTexture()
@@ -177,7 +177,7 @@ private:
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE]);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);	
 
-		return glf::checkError("initTextureBuffer");
+		return this->checkError("initTextureBuffer");
 	}
 
 	bool initVertexArray()
@@ -192,7 +192,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -210,7 +210,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
@@ -220,7 +220,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

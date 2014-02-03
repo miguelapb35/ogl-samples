@@ -90,8 +90,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -110,7 +110,7 @@ private:
 			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -127,7 +127,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBuffer()
@@ -143,7 +143,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
@@ -157,18 +157,18 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG]);
+		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

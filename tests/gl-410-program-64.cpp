@@ -91,7 +91,7 @@ private:
 
 		if(Validated)
 		{
-			std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -100,12 +100,12 @@ private:
 		if(Validated)
 		{
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		if(Validated)
 		{
-			std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
@@ -114,7 +114,7 @@ private:
 		if(Validated)
 		{
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		// Get variables locations
@@ -124,7 +124,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexBuffer()
@@ -139,7 +139,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool initVertexArray()
@@ -154,7 +154,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()

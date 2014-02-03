@@ -103,9 +103,9 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
 				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
 				"--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
@@ -153,7 +153,7 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_BPTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BPTC).c_str()));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::BPTC]);
@@ -183,7 +183,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_DXT5).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5).c_str()));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT5]);
@@ -214,7 +214,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGTC).c_str()));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGTC]);
@@ -245,7 +245,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);

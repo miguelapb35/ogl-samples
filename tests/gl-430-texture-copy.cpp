@@ -86,8 +86,8 @@ private:
 	
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
 			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -132,7 +132,7 @@ private:
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glActiveTexture(GL_TEXTURE0);
@@ -221,7 +221,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && glf::checkExtension("GL_ARB_copy_image");
+		Validated = Validated && this->checkExtension("GL_ARB_copy_image");
 
 		if(Validated)
 			Validated = initTexture();

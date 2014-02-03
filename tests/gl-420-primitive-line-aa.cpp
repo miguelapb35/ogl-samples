@@ -97,8 +97,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_AA);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_AA);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_AA);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_AA);
 
 			ProgramName[pipeline::MULTISAMPLE] = glCreateProgram();
 			glProgramParameteri(ProgramName[pipeline::MULTISAMPLE], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -117,8 +117,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SPLASH);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SPLASH);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH);
 
 			ProgramName[pipeline::SPLASH] = glCreateProgram();
 			glProgramParameteri(ProgramName[pipeline::SPLASH], GL_PROGRAM_SEPARABLE, GL_TRUE);

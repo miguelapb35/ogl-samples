@@ -106,8 +106,8 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_MULTIPLE] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-			ShaderName[shader::FRAG_MULTIPLE] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+			ShaderName[shader::VERT_MULTIPLE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+			ShaderName[shader::FRAG_MULTIPLE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::MULTIPLE] = glCreateProgram();
@@ -129,8 +129,8 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
@@ -151,7 +151,7 @@ private:
 			UniformLayer = glGetUniformLocation(ProgramName[program::SPLASH], "Layer");
 		}
 
-		return glf::checkError("initProgram");
+		return this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -162,7 +162,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initTexture()
@@ -189,7 +189,7 @@ private:
 			GL_UNSIGNED_BYTE,
 			NULL);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
@@ -211,7 +211,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -236,7 +236,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -259,13 +259,16 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG_MULTIPLE]);
+		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
+		glDeleteShader(ShaderName[shader::VERT_MULTIPLE]);
+		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
+
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 		glDeleteBuffers(1, &BufferName);
@@ -273,7 +276,7 @@ private:
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

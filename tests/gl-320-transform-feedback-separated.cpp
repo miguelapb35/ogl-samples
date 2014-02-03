@@ -95,9 +95,9 @@ private:
 		bool Validated = true;
 	
 		glf::compiler Compiler;
-		ShaderName[shader::VERT_TRANSFORM] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_TRANSFORM, "--version 150 --profile core");
-		ShaderName[shader::VERT_FEEDBACK] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
-		ShaderName[shader::FRAG_FEEDBACK] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
+		ShaderName[shader::VERT_TRANSFORM] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 150 --profile core");
+		ShaderName[shader::VERT_FEEDBACK] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
+		ShaderName[shader::FRAG_FEEDBACK] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
 		Validated = Validated && Compiler.check();
 
 		// Create program
@@ -158,7 +158,7 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName[program::FEEDBACK]);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -186,7 +186,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBuffer()
@@ -204,7 +204,7 @@ private:
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
@@ -220,20 +220,21 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG_FEEDBACK]);
+		glDeleteShader(ShaderName[shader::VERT_FEEDBACK]);
+
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 		glDeleteBuffers(program::MAX, &BufferName[0]);
 		glDeleteQueries(1, &Query);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

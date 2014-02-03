@@ -16,10 +16,10 @@
 namespace
 {
 	std::string const SAMPLE_NAME = "OpenGL Alpha coverage";
-	std::string const VERTEX_SHADER_SOURCE(glf::DATA_DIRECTORY + "330/image-2d.vert");
-	std::string const FRAGMENT_SHADER_SOURCE(glf::DATA_DIRECTORY + "330/image-2d.frag");
-	std::string const TEXTURE_DIFFUSE(glf::DATA_DIRECTORY + "kueken256-rgb8.dds");
-	std::string const TEXTURE_DIFFUSE_DXT1(glf::DATA_DIRECTORY + "kueken256-bc1-saved.dds");
+	std::string const VERTEX_SHADER_SOURCE(getDataDirectory() + "330/image-2d.vert");
+	std::string const FRAGMENT_SHADER_SOURCE(getDataDirectory() + "330/image-2d.frag");
+	std::string const TEXTURE_DIFFUSE(getDataDirectory() + "kueken256-rgb8.dds");
+	std::string const TEXTURE_DIFFUSE_DXT1(getDataDirectory() + "kueken256-bc1-saved.dds");
 	int const SAMPLE_SIZE_WIDTH = 640;
 	int const SAMPLE_SIZE_HEIGHT = 480;
 	int const SAMPLE_MAJOR_VERSION = 3;

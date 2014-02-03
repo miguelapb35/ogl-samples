@@ -105,8 +105,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 330 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -122,7 +122,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initArrayBuffer()
@@ -133,7 +133,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");;
+		return this->checkError("initArrayBuffer");;
 	}
 
 	bool initSampler()
@@ -157,7 +157,7 @@ private:
 		glSamplerParameteri(SamplerName[viewport::V11], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerName[viewport::V01], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		return glf::checkError("initSampler");
+		return this->checkError("initSampler");
 	}
 
 	bool initTexture2D()
@@ -167,7 +167,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -184,7 +184,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -200,7 +200,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -226,19 +226,19 @@ private:
 		if(Validated)
 			Validated = initSampler();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG]);
+		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &Texture2DName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

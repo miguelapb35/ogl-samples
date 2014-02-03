@@ -86,7 +86,7 @@ private:
 		bool Validated = true;
 		glEnable(GL_DEPTH_TEST);
 
-		return Validated && glf::checkError("initTest");
+		return Validated && this->checkError("initTest");
 	}
 
 	bool initProgram()
@@ -97,8 +97,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE, "--version 430 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -219,7 +219,7 @@ private:
 	{
 		bool Validated(true);
 	
-		Validated = Validated && glf::checkExtension("GL_ARB_texture_buffer_range");
+		Validated = Validated && this->checkExtension("GL_ARB_texture_buffer_range");
 
 		if(Validated)
 			Validated = initTest();

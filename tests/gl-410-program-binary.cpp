@@ -99,7 +99,7 @@ private:
 		glGetProgramBinary(ProgramName, Size, NULL, &Format, &Data[0]);
 		glf::saveBinary(String, Format, Data, Size);
 
-		return glf::checkError("saveProgram");
+		return this->checkError("saveProgram");
 	}
 
 	bool initProgram()
@@ -118,7 +118,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(glf::loadBinary(glf::DATA_DIRECTORY + VERT_PROGRAM_BINARY, Format, Data, Size))
+			if(glf::loadBinary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
@@ -128,7 +128,7 @@ private:
 		// Create program
 		if(Validated && !Success)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
 
 			glAttachShader(ProgramName[program::VERT], VertShaderName);
 			glDeleteShader(VertShaderName);
@@ -145,7 +145,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(glf::loadBinary(glf::DATA_DIRECTORY + GEOM_PROGRAM_BINARY, Format, Data, Size))
+			if(glf::loadBinary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
@@ -155,7 +155,7 @@ private:
 		// Create program
 		if(Validated && !Success)
 		{
-			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE);
+			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE);
 
 			glAttachShader(ProgramName[program::GEOM], GeomShaderName);
 			glDeleteShader(GeomShaderName);
@@ -172,7 +172,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(glf::loadBinary(glf::DATA_DIRECTORY + FRAG_PROGRAM_BINARY, Format, Data, Size))
+			if(glf::loadBinary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
@@ -182,7 +182,7 @@ private:
 		// Create program
 		if(Validated && !Success)
 		{
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 
 			glAttachShader(ProgramName[program::FRAG], FragShaderName);
 			glDeleteShader(FragShaderName);
@@ -196,7 +196,7 @@ private:
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
 			glUseProgramStages(PipelineName, GL_GEOMETRY_SHADER_BIT, ProgramName[program::GEOM]);
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		// Get variables locations
@@ -206,11 +206,11 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		saveProgram(ProgramName[program::VERT], glf::DATA_DIRECTORY + VERT_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::GEOM], glf::DATA_DIRECTORY + GEOM_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::FRAG], glf::DATA_DIRECTORY + FRAG_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::VERT], getDataDirectory() + VERT_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::GEOM], getDataDirectory() + GEOM_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::FRAG], getDataDirectory() + FRAG_PROGRAM_BINARY);
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initTexture()
@@ -226,7 +226,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -241,7 +241,7 @@ private:
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initBuffer()
@@ -256,7 +256,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
@@ -273,7 +273,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()

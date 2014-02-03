@@ -82,8 +82,8 @@ void testCompiler::render()
 		{
 			for(std::size_t ShaderIndex = 0; ShaderIndex < VertShaderFile.size(); ++ShaderIndex)
 			{
-				VertShaderName[ShaderIndex] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VertShaderFile[ShaderIndex], "--version 420 --profile core");
-				FragShaderName[ShaderIndex] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FragShaderFile[ShaderIndex], "--version 420 --profile core");
+				VertShaderName[ShaderIndex] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VertShaderFile[ShaderIndex], "--version 420 --profile core");
+				FragShaderName[ShaderIndex] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FragShaderFile[ShaderIndex], "--version 420 --profile core");
 			}
 
 			for(std::size_t ProgramIndex = 0; ProgramIndex < ProgramName.size(); ++ProgramIndex)
@@ -103,8 +103,8 @@ void testCompiler::render()
 		{
 			for(std::size_t ShaderIndex = 0; ShaderIndex < VertShaderFile.size(); ++ShaderIndex)
 			{
-				VertShaderName[ShaderIndex] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VertShaderFile[ShaderIndex], "--version 420 --profile core");
-				FragShaderName[ShaderIndex] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FragShaderFile[ShaderIndex], "--version 420 --profile core");
+				VertShaderName[ShaderIndex] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VertShaderFile[ShaderIndex], "--version 420 --profile core");
+				FragShaderName[ShaderIndex] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FragShaderFile[ShaderIndex], "--version 420 --profile core");
 				Compiler.check();
 			}
 
@@ -122,8 +122,8 @@ void testCompiler::render()
 		{
 			for(std::size_t ProgramIndex = 0; ProgramIndex < ProgramName.size(); ++ProgramIndex)
 			{
-				VertShaderName[ProgramIndex] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VertShaderFile[ProgramIndex], "--version 420 --profile core");
-				FragShaderName[ProgramIndex] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FragShaderFile[ProgramIndex], "--version 420 --profile core");
+				VertShaderName[ProgramIndex] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VertShaderFile[ProgramIndex], "--version 420 --profile core");
+				FragShaderName[ProgramIndex] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FragShaderFile[ProgramIndex], "--version 420 --profile core");
 				Compiler.check();
 
 				ProgramName[ProgramIndex] = glCreateProgram();

@@ -108,10 +108,10 @@ private:
 		bool Validated = true;
 
 		glf::compiler Compiler;
-		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 330 --profile core");
-		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 330 --profile core");
-		ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 330 --profile core");
-		ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 330 --profile core");
+		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 330 --profile core");
+		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 330 --profile core");
+		ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 330 --profile core");
+		ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 330 --profile core");
 		Validated = Validated && Compiler.check();
 
 		if(Validated)
@@ -144,7 +144,7 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 		}
 
-		return glf::checkError("initProgram");
+		return this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -155,7 +155,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initSampler()
@@ -173,7 +173,7 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return glf::checkError("initSampler");
+		return this->checkError("initSampler");
 	}
 
 	bool initTexture()
@@ -181,7 +181,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, Texture2DName);
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_RGB8]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -230,7 +230,7 @@ private:
 				0);
 		}
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
@@ -251,7 +251,7 @@ private:
 		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -267,7 +267,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBlend()
@@ -285,7 +285,7 @@ private:
 		glColorMaski(2, GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 		glColorMaski(3, GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 
-		return glf::checkError("initBlend");
+		return this->checkError("initBlend");
 	}
 
 	bool begin()
@@ -313,13 +313,16 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG1]);
+		glDeleteShader(ShaderName[shader::VERT1]);
+		glDeleteShader(ShaderName[shader::FRAG2]);
+		glDeleteShader(ShaderName[shader::VERT2]);
+
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramNameMultiple);
 		glDeleteProgram(ProgramNameSingle);
@@ -327,7 +330,7 @@ private:
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteSamplers(1, &SamplerName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	bool render()

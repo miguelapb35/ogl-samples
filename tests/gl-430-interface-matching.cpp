@@ -106,11 +106,11 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER, "--version 420 --profile core");
-			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER, "--version 420 --profile core");
-			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER, "--version 420 --profile core");
-			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER, "--version 420 --profile core");
+			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER, "--version 420 --profile core");
+			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER, "--version 420 --profile core");
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::VERT] = glCreateProgram();
@@ -156,11 +156,11 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
 		glBindVertexArray(0);
 
-		std::vector<glf::vertexattrib> Valid(16); 
-		Valid[glf::semantic::attr::POSITION + 0] = glf::vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		Valid[glf::semantic::attr::POSITION + 1] = glf::vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		Valid[glf::semantic::attr::COLOR]        = glf::vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		//Valid[glf::semantic::attr::COLOR]        = glf::vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_DOUBLE, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)),NULL);
+		std::vector<vertexattrib> Valid(16); 
+		Valid[glf::semantic::attr::POSITION + 0] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		Valid[glf::semantic::attr::POSITION + 1] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		Valid[glf::semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		//Valid[glf::semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_DOUBLE, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)),NULL);
 
 		// TODO
 		//glf::validateVAO(VertexArrayName, Valid);
@@ -237,7 +237,7 @@ private:
 			GLsizei Length(0);
 			glGetProgramResourceiv(ProgramName, GL_PROGRAM_INPUT, i, 3, Props, 3, &Length, Params);
 
-			glf::vertexattrib VertexAttrib;
+			vertexattrib VertexAttrib;
 			glGetActiveAttrib(ProgramName,
 				GLuint(i),
 				GLsizei(ActiveAttributeMaxLength),
@@ -338,8 +338,8 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && glf::checkExtension("GL_ARB_arrays_of_arrays");
-		Validated = Validated && glf::checkExtension("GL_ARB_program_interface_query");
+		Validated = Validated && this->checkExtension("GL_ARB_arrays_of_arrays");
+		Validated = Validated && this->checkExtension("GL_ARB_program_interface_query");
 
 		if(Validated)
 			Validated = initMax();;

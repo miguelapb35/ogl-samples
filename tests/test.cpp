@@ -40,7 +40,7 @@ namespace
 			return "unknown/";
 	}
 
-	inline bool checkFramebuffer(GLFWwindow* pWindow, char const * Title)
+	inline bool checkTemplate(GLFWwindow* pWindow, char const * Title)
 	{
 		//glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &Params); // For ES 2 this is actually necessary
 
@@ -55,12 +55,9 @@ namespace
 
 		bool Success = true;
 
-		if(!glf::checkError("checkFramebuffer"))
-			Success = false;
-
 		if(Success)
 		{
-			gli::texture2D Template(glf::load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Title + ".png").c_str()));
+			gli::texture2D Template(glf::load_png((getDataDirectory() + "templates/" + vendor() + Title + ".png").c_str()));
 
 			if(Success)
 				Success = Success && (!Template.empty());
@@ -70,10 +67,22 @@ namespace
 		}
 
 		if(!Success)
-			glf::save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Title + ".png").c_str());
+			glf::save_png(Texture, (getDataDirectory() + "./results/" + vendor() + Title + ".png").c_str());
 
 		return Success;
 	}
+}//namespace
+
+std::string getDataDirectory()
+{
+#	if defined(WIN32)
+		return std::string("../data/");
+#	elif defined(__APPLE__)
+		return std::string("../data/");
+#	else
+		// For packages.
+		return std::string("data/");
+#	endif
 }
 
 test::test
@@ -183,7 +192,7 @@ int test::operator()()
 	int Result = EXIT_SUCCESS;
 
 	if(version(this->Major, this->Minor) >= version(3, 0))
-		Result = glf::checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
+		Result = checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(Result == EXIT_SUCCESS)
 		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -193,15 +202,18 @@ int test::operator()()
 	while(true && Result == EXIT_SUCCESS)
 	{
 		Result = this->render() ? EXIT_SUCCESS : EXIT_FAILURE;
-		Result = Result && glf::checkError("render");
+		Result = Result && this->checkError("render");
 
 		glfwPollEvents();
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
 		{
 			//if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && (this->Profile == CORE || (this->Profile == ES && version(this->Major, this->Minor) >= version(3, 0))))
 			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && this->Profile == CORE)
-				if(!checkFramebuffer(this->Window, this->Title.c_str()))
+			{
+				if(!checkTemplate(this->Window, this->Title.c_str()))
 					Result = EXIT_FAILURE;
+				this->checkError("checkTemplate");
+			}
 			break;
 		}
 
@@ -284,6 +296,155 @@ void test::endTimer()
 	this->TimeMin = glm::min(this->TimeMin, InstantTime);
 
 	fprintf(stdout, "\rTime: %2.4f ms    ", InstantTime / 1000.0);
+}
+
+std::string test::loadFile(std::string const & Filename) const
+{
+	std::string Result;
+
+	std::ifstream Stream(Filename.c_str());
+	if(!Stream.is_open())
+		return Result;
+
+	Stream.seekg(0, std::ios::end);
+	Result.reserve(Stream.tellg());
+	Stream.seekg(0, std::ios::beg);
+
+	Result.assign(
+		(std::istreambuf_iterator<char>(Stream)),
+		std::istreambuf_iterator<char>());
+
+	return Result;
+}
+
+void test::logImplementationDependentLimit(GLenum Value, std::string const & String) const
+{
+	GLint Result(0);
+	glGetIntegerv(Value, &Result);
+	std::string Message(glf::format("%s: %d", String.c_str(), Result));
+#	if(!defined(__APPLE__) && defined(GL_ARB_debug_output))
+		glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
+#	endif
+}
+
+bool test::validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const
+{
+	bool Success = true;
+#if !defined(__APPLE__)
+	GLint MaxVertexAttrib(0);
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttrib);
+
+	glBindVertexArray(VertexArrayName);
+	for (GLuint AttribLocation = 0; AttribLocation < glm::min(GLuint(MaxVertexAttrib), GLuint(Expected.size())); ++AttribLocation)
+	{
+		vertexattrib VertexAttrib;
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &VertexAttrib.Enabled);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &VertexAttrib.Size);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &VertexAttrib.Stride);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &VertexAttrib.Type);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &VertexAttrib.Normalized);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_INTEGER, &VertexAttrib.Integer);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_LONG, &VertexAttrib.Long);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_DIVISOR, &VertexAttrib.Divisor);
+		glGetVertexAttribPointerv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_POINTER, &VertexAttrib.Pointer);
+		Success = Success && (VertexAttrib == Expected[AttribLocation]);
+		assert(Success);
+	}
+	glBindVertexArray(0);
+#endif//!defined(__APPLE__)
+	return Success;
+}
+
+bool test::checkError(const char* Title) const
+{
+	int Error;
+	if((Error = glGetError()) != GL_NO_ERROR)
+	{
+		std::string ErrorString;
+		switch(Error)
+		{
+		case GL_INVALID_ENUM:
+			ErrorString = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			ErrorString = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			ErrorString = "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			ErrorString = "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			ErrorString = "GL_OUT_OF_MEMORY";
+			break;
+		default:
+			ErrorString = "UNKNOWN";
+			break;
+		}
+		fprintf(stdout, "OpenGL Error(%s): %s\n", ErrorString.c_str(), Title);
+		assert(0);
+	}
+	return Error == GL_NO_ERROR;
+}
+
+bool test::checkFramebuffer(GLuint FramebufferName) const
+{
+	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	switch(Status)
+	{
+	case GL_FRAMEBUFFER_UNDEFINED:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_UNDEFINED");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_UNSUPPORTED");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+		break;
+	}
+
+	return Status != GL_FRAMEBUFFER_COMPLETE;
+}
+
+bool test::checkExtension(char const * ExtensionName) const
+{
+	GLint ExtensionCount = 0;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
+	for(GLint i = 0; i < ExtensionCount; ++i)
+		if(std::string((char const*)glGetStringi(GL_EXTENSIONS, i)) == std::string(ExtensionName))
+			return true;
+	printf("Failed to find Extension: \"%s\"\n", ExtensionName);
+	return false;
+}
+
+bool test::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) const
+{
+	GLint MajorVersionContext = 0;
+	GLint MinorVersionContext = 0;
+	glGetIntegerv(GL_MAJOR_VERSION, &MajorVersionContext);
+	glGetIntegerv(GL_MINOR_VERSION, &MinorVersionContext);
+	printf("OpenGL Version Needed %d.%d ( %d.%d Found )\n",
+		MajorVersionRequire, MinorVersionRequire,
+		MajorVersionContext, MinorVersionContext);
+	return version(MajorVersionContext, MinorVersionContext) 
+		>= version(MajorVersionRequire, MinorVersionRequire);
 }
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)

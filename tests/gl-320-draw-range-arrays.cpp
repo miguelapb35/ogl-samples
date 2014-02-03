@@ -78,7 +78,7 @@ private:
 		bool Validated = true;
 		glEnable(GL_DEPTH_TEST);
 
-		return Validated && glf::checkError("initTest");
+		return Validated && this->checkError("initTest");
 	}
 
 	bool initProgram()
@@ -88,8 +88,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
@@ -113,7 +113,7 @@ private:
 			glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -132,7 +132,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformTransformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
@@ -145,7 +145,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -161,7 +161,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()

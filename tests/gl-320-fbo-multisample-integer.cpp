@@ -115,8 +115,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-			ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+			ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+			ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::RENDER] = glCreateProgram();
@@ -139,8 +139,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-			ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+			ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+			ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
@@ -160,7 +160,7 @@ private:
 			UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -170,7 +170,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");;
+		return this->checkError("initBuffer");;
 	}
 
 	bool initTexture()
@@ -185,7 +185,7 @@ private:
 		glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
 		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
 
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
@@ -227,7 +227,7 @@ private:
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
@@ -246,7 +246,7 @@ private:
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return glf::checkError("initFramebuffer");
+		return this->checkError("initFramebuffer");
 	}
 
 	bool initVertexArray()
@@ -262,7 +262,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()
@@ -280,13 +280,16 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG1]);
+		glDeleteShader(ShaderName[shader::FRAG2]);
+		glDeleteShader(ShaderName[shader::VERT1]);
+		glDeleteShader(ShaderName[shader::VERT2]);
+
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName[program::RENDER]);
 		glDeleteProgram(ProgramName[program::SPLASH]);
@@ -294,7 +297,7 @@ private:
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return glf::checkError("end");
+		return this->checkError("end");
 	}
 
 	void renderFBO(GLuint Framebuffer)
@@ -324,7 +327,7 @@ private:
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
-		glf::checkError("renderFBO");
+		this->checkError("renderFBO");
 	}
 
 	void renderFB(GLuint TextureName)
@@ -348,7 +351,7 @@ private:
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		
-		glf::checkError("renderFB");
+		this->checkError("renderFB");
 	}
 
 	bool render()

@@ -97,8 +97,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			UnifiedProgramName = glCreateProgram();
 			glAttachShader(UnifiedProgramName, VertShaderName);
@@ -115,7 +115,7 @@ private:
 			UnifiedUniformDiffuse = glGetUniformLocation(UnifiedProgramName, "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initSeparateProgram()
@@ -126,7 +126,7 @@ private:
 
 		if(Validated)
 		{
-			std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
+			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERTEX_SHADER_SOURCE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			SeparateProgramName[program::VERTEX] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 			Validated = glf::checkProgram(SeparateProgramName[program::VERTEX]);
@@ -137,7 +137,7 @@ private:
 
 		if(Validated)
 		{
-			std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			SeparateProgramName[program::FRAGMENT] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 			Validated = glf::checkProgram(SeparateProgramName[program::FRAGMENT]);
@@ -153,12 +153,12 @@ private:
 			SeparateUniformDiffuse = glGetUniformLocation(SeparateProgramName[program::FRAGMENT], "Diffuse");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
 
@@ -184,7 +184,7 @@ private:
 				Texture[Level].data());
 		}
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexBuffer()
@@ -199,7 +199,7 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initArrayBuffer");
+		return this->checkError("initArrayBuffer");
 	}
 
 	bool initVertexArray()
@@ -215,7 +215,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool begin()

@@ -28,13 +28,91 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glf/glf.hpp>
-#include <glu/glu.hpp>
+
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+
+#include <glf/compiler.hpp>
+#include <glf/sementics.hpp>
+#include <glf/vertex.hpp>
 
 #include <memory>
 #include <array>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
+#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
+
+struct vertexattrib
+{
+	vertexattrib() :
+		Enabled(GL_FALSE),
+		Binding(0),
+		Size(4),
+		Stride(0),
+		Type(GL_FLOAT),
+		Normalized(GL_FALSE),
+		Integer(GL_FALSE),
+		Long(GL_FALSE),
+		Divisor(0),
+		Pointer(NULL)
+	{}
+
+	vertexattrib
+	(
+		GLint Enabled,
+		GLint Binding,
+		GLint Size,
+		GLint Stride,
+		GLint Type,
+		GLint Normalized,
+		GLint Integer,
+		GLint Long,
+		GLint Divisor,
+		GLvoid* Pointer
+	) :
+		Enabled(Enabled),
+		Binding(Binding),
+		Size(Size),
+		Stride(Stride),
+		Type(Type),
+		Normalized(Normalized),
+		Integer(Integer),
+		Long(Long),
+		Divisor(Divisor),
+		Pointer(Pointer)
+	{}
+
+	GLint Enabled;
+	GLint Binding;
+	GLint Size;
+	GLint Stride;
+	GLint Type;
+	GLint Normalized;
+	GLint Integer;
+	GLint Long;
+	GLint Divisor;
+	GLvoid* Pointer;
+};
+
+inline bool operator== (vertexattrib const & A, vertexattrib const & B)
+{
+	return A.Enabled == B.Enabled && 
+		A.Size == B.Size && 
+		A.Stride == B.Stride && 
+		A.Type == B.Type && 
+		A.Normalized == B.Normalized && 
+		A.Integer == B.Integer && 
+		A.Long == B.Long;
+}
+
+inline bool operator!= (vertexattrib const & A, vertexattrib const & B)
+{
+	return !(A == B);
+}
+
+std::string getDataDirectory();
 
 class test
 {
@@ -143,6 +221,13 @@ protected:
 	void beginTimer();
 	void endTimer();
 
+	std::string loadFile(std::string const & Filename) const;
+	void logImplementationDependentLimit(GLenum Value, std::string const & String) const;
+	bool validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const;
+	bool checkError(const char* Title) const;
+	bool checkFramebuffer(GLuint FramebufferName) const;
+	bool checkExtension(char const * ExtensionName) const;
+
 private:
 	GLFWwindow* Window;
 	template_test const TemplateTest;
@@ -165,11 +250,14 @@ private:
 	double TimeSum, TimeMin, TimeMax;
 
 private:
-	int version(int Major, int Minor) {return Major * 100 + Minor * 10;}
+	int version(int Major, int Minor) const{return Major * 100 + Minor * 10;}
+	bool checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) const;
 
 	static void cursorPositionCallback(GLFWwindow* Window, double x, double y);
 	static void mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int mods);
 	static void keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods);
+
+public:
 	static void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);
 };
 

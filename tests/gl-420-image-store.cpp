@@ -76,7 +76,7 @@ private:
 		glBindProgramPipeline(PipelineName[pipeline::READ]);
 		if(Validated)
 		{
-			std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_READ);
+			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE_READ);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -84,7 +84,7 @@ private:
 
 		if(Validated)
 		{
-			std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_READ);
+			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE_READ);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
@@ -94,13 +94,13 @@ private:
 		{
 			glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
 			glUseProgramStages(PipelineName[pipeline::READ], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		glBindProgramPipeline(PipelineName[pipeline::SAVE]);
 		if(Validated)
 		{
-			std::string VertexSourceContent = glf::loadFile(glf::DATA_DIRECTORY + VERT_SHADER_SOURCE_SAVE);
+			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE_SAVE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
@@ -108,7 +108,7 @@ private:
 
 		if(Validated)
 		{
-			std::string FragmentSourceContent = glf::loadFile(glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE_SAVE);
+			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE_SAVE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
@@ -118,7 +118,7 @@ private:
 		{
 			glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
 			glUseProgramStages(PipelineName[pipeline::SAVE], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && glf::checkError("initProgram - stage");
+			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		return Validated;
@@ -158,18 +158,18 @@ private:
 	{
 		bool Validated(true);
 
-		glf::logImplementationDependentLimit(GL_MAX_IMAGE_UNITS, "GL_MAX_IMAGE_UNITS");
-		glf::logImplementationDependentLimit(GL_MAX_VERTEX_IMAGE_UNIFORMS, "GL_MAX_VERTEX_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS, "GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS, "GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_GEOMETRY_IMAGE_UNIFORMS, "GL_MAX_GEOMETRY_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_FRAGMENT_IMAGE_UNIFORMS, "GL_MAX_FRAGMENT_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_COMBINED_IMAGE_UNIFORMS, "GL_MAX_COMBINED_IMAGE_UNIFORMS");
-		glf::logImplementationDependentLimit(GL_MAX_ARRAY_TEXTURE_LAYERS, "GL_MAX_ARRAY_TEXTURE_LAYERS");
-		glf::logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
-		glf::logImplementationDependentLimit(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS");
-		glf::logImplementationDependentLimit(GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS, "GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS");
-		//glf::logImplementationDependentLimit(GL_MAX_TEXTURE_UNITS, "GL_MAX_TEXTURE_UNITS");
+		this->logImplementationDependentLimit(GL_MAX_IMAGE_UNITS, "GL_MAX_IMAGE_UNITS");
+		this->logImplementationDependentLimit(GL_MAX_VERTEX_IMAGE_UNIFORMS, "GL_MAX_VERTEX_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS, "GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS, "GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_GEOMETRY_IMAGE_UNIFORMS, "GL_MAX_GEOMETRY_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_FRAGMENT_IMAGE_UNIFORMS, "GL_MAX_FRAGMENT_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_COMBINED_IMAGE_UNIFORMS, "GL_MAX_COMBINED_IMAGE_UNIFORMS");
+		this->logImplementationDependentLimit(GL_MAX_ARRAY_TEXTURE_LAYERS, "GL_MAX_ARRAY_TEXTURE_LAYERS");
+		this->logImplementationDependentLimit(GL_MAX_TEXTURE_IMAGE_UNITS, "GL_MAX_TEXTURE_IMAGE_UNITS");
+		this->logImplementationDependentLimit(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS");
+		this->logImplementationDependentLimit(GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS, "GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS");
+		//this->logImplementationDependentLimit(GL_MAX_TEXTURE_UNITS, "GL_MAX_TEXTURE_UNITS");
 
 		if(Validated)
 			Validated = initTexture();

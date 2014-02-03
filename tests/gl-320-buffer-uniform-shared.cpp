@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-320/buffer-uniform-shared.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/buffer-uniform-shared.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/buffer-uniform-shared.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/buffer-uniform-shared.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -97,11 +97,10 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT] = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			ShaderName[shader::FRAG] = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(ShaderName[shader::VERT], VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(ShaderName[shader::FRAG], FRAGMENT_SHADER_SOURCE);
+			glf::compiler Compiler;
+			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, ShaderName[shader::VERT]);
@@ -119,7 +118,7 @@ private:
 			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initVertexArray()
@@ -134,7 +133,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initBuffer()
@@ -170,7 +169,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
@@ -184,13 +183,13 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		for(std::size_t i = 0; 0 < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
+		glDeleteShader(ShaderName[shader::FRAG]);
+		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);

@@ -91,8 +91,8 @@ private:
 	
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE);
+			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
+			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
 
 			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
 			Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
@@ -107,7 +107,7 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
 
-		return Validated && glf::checkError("initProgram");;
+		return Validated && this->checkError("initProgram");;
 	}
 
 	bool initBuffer()
@@ -122,7 +122,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initTexture()
@@ -137,7 +137,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
-		gli::texture2DArray Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2DArray Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY,
 			GLsizei(Texture.levels()),
@@ -164,7 +164,7 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return glf::checkError("initTexture");
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -180,7 +180,7 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
 	bool initSampler()
@@ -199,7 +199,7 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return glf::checkError("initSampler");
+		return this->checkError("initSampler");
 	}
 
 	bool begin()
@@ -217,7 +217,7 @@ private:
 		if(Validated)
 			Validated = initSampler();
 
-		return Validated && glf::checkError("begin");
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
