@@ -214,9 +214,6 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_texture_query_levels");
-		Validated = Validated && this->checkExtension("GL_ARB_texture_view");
-		Validated = Validated && this->checkExtension("GL_ARB_fragment_layer_viewport");
 
 		if(Validated)
 			Validated = initProgram();
