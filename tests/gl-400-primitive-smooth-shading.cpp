@@ -72,7 +72,7 @@ class gl_400_primitive_smooth_shading : public test
 {
 public:
 	gl_400_primitive_smooth_shading(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-primitive-smooth_shading", test::CORE, 4, 0)
+		test(argc, argv, "gl-400-primitive-smooth-shading", test::CORE, 4, 0)
 	{}
 
 private:

@@ -73,7 +73,7 @@ class gl_420_primitive_bindless_nv : public test
 {
 public:
 	gl_420_primitive_bindless_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-primitive-bindless", test::CORE, 4, 2),
+		test(argc, argv, "gl-420-primitive-bindless-nv", test::CORE, 4, 2),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

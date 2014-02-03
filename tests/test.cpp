@@ -152,37 +152,45 @@ test::test
 	}
 
 	this->Window = glfwCreateWindow(WindowSize.x, WindowSize.y, argv[0], NULL,NULL);
-	glfwSetWindowUserPointer(this->Window, this);
-	assert(this->Window != nullptr);
 
-	glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
-	glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
-	glfwSetKeyCallback(this->Window, test::keyCallback);
-	glfwMakeContextCurrent(this->Window);
+	if(this->Window)
+	{
+		glfwSetWindowUserPointer(this->Window, this);
+		assert(this->Window != nullptr);
 
-	glewExperimental = GL_TRUE;
-	glewInit();
-	glGetError();
+		glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
+		glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
+		glfwSetKeyCallback(this->Window, test::keyCallback);
+		glfwMakeContextCurrent(this->Window);
 
-#	ifdef GL_ARB_debug_output
-		if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
-		if(this->isExtensionSupported("GL_ARB_debug_output"))
-		{
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-			glDebugMessageCallbackARB(&test::debugOutput, NULL);
-		}
-#	endif
+		glewExperimental = GL_TRUE;
+		glewInit();
+		glGetError();
 
-	glGenQueries(1, &this->TimerQueryName);
+	#	ifdef GL_ARB_debug_output
+			if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
+			if(this->isExtensionSupported("GL_ARB_debug_output"))
+			{
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+				glDebugMessageCallbackARB(&test::debugOutput, NULL);
+			}
+	#	endif
+
+		glGenQueries(1, &this->TimerQueryName);
+	}
 }
 
 test::~test()
 {
-	glDeleteQueries(1, &this->TimerQueryName);
+	if(this->TimerQueryName)
+		glDeleteQueries(1, &this->TimerQueryName);
 
-	glfwDestroyWindow(this->Window);
-	this->Window = 0;
+	if(this->Window)
+	{
+		glfwDestroyWindow(this->Window);
+		this->Window = 0;
+	}
 
 	glfwTerminate();
 }
@@ -190,9 +198,13 @@ test::~test()
 int test::operator()()
 {
 	int Result = EXIT_SUCCESS;
+	
+	if(Result == EXIT_SUCCESS)
+		Result = this->Window ? EXIT_SUCCESS : EXIT_FAILURE;
 
-	if(version(this->Major, this->Minor) >= version(3, 0))
-		Result = checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
+	if(Result == EXIT_SUCCESS)
+		if(version(this->Major, this->Minor) >= version(3, 0))
+			Result = checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(Result == EXIT_SUCCESS)
 		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
