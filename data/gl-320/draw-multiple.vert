@@ -1,11 +1,14 @@
 #version 150 core
 
-uniform mat4 MVP;
+uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 in vec4 Position;
 
 void main()
 {
-	gl_Position = MVP * Position;
+	gl_Position = Transform.MVP * Position;
 }
 

@@ -37,7 +37,7 @@ namespace gli
 	{
 		image Result = Image;
 		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)
-			*static_cast<genType*>(Image.data)[i] = Texel;
+			*reinterpret_cast<genType*>(Image.data())[i] = Texel;
 		return Result;
 	}
 

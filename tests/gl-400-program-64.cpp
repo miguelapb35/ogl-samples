@@ -1,19 +1,30 @@
-//**********************************
-// OpenGL Double
-// 28/06/2010 - 28/06/2010
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-400-program-64");
 	char const * VERTEX_SHADER_SOURCE("gl-400/double.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/double.frag");
 
@@ -50,122 +61,133 @@ namespace
 	GLuint VertexArrayName;
 	GLint UniformMVP = 0;
 	GLint UniformDiffuse = 0;
-
 }//namespace
 
-bool initProgram()
+class gl_400_program_64 : public test
 {
-	bool Validated = true;
+public:
+	gl_400_program_64(int argc, char* argv[]) :
+		test(argc, argv, "gl-400-program-64", test::CORE, 4, 0)
+	{}
+
+private:
+	bool initProgram()
+	{
+		bool Validated = true;
 	
-	// Create program
-	if(Validated)
-	{
-		GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-		GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+		// Create program
+		if(Validated)
+		{
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
-		Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-		Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
+			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, VertexShaderName);
-		glAttachShader(ProgramName, FragmentShaderName);
-		glDeleteShader(VertexShaderName);
-		glDeleteShader(FragmentShaderName);
-		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+			ProgramName = glCreateProgram();
+			glAttachShader(ProgramName, VertexShaderName);
+			glAttachShader(ProgramName, FragmentShaderName);
+			glDeleteShader(VertexShaderName);
+			glDeleteShader(FragmentShaderName);
+			glLinkProgram(ProgramName);
+			Validated = Validated && glf::checkProgram(ProgramName);
+		}
+
+		// Get variables locations
+		if(Validated)
+		{
+			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
+			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		}
+
+		return Validated && this->checkError("initProgram");
 	}
 
-	// Get variables locations
-	if(Validated)
+	bool initVertexBuffer()
 	{
-		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
-	}
+		// Generate a buffer object
+		glGenBuffers(buffer::MAX, BufferName);
 
-	return Validated && glf::checkError("initProgram");
-}
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-bool initVertexBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(buffer::MAX, BufferName);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
-	glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initArrayBuffer");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-
-	glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-	glBindVertexArray(0);
+		return this->checkError("initArrayBuffer");
+	}
 
-	return glf::checkError("initVertexArray");
-}
+	bool initVertexArray()
+	{
+		glGenVertexArrays(1, &VertexArrayName);
 
-bool begin()
-{
-	bool Validated = true;
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initVertexBuffer();
-	if(Validated)
-		Validated = initVertexArray();
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+		glBindVertexArray(0);
 
-	return Validated && glf::checkError("begin");
-}
+		return this->checkError("initVertexArray");
+	}
 
-bool end()
-{
-	// Delete objects
-	glDeleteBuffers(buffer::MAX, BufferName);
-	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteProgram(ProgramName);
+	bool begin()
+	{
+		bool Validated = true;
 
-	return glf::checkError("end");
-}
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initVertexBuffer();
+		if(Validated)
+			Validated = initVertexArray();
 
-void display()
-{
-	// Compute the MVP (Model View Projection matrix)
-    glm::dmat4 Projection = glm::perspective(glm::pi<double>() * 0.25, 4.0 / 3.0, 0.1, 100.0);
-	glm::dmat4 ViewTranslateZ = glm::translate(glm::dmat4(1.0), glm::dvec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::dmat4 ViewRotateX = glm::rotate(ViewTranslateZ, double(Window.RotationCurrent.y), glm::dvec3(1.f, 0.f, 0.f));
-	glm::dmat4 ViewRotateY = glm::rotate(ViewRotateX, double(Window.RotationCurrent.x), glm::dvec3(0.f, 1.f, 0.f));
-	glm::dmat4 View = ViewRotateY;
-	glm::dmat4 Model = glm::dmat4(1.0f);
-	glm::dmat4 MVP = Projection * View * Model;
+		return Validated && this->checkError("begin");
+	}
 
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
+	bool end()
+	{
+		glDeleteBuffers(buffer::MAX, BufferName);
+		glDeleteVertexArrays(1, &VertexArrayName);
+		glDeleteProgram(ProgramName);
 
-	glUseProgram(ProgramName);
-	glUniformMatrix4dv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glUniform4dv(UniformDiffuse, 1, &glm::dvec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		return this->checkError("end");
+	}
 
-	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
+	bool render()
+	{
+		glm::dvec2 WindowSize(this->getWindowSize());
 
-	glf::checkError("display");
-}
+		glm::dmat4 Projection = glm::perspective(glm::pi<double>() * 0.25, WindowSize.x / WindowSize.y, 0.1, 100.0);
+		glm::dmat4 Model = glm::dmat4(1.0f);
+		glm::dmat4 View(this->view());
+		glm::dmat4 MVP = Projection * View * Model;
+
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
+
+		glUseProgram(ProgramName);
+		glUniformMatrix4dv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		glUniform4dv(UniformDiffuse, 1, &glm::dvec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+
+		glBindVertexArray(VertexArrayName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
+
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 4, 0);
+	int Error(0);
+
+	gl_400_program_64 Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

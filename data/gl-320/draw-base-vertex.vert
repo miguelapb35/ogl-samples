@@ -1,6 +1,9 @@
 #version 150 core
 
-uniform mat4 MVP;
+uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 in vec3 Position;
 in vec4 Color;
@@ -13,7 +16,7 @@ out block
 
 void main()
 {
-	gl_Position = MVP * vec4(Position, 1.0);
+	gl_Position = Transform.MVP * vec4(Position, 1.0);
 	Out.Color = Color;
 	Out.Index = gl_VertexID / 4;
 }

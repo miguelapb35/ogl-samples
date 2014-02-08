@@ -1,11 +1,28 @@
-﻿#include "test.hpp"
+﻿///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
+
+#include "test.hpp"
 #include "png.hpp"
-
-int const MAJOR = 3;
-int const MINOR = 2;
-
-glm::ivec2 const test::DEFAULT_WINDOW_SIZE(640, 480);
-std::size_t const test::DEFAULT_MAX_FRAME(100);
 
 namespace 
 {
@@ -23,8 +40,10 @@ namespace
 			return "unknown/";
 	}
 
-	inline bool checkFramebuffer(GLFWwindow* pWindow, char const * Title)
+	inline bool checkTemplate(GLFWwindow* pWindow, char const * Title)
 	{
+		//glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &Params); // For ES 2 this is actually necessary
+
 		GLint WindowSizeX(0);
 		GLint WindowSizeY(0);
 		glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
@@ -34,38 +53,77 @@ namespace
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
 
-		glf::save_png(Texture, (glf::DATA_DIRECTORY + "./results/" + vendor() + Title + ".png").c_str());
+		bool Success = true;
 
-		gli::texture2D Template(glf::load_png((glf::DATA_DIRECTORY + "templates/" + vendor() + Title + ".png").c_str()));
-		if(Template.empty())
-			return false;
+		if(Success)
+		{
+			gli::texture2D Template(glf::load_png((getDataDirectory() + "templates/" + vendor() + Title + ".png").c_str()));
 
-		return Template == Texture;
+			if(Success)
+				Success = Success && (!Template.empty());
+
+			if(Success)
+				Success = Success && (Template == Texture);
+		}
+
+		if(!Success)
+			glf::save_png(Texture, (getDataDirectory() + "./results/" + vendor() + Title + ".png").c_str());
+
+		return Success;
 	}
+}//namespace
+
+std::string getDataDirectory()
+{
+#	if defined(WIN32)
+		return std::string("../data/");
+#	elif defined(__APPLE__)
+		return std::string("../data/");
+#	else
+		// For packages.
+		return std::string("data/");
+#	endif
 }
 
-test::test(int argc, char* argv[], char const * Title, profile Profile, int Major, int Minor, glm::ivec2 const & WindowSize, std::size_t FrameCount) :
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
+	glm::vec2 const & Orientation,
+	template_test TemplateTest
+) :
+	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, TemplateTest)
+{}
+
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
+	glm::ivec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
+	std::size_t FrameCount, template_test TemplateTest
+) :
 	Window(nullptr),
-	TemplateTest(TEMPLATE_TEST_EXECUTE),
+	TemplateTest(TemplateTest),
 	Title(Title),
 	Profile(Profile),
 	Major(Major),
 	Minor(Minor),
-	QueryName(0),
+	TimerQueryName(0),
 	FrameCount(FrameCount),
 	TimeSum(0.0),
 	TimeMin(std::numeric_limits<double>::max()),
 	TimeMax(0.0),
 	MouseOrigin(WindowSize >> 1),
 	MouseCurrent(WindowSize >> 1),
-	TranlationOrigin(0, 4),
-	TranlationCurrent(0, 4),
-	RotationOrigin(0), 
-	RotationCurrent(0),
+	TranlationOrigin(Position),
+	TranlationCurrent(Position),
+	RotationOrigin(Orientation), 
+	RotationCurrent(Orientation),
 	MouseButtonFlags(0)
 {
-	glfwInit();
+	memset(&KeyPressed[0], 0, sizeof(KeyPressed));
 
+	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
 
 	if(version(this->Major, this->Minor) >= version(3, 2) || (Profile == ES))
@@ -94,37 +152,45 @@ test::test(int argc, char* argv[], char const * Title, profile Profile, int Majo
 	}
 
 	this->Window = glfwCreateWindow(WindowSize.x, WindowSize.y, argv[0], NULL,NULL);
-	glfwSetWindowUserPointer(this->Window, this);
-	assert(this->Window != nullptr);
 
-	glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
-	glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
-	glfwSetKeyCallback(this->Window, test::keyCallback);
-	glfwMakeContextCurrent(this->Window);
+	if(this->Window)
+	{
+		glfwSetWindowUserPointer(this->Window, this);
+		assert(this->Window != nullptr);
 
-	glewExperimental = GL_TRUE;
-	glewInit();
-	glGetError();
+		glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
+		glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
+		glfwSetKeyCallback(this->Window, test::keyCallback);
+		glfwMakeContextCurrent(this->Window);
 
-#	ifdef GL_ARB_debug_output
-		if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
-		if(this->isExtensionSupported("GL_ARB_debug_output"))
-		{
-			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-			glDebugMessageCallbackARB(&test::debugOutput, NULL);
-		}
-#	endif
+		glewExperimental = GL_TRUE;
+		glewInit();
+		glGetError();
 
-	glGenQueries(1, &this->QueryName);
+	#	ifdef GL_ARB_debug_output
+			if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
+			if(this->isExtensionSupported("GL_ARB_debug_output"))
+			{
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+				glDebugMessageCallbackARB(&test::debugOutput, NULL);
+			}
+	#	endif
+
+		glGenQueries(1, &this->TimerQueryName);
+	}
 }
 
 test::~test()
 {
-	glDeleteQueries(1, &this->QueryName);
+	if(this->TimerQueryName)
+		glDeleteQueries(1, &this->TimerQueryName);
 
-	glfwDestroyWindow(this->Window);
-	this->Window = 0;
+	if(this->Window)
+	{
+		glfwDestroyWindow(this->Window);
+		this->Window = 0;
+	}
 
 	glfwTerminate();
 }
@@ -132,29 +198,34 @@ test::~test()
 int test::operator()()
 {
 	int Result = EXIT_SUCCESS;
-
-	if(version(this->Major, this->Minor) >= version(3, 0))
-		Result = glf::checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
+	
+	if(Result == EXIT_SUCCESS)
+		Result = this->Window ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->begin();
+		if(version(this->Major, this->Minor) >= version(3, 0))
+			Result = checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
+
+	if(Result == EXIT_SUCCESS)
+		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	std::size_t FrameNum = 0;
 
 	while(true && Result == EXIT_SUCCESS)
 	{
-		this->render();
-		glf::checkError("render");
+		Result = this->render() ? EXIT_SUCCESS : EXIT_FAILURE;
+		Result = Result && this->checkError("render");
 
 		glfwPollEvents();
-		if(glfwWindowShouldClose(this->Window))
-			break;
-
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
 		{
-			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE)
-				if(!checkFramebuffer(this->Window, this->Title.c_str()))
+			//if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && (this->Profile == CORE || (this->Profile == ES && version(this->Major, this->Minor) >= version(3, 0))))
+			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && this->Profile == CORE)
+			{
+				if(!checkTemplate(this->Window, this->Title.c_str()))
 					Result = EXIT_FAILURE;
+				this->checkError("checkTemplate");
+			}
 			break;
 		}
 
@@ -163,11 +234,11 @@ int test::operator()()
 #		ifdef AUTOMATED_TESTS
 			if(FrameCount > 0)
 				++FrameNum;
-#		endif
+#		endif//AUTOMATED_TESTS
 	}
 
 	if(Result == EXIT_SUCCESS)
-		Result = this->end();
+		Result = this->end() ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	return Result;
 }
@@ -210,9 +281,17 @@ bool test::isKeyPressed(int Key) const
 	return this->KeyPressed[Key];
 }
 
+glm::mat4 test::view() const
+{
+	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
+	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+	glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+	return View;
+}
+
 void test::beginTimer()
 {
-	glBeginQuery(GL_TIME_ELAPSED, this->QueryName);
+	glBeginQuery(GL_TIME_ELAPSED, this->TimerQueryName);
 }
 
 void test::endTimer()
@@ -220,7 +299,7 @@ void test::endTimer()
 	glEndQuery(GL_TIME_ELAPSED);
 
 	GLuint QueryTime(0);
-	glGetQueryObjectuiv(this->QueryName, GL_QUERY_RESULT, &QueryTime);
+	glGetQueryObjectuiv(this->TimerQueryName, GL_QUERY_RESULT, &QueryTime);
 
 	double const InstantTime(static_cast<double>(QueryTime) / 1000.0);
 
@@ -229,6 +308,155 @@ void test::endTimer()
 	this->TimeMin = glm::min(this->TimeMin, InstantTime);
 
 	fprintf(stdout, "\rTime: %2.4f ms    ", InstantTime / 1000.0);
+}
+
+std::string test::loadFile(std::string const & Filename) const
+{
+	std::string Result;
+
+	std::ifstream Stream(Filename.c_str());
+	if(!Stream.is_open())
+		return Result;
+
+	Stream.seekg(0, std::ios::end);
+	Result.reserve(Stream.tellg());
+	Stream.seekg(0, std::ios::beg);
+
+	Result.assign(
+		(std::istreambuf_iterator<char>(Stream)),
+		std::istreambuf_iterator<char>());
+
+	return Result;
+}
+
+void test::logImplementationDependentLimit(GLenum Value, std::string const & String) const
+{
+	GLint Result(0);
+	glGetIntegerv(Value, &Result);
+	std::string Message(glf::format("%s: %d", String.c_str(), Result));
+#	if(!defined(__APPLE__) && defined(GL_ARB_debug_output))
+		glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
+#	endif
+}
+
+bool test::validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const
+{
+	bool Success = true;
+#if !defined(__APPLE__)
+	GLint MaxVertexAttrib(0);
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &MaxVertexAttrib);
+
+	glBindVertexArray(VertexArrayName);
+	for (GLuint AttribLocation = 0; AttribLocation < glm::min(GLuint(MaxVertexAttrib), GLuint(Expected.size())); ++AttribLocation)
+	{
+		vertexattrib VertexAttrib;
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &VertexAttrib.Enabled);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &VertexAttrib.Binding);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_SIZE, &VertexAttrib.Size);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &VertexAttrib.Stride);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_TYPE, &VertexAttrib.Type);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &VertexAttrib.Normalized);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_INTEGER, &VertexAttrib.Integer);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_LONG, &VertexAttrib.Long);
+		glGetVertexAttribiv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_DIVISOR, &VertexAttrib.Divisor);
+		glGetVertexAttribPointerv(AttribLocation, GL_VERTEX_ATTRIB_ARRAY_POINTER, &VertexAttrib.Pointer);
+		Success = Success && (VertexAttrib == Expected[AttribLocation]);
+		assert(Success);
+	}
+	glBindVertexArray(0);
+#endif//!defined(__APPLE__)
+	return Success;
+}
+
+bool test::checkError(const char* Title) const
+{
+	int Error;
+	if((Error = glGetError()) != GL_NO_ERROR)
+	{
+		std::string ErrorString;
+		switch(Error)
+		{
+		case GL_INVALID_ENUM:
+			ErrorString = "GL_INVALID_ENUM";
+			break;
+		case GL_INVALID_VALUE:
+			ErrorString = "GL_INVALID_VALUE";
+			break;
+		case GL_INVALID_OPERATION:
+			ErrorString = "GL_INVALID_OPERATION";
+			break;
+		case GL_INVALID_FRAMEBUFFER_OPERATION:
+			ErrorString = "GL_INVALID_FRAMEBUFFER_OPERATION";
+			break;
+		case GL_OUT_OF_MEMORY:
+			ErrorString = "GL_OUT_OF_MEMORY";
+			break;
+		default:
+			ErrorString = "UNKNOWN";
+			break;
+		}
+		fprintf(stdout, "OpenGL Error(%s): %s\n", ErrorString.c_str(), Title);
+		assert(0);
+	}
+	return Error == GL_NO_ERROR;
+}
+
+bool test::checkFramebuffer(GLuint FramebufferName) const
+{
+	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	switch(Status)
+	{
+	case GL_FRAMEBUFFER_UNDEFINED:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_UNDEFINED");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_UNSUPPORTED");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+		fprintf(stdout, "OpenGL Error(%s)\n", "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS");
+		break;
+	}
+
+	return Status != GL_FRAMEBUFFER_COMPLETE;
+}
+
+bool test::checkExtension(char const * ExtensionName) const
+{
+	GLint ExtensionCount = 0;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
+	for(GLint i = 0; i < ExtensionCount; ++i)
+		if(std::string((char const*)glGetStringi(GL_EXTENSIONS, i)) == std::string(ExtensionName))
+			return true;
+	printf("Failed to find Extension: \"%s\"\n", ExtensionName);
+	return false;
+}
+
+bool test::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) const
+{
+	GLint MajorVersionContext = 0;
+	GLint MinorVersionContext = 0;
+	glGetIntegerv(GL_MAJOR_VERSION, &MajorVersionContext);
+	glGetIntegerv(GL_MINOR_VERSION, &MinorVersionContext);
+	printf("OpenGL Version Needed %d.%d ( %d.%d Found )\n",
+		MajorVersionRequire, MinorVersionRequire,
+		MajorVersionContext, MinorVersionContext);
+	return version(MajorVersionContext, MinorVersionContext) 
+		>= version(MajorVersionRequire, MinorVersionRequire);
 }
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)
@@ -305,7 +533,7 @@ void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, in
 	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
-	Test->KeyPressed[Key] = Action != KEY_RELEASE;
+	Test->KeyPressed[Key] = Action == KEY_PRESS;
 
 	if(Test->isKeyPressed(GLFW_KEY_ESCAPE))
 		Test->stop();

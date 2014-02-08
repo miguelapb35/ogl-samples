@@ -19,7 +19,7 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 out block

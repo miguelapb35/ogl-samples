@@ -9,6 +9,8 @@
 // www.g-truc.net
 //**********************************
 
+std::string getDataDirectory();
+
 namespace glf
 {
 	// compiler::commandline
@@ -43,7 +45,7 @@ namespace glf
 			if(FoundDefine != std::string::npos)
 				this->Defines.push_back(Param.substr(2, Param.size() - 2));
 			else if(FoundInclude != std::string::npos)
-				this->Includes.push_back(glf::DATA_DIRECTORY + Param.substr(2, Param.size() - 2));
+				this->Includes.push_back(getDataDirectory() + Param.substr(2, Param.size() - 2));
 			else if(Param == "--define")
 			{
 				std::string Define;
@@ -58,7 +60,7 @@ namespace glf
 			{
 				std::string Include;
 				Stream >> Include;
-				this->Includes.push_back(glf::DATA_DIRECTORY + Include);
+				this->Includes.push_back(getDataDirectory() + Include);
 			}
 /*
 			else 
@@ -89,13 +91,9 @@ namespace glf
 
 	// compiler::parser
 
-	inline std::string compiler::parser::operator()  
-	(
-		commandline const & CommandLine,
-		std::string const & Filename
-	) const
+	inline std::string compiler::parser::operator()(commandline const & CommandLine, std::string const & Filename) const
 	{
-		std::string Source = glf::loadFile(Filename);
+		std::string Source = loadFile(Filename);
 
 		std::stringstream Stream;
 		Stream << Source;
@@ -142,7 +140,7 @@ namespace glf
 				for(std::size_t i = 0; i < Includes.size(); ++i)
 				{
 					std::string PathName = Includes[i] + Include;
-					std::string Source = glf::loadFile(PathName);
+					std::string Source = loadFile(PathName);
 					if(!Source.empty())
 					{
 						Text += Source;
@@ -276,7 +274,26 @@ namespace glf
 		this->PendingChecks.clear();
 	}
 
-	inline bool compiler::loadBinary
+	inline std::string loadFile(std::string const & Filename)
+	{
+		std::string Result;
+		
+		std::ifstream Stream(Filename.c_str());
+		if(!Stream.is_open())
+			return Result;
+
+		Stream.seekg(0, std::ios::end);
+		Result.reserve(Stream.tellg());
+		Stream.seekg(0, std::ios::beg);
+		
+		Result.assign(
+			(std::istreambuf_iterator<char>(Stream)),
+			std::istreambuf_iterator<char>());
+
+		return Result;
+	}
+
+	inline bool loadBinary
 	(
 		std::string const & Filename,
 		GLenum & Format,
@@ -297,27 +314,26 @@ namespace glf
 		}
 		return false;
 	}
-
-	inline std::string compiler::loadFile
+	
+	inline bool saveBinary
 	(
-		std::string const & Filename
+		std::string const & Filename, 
+		GLenum const & Format,
+		std::vector<glm::byte> const & Data,
+		GLint const & Size
 	)
 	{
-		std::string Result;
-		
-		std::ifstream Stream(Filename.c_str());
-		if(!Stream.is_open())
-			return Result;
+		FILE* File = fopen(Filename.c_str(), "w");
 
-		Stream.seekg(0, std::ios::end);
-		Result.reserve(Stream.tellg());
-		Stream.seekg(0, std::ios::beg);
-		
-		Result.assign(
-			(std::istreambuf_iterator<char>(Stream)),
-			std::istreambuf_iterator<char>());
-
-		return Result;
+		if(File)
+		{
+			fwrite(&Format, sizeof(GLenum), 1, File);
+			fwrite(&Size, sizeof(Size), 1, File);
+			fwrite(&Data[0], Size, 1, File);
+			fclose(File);
+			return true;
+		}
+		return false;
 	}
 
 	inline std::string format(const char* msg, ...)

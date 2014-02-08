@@ -1,20 +1,30 @@
-//**********************************
-// OpenGL Primitive smooth shading
-// 26/08/2009 - 19/10/2010
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-400-primitive-smooth-shading");
-
 	std::string const SAMPLE_VERT_SHADER1("gl-400/tess.vert");
 	std::string const SAMPLE_CONT_SHADER1("gl-400/tess.cont");
 	std::string const SAMPLE_EVAL_SHADER1("gl-400/tess.eval");
@@ -56,172 +66,184 @@ namespace
 	GLuint VertexArrayName = 0;
 	GLint UniformMVP[2] = {0, 0};
 	GLint UniformDiffuse[2] = {0, 0};
-
 }//namespace
 
-bool initProgram()
+class gl_400_primitive_smooth_shading : public test
 {
-	bool Validated = true;
+public:
+	gl_400_primitive_smooth_shading(int argc, char* argv[]) :
+		test(argc, argv, "gl-400-primitive-smooth-shading", test::CORE, 4, 0)
+	{}
+
+private:
+	bool initProgram()
+	{
+		bool Validated = true;
 	
-	// Create program
-	if(Validated)
-	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER1);
-		GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, glf::DATA_DIRECTORY + SAMPLE_CONT_SHADER1);
-		GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, glf::DATA_DIRECTORY + SAMPLE_EVAL_SHADER1);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER1);
+		// Create program
+		if(Validated)
+		{
+			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER1);
+			GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER1);
+			GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER1);
+			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER1);
+			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER1);
 
-		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
-		Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
-		Validated = Validated && glf::checkShader(EvalShader, SAMPLE_EVAL_SHADER1);
-		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER1);
-		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER1);
+			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
+			Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
+			Validated = Validated && glf::checkShader(EvalShader, SAMPLE_EVAL_SHADER1);
+			Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER1);
+			Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER1);
 
-		ProgramName[0] = glCreateProgram();
-		glAttachShader(ProgramName[0], VertShader);
-		glAttachShader(ProgramName[0], GeomShader);
-		glAttachShader(ProgramName[0], ContShader);
-		glAttachShader(ProgramName[0], EvalShader);
-		glAttachShader(ProgramName[0], FragShader);
-		glDeleteShader(VertShader);
-		glDeleteShader(GeomShader);
-		glDeleteShader(ContShader);
-		glDeleteShader(EvalShader);
-		glDeleteShader(FragShader);
+			ProgramName[0] = glCreateProgram();
+			glAttachShader(ProgramName[0], VertShader);
+			glAttachShader(ProgramName[0], GeomShader);
+			glAttachShader(ProgramName[0], ContShader);
+			glAttachShader(ProgramName[0], EvalShader);
+			glAttachShader(ProgramName[0], FragShader);
+			glDeleteShader(VertShader);
+			glDeleteShader(GeomShader);
+			glDeleteShader(ContShader);
+			glDeleteShader(EvalShader);
+			glDeleteShader(FragShader);
 
-		glLinkProgram(ProgramName[0]);
-		Validated = Validated && glf::checkProgram(ProgramName[0]);
+			glLinkProgram(ProgramName[0]);
+			Validated = Validated && glf::checkProgram(ProgramName[0]);
+		}
+
+		// Get variables locations
+		if(Validated)
+		{
+			UniformMVP[0] = glGetUniformLocation(ProgramName[0], "MVP");
+		}
+
+		// Create program
+		if(Validated)
+		{
+			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER2);
+			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER2);
+			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER2);
+
+			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
+			Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
+			Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
+
+			ProgramName[1] = glCreateProgram();
+			glAttachShader(ProgramName[1], VertShader);
+			glAttachShader(ProgramName[1], GeomShader);
+			glAttachShader(ProgramName[1], FragShader);
+			glDeleteShader(VertShader);
+			glDeleteShader(GeomShader);
+			glDeleteShader(FragShader);
+
+			glLinkProgram(ProgramName[1]);
+			Validated = Validated && glf::checkProgram(ProgramName[1]);
+		}
+
+		// Get variables locations
+		if(Validated)
+		{
+			UniformMVP[1] = glGetUniformLocation(ProgramName[1], "MVP");
+		}
+
+		return Validated && this->checkError("initProgram");
 	}
 
-	// Get variables locations
-	if(Validated)
+	bool initVertexArray()
 	{
-		UniformMVP[0] = glGetUniformLocation(ProgramName[0], "MVP");
+		// Build a vertex array object
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+
+		return this->checkError("initVertexArray");
 	}
 
-	// Create program
-	if(Validated)
+	bool initBuffer()
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + SAMPLE_VERT_SHADER2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + SAMPLE_GEOM_SHADER2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + SAMPLE_FRAG_SHADER2);
+		// Generate a buffer object
+		glGenBuffers(1, &ElementBufferName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
-		Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
-		Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
-
-		ProgramName[1] = glCreateProgram();
-		glAttachShader(ProgramName[1], VertShader);
-		glAttachShader(ProgramName[1], GeomShader);
-		glAttachShader(ProgramName[1], FragShader);
-		glDeleteShader(VertShader);
-		glDeleteShader(GeomShader);
-		glDeleteShader(FragShader);
-
-		glLinkProgram(ProgramName[1]);
-		Validated = Validated && glf::checkProgram(ProgramName[1]);
-	}
-
-	// Get variables locations
-	if(Validated)
-	{
-		UniformMVP[1] = glGetUniformLocation(ProgramName[1], "MVP");
-	}
-
-	return Validated && glf::checkError("initProgram");
-}
-
-bool initVertexArray()
-{
-	// Build a vertex array object
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+		glGenBuffers(1, &ArrayBufferName);
 		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 
-	return glf::checkError("initVertexArray");
-}
+		return this->checkError("initBuffer");
+	}
 
-bool initBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(1, &ElementBufferName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	bool begin()
+	{
+		bool Validated = true;
 
-	glGenBuffers(1, &ArrayBufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
 
-	return glf::checkError("initBuffer");
-}
+		return Validated && this->checkError("begin");
+	}
 
-bool begin()
-{
-	bool Validated = true;
+	bool end()
+	{
+		glDeleteVertexArrays(1, &VertexArrayName);
+		glDeleteBuffers(1, &ArrayBufferName);
+		glDeleteBuffers(1, &ElementBufferName);
+		glDeleteProgram(ProgramName[0]);
+		glDeleteProgram(ProgramName[1]);
 
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initBuffer();
-	if(Validated)
-		Validated = initVertexArray();
+		return this->checkError("end");
+	}
 
-	return Validated && glf::checkError("begin");
-}
+	bool render()
+	{
+		glm::vec2 WindowSize(this->getWindowSize());
 
-bool end()
-{
-	glDeleteVertexArrays(1, &VertexArrayName);
-	glDeleteBuffers(1, &ArrayBufferName);
-	glDeleteBuffers(1, &ElementBufferName);
-	glDeleteProgram(ProgramName[0]);
-	glDeleteProgram(ProgramName[1]);
-
-	return glf::checkError("end");
-}
-
-void display()
-{
-	glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, float(Window.Size.x / 2) / float(Window.Size.y), 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x * 0.5f / WindowSize.y, 0.1f, 100.0f);
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * this->view() * Model;
 	
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-	glBindVertexArray(VertexArrayName);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindVertexArray(VertexArrayName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 
-	glViewport(0, 0, Window.Size.x / 2, Window.Size.y);
-	glUseProgram(ProgramName[0]);
-	glUniformMatrix4fv(UniformMVP[0], 1, GL_FALSE, &MVP[0][0]);
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x * 0.5f), static_cast<GLsizei>(WindowSize.y));
+		glUseProgram(ProgramName[0]);
+		glUniformMatrix4fv(UniformMVP[0], 1, GL_FALSE, &MVP[0][0]);
 
-	glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
-	glDrawArraysInstanced(GL_PATCHES, 0, VertexCount, 1);
+		glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
+		glDrawArraysInstanced(GL_PATCHES, 0, VertexCount, 1);
 	
-	glViewport(Window.Size.x / 2, 0, Window.Size.x / 2, Window.Size.y);
-	glUseProgram(ProgramName[1]);
-	glUniformMatrix4fv(UniformMVP[1], 1, GL_FALSE, &MVP[0][0]);
+		glViewport(static_cast<GLint>(WindowSize.x * 0.5f), 0, static_cast<GLsizei>(WindowSize.x * 0.5f), static_cast<GLsizei>(WindowSize.y));
+		glUseProgram(ProgramName[1]);
+		glUniformMatrix4fv(UniformMVP[1], 1, GL_FALSE, &MVP[0][0]);
 
-	glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
-	
-	glf::checkError("display");
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
 
-}
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 4, 0);
+	int Error(0);
+
+	gl_400_primitive_smooth_shading Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

@@ -11,7 +11,7 @@
 in block
 {
 	vec2 Texcoord;
-	flat uint DrawID;
+	flat int DrawID;
 } In;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;

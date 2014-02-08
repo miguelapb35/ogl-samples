@@ -67,8 +67,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE1);
 		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE1);
@@ -93,9 +93,9 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE2);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE2);
 		Validated = Validated && glf::checkShader(GeomShader, GEOM_SHADER_SOURCE2);

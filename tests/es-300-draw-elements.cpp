@@ -1,20 +1,30 @@
-//**********************************
-// OpenGL Draw Elements
-// 10/05/2010 - 12/03/2012
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
 
 namespace
 {
-	glf::window Window("es-300-draw-elements", glm::ivec2(640, 480));
-
 	char const * VERTEX_SHADER_SOURCE("es-300/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("es-300/flat-color.frag");
 
@@ -48,7 +58,7 @@ class es_300_draw_elements : public test
 {
 public:
 	es_300_draw_elements(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2)
+		test(argc, argv, "es-300-draw-elements", test::ES, 3, 0)
 	{}
 
 private:
@@ -59,8 +69,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 			glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
 			glf::checkShader(VertexShaderName, FRAGMENT_SHADER_SOURCE);
 
@@ -97,7 +107,7 @@ private:
 			glUseProgram(0);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -112,7 +122,7 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
@@ -127,10 +137,10 @@ private:
 			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated(true);
 
@@ -143,33 +153,30 @@ private:
 			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
-		return Validated && glf::checkError("begin");
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		// Delete objects
 		glDeleteBuffers(1, &ArrayBufferName);
 		glDeleteBuffers(1, &ElementBufferName);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
+		glm::mat4 MVP = Projection * this->view() * Model;
 
 		// Set the display viewport
-		glViewport(0, 0, Window.Size.x, Window.Size.y);
+		glm::ivec2 WindowSize = this->getWindowSize();
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
 		// Clear color buffer with black
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -185,6 +192,8 @@ private:
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
+
+		return true;
 	}
 };
 
@@ -197,6 +206,9 @@ int main(int argc, char* argv[])
 
 	return Error;
 }
+
+
+
 
 
 

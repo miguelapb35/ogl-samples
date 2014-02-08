@@ -1,20 +1,30 @@
-//**********************************
-// OpenGL Texture Format
-// 23/01/2012 - 16/02/2013
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	glf::window Window("gl-320-texture-format");
-
 	char const * VERT_SHADER_SOURCE("gl-320/texture-format.vert");
 	char const * FRAG_SHADER_SOURCE[3] = 
 	{
@@ -120,200 +130,214 @@ namespace
 	std::vector<GLuint> ShaderName(shader::MAX);
 }//namespace
 
-bool initProgram()
+class gl_320_texture_format : public test
 {
-	bool Validated(true);
+public:
+	gl_320_texture_format(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-texture-format", test::CORE, 3, 2)
+	{}
 
-	glf::compiler Compiler;
-	ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-
-	for(std::size_t i = 0; i < program::MAX; ++i)
-		ShaderName[shader::FRAG_NORMALIZED + i] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE[i], "--version 150 --profile core");
-	Validated = Validated && Compiler.check();
-
-	for(std::size_t i = 0; (i < program::MAX) && Validated; ++i)
+private:
+	bool initProgram()
 	{
-		ProgramName[i] = glCreateProgram();
-		glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
-		glAttachShader(ProgramName[i], ShaderName[shader::FRAG_NORMALIZED + i]);
+		bool Validated(true);
 
-		glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
-		glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
-		glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
-		glLinkProgram(ProgramName[i]);
-		Validated = Validated && glf::checkProgram(ProgramName[i]);
+		glf::compiler Compiler;
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 
-		UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
-		Validated = Validated && (UniformMVP[i] != -1);
-		UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
-		Validated = Validated && (UniformDiffuse[i] != -1);
+		for(std::size_t i = 0; i < program::MAX; ++i)
+			ShaderName[shader::FRAG_NORMALIZED + i] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE[i], "--version 150 --profile core");
+		Validated = Validated && Compiler.check();
+
+		for(std::size_t i = 0; (i < program::MAX) && Validated; ++i)
+		{
+			ProgramName[i] = glCreateProgram();
+			glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
+			glAttachShader(ProgramName[i], ShaderName[shader::FRAG_NORMALIZED + i]);
+
+			glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
+			glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName[i]);
+			Validated = Validated && glf::checkProgram(ProgramName[i]);
+
+			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
+			Validated = Validated && (UniformMVP[i] != -1);
+			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
+			Validated = Validated && (UniformDiffuse[i] != -1);
+		}
+
+		return Validated && this->checkError("initProgram");
 	}
 
-	return Validated && glf::checkError("initProgram");
-}
-
-bool initBuffer()
-{
-	glGenBuffers(1, &BufferName);
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initBuffer");;
-}
-
-bool initTexture()
-{
-	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glGenTextures(texture::MAX, TextureName);
-	glActiveTexture(GL_TEXTURE0);
-
-	for(std::size_t i = 0; i < texture::MAX; ++i)
+	bool initBuffer()
 	{
-		glBindTexture(GL_TEXTURE_2D, TextureName[i]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			static_cast<GLint>(0), 
-			TextureInternalFormat[i], 
-			static_cast<GLsizei>(Texture.dimensions().x), 
-			static_cast<GLsizei>(Texture.dimensions().y), 
-			0,
-			TextureFormat[i], 
-			GL_UNSIGNED_BYTE, 
-			Texture.data());
-	}
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-	return glf::checkError("initTexture");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+		glGenBuffers(1, &BufferName);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
-	glBindVertexArray(0);
-
-	return glf::checkError("initVertexArray");
-}
-
-bool begin()
-{
-	bool Validated = true;
-
-	if(Validated)
-		Validated = initTexture();
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initBuffer();
-	if(Validated)
-		Validated = initVertexArray();
-
-	return Validated && glf::checkError("begin");
-}
-
-bool end()
-{
-	for(std::size_t i = 0; 0 < shader::MAX; ++i)
-		glDeleteShader(ShaderName[i]);
-	glDeleteBuffers(1, &BufferName);
-	for(std::size_t i = 0; i < program::MAX; ++i)
-		glDeleteProgram(ProgramName[i]);
-	glDeleteTextures(texture::MAX, TextureName);
-	glDeleteVertexArrays(1, &VertexArrayName);
-
-	return glf::checkError("end");
-}
-
-void display()
-{
-	// Compute the MVP (Model View Projection matrix)
-	glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
-
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-	glBindVertexArray(VertexArrayName);
-	glActiveTexture(GL_TEXTURE0);
-
-	{
-		std::size_t ViewportIndex(0); 
-		glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
-
-		glUseProgram(ProgramName[program::UINT]);
-		glUniform1i(UniformDiffuse[program::UINT], 0);
-		glUniformMatrix4fv(UniformMVP[program::UINT], 1, GL_FALSE, &MVP[0][0]);
-
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8UI]);
-
-		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		return this->checkError("initBuffer");;
 	}
 
+	bool initTexture()
 	{
-		std::size_t ViewportIndex(1); 
-		glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
-		glUseProgram(ProgramName[program::NORMALIZED]);
-		glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
-		glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA16F]);
+		glGenTextures(texture::MAX, TextureName);
+		glActiveTexture(GL_TEXTURE0);
 
-		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		for(std::size_t i = 0; i < texture::MAX; ++i)
+		{
+			glBindTexture(GL_TEXTURE_2D, TextureName[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+			glTexImage2D(
+				GL_TEXTURE_2D, 
+				static_cast<GLint>(0), 
+				TextureInternalFormat[i], 
+				static_cast<GLsizei>(Texture.dimensions().x), 
+				static_cast<GLsizei>(Texture.dimensions().y), 
+				0,
+				TextureFormat[i], 
+				GL_UNSIGNED_BYTE, 
+				Texture.data());
+		}
+	
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+		return this->checkError("initTexture");
 	}
 
+	bool initVertexArray()
 	{
-		std::size_t ViewportIndex(2); 
-		glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glUseProgram(ProgramName[program::NORMALIZED]);
-		glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
-		glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+		glBindVertexArray(0);
 
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8]);
-
-		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		return this->checkError("initVertexArray");
 	}
 
+	bool begin()
 	{
-		std::size_t ViewportIndex(3); 
-		glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+		bool Validated = true;
 
-		glUseProgram(ProgramName[program::NORMALIZED]);
-		glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
-		glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+		if(Validated)
+			Validated = initTexture();
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
 
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8_SNORM]);
-
-		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		return Validated && this->checkError("begin");
 	}
 
-	glf::checkError("display");
+	bool end()
+	{
+		glDeleteShader(ShaderName[shader::FRAG_NORMALIZED]);
+		glDeleteShader(ShaderName[shader::FRAG_UINT]);
+		glDeleteShader(ShaderName[shader::VERT]);
 
-}
+		glDeleteBuffers(1, &BufferName);
+		for(std::size_t i = 0; i < program::MAX; ++i)
+			glDeleteProgram(ProgramName[i]);
+		glDeleteTextures(texture::MAX, TextureName);
+		glDeleteVertexArrays(1, &VertexArrayName);
+
+		return this->checkError("end");
+	}
+
+	bool render()
+	{
+		glm::ivec2 WindowSize(this->getWindowSize());
+
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * this->view() * Model;
+
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glBindVertexArray(VertexArrayName);
+		glActiveTexture(GL_TEXTURE0);
+
+		{
+			std::size_t ViewportIndex(0); 
+			glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+
+			glUseProgram(ProgramName[program::UINT]);
+			glUniform1i(UniformDiffuse[program::UINT], 0);
+			glUniformMatrix4fv(UniformMVP[program::UINT], 1, GL_FALSE, &MVP[0][0]);
+
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8UI]);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		}
+
+		{
+			std::size_t ViewportIndex(1); 
+			glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+
+			glUseProgram(ProgramName[program::NORMALIZED]);
+			glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
+			glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA16F]);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		}
+
+		{
+			std::size_t ViewportIndex(2); 
+			glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+
+			glUseProgram(ProgramName[program::NORMALIZED]);
+			glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
+			glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8]);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		}
+
+		{
+			std::size_t ViewportIndex(3); 
+			glViewport(Viewport[ViewportIndex].x, Viewport[ViewportIndex].y, Viewport[ViewportIndex].z, Viewport[ViewportIndex].w);
+
+			glUseProgram(ProgramName[program::NORMALIZED]);
+			glUniform1i(UniformDiffuse[program::NORMALIZED], 0);
+			glUniformMatrix4fv(UniformMVP[program::NORMALIZED], 1, GL_FALSE, &MVP[0][0]);
+
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGBA8_SNORM]);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		}
+
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(argc, argv, glf::CORE, 3, 2);
+	int Error(0);
+
+	gl_320_texture_format Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

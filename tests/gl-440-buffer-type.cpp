@@ -1,13 +1,25 @@
-//**********************************
-// OpenGL Buffer Type
-// 10/05/2010
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
 
@@ -120,12 +132,19 @@ namespace
 			MAX
 		};
 	}//namespace viewport
+}//namespace
 
-	GLuint PipelineName(0);
-	GLuint ProgramName(0);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	std::vector<GLuint> VertexArrayName(vertex_format::MAX);
+class gl_440_buffer_type : public test
+{
+public:
+	gl_440_buffer_type(int argc, char* argv[]) :
+		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 4),
+		PipelineName(0),
+		ProgramName(0),
+		UniformPointer(nullptr)
+	{}
 
+private:
 	struct view
 	{
 		view(){}
@@ -141,33 +160,22 @@ namespace
 		vertex_format::type VertexFormat;
 	};
 
-	std::vector<view> Viewport(viewport::MAX);
-	glm::mat4* UniformPointer(NULL);
-}//namespace
+	std::array<view, viewport::MAX> Viewport;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, vertex_format::MAX> VertexArrayName;
+	GLuint PipelineName;
+	GLuint ProgramName;
+	glm::mat4* UniformPointer;
 
-class gl_440_buffer_type : public test
-{
-public:
-	gl_320_texture2d(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-type", test::CORE, 3, 2)
-	{}
-
-private:
 	bool initProgram()
 	{
 		bool Validated(true);
 		
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, 
-				glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-				"--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-				glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-				"--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -182,9 +190,12 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -212,18 +223,14 @@ private:
 		glBufferStorage(GL_ARRAY_BUFFER, GLsizeiptr(Data.size()), &Data[0], 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
@@ -264,12 +271,12 @@ private:
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initVertexArray");
+		return this->checkError("initVertexArray");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
-		glm::vec2 ViewportSize(Window.Size.x * 0.33f, Window.Size.y * 0.50f);
+		glm::vec2 ViewportSize = glm::vec2(this->getWindowSize()) * glm::vec2(0.33f, 0.50f);
 
 		Viewport[viewport::VIEWPORT0] = view(glm::vec4(ViewportSize.x * 0.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::F16);
 		Viewport[viewport::VIEWPORT1] = view(glm::vec4(ViewportSize.x * 1.0f, ViewportSize.y * 0.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::I32);
@@ -292,37 +299,35 @@ private:
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
 		if(!UniformPointer)
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
-			UniformPointer = NULL;
+			UniformPointer = nullptr;
 		}
 
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteVertexArrays(vertex_format::MAX, &VertexArrayName[0]);
 		glDeleteProgramPipelines(1, &PipelineName);
 		glDeleteProgram(ProgramName);
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
+		glm::ivec2 WindowSize = this->getWindowSize();
+
 		{
 			// Compute the MVP (Model View Projection matrix)
-			float Aspect = (Window.Size.x * 0.33f) / (Window.Size.y * 0.50f);
+			float Aspect = (WindowSize.x * 0.33f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 ViewTranslateZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-			glm::mat4 ViewRotateX = glm::rotate(ViewTranslateZ, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-			glm::mat4 ViewRotateY = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-			glm::mat4 View = ViewRotateY;
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 MVP = Projection * this->test::view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}
@@ -345,6 +350,8 @@ private:
 			glBindVertexArray(VertexArrayName[Viewport[Index].VertexFormat]);
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		}
+
+		return true;
 	}
 };
 

@@ -1,13 +1,25 @@
-//**********************************
-// OpenGL Draw Elements
-// 10/05/2010 - 12/03/2012
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
 
@@ -17,8 +29,8 @@ namespace
 	char const * FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
 
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
-	glm::uint32 const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);
+	glm::uint16 const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		0, 2, 3
@@ -34,19 +46,27 @@ namespace
 		glm::vec2(-1.0f, 1.0f)
 	};
 
-	GLuint VertexArrayName = 0;
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			ELEMENT,
+			MAX
+		};
+	}//namespace buffer
+
+	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint ProgramName = 0;
-	GLuint ArrayBufferName = 0;
-	GLuint ElementBufferName = 0;
 	GLint UniformMVP = 0;
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class es_300_draw_elements : public test
+class es_200_draw_elements : public test
 {
 public:
-	es_300_draw_elements(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2)
+	es_200_draw_elements(int argc, char* argv[]) :
+		test(argc, argv, "es-200-draw-elements", test::ES, 2, 0)
 	{}
 
 private:
@@ -57,8 +77,8 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAGMENT_SHADER_SOURCE);
+			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertexShaderName);
@@ -91,25 +111,25 @@ private:
 			glUseProgram(0);
 		}
 
-		return Validated && glf::checkError("initProgram");
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
 	{
-		glGenBuffers(1, &ArrayBufferName);
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glGenBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glGenBuffers(1, &ElementBufferName);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return glf::checkError("initBuffer");
+		return this->checkError("initBuffer");
 	}
 
-	virtual int begin()
+	bool begin()
 	{
 		bool Validated(true);
 
@@ -121,31 +141,27 @@ private:
 		if(Validated)
 			Validated = initBuffer();
 
-		return Validated ? EXIT_SUCCESS : EXIT_FAILURE;
+		return Validated;
 	}
 
-	virtual int end()
+	bool end()
 	{
-		// Delete objects
-		glDeleteBuffers(1, &ArrayBufferName);
-		glDeleteBuffers(1, &ElementBufferName);
+		glDeleteBuffers(static_cast<GLsizei>(BufferName.size()), &BufferName[0]);
 		glDeleteProgram(ProgramName);
 
-		return glf::checkError("end") ? EXIT_SUCCESS : EXIT_FAILURE;
+		return true;
 	}
 
-	virtual void render()
+	bool render()
 	{
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
+		glm::mat4 MVP = Projection * this->view() * Model;
 
 		// Set the display viewport
-		glViewport(0, 0, Window.Size.x, Window.Size.y);
+		glm::ivec2 WindowSize = this->getWindowSize();
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
 		// Clear color buffer with black
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -158,19 +174,19 @@ private:
 		// Set the value of MVP uniform.
 		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
 		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-
-		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, 0);
-
+			glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0);
 		glDisableVertexAttribArray(glf::semantic::attr::POSITION);
 
 		// Unbind program
 		glUseProgram(0);
+
+		return true;
 	}
 };
 
