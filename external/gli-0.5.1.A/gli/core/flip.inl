@@ -29,7 +29,7 @@
 namespace gli{
 namespace detail
 {
-	inline void flip(image & ImageDst, image & ImageSrc, std::size_t BlockSize)
+	inline void flip(image ImageDst, image ImageSrc, std::size_t BlockSize)
 	{
 		std::size_t const LineSize = BlockSize * ImageDst.dimensions().x;
 
