@@ -290,7 +290,7 @@ private:
 		for(GLint i = 0; i < 2; ++i)
 		{
 			glProgramUniform1i(ProgramName, UniformInstance, i);
-			glDrawElementsInstancedBaseVertexBaseInstance(GL_QUADS, ElementCount, GL_FLOAT, 0, 1, 0,-1);
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLE_STRIP, ElementCount, GL_FLOAT, 0, 1, 0,-1);
 		}
 
 		return true;
