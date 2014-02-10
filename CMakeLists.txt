@@ -14,6 +14,12 @@ if(MSVC)
 	set(BINARY_DIRECTORY build)
 endif()
 
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel") AND UNIX))
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+	set(CMAKE_CXX_FLAGS "-std=c++11")
+endif()
+
 ################################
 # Add GLEXT 
 
@@ -69,8 +75,14 @@ add_definitions(-DFREEIMAGE_LIB)
 set(FREEIMAGE_DIRECTORY FreeImage-3.15.4)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY})
-set(FREEIMAGE_LIBRARY FreeImage.lib)
-set(FREEIMAGE_BINARY_FILE FreeImage.dll)
+
+if(MSVC)
+	set(FREEIMAGE_LIBRARY FreeImage.lib)
+	set(FREEIMAGE_BINARY_FILE FreeImage.dll)
+else()
+	set(FREEIMAGE_LIBRARY FreeImage)
+	set(FREEIMAGE_BINARY_FILE FreeImage)
+endif()
 
 ################################
 # Add GLM 
