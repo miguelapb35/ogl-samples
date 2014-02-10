@@ -96,7 +96,7 @@ private:
 
 		glGetProgramiv(ProgramName, GL_PROGRAM_BINARY_LENGTH, &Size);
 		std::vector<glm::byte> Data(Size);
-		glGetProgramBinary(ProgramName, Size, NULL, &Format, &Data[0]);
+		glGetProgramBinary(ProgramName, Size, nullptr, &Format, &Data[0]);
 		glf::saveBinary(String, Format, Data, Size);
 
 		return this->checkError("saveProgram");

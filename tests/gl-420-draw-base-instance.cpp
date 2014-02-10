@@ -87,7 +87,7 @@ class gl_420_draw_base_instance : public test
 {
 public:
 	gl_420_draw_base_instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-draw-base-instance", test::CORE, 4, 2)
+		test(argc, argv, "gl-420-draw-base-instance", test::CORE, 4, 2, glm::ivec2(640, 480), - glm::vec2(-glm::pi<float>() * 0.2f))
 	{}
 
 private:

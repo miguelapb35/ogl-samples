@@ -327,19 +327,19 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
-		glViewportIndexedf(0, 0, 0, GLfloat(WindowSize.x) / 2.0f, GLfloat(WindowSize.y));
-		glViewportIndexedf(1, GLfloat(WindowSize.x) / 2.0f, 0, GLfloat(WindowSize.x) / 2.0f, GLfloat(WindowSize.y));
-
 		glUseProgram(ProgramName);
 		std::vector<GLuint> Index(2);
 		Index[0] = sementics::sampling::RGB8;
 		Index[1] = sementics::sampling::DXT1;
-		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(Index.size()), &Index[0]);
+		
+		glViewportIndexedf(0, 0, 0, GLfloat(WindowSize.x) / 2.0f, GLfloat(WindowSize.y));
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(1), &Index[0]);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, nullptr, 1, 0);
 
-		//glProgramUniformSubroutines(ProgramName, GL_FRAGMENT_SHADER, GLintptr offset, GLsizeiptr size, GLsizei stride);
-
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, NULL, 2, 0);
-
+		glViewportIndexedf(0, GLfloat(WindowSize.x) / 2.0f, 0, GLfloat(WindowSize.x) / 2.0f, GLfloat(WindowSize.y));
+		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, GLsizei(1), &Index[1]);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, nullptr, 1, 0);
+		
 		return true;
 	}
 };

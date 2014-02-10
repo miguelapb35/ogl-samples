@@ -297,7 +297,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
 		//glDrawBuffer(GL_NONE); // AMD workaround glDrawBuffer* is not FBO states
-		if(this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
+		if(this->checkFramebuffer(FramebufferName[framebuffer::SHADOW]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

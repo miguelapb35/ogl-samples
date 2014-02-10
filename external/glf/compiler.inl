@@ -323,7 +323,7 @@ namespace glf
 		GLint const & Size
 	)
 	{
-		FILE* File = fopen(Filename.c_str(), "w");
+		FILE* File = fopen(Filename.c_str(), "wb");
 
 		if(File)
 		{
