@@ -167,10 +167,11 @@ protected:
 		GLuint baseInstance;
 	};
 
-	enum template_test
+	enum success
 	{
-		TEMPLATE_TEST_IGNORE,
-		TEMPLATE_TEST_EXECUTE
+		RUN_ONLY,
+		GENERATE_ERROR,
+		MATCH_TEMPLATE
 	};
 
 	enum mouse_button
@@ -195,12 +196,12 @@ protected:
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
 		std::size_t FrameCount = 2,
-		template_test TemplateTest = TEMPLATE_TEST_EXECUTE);
+		success Success = MATCH_TEMPLATE);
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
-		template_test TemplateTest = TEMPLATE_TEST_EXECUTE);
+		success Success = MATCH_TEMPLATE);
 	virtual ~test();
 
 	virtual bool begin() = 0;
@@ -230,7 +231,7 @@ protected:
 
 private:
 	GLFWwindow* Window;
-	template_test const TemplateTest;
+	success const Success;
 	std::string const Title;
 	profile const Profile;
 	int const Major;
@@ -245,6 +246,7 @@ private:
 	glm::vec2 RotationCurrent;
 	int MouseButtonFlags;
 	std::array<bool, 512> KeyPressed;
+	bool Error;
 
 private:
 	double TimeSum, TimeMin, TimeMax;

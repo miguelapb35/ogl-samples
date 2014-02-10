@@ -90,9 +90,9 @@ test::test
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
 	glm::vec2 const & Orientation,
-	template_test TemplateTest
+	success Success
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, TemplateTest)
+	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, Success)
 {}
 
 test::test
@@ -100,10 +100,10 @@ test::test
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
 	glm::ivec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
-	std::size_t FrameCount, template_test TemplateTest
+	std::size_t FrameCount, success Success
 ) :
 	Window(nullptr),
-	TemplateTest(TemplateTest),
+	Success(Success),
 	Title(Title),
 	Profile(Profile),
 	Major(Major),
@@ -119,7 +119,8 @@ test::test
 	TranlationCurrent(Position),
 	RotationOrigin(Orientation), 
 	RotationCurrent(Orientation),
-	MouseButtonFlags(0)
+	MouseButtonFlags(0),
+	Error(false)
 {
 	memset(&KeyPressed[0], 0, sizeof(KeyPressed));
 
@@ -211,7 +212,7 @@ int test::operator()()
 
 	std::size_t FrameNum = 0;
 
-	while(true && Result == EXIT_SUCCESS)
+	while(true && Result == EXIT_SUCCESS && !this->Error)
 	{
 		Result = this->render() ? EXIT_SUCCESS : EXIT_FAILURE;
 		Result = Result && this->checkError("render");
@@ -220,7 +221,7 @@ int test::operator()()
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
 		{
 			//if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && (this->Profile == CORE || (this->Profile == ES && version(this->Major, this->Minor) >= version(3, 0))))
-			if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && this->Profile == CORE)
+			if(this->Success == MATCH_TEMPLATE && this->Profile == CORE)
 			{
 				if(!checkTemplate(this->Window, this->Title.c_str()))
 					Result = EXIT_FAILURE;
@@ -240,7 +241,10 @@ int test::operator()()
 	if(Result == EXIT_SUCCESS)
 		Result = this->end() ? EXIT_SUCCESS : EXIT_FAILURE;
 
-	return Result;
+	if(this->Success == GENERATE_ERROR)
+		return (Result != EXIT_SUCCESS || this->Error) ? EXIT_SUCCESS : EXIT_FAILURE;
+	else
+		return (Result == EXIT_SUCCESS && !this->Error) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 void test::swap()
@@ -550,8 +554,10 @@ void APIENTRY test::debugOutput
 	GLvoid* userParam
 )
 {
+	assert(userParam);
+	test* Test = static_cast<test*>(userParam);
+	
 	char debSource[32], debType[32], debSev[32];
-	bool Error(false);
 
 	if(source == GL_DEBUG_SOURCE_API_ARB)
 		strcpy(debSource, "OpenGL");
@@ -592,7 +598,7 @@ void APIENTRY test::debugOutput
 	if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 	{
 		strcpy(debSev, "high");
-		Error = true;
+		Test->Error = true;
 	}
 	else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
 		strcpy(debSev, "medium");
@@ -604,5 +610,7 @@ void APIENTRY test::debugOutput
 		assert(0);
 
 	fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
-	assert(!Error);
+
+	if(Test->Success != GENERATE_ERROR)
+		assert(!Test->Error);
 }

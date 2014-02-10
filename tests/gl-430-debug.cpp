@@ -73,7 +73,7 @@ class gl_430_debug : public test
 {
 public:
 	gl_430_debug(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-debug", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-debug", test::CORE, 4, 3, glm::vec2(0), test::GENERATE_ERROR),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -102,7 +102,7 @@ private:
 
 			ProgramName[program::VERTEX] = glCreateProgram();
 
-			glObjectLabel(GL_PROGRAM, PipelineName, -1, "Vertex Program object");
+			glObjectLabel(GL_PROGRAM, ProgramName[program::VERTEX], -1, "Vertex Program object");
 
 			glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::VERTEX], VertShaderName);
@@ -111,7 +111,7 @@ private:
 
 			ProgramName[program::FRAGMENT] = glCreateProgram();
 
-			glObjectLabel(GL_PROGRAM, PipelineName, -1, "Fragment Program object");
+			glObjectLabel(GL_PROGRAM, ProgramName[program::FRAGMENT], -1, "Fragment Program object");
 
 			glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
@@ -150,11 +150,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glObjectLabel(GL_BUFFER, BufferName[buffer::TRANSFORM], -1, "Uniform Buffer object");
@@ -185,7 +181,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_LINEAR); // Generates an error GL_LINEAR instead of GL_ALPHA 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_LINEAR); // Generates an error GL_LINEAR instead of GL_ALPHA 
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
@@ -240,9 +236,9 @@ private:
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallback(&test::debugOutput, NULL);
+		glDebugMessageCallback(&test::debugOutput, this);
 
-		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Messafge test: Begin");
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Message test: Begin");
 
 			GLuint MessageId(4);
 			glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_FALSE);
@@ -318,10 +314,7 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glPushDebugGroup(
-			GL_DEBUG_SOURCE_APPLICATION, 
-			1, 
-			-1, "Frame");
+		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Frame");
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
