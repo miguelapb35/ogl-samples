@@ -201,57 +201,6 @@ if(MSVC)
 endif(MSVC)
 
 ################################
-# function to create a project for the sample in the solution
-
-function(createSample NAME)
-	file(GLOB PROJECT_SOURCE *.cpp)
-	file(GLOB_RECURSE PROJECT_SHADER *.vert *.frag *.geom *.cont *.eval *.glsl *.vs *.fs *.gs *.ps *.es)
-	file(GLOB PROJECT_INLINE *.inl)
-	file(GLOB PROJECT_HEADER *.hpp)
-	file(GLOB PROJECT_TEXT readme.txt)
-
-	source_group("Text Files" FILES ${PROJECT_TEXT})
-	source_group("Inline Files" FILES ${PROJECT_INLINE})
-	source_group("Shader Files" FILES ${PROJECT_SHADER})
-
-	add_executable(${NAME} ${PROJECT_SOURCE} ${PROJECT_INLINE} ${PROJECT_HEADER} ${PROJECT_SHADER} ${PROJECT_TEXT})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
-
-	add_dependencies(${NAME} glfw GLEW)
-	target_link_libraries(${NAME} ${BINARY_FILES})
-	install ( TARGETS ${NAME} DESTINATION .)
-endfunction(createSample)
-
-function(createSampleWGL NAME)
-	file(GLOB PROJECT_SOURCE *.cpp)
-	file(GLOB_RECURSE PROJECT_SHADER *.vert *.frag *.geom *.cont *.eval *.glsl)
-	file(GLOB PROJECT_INLINE *.inl)
-	file(GLOB PROJECT_HEADER *.hpp)
-	file(GLOB PROJECT_TEXT readme.txt)
-
-	source_group("Text Files" FILES ${PROJECT_TEXT})
-	source_group("Inline Files" FILES ${PROJECT_INLINE})
-	source_group("Shader Files" FILES ${PROJECT_SHADER})
-
-	add_executable(${NAME} WIN32 ${PROJECT_SOURCE} ${PROJECT_INLINE} ${PROJECT_HEADER} ${PROJECT_SHADER} ${PROJECT_TEXT})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
-
-	add_dependencies(${NAME} GLEW glfw)
-	target_link_libraries(${NAME} ${BINARY_FILES})
-	install ( TARGETS ${NAME} DESTINATION .)
-endfunction(createSampleWGL)
-
-################################
 # Add subdirectory
 
 add_subdirectory(tests)

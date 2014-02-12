@@ -20,9 +20,6 @@ function(glCreateSampleGTC NAME)
 	install(TARGETS ${SAMPLE_NAME} DESTINATION .)
 endfunction(glCreateSampleGTC)
 
-#add_subdirectory(gl-alpha-to-coverage)
-#add_subdirectory(gl-buffer-render)
-
 if(NOT APPLE)
 
 # OpenGL ES 2.0 samples
