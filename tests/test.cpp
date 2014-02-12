@@ -67,7 +67,7 @@ namespace
 		}
 
 		if(!Success)
-			glf::save_png(Texture, (getDataDirectory() + "./results/" + vendor() + Title + ".png").c_str());
+			glf::save_png(Texture, (std::string("./") + Title + ".png").c_str());
 
 		return Success;
 	}
@@ -75,14 +75,7 @@ namespace
 
 std::string getDataDirectory()
 {
-#	if defined(WIN32)
-		return std::string("../data/");
-#	elif defined(__APPLE__)
-		return std::string("../data/");
-#	else
-		// For packages.
-		return std::string("data/");
-#	endif
+	return std::string(OGL_SAMPLES_SOURCE_DIR) + "/data/";
 }
 
 test::test
@@ -174,7 +167,7 @@ test::test
 			{
 				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-				glDebugMessageCallbackARB(&test::debugOutput, NULL);
+				glDebugMessageCallbackARB(&test::debugOutput, this);
 			}
 	#	endif
 

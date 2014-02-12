@@ -20,6 +20,8 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" 
 	set(CMAKE_CXX_FLAGS "-std=c++11")
 endif()
 
+add_definitions(-DOGL_SAMPLES_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
 ################################
 # Add GLEXT 
 
@@ -176,31 +178,6 @@ else(MSVC)
 		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/Release )
 	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(MSVC)
-
-################################
-# Add custom target to copy all data
-
-if(APPLE)
-	add_custom_target(
-		${TARGET_DATA_COPY}
-		COMMAND ls)
-
-else(APPLE)
-	set(TARGET_DATA_COPY DATA_COPY)
-
-	if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-		add_custom_target(
-			${TARGET_DATA_COPY}
-			COMMAND ${CMAKE_COMMAND} -E echo "In source build")
-	else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-		add_custom_target(
-			${TARGET_DATA_COPY}
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data/
-			COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE} ${COPY_OUTPUT_PATH})
-	endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-endif(APPLE)
-
-set(OGL_DATA_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 ################################
 # Add options

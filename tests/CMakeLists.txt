@@ -12,18 +12,12 @@ function(glCreateSampleGTC NAME)
 	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${COMMON_SOURCE} ${SHADER_PATH})
 	add_custom_command(
 		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
-	if(WIN32)
-		add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
-	endif(WIN32)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
 	add_dependencies(${SAMPLE_NAME} GLEW glfw)
-	install ( TARGETS ${SAMPLE_NAME} DESTINATION .)
+	install(TARGETS ${SAMPLE_NAME} DESTINATION .)
 endfunction(glCreateSampleGTC)
 
 #add_subdirectory(gl-alpha-to-coverage)
