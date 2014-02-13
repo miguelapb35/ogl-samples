@@ -78,11 +78,11 @@ if(APPLE)
 endif()
 
 if(UNIX AND NOT APPLE AND CMAKE_CL_64)
-	set(FREEIMAGE_BINARY_DIRECTORY "win64")
+	set(FREEIMAGE_BINARY_DIRECTORY "linux64")
 endif()
 
 if(UNIX AND NOT APPLE AND NOT CMAKE_CL_64)
-	set(FREEIMAGE_BINARY_DIRECTORY "win64")
+	set(FREEIMAGE_BINARY_DIRECTORY "linux64")
 endif()
 
 add_definitions(-DFREEIMAGE_LIB)
@@ -94,14 +94,14 @@ if(MSVC)
 	set(FREEIMAGE_LIBRARY FreeImage.lib)
 	set(FREEIMAGE_BINARY_FILE FreeImage.dll)
 else()
-	set(FREEIMAGE_LIBRARY FreeImage)
-	set(FREEIMAGE_BINARY_FILE FreeImage)
+	set(FREEIMAGE_LIBRARY freeimage)
+	set(FREEIMAGE_BINARY_FILE freeimage)
 endif()
 
 ################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.5.1)
+set(GLM_DIRECTORY glm-0.9.5.3)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################

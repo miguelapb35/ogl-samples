@@ -23,6 +23,7 @@
 
 #include "csv.hpp"
 #include <cstdio>
+#include <cstring>
 
 std::string format(const char * Message, ...)
 {

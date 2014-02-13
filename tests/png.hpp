@@ -24,6 +24,7 @@
 #ifndef PNG_INCLUDED
 #define PNG_INCLUDED
 
+#define GLM_FORCE_RADIANS
 #include <gli/gli.hpp>
 
 namespace glf
