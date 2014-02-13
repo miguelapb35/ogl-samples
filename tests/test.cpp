@@ -145,7 +145,13 @@ test::test
 #		endif
 	}
 
-	this->Window = glfwCreateWindow(WindowSize.x, WindowSize.y, argv[0], NULL,NULL);
+#	if defined(__APPLE__)
+		int const DPI = 2;
+#	else
+		int const DPI = 1;
+#	endif
+	
+	this->Window = glfwCreateWindow(WindowSize.x / DPI, WindowSize.y / DPI, argv[0], NULL,NULL);
 
 	if(this->Window)
 	{
@@ -161,7 +167,7 @@ test::test
 		glewInit();
 		glGetError();
 
-	#	ifdef GL_ARB_debug_output
+#		ifdef GL_ARB_debug_output
 			if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
 			if(this->isExtensionSupported("GL_ARB_debug_output"))
 			{
@@ -169,7 +175,7 @@ test::test
 				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 				glDebugMessageCallbackARB(&test::debugOutput, this);
 			}
-	#	endif
+#		endif
 
 		glGenQueries(1, &this->TimerQueryName);
 	}

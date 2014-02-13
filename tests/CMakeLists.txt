@@ -239,8 +239,6 @@ glCreateSampleGTC(program-binary)
 set(GL_SHADER_GTC separate.vert separate.frag)
 glCreateSampleGTC(program-separate)
 
-if(NOT APPLE)
-
 # OpenGL 4.2 samples
 set(GL_VERSION_GTC 420)
 
@@ -372,5 +370,3 @@ set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-compressed)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
-
-endif(NOT APPLE)
