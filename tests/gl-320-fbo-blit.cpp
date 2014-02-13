@@ -50,12 +50,12 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
 	vertex const VertexData[VertexCount] =
 	{
-		vertex(glm::vec2(-3.0f,-3.0f), glm::vec2(0.0f, 0.0f)),
-		vertex(glm::vec2( 3.0f,-3.0f), glm::vec2(1.0f, 0.0f)),
-		vertex(glm::vec2( 3.0f, 3.0f), glm::vec2(1.0f, 1.0f)),
-		vertex(glm::vec2( 3.0f, 3.0f), glm::vec2(1.0f, 1.0f)),
-		vertex(glm::vec2(-3.0f, 3.0f), glm::vec2(0.0f, 1.0f)),
-		vertex(glm::vec2(-3.0f,-3.0f), glm::vec2(0.0f, 0.0f))
+		vertex(glm::vec2(-1.5f,-1.5f), glm::vec2(0.0f, 0.0f)),
+		vertex(glm::vec2( 1.5f,-1.5f), glm::vec2(1.0f, 0.0f)),
+		vertex(glm::vec2( 1.5f, 1.5f), glm::vec2(1.0f, 1.0f)),
+		vertex(glm::vec2( 1.5f, 1.5f), glm::vec2(1.0f, 1.0f)),
+		vertex(glm::vec2(-1.5f, 1.5f), glm::vec2(0.0f, 1.0f)),
+		vertex(glm::vec2(-1.5f,-1.5f), glm::vec2(0.0f, 0.0f))
 	};
 
 	namespace framebuffer
@@ -322,14 +322,15 @@ private:
 		int const Tile = 4;
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
-
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		
 		for(int j = 0; j < Tile; ++j)
 		for(int i = 0; i < Tile; ++i)
 		{
 			if((i + j) % 2)
 				continue;
 
-			glBlitFramebuffer(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 
+			glBlitFramebuffer(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 				FRAMEBUFFER_SIZE.x / Tile * (i + 0) + Border, 
 				FRAMEBUFFER_SIZE.x / Tile * (j + 0) + Border, 
 				FRAMEBUFFER_SIZE.y / Tile * (i + 1) - Border, 
@@ -340,7 +341,7 @@ private:
 		// Pass 2
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 		renderFB();
 
 		return true;

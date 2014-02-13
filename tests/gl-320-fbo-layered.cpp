@@ -311,7 +311,8 @@ private:
 		// Pass 2
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
+			
 			glUseProgram(ProgramName[program::SPLASH]);
 			glUniformMatrix4fv(UniformMVP[program::SPLASH], 1, GL_FALSE, &MVP[0][0]);
 			glUniform1i(UniformDiffuse, 0);

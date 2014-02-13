@@ -155,11 +155,11 @@ private:
 
 	bool end()
 	{
+		glDeleteProgram(ProgramName);
 		glDeleteShader(ShaderName[shader::FRAG]);
 		glDeleteShader(ShaderName[shader::VERT]);
 
 		glDeleteBuffers(1, &BufferName);
-		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
 		return this->checkError("end");
