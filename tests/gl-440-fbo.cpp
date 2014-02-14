@@ -324,27 +324,30 @@ private:
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
+		glm::u8vec4 Color[] = {
+			{255, 127,   0, 255},
+			{  0, 127, 255, 255}};
+		
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
-		glClearTexImage(TextureName[texture::COLORBUFFER], 0, 
-			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(255, 127,   0, 255));
-		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
+		glClearTexImage(TextureName[texture::COLORBUFFER], 0, GL_RGBA, GL_UNSIGNED_BYTE, &Color[0][0]);
+		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0,
 			64, 64, 0,
 			64, 64, 1,
-			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
-		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
+			GL_RGBA, GL_UNSIGNED_BYTE, &Color[1][0]);
+		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0,
 			256, 0, 0,
 			128, 128, 1,
-			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
-		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
+			GL_RGBA, GL_UNSIGNED_BYTE, &Color[1][0]);
+		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0,
 			128, 384, 0,
 			64, 64, 1,
-			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
-		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0, 
+			GL_RGBA, GL_UNSIGNED_BYTE, &Color[1][0]);
+		glClearTexSubImage(TextureName[texture::COLORBUFFER], 0,
 			512, 256, 0,
 			64, 64, 1,
-			GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(  0, 127, 255, 255));
+			GL_RGBA, GL_UNSIGNED_BYTE, &Color[1][0]);
 
 		glBindProgramPipeline(PipelineName[pipeline::TEXTURE]);
 		glActiveTexture(GL_TEXTURE0);
