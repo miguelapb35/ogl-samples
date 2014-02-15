@@ -277,18 +277,24 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated;
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
-		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
-		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
-		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
-		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);
+		
+		this->checkError("end 1");
+		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
+		this->checkError("end 2");
+		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
+		this->checkError("end 3");
+		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
+		this->checkError("end 4");
+		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
+		
+		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);

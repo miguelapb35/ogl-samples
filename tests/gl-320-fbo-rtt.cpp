@@ -281,13 +281,18 @@ private:
 
 	bool end()
 	{
+		for(std::size_t i = 0; i < program::MAX; ++i)
+			glDeleteProgram(ProgramName[i]);
+		
+		this->checkError("end 1");
+		
 		glDeleteShader(ShaderName[shader::FRAG1]);
 		glDeleteShader(ShaderName[shader::VERT1]);
 		glDeleteShader(ShaderName[shader::FRAG2]);
 		glDeleteShader(ShaderName[shader::VERT2]);
 
-		for(std::size_t i = 0; i < program::MAX; ++i)
-			glDeleteProgram(ProgramName[i]);
+		this->checkError("end 2");
+		
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteFramebuffers(1, &FramebufferName);

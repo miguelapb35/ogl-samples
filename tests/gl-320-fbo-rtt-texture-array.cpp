@@ -264,13 +264,18 @@ private:
 
 	bool end()
 	{
+		for(std::size_t i = 0; i < program::MAX; ++i)
+			glDeleteProgram(ProgramName[i]);
+		
+		this->checkError("end 0");
+		
 		glDeleteShader(ShaderName[shader::FRAG_MULTIPLE]);
 		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
 		glDeleteShader(ShaderName[shader::VERT_MULTIPLE]);
 		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
 
-		for(std::size_t i = 0; i < program::MAX; ++i)
-			glDeleteProgram(ProgramName[i]);
+		this->checkError("end 1");
+		
 		glDeleteBuffers(1, &BufferName);
 		glDeleteTextures(1, &TextureName);
 		glDeleteFramebuffers(1, &FramebufferName);

@@ -77,16 +77,6 @@ namespace
 			MAX
 		};
 	}//namespace texture
-
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
 }//namespace
 
 class gl_320_fbo_blit : public test
@@ -103,7 +93,6 @@ public:
 	{}
 
 private:
-	std::array<GLuint, shader::MAX> ShaderName;
 	std::array<GLuint, texture::MAX> TextureName;
 	std::array<GLuint, framebuffer::MAX> FramebufferName;
 	GLuint VertexArrayName;
@@ -122,18 +111,22 @@ private:
 		// Create program
 		if(Validated)
 		{
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
@@ -284,10 +277,8 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
-		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
+		glDeleteBuffers(1, &BufferName);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteRenderbuffers(1, &ColorRenderbufferName);
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);

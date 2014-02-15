@@ -88,7 +88,7 @@ private:
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
-			glAttachShader(ProgramName, FragShaderName);
+			glAttachShader(ProgramName, FragShaderName);			
 			glDeleteShader(VertShaderName);
 			glDeleteShader(FragShaderName);
 
@@ -160,7 +160,6 @@ private:
 
 	bool initBuffer()
 	{
-		// Generate buffer objects
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -170,15 +169,11 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+		
 		GLint UniformBlockSize = 0;
 
 		{
-			glGetActiveUniformBlockiv(
-				ProgramName, 
-				UniformTransform,
-				GL_UNIFORM_BLOCK_DATA_SIZE,
-				&UniformBlockSize);
+			glGetActiveUniformBlockiv(ProgramName, UniformTransform, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, 0, GL_DYNAMIC_DRAW);
@@ -188,11 +183,7 @@ private:
 		{
 			glm::vec4 Diffuse(1.0f, 0.5f, 0.0f, 1.0f);
 
-			glGetActiveUniformBlockiv(
-				ProgramName, 
-				UniformMaterial,
-				GL_UNIFORM_BLOCK_DATA_SIZE,
-				&UniformBlockSize);
+			glGetActiveUniformBlockiv(ProgramName, UniformMaterial, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
 			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, &Diffuse[0], GL_DYNAMIC_DRAW);

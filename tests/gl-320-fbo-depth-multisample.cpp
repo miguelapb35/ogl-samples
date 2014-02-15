@@ -159,7 +159,7 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 		}
 
-		return Validated;
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -175,18 +175,14 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return true;
+		return this->checkError("initBuffer");
 	}
 
 	bool initTexture()
@@ -208,31 +204,36 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
+		
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
+			glCompressedTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
 				0, 
-				GLsizei(Texture[Level].size()), 
+				GLsizei(Texture[Level].size()),
 				Texture[Level].data());
 		}
-
+		
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE]);
+		
+		this->checkError("initTexture 1");
+		
 		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0);
+		
+		this->checkError("initTexture 2");
+		
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
-
+		
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return Validated && this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -253,7 +254,7 @@ private:
 		glBindVertexArray(VertexArrayName[program::SPLASH]);
 		glBindVertexArray(0);
 
-		return true;
+		return this->checkError("initVertexArray");
 	}
 
 	bool initFramebuffer()
@@ -268,7 +269,7 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);	
-		return true;
+		return this->checkError("initFramebuffer");
 	}
 
 	bool begin()
@@ -286,7 +287,7 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated;
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
