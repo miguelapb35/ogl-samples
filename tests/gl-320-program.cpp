@@ -88,7 +88,7 @@ private:
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
-			glAttachShader(ProgramName, FragShaderName);			
+			glAttachShader(ProgramName, FragShaderName);
 			glDeleteShader(VertShaderName);
 			glDeleteShader(FragShaderName);
 

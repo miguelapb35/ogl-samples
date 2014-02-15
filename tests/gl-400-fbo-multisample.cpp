@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-400/multisample.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-400/multisample.frag");
+	char const * VERT_SHADER_SOURCE("gl-400/multisample.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/multisample.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(80, 60);
 
@@ -83,17 +83,20 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertexShader, VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragmentShader, FRAGMENT_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertexShader);
-			glAttachShader(ProgramName, FragmentShader);
-			glDeleteShader(VertexShader);
-			glDeleteShader(FragmentShader);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
@@ -107,7 +110,7 @@ private:
 		return Validated && this->checkError("initProgram");
 	}
 
-	bool initVertexBuffer()
+	bool initBuffer()
 	{
 		glGenBuffers(BUFFER_MAX, BufferName);
 
@@ -119,14 +122,13 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initArrayBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerName);
 
-		// Parameters part of the sampler object:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -228,7 +230,7 @@ private:
 		if(Validated)
 			Validated = initSampler();
 		if(Validated)
-			Validated = initVertexBuffer();
+			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
 		if(Validated)

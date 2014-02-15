@@ -101,11 +101,14 @@ private:
 			glAttachShader(ProgramName[0], ContShader);
 			glAttachShader(ProgramName[0], EvalShader);
 			glAttachShader(ProgramName[0], FragShader);
-			glDeleteShader(VertShader);
-			glDeleteShader(GeomShader);
-			glDeleteShader(ContShader);
-			glDeleteShader(EvalShader);
-			glDeleteShader(FragShader);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShader);
+				glDeleteShader(GeomShader);
+				glDeleteShader(ContShader);
+				glDeleteShader(EvalShader);
+				glDeleteShader(FragShader);
+#			endif
 
 			glLinkProgram(ProgramName[0]);
 			Validated = Validated && glf::checkProgram(ProgramName[0]);
@@ -132,9 +135,12 @@ private:
 			glAttachShader(ProgramName[1], VertShader);
 			glAttachShader(ProgramName[1], GeomShader);
 			glAttachShader(ProgramName[1], FragShader);
-			glDeleteShader(VertShader);
-			glDeleteShader(GeomShader);
-			glDeleteShader(FragShader);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShader);
+				glDeleteShader(GeomShader);
+				glDeleteShader(FragShader);
+#			endif
 
 			glLinkProgram(ProgramName[1]);
 			Validated = Validated && glf::checkProgram(ProgramName[1]);

@@ -79,21 +79,22 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
-			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(GeomShader, GEOM_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertShader);
-			glAttachShader(ProgramName, GeomShader);
-			glAttachShader(ProgramName, FragShader);
-			glDeleteShader(VertShader);
-			glDeleteShader(GeomShader);
-			glDeleteShader(FragShader);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, GeomShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(GeomShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
 
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);

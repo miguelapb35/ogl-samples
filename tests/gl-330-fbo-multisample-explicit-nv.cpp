@@ -92,7 +92,6 @@ namespace
 		};
 	}//namespace shader
 
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName[program::MAX];
 	GLuint BufferName(0);
@@ -134,6 +133,8 @@ private:
 	{
 		bool Validated = true;
 
+		std::array<GLuint, shader::MAX> ShaderName;
+
 		glf::compiler Compiler;
 		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
 		for(int i = 0; i < program::MAX; ++i)
@@ -151,6 +152,9 @@ private:
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
 		}
+
+		for(int i = 0; i < shader::MAX; ++i)
+			glDeleteShader(ShaderName[i]);
 
 		return Validated && this->checkError("initProgram");
 	}

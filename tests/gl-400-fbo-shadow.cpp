@@ -122,10 +122,8 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER, 
-				"--version 400 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER,
-				"--version 400 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER, "--version 400 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::RENDER] = glCreateProgram();
@@ -135,8 +133,11 @@ private:
 			glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::COLOR, "Color");
 			glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
 
 			Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
 		}
@@ -150,15 +151,18 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH, 
-				"--version 400 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH, "--version 400 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::DEPTH] = glCreateProgram();
 			glAttachShader(ProgramName[program::DEPTH], VertShaderName);
 			glBindAttribLocation(ProgramName[program::DEPTH], glf::semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName[program::DEPTH]);
-			glDeleteShader(VertShaderName);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+#			endif
+
 
 			Validated = Validated && glf::checkProgram(ProgramName[program::DEPTH]);
 		}

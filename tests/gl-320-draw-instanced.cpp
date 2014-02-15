@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-320/draw-instanced.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-320/draw-instanced.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/draw-instanced.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/draw-instanced.frag");
 
 	GLsizei const VertexCount = 6;
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -82,15 +82,20 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertShaderName, VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragShaderName, FRAGMENT_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 			glDeleteShader(VertShaderName);
