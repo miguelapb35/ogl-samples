@@ -94,7 +94,6 @@ namespace
 	}//namespace shader
 
 	GLuint FramebufferName(0);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> UniformMVP(program::MAX);
 	std::vector<GLuint> UniformDiffuse(program::MAX);
@@ -120,18 +119,23 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-			ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::MULTIPLE] = glCreateProgram();
-			glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::VERT1]);
-			glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::FRAG1]);
+			glAttachShader(ProgramName[program::MULTIPLE], VertShaderName);
+			glAttachShader(ProgramName[program::MULTIPLE], FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName[program::MULTIPLE], glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::RED, "Red");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::GREEN, "Green");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::BLUE, "Blue");
-
 			glLinkProgram(ProgramName[program::MULTIPLE]);
 			Validated = Validated && glf::checkProgram(ProgramName[program::MULTIPLE]);
 		}
@@ -143,17 +147,22 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-			ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SINGLE] = glCreateProgram();
-			glAttachShader(ProgramName[program::SINGLE], ShaderName[shader::VERT2]);
-			glAttachShader(ProgramName[program::SINGLE], ShaderName[shader::FRAG2]);
+			glAttachShader(ProgramName[program::SINGLE], VertShaderName);
+			glAttachShader(ProgramName[program::SINGLE], FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName[program::SINGLE], glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[program::SINGLE], glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[program::SINGLE], glf::semantic::frag::COLOR, "Color");
-
 			glLinkProgram(ProgramName[program::SINGLE]);
 			Validated = Validated && glf::checkProgram(ProgramName[program::SINGLE]);
 		}
@@ -283,15 +292,6 @@ private:
 	{
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
-		
-		this->checkError("end 1");
-		
-		glDeleteShader(ShaderName[shader::FRAG1]);
-		glDeleteShader(ShaderName[shader::VERT1]);
-		glDeleteShader(ShaderName[shader::FRAG2]);
-		glDeleteShader(ShaderName[shader::VERT2]);
-
-		this->checkError("end 2");
 		
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);

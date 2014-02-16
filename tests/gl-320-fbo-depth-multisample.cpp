@@ -102,7 +102,6 @@ namespace
 	}//namespace shader
 
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -122,6 +121,8 @@ private:
 	{
 		bool Validated(true);
 	
+		std::vector<GLuint> ShaderName(shader::MAX);
+		
 		if(Validated)
 		{
 			glf::compiler Compiler;
@@ -159,6 +160,11 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 		}
 
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+		for(std::size_t i = 0; i < ShaderName.size(); ++i)
+			glDeleteShader(ShaderName[i]);
+#		endif
+		
 		return Validated && this->checkError("initProgram");
 	}
 
@@ -292,11 +298,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
-		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
-		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
-		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
-
 		glDeleteFramebuffers(GLsizei(FramebufferName.size()), &FramebufferName[0]);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);

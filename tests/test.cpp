@@ -237,8 +237,7 @@ int test::operator()()
 #		endif//AUTOMATED_TESTS
 	}
 
-	if(Result == EXIT_SUCCESS)
-		Result = this->end() ? EXIT_SUCCESS : EXIT_FAILURE;
+	Result = this->end() && (Result == EXIT_SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	if(this->Success == GENERATE_ERROR)
 		return (Result != EXIT_SUCCESS || this->Error) ? EXIT_SUCCESS : EXIT_FAILURE;

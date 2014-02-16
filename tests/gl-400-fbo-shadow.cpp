@@ -172,7 +172,7 @@ private:
 			UniformTransform[program::DEPTH] = glGetUniformBlockIndex(ProgramName[program::DEPTH], "transform");
 		}
 
-		return Validated;
+		return Validated && this->checkError("initProgram");
 	}
 
 	bool initBuffer()
@@ -199,13 +199,11 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return true;
+		return this->checkError("initBuffer");
 	}
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -263,7 +261,7 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -303,7 +301,8 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
+		
+		return this->checkError("initFramebuffer");
 	}
 
 	bool begin()
@@ -321,13 +320,11 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated;
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		bool Validated(true);
-
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
@@ -335,7 +332,7 @@ private:
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 
-		return Validated;
+		return this->checkError("end");
 	}
 
 	void renderShadow()
@@ -357,6 +354,8 @@ private:
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 		glDisable(GL_DEPTH_TEST);
+		
+		this->checkError("renderShadow");
 	}
 
 	void renderFramebuffer()
@@ -384,6 +383,8 @@ private:
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 		glDisable(GL_DEPTH_TEST);
+		
+		this->checkError("renderFramebuffer");
 	}
 
 	bool render()
@@ -427,7 +428,7 @@ private:
 		renderFramebuffer();
 		//renderSplash();
 
-		return true;
+		return this->checkError("render");
 	}
 };
 

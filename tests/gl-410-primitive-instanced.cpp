@@ -88,8 +88,6 @@ private:
 		bool Validated = true;
 
 		glGenProgramPipelines(1, &PipelineName);
-		glBindProgramPipeline(PipelineName);
-		glBindProgramPipeline(0);
 
 		// Create program
 		if(Validated)
@@ -106,10 +104,13 @@ private:
 			glAttachShader(ProgramName[program::VERT], VertShaderName);
 			glAttachShader(ProgramName[program::VERT], GeomShaderName);
 			glAttachShader(ProgramName[program::FRAG], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(GeomShaderName);
-			glDeleteShader(FragShaderName);
-
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(GeomShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glProgramParameteri(ProgramName[program::VERT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glProgramParameteri(ProgramName[program::FRAG], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glLinkProgram(ProgramName[program::VERT]);

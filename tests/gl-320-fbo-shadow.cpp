@@ -109,7 +109,6 @@ namespace
 	}//namespace shader
 
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -131,6 +130,8 @@ private:
 	{
 		bool Validated(true);
 	
+		std::vector<GLuint> ShaderName(shader::MAX);
+		
 		if(Validated)
 		{
 			glf::compiler Compiler;
@@ -326,10 +327,6 @@ private:
 	{
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
-		
-		glDeleteShader(ShaderName[shader::FRAG_RENDER]);
-		glDeleteShader(ShaderName[shader::VERT_DEPTH]);
-		glDeleteShader(ShaderName[shader::VERT_RENDER]);
 
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
