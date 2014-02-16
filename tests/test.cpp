@@ -30,14 +30,20 @@ namespace
 	{
 		std::string String(reinterpret_cast<char const *>(glGetString(GL_VENDOR)));
 
+#		ifdef __APPLE__
+		std::string os("apple-");
+#		else
+		std::string os;
+#		endif
+		
 		if(String.find("NVIDIA") != std::string::npos)
-			return "nvidia/";
+			return os + "nvidia/";
 		else if(String.find("ATI") != std::string::npos || String.find("AMD") != std::string::npos)
-			return "amd/";
+			return os + "amd/";
 		else if(String.find("Intel") != std::string::npos)
-			return "intel/";
+			return os + "intel/";
 		else
-			return "unknown/";
+			return os + "unknown/";
 	}
 
 	inline bool checkTemplate(GLFWwindow* pWindow, char const * Title)
