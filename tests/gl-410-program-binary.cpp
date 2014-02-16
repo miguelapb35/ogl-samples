@@ -278,14 +278,14 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
-
 		GLint NumProgramBinaryFormats(0);
 		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
 
 		std::vector<GLint> ProgramBinaryFormats(static_cast<std::size_t>(NumProgramBinaryFormats));
 		glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, &ProgramBinaryFormats[0]);
 
+		bool Validated = NumProgramBinaryFormats > 0 ? true : false;
+		
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
