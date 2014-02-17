@@ -203,11 +203,11 @@ test::~test()
 
 int test::operator()()
 {
+	if(this->Window == 0)
+		return EXIT_FAILURE;
+
 	int Result = EXIT_SUCCESS;
 	
-	if(Result == EXIT_SUCCESS)
-		Result = this->Window ? EXIT_SUCCESS : EXIT_FAILURE;
-
 	if(Result == EXIT_SUCCESS)
 		if(version(this->Major, this->Minor) >= version(3, 0))
 			Result = checkGLVersion(this->Major, this->Minor) ? EXIT_SUCCESS : EXIT_FAILURE;
