@@ -2,6 +2,7 @@
 #define GLF_COMMON_INCLUDED
 
 // GLM
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/packing.hpp>
@@ -13,6 +14,9 @@
 
 // GLI
 #include <gli/gli.hpp>
+
+// GLI
+//#include <glu/glu.hpp>
 
 // STL
 #include <vector>
@@ -31,7 +35,7 @@ namespace glf
 #	if defined(WIN32)
 		static std::string const DATA_DIRECTORY("../data/");
 #	elif defined(__APPLE__)
-		static std::string const DATA_DIRECTORY("../../../data/");
+		static std::string const DATA_DIRECTORY("../data/");
 #	else
 		// For packages.
 		static std::string const DATA_DIRECTORY("data/");

@@ -9,6 +9,8 @@
 // www.g-truc.net
 //**********************************
 
+std::string getDataDirectory();
+
 namespace glf
 {
 	// compiler::commandline
@@ -43,7 +45,7 @@ namespace glf
 			if(FoundDefine != std::string::npos)
 				this->Defines.push_back(Param.substr(2, Param.size() - 2));
 			else if(FoundInclude != std::string::npos)
-				this->Includes.push_back(glf::DATA_DIRECTORY + Param.substr(2, Param.size() - 2));
+				this->Includes.push_back(getDataDirectory() + Param.substr(2, Param.size() - 2));
 			else if(Param == "--define")
 			{
 				std::string Define;
@@ -58,7 +60,7 @@ namespace glf
 			{
 				std::string Include;
 				Stream >> Include;
-				this->Includes.push_back(glf::DATA_DIRECTORY + Include);
+				this->Includes.push_back(getDataDirectory() + Include);
 			}
 /*
 			else 
@@ -89,13 +91,9 @@ namespace glf
 
 	// compiler::parser
 
-	inline std::string compiler::parser::operator()  
-	(
-		commandline const & CommandLine,
-		std::string const & Filename
-	) const
+	inline std::string compiler::parser::operator()(commandline const & CommandLine, std::string const & Filename) const
 	{
-		std::string Source = glf::loadFile(Filename);
+		std::string Source = loadFile(Filename);
 
 		std::stringstream Stream;
 		Stream << Source;
@@ -142,7 +140,7 @@ namespace glf
 				for(std::size_t i = 0; i < Includes.size(); ++i)
 				{
 					std::string PathName = Includes[i] + Include;
-					std::string Source = glf::loadFile(PathName);
+					std::string Source = loadFile(PathName);
 					if(!Source.empty())
 					{
 						Text += Source;
@@ -155,6 +153,8 @@ namespace glf
 
 			Text += Line + "\n";
 		}
+
+		//Text += glf::format("\nconst float G_TRUC_GNI = %f;\n", glm::linearRand(0.0f, 1.0f));
 
 		return Text;
 	}
@@ -185,9 +185,11 @@ namespace glf
 		commandline CommandLine(Filename, Arguments);
 
 		std::string PreprocessedSource = parser()(CommandLine, Filename);
+		PreprocessedSource += glf::format("\n/*\n%f*/\n", glm::linearRand(0.0f, 1.0f));
+		assert(!PreprocessedSource.empty());
 		char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
-		fprintf(stdout, "%s\n", PreprocessedSource.c_str());
+		//fprintf(stdout, "%s\n", PreprocessedSource.c_str());
 
 		GLuint Name = glCreateShader(Type);
 		glShaderSource(Name, 1, &PreprocessedSourcePointer, NULL);
@@ -240,16 +242,16 @@ namespace glf
 			GLint Result = GL_FALSE;
 			glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
 
-			if(Result == GL_FALSE)
+			if(Result == GL_TRUE)
+				continue;
+
+			int InfoLogLength;
+			glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if(InfoLogLength > 0)
 			{
-				int InfoLogLength;
-				glGetShaderiv(ShaderName, GL_INFO_LOG_LENGTH, &InfoLogLength);
-				if(InfoLogLength > 0)
-				{
-					std::vector<char> Buffer(InfoLogLength);
-					glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
-					fprintf(stdout, "%s\n", &Buffer[0]);
-				}
+				std::vector<char> Buffer(InfoLogLength);
+				glGetShaderInfoLog(ShaderName, InfoLogLength, NULL, &Buffer[0]);
+				fprintf(stdout, "%s\n", &Buffer[0]);
 			}
 
 			Success = Success && Result == GL_TRUE;
@@ -272,7 +274,26 @@ namespace glf
 		this->PendingChecks.clear();
 	}
 
-	inline bool compiler::loadBinary
+	inline std::string loadFile(std::string const & Filename)
+	{
+		std::string Result;
+		
+		std::ifstream Stream(Filename.c_str());
+		if(!Stream.is_open())
+			return Result;
+
+		Stream.seekg(0, std::ios::end);
+		Result.reserve(Stream.tellg());
+		Stream.seekg(0, std::ios::beg);
+		
+		Result.assign(
+			(std::istreambuf_iterator<char>(Stream)),
+			std::istreambuf_iterator<char>());
+
+		return Result;
+	}
+
+	inline bool loadBinary
 	(
 		std::string const & Filename,
 		GLenum & Format,
@@ -293,27 +314,26 @@ namespace glf
 		}
 		return false;
 	}
-
-	inline std::string compiler::loadFile
+	
+	inline bool saveBinary
 	(
-		std::string const & Filename
+		std::string const & Filename, 
+		GLenum const & Format,
+		std::vector<glm::byte> const & Data,
+		GLint const & Size
 	)
 	{
-		std::string Result;
-		
-		std::ifstream Stream(Filename.c_str());
-		if(!Stream.is_open())
-			return Result;
+		FILE* File = fopen(Filename.c_str(), "wb");
 
-		Stream.seekg(0, std::ios::end);
-		Result.reserve(Stream.tellg());
-		Stream.seekg(0, std::ios::beg);
-		
-		Result.assign(
-			(std::istreambuf_iterator<char>(Stream)),
-			std::istreambuf_iterator<char>());
-
-		return Result;
+		if(File)
+		{
+			fwrite(&Format, sizeof(GLenum), 1, File);
+			fwrite(&Size, sizeof(Size), 1, File);
+			fwrite(&Data[0], Size, 1, File);
+			fclose(File);
+			return true;
+		}
+		return false;
 	}
 
 	inline std::string format(const char* msg, ...)
@@ -341,17 +361,17 @@ namespace glf
 		GLint Result = GL_FALSE;
 		glGetProgramiv(ProgramName, GL_VALIDATE_STATUS, &Result);
 
-		if(Result == GL_FALSE)
+		if(Result == GL_TRUE)
+			return true;
+
+		fprintf(stdout, "Validate program\n");
+		int InfoLogLength;
+		glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if(InfoLogLength > 0)
 		{
-			fprintf(stdout, "Validate program\n");
-			int InfoLogLength;
-			glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
-			if(InfoLogLength > 0)
-			{
-				std::vector<char> Buffer(InfoLogLength);
-				glGetProgramInfoLog(ProgramName, InfoLogLength, NULL, &Buffer[0]);
-				fprintf(stdout, "%s\n", &Buffer[0]);
-			}
+			std::vector<char> Buffer(InfoLogLength);
+			glGetProgramInfoLog(ProgramName, InfoLogLength, NULL, &Buffer[0]);
+			fprintf(stdout, "%s\n", &Buffer[0]);
 		}
 
 		return Result == GL_TRUE;
@@ -365,7 +385,10 @@ namespace glf
 		GLint Result = GL_FALSE;
 		glGetProgramiv(ProgramName, GL_LINK_STATUS, &Result);
 
-		fprintf(stdout, "Linking program\n");
+		if(Result == GL_TRUE)
+			return true;
+
+		//fprintf(stdout, "Linking program\n");
 		int InfoLogLength;
 		glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if(InfoLogLength > 0)
@@ -389,6 +412,9 @@ namespace glf
 
 		GLint Result = GL_FALSE;
 		glGetShaderiv(ShaderName, GL_COMPILE_STATUS, &Result);
+
+		if(Result == GL_TRUE)
+			return true;
 
 		fprintf(stdout, "Compiling shader\n%s...\n", File.c_str());
 		int InfoLogLength;

@@ -13,7 +13,7 @@ void main()
 {
 	vec2 Size = textureSize(Diffuse, 0) - 1;
 	vec2 Texcoord = In.Texcoord * Size;
-	ivec2 Coord = ivec2(In.Texcoord * Size);
+	ivec2 Coord = ivec2(Texcoord);
 	
 	vec4 Texel00 = texelFetch(Diffuse, Coord + ivec2(0, 0), 0);
 	vec4 Texel10 = texelFetch(Diffuse, Coord + ivec2(1, 0), 0);

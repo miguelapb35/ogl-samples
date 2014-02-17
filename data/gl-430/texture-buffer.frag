@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 #define POSITION		0
 #define COLOR			3
@@ -8,7 +8,7 @@
 
 precision highp int;
 
-uniform samplerBuffer Diffuse;
+layout(binding = 1) uniform samplerBuffer Diffuse;
 
 in block
 {

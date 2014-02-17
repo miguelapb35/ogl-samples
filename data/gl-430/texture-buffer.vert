@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 #define POSITION		0
 #define COLOR			3
@@ -6,10 +6,16 @@
 #define INSTANCE		7
 #define FRAG_COLOR		0
 
+#define TRANSFORM0		1
+
 precision highp int;
 
-uniform samplerBuffer Displacement;
-uniform mat4 MVP;
+layout(binding = 0) uniform samplerBuffer Displacement;
+
+layout(binding = TRANSFORM0) uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 layout(location = POSITION) in vec2 Position;
 
@@ -21,5 +27,5 @@ out block
 void main()
 {	
 	Out.Instance = gl_InstanceID;
-	gl_Position = MVP * (vec4(Position, 0.0, 0.0) + texelFetch(Displacement, gl_InstanceID));
+	gl_Position = Transform.MVP * (vec4(Position, 0.0, 0.0) + texelFetch(Displacement, gl_InstanceID));
 }

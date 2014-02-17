@@ -121,7 +121,8 @@ GLboolean _glfwIsValidContextConfig(_GLFWwndconfig* wndconfig)
         if (wndconfig->glProfile)
         {
             if (wndconfig->glProfile != GLFW_OPENGL_CORE_PROFILE &&
-                wndconfig->glProfile != GLFW_OPENGL_COMPAT_PROFILE)
+                wndconfig->glProfile != GLFW_OPENGL_COMPAT_PROFILE && 
+				wndconfig->glProfile != GLFW_OPENGL_ES_PROFILE )
             {
                 _glfwInputError(GLFW_INVALID_ENUM,
                                 "Invalid OpenGL profile requested");
@@ -419,6 +420,8 @@ GLboolean _glfwRefreshContextAttribs(void)
                 window->glProfile = GLFW_OPENGL_COMPAT_PROFILE;
             else if (mask & GL_CONTEXT_CORE_PROFILE_BIT)
                 window->glProfile = GLFW_OPENGL_CORE_PROFILE;
+            else if (mask & GL_CONTEXT_ES_PROFILE_BIT)
+                window->glProfile = GLFW_OPENGL_ES_PROFILE;
         }
 
         // Read back robustness strategy

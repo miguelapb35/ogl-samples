@@ -28,7 +28,8 @@ struct vertex
 
 layout(location = 0) out vertex st_Out[2];
 
-layout(location = 0 + 1 * st_Out.length()) out block
+//layout(location = 0 + 1 * st_Out.length()) out block
+layout(location = 0 + 1 * 2) out block
 {
 	vec4 Color;
 	mediump float Lumimance[2];

@@ -1,9 +1,9 @@
-#version 420 core
+#version 330 core
 #extension GL_NV_explicit_multisample : require
 
 #define FRAG_COLOR		0
 
-layout(binding = 0) uniform samplerRenderbuffer Diffuse;
+uniform samplerRenderbuffer Diffuse;
 
 in block
 {

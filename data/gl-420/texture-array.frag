@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 
 #define POSITION		0
 #define COLOR			3
@@ -6,7 +6,9 @@
 #define INSTANCE		7
 #define FRAG_COLOR		0
 
-uniform sampler2DArray Diffuse;
+#define DIFFUSE			0
+
+layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 
 in block
 {

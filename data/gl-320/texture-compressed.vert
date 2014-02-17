@@ -1,4 +1,4 @@
-#version 330 core
+#version 320 core
 
 #define POSITION	0
 #define COLOR		3
@@ -7,8 +7,8 @@
 
 uniform mat4 MVP;
 
-layout(location = POSITION) in vec2 Position;
-layout(location = TEXCOORD) in vec2 Texcoord;
+in vec2 Position;
+in vec2 Texcoord;
 
 out block
 {
