@@ -68,7 +68,7 @@ class gl_420_texture_storage : public test
 {
 public:
 	gl_420_texture_storage(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-storage", test::CORE, 4, 2)
+		test(argc, argv, "gl-420-fbo-layered-amd", test::CORE, 4, 2)
 	{}
 
 private:
