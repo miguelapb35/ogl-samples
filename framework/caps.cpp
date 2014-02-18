@@ -39,7 +39,7 @@ void caps::initVersion()
 	glGetIntegerv(GL_MAJOR_VERSION, &VersionData.Major);
 	glGetIntegerv(GL_NUM_EXTENSIONS, &VersionData.NumExtensions);
 
-	if(this->VersionData.Profile == CORE || this->VersionData.Profile == COMPATIBILITY)
+	if((this->VersionData.Profile == CORE) || (this->VersionData.Profile == COMPATIBILITY))
 	{
 		for (GLint i = 0; i < VersionData.NumExtensions; ++i)
 		{
@@ -523,7 +523,7 @@ void caps::initCompute()
 		glGetIntegerv(GL_MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS, &ComputeData.MAX_COMPUTE_ATOMIC_COUNTER_BUFFERS);
 	}
 
-	if(check(4, 3) || VersionData.GL.ARB_compute_shader && VersionData.GL.ARB_shader_storage_buffer_object)
+	if(check(4, 3) || (VersionData.GL.ARB_compute_shader && VersionData.GL.ARB_shader_storage_buffer_object))
 		glGetIntegerv(GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS, &ComputeData.MAX_COMPUTE_SHADER_STORAGE_BLOCKS);
 }
 

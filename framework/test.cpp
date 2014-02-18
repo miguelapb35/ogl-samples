@@ -73,7 +73,7 @@ namespace
 		}
 
 		if(!Success)
-			glf::save_png(Texture, (std::string("./") + Title + ".png").c_str());
+			glf::save_png(Texture, (getBinaryDirectory() + Title + ".png").c_str());
 
 		return Success;
 	}
@@ -82,6 +82,11 @@ namespace
 std::string getDataDirectory()
 {
 	return std::string(OGL_SAMPLES_SOURCE_DIR) + "/data/";
+}
+
+std::string getBinaryDirectory()
+{
+	return std::string(OGL_SAMPLES_BINARY_DIR) + "/";
 }
 
 test::test

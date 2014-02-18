@@ -114,6 +114,7 @@ inline bool operator!= (vertexattrib const & A, vertexattrib const & B)
 }
 
 std::string getDataDirectory();
+std::string getBinaryDirectory();
 
 class test
 {
