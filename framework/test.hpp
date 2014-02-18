@@ -21,8 +21,7 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef TEST_INCLUDED
-#define TEST_INCLUDED
+#pragma once
 
 #include "csv.hpp"
 
@@ -265,4 +264,3 @@ public:
 	static void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);
 };
 
-#endif//TEST_INCLUDED

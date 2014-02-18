@@ -21,8 +21,7 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef PNG_INCLUDED
-#define PNG_INCLUDED
+#pragma once
 
 #define GLM_FORCE_RADIANS
 #include <gli/gli.hpp>
@@ -36,4 +35,3 @@ namespace glf
 
 }//namespace glf
 
-#endif//PNG_INCLUDED

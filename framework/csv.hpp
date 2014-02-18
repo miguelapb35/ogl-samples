@@ -21,8 +21,7 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CSV_INCLUDED
-#define CSV_INCLUDED
+#pragma once
 
 #include <vector>
 #include <string>
@@ -57,4 +56,3 @@ private:
 	std::vector<data> Data;
 };
 
-#endif//CSV_INCLUDED

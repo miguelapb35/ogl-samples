@@ -21,8 +21,7 @@
 /// THE SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CAPS_INCLUDED
-#define CAPS_INCLUDED
+#pragma once
 
 #include "test.hpp"
 
@@ -505,4 +504,3 @@ public:
 	program const & Program;
 };
 
-#endif//CAPS_INCLUDED
