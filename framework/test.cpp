@@ -225,7 +225,6 @@ int test::operator()()
 		glfwPollEvents();
 		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
 		{
-			//if(this->TemplateTest == TEMPLATE_TEST_EXECUTE && (this->Profile == CORE || (this->Profile == ES && version(this->Major, this->Minor) >= version(3, 0))))
 			if(this->Success == MATCH_TEMPLATE && this->Profile == CORE)
 			{
 				if(!checkTemplate(this->Window, this->Title.c_str()))

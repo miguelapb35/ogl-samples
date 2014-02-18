@@ -98,7 +98,6 @@ private:
 
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
