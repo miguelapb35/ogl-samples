@@ -27,32 +27,10 @@ add_definitions(-DOGL_SAMPLES_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_definitions(-DOGL_SAMPLES_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 
 ################################
-# Add GLEXT 
-
-function(getKhronosGLHeader HEADER)
-	if(WIN32)
-		
-	elseif(UNIX)
-		file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER} khronos-headers/GL/${HEADER})
-	endif(WIN32)
-endfunction(getKhronosGLHeader)
-
-#download Updated OpenGL Extension headers.
-getKhronosGLHeader(glext.h)
-getKhronosGLHeader(glcorearb.h)
-getKhronosGLHeader(glxext.h)
-getKhronosGLHeader(wglext.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/khronos-headers/)
-
-################################
 # Add GLEW
 
-set(GLEW_DIRECTORY glew-1.10.0)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_definitions(-DGLEW_STATIC)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
 
 ################################
 # Add GLFW
@@ -175,7 +153,7 @@ set(EGL_LIBRARY libEGL)
 ################################
 # Add libraries to executables
 
-set(BINARY_FILES GLEW glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
+set(BINARY_FILES glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
 
 ################################
 # Add output directory
