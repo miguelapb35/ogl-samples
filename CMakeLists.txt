@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(VERSION 2.8)
 
-project(ogl-samples-pack)
+set(OGL_SAMPLES_NAME ogl-samples)
+set(FRAMEWORK_NAME framework)
+
+project(${OGL_SAMPLES_NAME})
 enable_testing()
 
 #CMAKE_BUILD_TOOL
@@ -211,6 +214,12 @@ endif()
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif(MSVC)
+
+################################
+# Add framework
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/framework)
+add_subdirectory(framework)
 
 ################################
 # Add subdirectory
