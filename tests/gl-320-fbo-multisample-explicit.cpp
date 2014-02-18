@@ -84,7 +84,6 @@ namespace
 		"gl-320/fbo-multisample-explicit-near.frag",
 	};
 
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint BufferName(0);
 	GLuint FramebufferRenderName(0);
@@ -109,6 +108,8 @@ private:
 	
 		glf::compiler Compiler;
 
+		std::array<GLuint, shader::MAX> ShaderName;
+		
 		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 
 		for(int i = 0; i < program::MAX; ++i)
@@ -130,7 +131,12 @@ private:
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
 		}
-
+		
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+			for(std::size_t i = 0; i < ShaderName.size(); ++i)
+				glDeleteShader(ShaderName[i]);
+#		endif
+		
 		return Validated && this->checkError("initProgram");
 	}
 
@@ -239,14 +245,10 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_BOX]);
-		glDeleteShader(ShaderName[shader::FRAG_NEAR]);
-		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
-		glDeleteShader(ShaderName[shader::VERT]);
-
-		glDeleteBuffers(1, &BufferName);
 		for(int i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
+		
+		glDeleteBuffers(1, &BufferName);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteFramebuffers(1, &FramebufferRenderName);
 		glDeleteFramebuffers(1, &FramebufferResolveName);

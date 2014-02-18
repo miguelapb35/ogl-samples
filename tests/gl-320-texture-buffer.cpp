@@ -50,18 +50,7 @@ namespace
 			MAX
 		};
 	}//namespace buffer
-	
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
 
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
@@ -96,14 +85,19 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
@@ -144,7 +138,7 @@ private:
 
 		glm::u8vec4 Diffuse[5] = 
 		{
-			glm::u8vec4(255,   0,   0, 255), 
+			glm::u8vec4(255,   0,   0, 255),
 			glm::u8vec4(255, 127,   0, 255),
 			glm::u8vec4(255, 255,   0, 255),
 			glm::u8vec4(  0, 255,   0, 255),
@@ -212,9 +206,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
-
 		glDeleteTextures(1, &DiffuseTextureName);
 		glDeleteTextures(1, &DisplacementTextureName);
 		glDeleteBuffers(buffer::MAX, BufferName);

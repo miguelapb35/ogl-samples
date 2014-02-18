@@ -106,18 +106,23 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_MULTIPLE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
-			ShaderName[shader::FRAG_MULTIPLE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::MULTIPLE] = glCreateProgram();
-			glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::VERT_MULTIPLE]);
-			glAttachShader(ProgramName[program::MULTIPLE], ShaderName[shader::FRAG_MULTIPLE]);
+			glAttachShader(ProgramName[program::MULTIPLE], VertShaderName);
+			glAttachShader(ProgramName[program::MULTIPLE], FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName[program::MULTIPLE], glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::RED, "Red");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::GREEN, "Green");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::BLUE, "Blue");
-
 			glLinkProgram(ProgramName[program::MULTIPLE]);
 			Validated = glf::checkProgram(ProgramName[program::MULTIPLE]);
 		}
@@ -129,17 +134,22 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
+			glAttachShader(ProgramName[program::SPLASH], VertShaderName);
+			glAttachShader(ProgramName[program::SPLASH], FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
-
 			glLinkProgram(ProgramName[program::SPLASH]);
 			Validated = glf::checkProgram(ProgramName[program::SPLASH]);
 		}
@@ -177,16 +187,14 @@ private:
 
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glTexImage3D(
-			GL_TEXTURE_2D_ARRAY, 
+		glTexImage3D(GL_TEXTURE_2D_ARRAY,
 			0,
 			GL_RGB8,
 			GLsizei(WindowSize.x / FRAMEBUFFER_SIZE),
 			GLsizei(WindowSize.y / FRAMEBUFFER_SIZE),
 			GLsizei(3),//depth
 			0,
-			GL_BGR,
-			GL_UNSIGNED_BYTE,
+			GL_BGR, GL_UNSIGNED_BYTE,
 			NULL);
 
 		return this->checkError("initTexture");
@@ -264,13 +272,9 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_MULTIPLE]);
-		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
-		glDeleteShader(ShaderName[shader::VERT_MULTIPLE]);
-		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
-
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
+		
 		glDeleteBuffers(1, &BufferName);
 		glDeleteTextures(1, &TextureName);
 		glDeleteFramebuffers(1, &FramebufferName);

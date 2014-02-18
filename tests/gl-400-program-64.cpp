@@ -87,8 +87,12 @@ private:
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertexShaderName);
 			glAttachShader(ProgramName, FragmentShaderName);
-			glDeleteShader(VertexShaderName);
-			glDeleteShader(FragmentShaderName);
+
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertexShaderName);
+				glDeleteShader(FragmentShaderName);
+#			endif
+
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}

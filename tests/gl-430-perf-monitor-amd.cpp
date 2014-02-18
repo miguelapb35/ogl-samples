@@ -204,29 +204,29 @@ namespace
 				{
 					case GL_UNSIGNED_INT64_AMD:
 					{
-						unsigned __int64 counterResult = *reinterpret_cast<unsigned __int64*>(&Result[wordCount + 2]);
-						printf("%s(%d): %ld\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
+						glm::uint64 * counterResult = reinterpret_cast<glm::uint64*>(&Result[wordCount + 2]);
+						printf("%s(%d): %ld\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 4;
 						break;
 					}
 					case GL_FLOAT:
 					{
-						float counterResult = *reinterpret_cast<float*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
+						float * counterResult = reinterpret_cast<float*>(&Result[wordCount + 2]);
+						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}
 					case GL_UNSIGNED_INT:
 					{
-						unsigned int counterResult = *reinterpret_cast<unsigned int*>(&Result[wordCount + 2]);
-						printf("%s(%d): %d\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
+						glm::uint32 * counterResult = reinterpret_cast<glm::uint32*>(&Result[wordCount + 2]);
+						printf("%s(%d): %d\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}
 					case GL_PERCENTAGE_AMD:
 					{
-						unsigned int counterResult = *reinterpret_cast<unsigned int*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, counterResult);
+						float * counterResult = reinterpret_cast<float*>(&Result[wordCount + 2]);
+						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}

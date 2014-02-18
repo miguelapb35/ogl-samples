@@ -182,9 +182,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
-
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &TextureName);

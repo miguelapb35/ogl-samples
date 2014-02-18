@@ -57,17 +57,6 @@ namespace
 		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
 	GLuint BufferName = 0;
@@ -89,15 +78,21 @@ private:
 		bool Validated = true;
 	
 		glf::compiler Compiler;
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
-		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
 		Validated = Validated && Compiler.check();
 
 		if(Validated)
 		{
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
@@ -132,15 +127,13 @@ private:
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				GL_RGB8, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+			glTexImage2D(GL_TEXTURE_2D,
+				GLint(Level),
+				GL_RGB8,
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL_BGR, 
-				GL_UNSIGNED_BYTE, 
+				GL_BGR, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
 		}
 
@@ -181,8 +174,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &TextureName);

@@ -6,28 +6,17 @@ function(glCreateSampleGTC NAME)
 		set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})
 	endforeach(FILE)
 
-	set(COMMON_SOURCE png.cpp png.hpp test.cpp test.hpp caps.cpp caps.hpp csv.cpp csv.hpp)
-
 	source_group("Shader Files" FILES ${SHADER_PATH})
-	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${COMMON_SOURCE} ${SHADER_PATH})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
+	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${SHADER_PATH})
 	add_custom_command(
 		TARGET ${NAME} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
-	if(WIN32)
-		add_dependencies(${SAMPLE_NAME} ${TARGET_DATA_COPY})
-	endif(WIN32)
-	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
-	add_dependencies(${SAMPLE_NAME} GLEW glfw)
-	install ( TARGETS ${SAMPLE_NAME} DESTINATION .)
+	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES} ${FRAMEWORK_NAME})
+	add_dependencies(${SAMPLE_NAME} GLEW glfw ${FRAMEWORK_NAME})
+	install(TARGETS ${SAMPLE_NAME} DESTINATION .)
 endfunction(glCreateSampleGTC)
-
-#add_subdirectory(gl-alpha-to-coverage)
-#add_subdirectory(gl-buffer-render)
 
 if(NOT APPLE)
 
@@ -248,8 +237,6 @@ glCreateSampleGTC(program-binary)
 set(GL_SHADER_GTC separate.vert separate.frag)
 glCreateSampleGTC(program-separate)
 
-if(NOT APPLE)
-
 # OpenGL 4.2 samples
 set(GL_VERSION_GTC 420)
 
@@ -381,5 +368,3 @@ set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-compressed)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
-
-endif(NOT APPLE)

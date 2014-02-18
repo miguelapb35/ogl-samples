@@ -80,20 +80,7 @@ namespace
 		};
 	}//namespace program
 
-	namespace shader
-	{
-		enum type
-		{
-			VERT_TEXTURE,
-			FRAG_TEXTURE,
-			VERT_SPLASH,
-			FRAG_SPLASH,
-			MAX
-		};
-	}//namespace shader
-
 	GLuint FramebufferName(0);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -116,14 +103,19 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
-			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
-			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::FRAG_TEXTURE]);
+			glAttachShader(ProgramName[program::TEXTURE], VertShaderName);
+			glAttachShader(ProgramName[program::TEXTURE], FragShaderName);
 
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
@@ -138,14 +130,19 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
+			glAttachShader(ProgramName[program::SPLASH], VertShaderName);
+			glAttachShader(ProgramName[program::SPLASH], FragShaderName);
 
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
 
@@ -277,18 +274,15 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated;
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
-		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
-		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
-		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
-		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);
+		
+		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);

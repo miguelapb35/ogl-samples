@@ -58,7 +58,18 @@ namespace
 		};
 	}//namespace buffer
 	
+	namespace shader
+	{
+		enum type
+		{
+			VERT,
+			FRAG,
+			MAX
+		};
+	}//namespace shader
+	
 	GLuint ProgramName(0);
+	std::array<GLuint, shader::MAX> ShaderName;
 	std::vector<GLuint> BufferName(buffer::MAX);
 	GLuint VertexArrayName(0);
 	GLint UniformTransform(0);
@@ -90,12 +101,15 @@ private:
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+			
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
@@ -176,6 +190,8 @@ private:
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
+		glDeleteShader(ShaderName[shader::VERT]);
+		glDeleteShader(ShaderName[shader::FRAG]);
 
 		return this->checkError("end");
 	}

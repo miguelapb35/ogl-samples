@@ -7,11 +7,11 @@
 
 layout(location = POSITION) in vec2 Position;
 layout(location = COLOR) in vec4 Color;
-layout(location = COLOR) flat out vec4 VertColor;
+layout(location = COLOR) out vec4 VertColor;
 
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 void main()

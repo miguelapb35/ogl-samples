@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-400/fbo-rtt.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-400/fbo-rtt.frag");
+	char const * VERT_SHADER_SOURCE("gl-400/fbo-rtt.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/fbo-rtt.frag");
 	int const FRAMEBUFFER_FACTOR = 2;
 	GLsizei const VertexCount(3);
 
@@ -61,17 +61,20 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertexShaderName);
-			glAttachShader(ProgramName, FragmentShaderName);
-			glDeleteShader(VertexShaderName);
-			glDeleteShader(FragmentShaderName);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}

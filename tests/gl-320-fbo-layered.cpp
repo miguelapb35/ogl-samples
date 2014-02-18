@@ -84,7 +84,6 @@ namespace
 	}//namespace shader
 
 	GLuint FramebufferName(0);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> UniformMVP(program::MAX);
@@ -108,6 +107,7 @@ private:
 	{
 		bool Validated = true;
 
+		std::vector<GLuint> ShaderName(shader::MAX);
 		glf::compiler Compiler;
 
 		if(Validated)
@@ -145,6 +145,11 @@ private:
 			Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 		}
 
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+		for(std::size_t i = 0; i < ShaderName.size(); ++i)
+			glDeleteShader(ShaderName[i]);
+#		endif
+		
 		if(Validated)
 		{
 			for(std::size_t i = 0; i < program::MAX; ++i)
@@ -268,15 +273,6 @@ private:
 
 	bool end()
 	{
-		//for(std::size_t i = 0; 0 < shader::MAX; ++i)
-		//	glDeleteShader(ShaderName[i]);
-
-		glDeleteShader(ShaderName[shader::FRAG1]);
-		glDeleteShader(ShaderName[shader::FRAG2]);
-		glDeleteShader(ShaderName[shader::GEOM1]);
-		glDeleteShader(ShaderName[shader::VERT1]);
-		glDeleteShader(ShaderName[shader::VERT2]);
-
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
@@ -311,7 +307,8 @@ private:
 		// Pass 2
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
+			
 			glUseProgram(ProgramName[program::SPLASH]);
 			glUniformMatrix4fv(UniformMVP[program::SPLASH], 1, GL_FALSE, &MVP[0][0]);
 			glUniform1i(UniformDiffuse, 0);

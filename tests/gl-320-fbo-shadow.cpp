@@ -109,7 +109,6 @@ namespace
 	}//namespace shader
 
 	std::vector<GLuint> FramebufferName(framebuffer::MAX);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
@@ -131,6 +130,8 @@ private:
 	{
 		bool Validated(true);
 	
+		std::vector<GLuint> ShaderName(shader::MAX);
+		
 		if(Validated)
 		{
 			glf::compiler Compiler;
@@ -319,18 +320,15 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated;
+		return Validated && this->checkError("begin");
 	}
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_RENDER]);
-		glDeleteShader(ShaderName[shader::VERT_DEPTH]);
-		glDeleteShader(ShaderName[shader::VERT_RENDER]);
-
-		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
+
+		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
@@ -354,9 +352,16 @@ private:
 		glUniformBlockBinding(ProgramName[program::DEPTH], UniformTransform[program::DEPTH], glf::semantic::uniform::TRANSFORM0);
 
 		glBindVertexArray(VertexArrayName[program::RENDER]);
+		
+		this->checkError("renderShadow 0");
+		
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
+		this->checkError("renderShadow 1");
+		
 		glDisable(GL_DEPTH_TEST);
+		
+		this->checkError("renderShadow");
 	}
 
 	void renderFramebuffer()
@@ -383,6 +388,8 @@ private:
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 		glDisable(GL_DEPTH_TEST);
+		
+		this->checkError("renderFramebuffer");
 	}
 
 	bool render()
@@ -425,7 +432,7 @@ private:
 		renderShadow();
 		renderFramebuffer();
 
-		return true;
+		return this->checkError("render");
 	}
 };
 

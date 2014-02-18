@@ -126,8 +126,6 @@ namespace
 			MAX
 		};
 	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
 }//namespace
 
 class gl_320_texture_format : public test
@@ -142,6 +140,8 @@ private:
 	{
 		bool Validated(true);
 
+		std::array<GLuint, shader::MAX> ShaderName;
+		
 		glf::compiler Compiler;
 		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 
@@ -167,6 +167,11 @@ private:
 			Validated = Validated && (UniformDiffuse[i] != -1);
 		}
 
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+			for(std::size_t i = 0; i < ShaderName.size(); ++i)
+				glDeleteShader(ShaderName[i]);
+#		endif
+		
 		return Validated && this->checkError("initProgram");
 	}
 
@@ -249,10 +254,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_NORMALIZED]);
-		glDeleteShader(ShaderName[shader::FRAG_UINT]);
-		glDeleteShader(ShaderName[shader::VERT]);
-
 		glDeleteBuffers(1, &BufferName);
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);

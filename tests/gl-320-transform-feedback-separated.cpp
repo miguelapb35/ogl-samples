@@ -73,7 +73,6 @@ namespace
 		};
 	}//namespace shader
 
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> VertexArrayName(program::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
@@ -94,6 +93,8 @@ private:
 	{
 		bool Validated = true;
 	
+		std::array<GLuint, shader::MAX> ShaderName;
+		
 		glf::compiler Compiler;
 		ShaderName[shader::VERT_TRANSFORM] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 150 --profile core");
 		ShaderName[shader::VERT_FEEDBACK] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
@@ -157,6 +158,11 @@ private:
 			glLinkProgram(ProgramName[program::FEEDBACK]);
 			Validated = Validated && glf::checkProgram(ProgramName[program::FEEDBACK]);
 		}
+		
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+		for(std::size_t i = 0; i < ShaderName.size(); ++i)
+			glDeleteShader(ShaderName[i]);
+#		endif
 
 		return Validated && this->checkError("initProgram");
 	}
@@ -225,9 +231,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_FEEDBACK]);
-		glDeleteShader(ShaderName[shader::VERT_FEEDBACK]);
-
 		for(std::size_t i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);

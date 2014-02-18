@@ -99,20 +99,23 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE);
+			glf::compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+
 			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
 			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
-
+			
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}

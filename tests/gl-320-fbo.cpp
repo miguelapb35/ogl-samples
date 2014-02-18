@@ -129,9 +129,6 @@ private:
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::FRAG_TEXTURE]);
 
-			glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
-			glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
-
 			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
@@ -155,9 +152,6 @@ private:
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
-
-			glDeleteShader(ShaderName[shader::VERT_SPLASH]);
-			glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
 
 			glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
@@ -308,6 +302,12 @@ private:
 		glDeleteFramebuffers(1, &FramebufferName);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteProgram(ProgramName[program::TEXTURE]);
+		
+		glDeleteShader(ShaderName[shader::VERT_TEXTURE]);
+		glDeleteShader(ShaderName[shader::FRAG_TEXTURE]);
+		glDeleteShader(ShaderName[shader::VERT_SPLASH]);
+		glDeleteShader(ShaderName[shader::FRAG_SPLASH]);
+		
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);

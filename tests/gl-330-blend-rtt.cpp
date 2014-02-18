@@ -79,8 +79,7 @@ namespace
 			MAX
 		};
 	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
+	
 	GLuint FramebufferName = 0;
 	GLuint VertexArrayName = 0;
 	GLuint ProgramNameSingle = 0;
@@ -107,6 +106,8 @@ private:
 	{
 		bool Validated = true;
 
+		std::array<GLuint, shader::MAX> ShaderName;
+		
 		glf::compiler Compiler;
 		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 330 --profile core");
 		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 330 --profile core");
@@ -144,6 +145,11 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 		}
 
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+		for(std::size_t i = 0; i < ShaderName.size(); ++i)
+			glDeleteShader(ShaderName[i]);
+#		endif
+		
 		return this->checkError("initProgram");
 	}
 
@@ -318,11 +324,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG1]);
-		glDeleteShader(ShaderName[shader::VERT1]);
-		glDeleteShader(ShaderName[shader::FRAG2]);
-		glDeleteShader(ShaderName[shader::VERT2]);
-
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramNameMultiple);
 		glDeleteProgram(ProgramNameSingle);

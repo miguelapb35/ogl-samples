@@ -69,17 +69,6 @@ namespace
 		};
 	}//namespace viewport
 
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName;
 	GLuint ProgramName;
 	GLuint BufferName;
@@ -105,13 +94,19 @@ private:
 		if(Validated)
 		{
 			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			
+#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+				glDeleteShader(VertShaderName);
+				glDeleteShader(FragShaderName);
+#			endif
+
 			glLinkProgram(ProgramName);
 			Validated = Validated && glf::checkProgram(ProgramName);
 		}
@@ -125,7 +120,7 @@ private:
 		return Validated && this->checkError("initProgram");
 	}
 
-	bool initArrayBuffer()
+	bool initBuffer()
 	{
 		glGenBuffers(1, &BufferName);
 
@@ -133,7 +128,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initArrayBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	#define GL_MIRROR_CLAMP_TO_EDGE			0x8743
@@ -164,7 +159,7 @@ private:
 		return this->checkError("initSampler");
 	}
 
-	bool initTexture2D()
+	bool initTexture()
 	{
 		glGenTextures(1, &Texture2DName);
 
@@ -218,9 +213,9 @@ private:
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
-			Validated = initArrayBuffer();
+			Validated = initBuffer();
 		if(Validated)
-			Validated = initTexture2D();
+			Validated = initTexture();
 		if(Validated)
 			Validated = initSampler();
 		if(Validated)
@@ -231,8 +226,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &Texture2DName);
@@ -251,7 +244,6 @@ private:
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-		// Bind the program for use
 		glUseProgram(ProgramName);
 		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(UniformDiffuse, 0);

@@ -85,7 +85,6 @@ namespace
 
 	GLuint VertexArrayName(0);
 	GLuint TextureName(0);
-	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> BufferName(buffer::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLint> UniformMVP(program::MAX);
@@ -106,6 +105,8 @@ private:
 	{
 		bool Validated = true;
 
+		std::array<GLuint, shader::MAX> ShaderName;
+		
 		glf::compiler Compiler;
 		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT, "--version 150 --profile core");
 		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG[program::OFFSET], "--version 150 --profile core");
@@ -117,7 +118,7 @@ private:
 			ProgramName[i] = glCreateProgram();
 			glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
 			glAttachShader(ProgramName[i], ShaderName[shader::FRAG + i]);
-
+			
 			glBindAttribLocation(ProgramName[i], glf::semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[i], glf::semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[i], glf::semantic::frag::COLOR, "Color");
@@ -130,6 +131,11 @@ private:
 				UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
 		}
 
+#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
+		for(std::size_t i = 0; i < ShaderName.size(); ++i)
+			glDeleteShader(ShaderName[i]);
+#		endif
+		
 		return Validated && this->checkError("initProgram");
 	}
 
@@ -221,9 +227,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG_BICUBIC]);
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		for(int i = 0; i < program::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);

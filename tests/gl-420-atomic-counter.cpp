@@ -68,7 +68,7 @@ class gl_420_atomic_counter : public test
 {
 public:
 	gl_420_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-atomic-counter", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.0f), test::TEMPLATE_TEST_IGNORE)
+		test(argc, argv, "gl-420-atomic-counter", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.0f), test::RUN_ONLY)
 	{}
 
 private:
