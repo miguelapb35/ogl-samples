@@ -134,11 +134,6 @@ private:
 			glBindFragDataLocation(ProgramName[program::RENDER], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
 
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::RENDER]);
 		}
 
@@ -158,11 +153,6 @@ private:
 			glAttachShader(ProgramName[program::DEPTH], VertShaderName);
 			glBindAttribLocation(ProgramName[program::DEPTH], semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName[program::DEPTH]);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-#			endif
-
 
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::DEPTH]);
 		}

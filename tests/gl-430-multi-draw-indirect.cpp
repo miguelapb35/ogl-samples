@@ -133,9 +133,6 @@ private:
 		glLinkProgram(ProgramName);
 		Validated = Validated && Compiler.checkProgram(ProgramName);
 
-		glDeleteShader(VertShaderName);
-		glDeleteShader(FragShaderName);
-
 		GLint ActiveUniform(0);
 		glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniform);
 

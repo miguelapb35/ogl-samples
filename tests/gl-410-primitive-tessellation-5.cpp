@@ -94,7 +94,6 @@ private:
 				ProgramName[i] = glCreateProgram();
 				glProgramParameteri(ProgramName[i], GL_PROGRAM_SEPARABLE, GL_TRUE);
 				glAttachShader(ProgramName[i], ShaderName[i]);
-				glDeleteShader(ShaderName[i]);
 				glLinkProgram(ProgramName[i]);
 			}
 

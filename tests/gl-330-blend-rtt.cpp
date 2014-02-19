@@ -145,11 +145,6 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 		}
 
-#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-		for(std::size_t i = 0; i < ShaderName.size(); ++i)
-			glDeleteShader(ShaderName[i]);
-#		endif
-		
 		return this->checkError("initProgram");
 	}
 

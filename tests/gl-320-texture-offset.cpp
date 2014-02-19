@@ -131,11 +131,6 @@ private:
 				UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
 		}
 
-#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-		for(std::size_t i = 0; i < ShaderName.size(); ++i)
-			glDeleteShader(ShaderName[i]);
-#		endif
-		
 		return Validated && this->checkError("initProgram");
 	}
 

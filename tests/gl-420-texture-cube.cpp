@@ -97,8 +97,6 @@ private:
 			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName);
 
 			Validated = Validated && Compiler.checkProgram(ProgramName);

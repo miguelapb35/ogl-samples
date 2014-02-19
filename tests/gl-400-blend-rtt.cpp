@@ -105,12 +105,6 @@ private:
 			ProgramNameMultiple = glCreateProgram();
 			glAttachShader(ProgramNameMultiple, VertShaderName);
 			glAttachShader(ProgramNameMultiple, FragShaderName);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-
 			glLinkProgram(ProgramNameMultiple);
 		}
 
@@ -129,12 +123,6 @@ private:
 			ProgramNameSingle = glCreateProgram();
 			glAttachShader(ProgramNameSingle, VertShaderName);
 			glAttachShader(ProgramNameSingle, FragShaderName);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-
 			glLinkProgram(ProgramNameSingle);
 		}
 

@@ -104,13 +104,6 @@ private:
 			glAttachShader(ProgramName[program::VERT], VertShaderName);
 			glAttachShader(ProgramName[program::VERT], GeomShaderName);
 			glAttachShader(ProgramName[program::FRAG], FragShaderName);
-			
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(GeomShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
 			glProgramParameteri(ProgramName[program::VERT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glProgramParameteri(ProgramName[program::FRAG], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glLinkProgram(ProgramName[program::VERT]);

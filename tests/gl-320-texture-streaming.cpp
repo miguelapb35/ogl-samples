@@ -107,11 +107,6 @@ private:
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
 			
 			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");

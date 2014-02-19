@@ -108,8 +108,6 @@ private:
 			glAttachShader(ProgramName[pipeline::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 
 			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
 		}

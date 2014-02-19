@@ -94,12 +94,6 @@ private:
 			glAttachShader(ProgramName[program::FRAG], FragShaderName);
 			glLinkProgram(ProgramName[program::FRAG]);
 
-			glDeleteShader(VertShaderName);
-			glDeleteShader(ContShaderName);
-			glDeleteShader(EvalShaderName);
-			glDeleteShader(GeomShaderName);
-			glDeleteShader(FragShaderName);
-
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT]);
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG]);
 		}

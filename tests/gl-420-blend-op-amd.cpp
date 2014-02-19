@@ -121,8 +121,6 @@ private:
 			glProgramParameteri(ProgramName[pipeline::BLEND_OP], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[pipeline::BLEND_OP], VertShaderName);
 			glAttachShader(ProgramName[pipeline::BLEND_OP], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[pipeline::BLEND_OP]);
 			Validated = Compiler.checkProgram(ProgramName[pipeline::BLEND_OP]);
 		}
@@ -141,8 +139,6 @@ private:
 			glProgramParameteri(ProgramName[pipeline::SPLASH], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[pipeline::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
 			Validated = Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
 		}

@@ -153,9 +153,6 @@ private:
 			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
 		}
 
-		for(int i = 0; i < shader::MAX; ++i)
-			glDeleteShader(ShaderName[i]);
-
 		return Validated && this->checkError("initProgram");
 	}
 
