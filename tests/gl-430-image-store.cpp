@@ -62,7 +62,7 @@ private:
 	{
 		bool Validated(true);
 
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
 
@@ -77,7 +77,7 @@ private:
 			glAttachShader(ProgramName[pipeline::READ], VertShaderName);
 			glAttachShader(ProgramName[pipeline::READ], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::READ]);
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::READ]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::READ]);
 		}
 
 		if(Validated)
@@ -94,7 +94,7 @@ private:
 			glAttachShader(ProgramName[pipeline::SAVE], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SAVE], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SAVE]);
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::SAVE]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SAVE]);
 		}
 
 		if(Validated)
@@ -173,7 +173,7 @@ private:
 			glDrawBuffer(GL_NONE);
 
 			glBindProgramPipeline(PipelineName[pipeline::SAVE]);
-			glBindImageTexture(glf::semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+			glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 			glBindVertexArray(VertexArrayName);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 		}
@@ -183,7 +183,7 @@ private:
 			glDrawBuffer(GL_BACK);
 
 			glBindProgramPipeline(PipelineName[pipeline::READ]);
-			glBindImageTexture(glf::semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+			glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
 			glBindVertexArray(VertexArrayName);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 		}

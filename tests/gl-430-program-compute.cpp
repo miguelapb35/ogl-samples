@@ -104,27 +104,32 @@ private:
 	bool initProgram()
 	{
 		bool Validated(true);
-	
+
+		compiler Compiler;
+
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VS_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FS_SOURCE);
-			GLuint ComputeShaderName = glf::createShader(GL_COMPUTE_SHADER, getDataDirectory() + CS_SOURCE);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VS_SOURCE);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FS_SOURCE);
+			GLuint ComputeShaderName = Compiler.create(GL_COMPUTE_SHADER, getDataDirectory() + CS_SOURCE);
 
 			ProgramName[program::GRAPHICS] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::GRAPHICS], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::GRAPHICS], VertShaderName);
 			glAttachShader(ProgramName[program::GRAPHICS], FragShaderName);
 			glLinkProgram(ProgramName[program::GRAPHICS]);
-			glDeleteShader(VertShaderName);
-			Validated = Validated && glf::checkProgram(ProgramName[program::GRAPHICS]);
 
 			ProgramName[program::COMPUTE] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::COMPUTE], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::COMPUTE], ComputeShaderName);
 			glLinkProgram(ProgramName[program::COMPUTE]);
-			glDeleteShader(ComputeShaderName);
-			Validated = Validated && glf::checkProgram(ProgramName[program::COMPUTE]);
+		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::GRAPHICS]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::COMPUTE]);
 		}
 
 		if(Validated)
@@ -207,11 +212,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -329,7 +330,7 @@ private:
 		glBindProgramPipeline(PipelineName[program::COMPUTE]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::INPUT, BufferName[buffer::INPUT]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::OUTPUT, BufferName[buffer::OUTPUT]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glDispatchCompute(GLuint(VertexCount), 1, 1);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
@@ -339,10 +340,10 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantics::INPUT, BufferName[buffer::OUTPUT]);
 
-		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, GLF_BUFFER_OFFSET(0), 1, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0), 1, 0, 0);
 
 		return true;
 	}

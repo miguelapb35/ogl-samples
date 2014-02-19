@@ -89,7 +89,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
@@ -99,7 +99,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = glf::checkProgram(ProgramName);
+			Validated = Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -136,9 +136,9 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return Validated;
@@ -196,7 +196,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 

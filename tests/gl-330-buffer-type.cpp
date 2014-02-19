@@ -22,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
+#include <glm/gtc/packing.hpp>
 
 namespace
 {
@@ -120,7 +121,7 @@ private:
 	
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
 			Validated = Validated && Compiler.check();
@@ -135,7 +136,7 @@ private:
 #			endif
 			
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		// Get variables locations
@@ -176,34 +177,34 @@ private:
 
 		glBindVertexArray(VertexArrayName[buffer::F32]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F32]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[buffer::I8]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I8]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, sizeof(glm::u8vec2), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_BYTE, GL_FALSE, sizeof(glm::u8vec2), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[buffer::I32]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::I32]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_INT, GL_FALSE, sizeof(glm::i32vec2), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_INT, GL_FALSE, sizeof(glm::i32vec2), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[buffer::RGB10A2]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::RGB10A2]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(glm::uint32), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_INT_2_10_10_10_REV, GL_TRUE, sizeof(glm::uint32), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

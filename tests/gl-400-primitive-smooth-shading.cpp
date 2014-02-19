@@ -78,22 +78,16 @@ public:
 private:
 	bool initProgram()
 	{
+		compiler Compiler;
+
 		bool Validated = true;
-	
-		// Create program
 		if(Validated)
 		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER1);
-			GLuint ContShader = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER1);
-			GLuint EvalShader = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER1);
-			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER1);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER1);
-
-			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER1);
-			Validated = Validated && glf::checkShader(ContShader, SAMPLE_CONT_SHADER1);
-			Validated = Validated && glf::checkShader(EvalShader, SAMPLE_EVAL_SHADER1);
-			Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER1);
-			Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER1);
+			GLuint VertShader = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER1);
+			GLuint ContShader = Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER1);
+			GLuint EvalShader = Compiler.create(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER1);
+			GLuint GeomShader = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER1);
+			GLuint FragShader = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER1);
 
 			ProgramName[0] = glCreateProgram();
 			glAttachShader(ProgramName[0], VertShader);
@@ -101,54 +95,32 @@ private:
 			glAttachShader(ProgramName[0], ContShader);
 			glAttachShader(ProgramName[0], EvalShader);
 			glAttachShader(ProgramName[0], FragShader);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShader);
-				glDeleteShader(GeomShader);
-				glDeleteShader(ContShader);
-				glDeleteShader(EvalShader);
-				glDeleteShader(FragShader);
-#			endif
-
 			glLinkProgram(ProgramName[0]);
-			Validated = Validated && glf::checkProgram(ProgramName[0]);
 		}
 
-		// Get variables locations
 		if(Validated)
 		{
-			UniformMVP[0] = glGetUniformLocation(ProgramName[0], "MVP");
-		}
-
-		// Create program
-		if(Validated)
-		{
-			GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER2);
-			GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER2);
-			GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER2);
-
-			Validated = Validated && glf::checkShader(VertShader, SAMPLE_VERT_SHADER2);
-			Validated = Validated && glf::checkShader(GeomShader, SAMPLE_GEOM_SHADER2);
-			Validated = Validated && glf::checkShader(FragShader, SAMPLE_FRAG_SHADER2);
+			GLuint VertShader = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER2);
+			GLuint GeomShader = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER2);
+			GLuint FragShader = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER2);
 
 			ProgramName[1] = glCreateProgram();
 			glAttachShader(ProgramName[1], VertShader);
 			glAttachShader(ProgramName[1], GeomShader);
 			glAttachShader(ProgramName[1], FragShader);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShader);
-				glDeleteShader(GeomShader);
-				glDeleteShader(FragShader);
-#			endif
-
 			glLinkProgram(ProgramName[1]);
-			Validated = Validated && glf::checkProgram(ProgramName[1]);
 		}
 
-		// Get variables locations
 		if(Validated)
 		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[0]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[1]);
+		}
+
+		if(Validated)
+		{
+			UniformMVP[0] = glGetUniformLocation(ProgramName[0], "MVP");
 			UniformMVP[1] = glGetUniformLocation(ProgramName[1], "MVP");
 		}
 
@@ -157,14 +129,13 @@ private:
 
 	bool initVertexArray()
 	{
-		// Build a vertex array object
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
@@ -173,7 +144,6 @@ private:
 
 	bool initBuffer()
 	{
-		// Generate a buffer object
 		glGenBuffers(1, &ElementBufferName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);

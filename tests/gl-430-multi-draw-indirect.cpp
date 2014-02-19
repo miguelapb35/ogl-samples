@@ -121,7 +121,7 @@ private:
 	{
 		bool Validated(true);
 	
-		glf::compiler Compiler;
+		compiler Compiler;
 		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 		Validated = Validated && Compiler.check();
@@ -131,7 +131,7 @@ private:
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
 		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+		Validated = Validated && Compiler.checkProgram(ProgramName);
 
 		glDeleteShader(VertShaderName);
 		glDeleteShader(FragShaderName);
@@ -215,16 +215,16 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
-			glVertexAttribIPointer(glf::semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), GLF_BUFFER_OFFSET(0));
-			glVertexAttribDivisor(glf::semantic::attr::DRAW_ID, 1);
+			glVertexAttribIPointer(semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), BUFFER_OFFSET(0));
+			glVertexAttribDivisor(semantic::attr::DRAW_ID, 1);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
-			glEnableVertexAttribArray(glf::semantic::attr::DRAW_ID);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::DRAW_ID);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]); 
 		glBindVertexArray(0);
@@ -408,8 +408,8 @@ private:
 
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 

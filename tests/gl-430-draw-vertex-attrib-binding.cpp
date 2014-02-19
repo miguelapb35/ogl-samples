@@ -92,7 +92,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
@@ -109,8 +109,8 @@ private:
 			glLinkProgram(ProgramName[program::FRAGMENT]);
 			glDeleteShader(FragShaderName);
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::VERTEX]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FRAGMENT]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERTEX]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAGMENT]);
 		}
 
 		if(Validated)
@@ -192,14 +192,14 @@ private:
 
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glVertexAttribBinding(glf::semantic::attr::POSITION, 0);
-			glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, 0);
+			glVertexAttribFormat(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
 
-			glVertexAttribBinding(glf::semantic::attr::TEXCOORD, 0);
-			glVertexAttribFormat(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+			glVertexAttribBinding(semantic::attr::TEXCOORD, 0);
+			glVertexAttribFormat(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 			glBindVertexBuffer(0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
@@ -263,7 +263,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 

@@ -84,45 +84,38 @@ private:
 	{
 		bool Validated = true;
 
-		glf::compiler Compiler;
-		GLuint VertTransformShaderName = Compiler.create(GL_VERTEX_SHADER, 
-			getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 440 --profile core");
-		GLuint VertFeedbackShaderName = Compiler.create(GL_VERTEX_SHADER, 
-			getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
-		GLuint FragFeedbackShaderName = Compiler.create(GL_FRAGMENT_SHADER, 
-			getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
+		compiler Compiler;
+		GLuint VertTransformShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 440 --profile core");
+		GLuint VertFeedbackShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
+		GLuint FragFeedbackShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
 
-		Validated = Validated && Compiler.check();
-
-		// Create program
 		if(Validated)
 		{
 			ProgramName[program::TRANSFORM] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::TRANSFORM], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::TRANSFORM], VertTransformShaderName);
-			glDeleteShader(VertTransformShaderName);
 			glLinkProgram(ProgramName[program::TRANSFORM]);
-
-			Validated = Validated && glf::checkProgram(ProgramName[program::TRANSFORM]);
 		}
 
-		// Create program
 		if(Validated)
 		{
 			ProgramName[program::FEEDBACK] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::FEEDBACK], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::FEEDBACK], VertFeedbackShaderName);
 			glAttachShader(ProgramName[program::FEEDBACK], FragFeedbackShaderName);
-			glDeleteShader(VertFeedbackShaderName);
-			glDeleteShader(FragFeedbackShaderName);
 			glLinkProgram(ProgramName[program::FEEDBACK]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FEEDBACK]);
 		}
-
-		glGenProgramPipelines(program::MAX, &PipelineName[0]);
 
 		if(Validated)
 		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::TRANSFORM]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FEEDBACK]);
+		}
+
+		if(Validated)
+		{
+			glGenProgramPipelines(program::MAX, &PipelineName[0]);
 			glUseProgramStages(PipelineName[program::TRANSFORM], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::TRANSFORM]);
 			glUseProgramStages(PipelineName[program::FEEDBACK], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::FEEDBACK]);
 		}
@@ -132,23 +125,22 @@ private:
 
 	bool initVertexArray()
 	{
-		// Build a vertex array object
 		glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 
 		glBindVertexArray(VertexArrayName[program::TRANSFORM]);
-			glVertexAttribFormat(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0);
-			glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glVertexAttribFormat(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, semantic::buffer::STATIC);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[program::FEEDBACK]);
-			glVertexAttribFormat(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0);
-			glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glVertexAttribFormat(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, semantic::buffer::STATIC);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 
-			glVertexAttribFormat(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4));
-			glVertexAttribBinding(glf::semantic::attr::COLOR, glf::semantic::buffer::STATIC);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glVertexAttribFormat(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4));
+			glVertexAttribBinding(semantic::attr::COLOR, semantic::buffer::STATIC);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -156,7 +148,6 @@ private:
 
 	bool initFeedback()
 	{
-		// Generate a buffer object
 		glGenTransformFeedbacks(1, &FeedbackName);
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, FeedbackName);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, BufferName[buffer::FEEDBACK]); 
@@ -167,7 +158,6 @@ private:
 
 	bool initBuffer()
 	{
-		// Generate a buffer object
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -179,11 +169,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -259,9 +245,9 @@ private:
 		glEnable(GL_RASTERIZER_DISCARD);
 
 		glBindProgramPipeline(PipelineName[program::TRANSFORM]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName[program::TRANSFORM]);
-		glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, sizeof(glm::vec4));
+		glBindVertexBuffer(semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, sizeof(glm::vec4));
 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, FeedbackName);
 		glBeginTransformFeedback(GL_TRIANGLES);
@@ -274,7 +260,7 @@ private:
 		// Second draw, reuse the captured attributes
 		glBindProgramPipeline(PipelineName[program::FEEDBACK]);
 		glBindVertexArray(VertexArrayName[program::FEEDBACK]);
-		glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::FEEDBACK], 0, sizeof(glf::vertex_v4fc4f));
+		glBindVertexBuffer(semantic::buffer::STATIC, BufferName[buffer::FEEDBACK], 0, sizeof(glf::vertex_v4fc4f));
 	
 		glDrawTransformFeedback(GL_TRIANGLES, FeedbackName);
 

@@ -135,7 +135,7 @@ private:
 
 		std::array<GLuint, shader::MAX> ShaderName;
 
-		glf::compiler Compiler;
+		compiler Compiler;
 		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
 		for(int i = 0; i < program::MAX; ++i)
 			ShaderName[shader::FRAG_THROUGH + i] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE[i], "--version 330 --profile core");
@@ -147,7 +147,7 @@ private:
 			glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
 			glAttachShader(ProgramName[i], ShaderName[shader::FRAG_THROUGH + i]);
 			glLinkProgram(ProgramName[i]);
-			Validated = Validated && glf::checkProgram(ProgramName[i]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[i]);
 
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");
@@ -229,12 +229,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

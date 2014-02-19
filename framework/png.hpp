@@ -26,12 +26,5 @@
 #define GLM_FORCE_RADIANS
 #include <gli/gli.hpp>
 
-namespace glf
-{
-	/// Loading a PNG file
-	gli::texture2D load_png(char const * Filename);
-
-	void save_png(gli::texture2D const & Texture, char const * Filename);
-
-}//namespace glf
-
+gli::texture2D load_png(char const * Filename);
+void save_png(gli::texture2D const & Texture, char const * Filename);

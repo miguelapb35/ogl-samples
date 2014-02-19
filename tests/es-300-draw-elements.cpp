@@ -69,22 +69,19 @@ private:
 		// Create program
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
-			glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-			glf::checkShader(VertexShaderName, FRAGMENT_SHADER_SOURCE);
+			compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertexShaderName);
-			glAttachShader(ProgramName, FragmentShaderName);
-			glDeleteShader(VertexShaderName);
-			glDeleteShader(FragmentShaderName);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 
-			glf::checkProgram(ProgramName);
-
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName);
-			Validated = glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		// Get variables locations
@@ -130,11 +127,11 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-				glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+				glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferName);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

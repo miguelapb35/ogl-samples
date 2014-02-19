@@ -80,7 +80,7 @@ private:
 		// Create program
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint ShaderName[] = {
 				Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER, "--version 410 --profile core"),
 				Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER, "--version 410 --profile core"),
@@ -99,7 +99,7 @@ private:
 			}
 
 			for(std::size_t i = 0; i < program::MAX; ++i)
-				Validated = Validated && glf::checkProgram(ProgramName[i]);
+				Validated = Validated && Compiler.checkProgram(ProgramName[i]);
 		}
 
 		if(Validated)
@@ -125,12 +125,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

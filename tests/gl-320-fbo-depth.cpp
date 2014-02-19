@@ -99,55 +99,46 @@ private:
 	bool initProgram()
 	{
 		bool Validated(true);
-	
+
+		compiler Compiler;
+
 		if(Validated)
 		{
-			glf::compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
 			glAttachShader(ProgramName[program::TEXTURE], VertShaderName);
 			glAttachShader(ProgramName[program::TEXTURE], FragShaderName);
 
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
-			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::TEXTURE], glf::semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName[program::TEXTURE], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::TEXTURE], semantic::attr::TEXCOORD, "Texcoord");
+			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::TEXTURE]);
-
-			Validated = Validated && glf::checkProgram(ProgramName[program::TEXTURE]);
 		}
 
 		if(Validated)
-			UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
-
-		if(Validated)
 		{
-			glf::compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[program::SPLASH], FragShaderName);
 
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
-			glBindFragDataLocation(ProgramName[program::TEXTURE], glf::semantic::frag::COLOR, "Color");
+			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
-
-			Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
 		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::TEXTURE]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::SPLASH]);
+		}
+
+		if(Validated)
+			UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
 
 		return Validated;
 	}
@@ -165,11 +156,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -201,8 +188,7 @@ private:
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
+			glCompressedTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
 				GLsizei(Texture[Level].dimensions().x), 
@@ -230,12 +216,12 @@ private:
 		glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 		glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
@@ -318,12 +304,12 @@ private:
 
 		// Bind rendering objects
 		glUseProgram(ProgramName[program::TEXTURE]);
-		glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, glf::semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, semantic::uniform::TRANSFORM0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glBindVertexArray(VertexArrayName[program::TEXTURE]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 

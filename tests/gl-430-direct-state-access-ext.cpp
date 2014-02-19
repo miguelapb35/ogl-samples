@@ -119,7 +119,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
@@ -131,7 +131,7 @@ private:
 			glLinkProgram(ProgramName);
 			glDeleteShader(VertShaderName);
 			glDeleteShader(FragShaderName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -224,10 +224,10 @@ private:
 	bool initVertexArray()
 	{
 		glGenVertexArrays(1, &VertexArrayName);
-		glVertexArrayVertexAttribOffsetEXT(VertexArrayName, BufferName[buffer::VERTEX], glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), 0);
-		glVertexArrayVertexAttribOffsetEXT(VertexArrayName, BufferName[buffer::VERTEX], glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), sizeof(glm::vec2));
-		glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::POSITION);
-		glEnableVertexArrayAttribEXT(VertexArrayName, glf::semantic::attr::TEXCOORD);
+		glVertexArrayVertexAttribOffsetEXT(VertexArrayName, BufferName[buffer::VERTEX], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), 0);
+		glVertexArrayVertexAttribOffsetEXT(VertexArrayName, BufferName[buffer::VERTEX], semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), sizeof(glm::vec2));
+		glEnableVertexArrayAttribEXT(VertexArrayName, semantic::attr::POSITION);
+		glEnableVertexArrayAttribEXT(VertexArrayName, semantic::attr::TEXCOORD);
 
 		return this->checkError("initVertexArray");
 	}
@@ -280,7 +280,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
 		glBindSampler(0, SamplerName);
 		glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::TEXTURE]);
 		glBindVertexArray(VertexArrayName);
@@ -301,7 +301,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
 		glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);

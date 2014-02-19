@@ -84,7 +84,7 @@ private:
 	
 		std::array<GLuint, shader::MAX> ShaderName;
 		
-		glf::compiler Compiler;
+		compiler Compiler;
 		ShaderName[shader::VERT_TRANSFORM] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 150 --profile core");
 		ShaderName[shader::VERT_FEEDBACK] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
 		ShaderName[shader::FRAG_FEEDBACK] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 150 --profile core");
@@ -94,13 +94,13 @@ private:
 		{
 			ProgramName[program::TRANSFORM] = glCreateProgram();
 			glAttachShader(ProgramName[program::TRANSFORM], ShaderName[shader::VERT_TRANSFORM]);
-			glBindAttribLocation(ProgramName[program::TRANSFORM], glf::semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::TRANSFORM], semantic::attr::POSITION, "Position");
 
 			GLchar const * Strings[] = {"gl_Position", "block.Color"}; 
 			glTransformFeedbackVaryings(ProgramName[program::TRANSFORM], 2, Strings, GL_INTERLEAVED_ATTRIBS); 
 			glLinkProgram(ProgramName[program::TRANSFORM]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::TRANSFORM]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::TRANSFORM]);
 
 			char Name[64];
 			memset(Name, 0, 64);
@@ -162,11 +162,11 @@ private:
 			glAttachShader(ProgramName[program::FEEDBACK], ShaderName[shader::VERT_FEEDBACK]);
 			glAttachShader(ProgramName[program::FEEDBACK], ShaderName[shader::FRAG_FEEDBACK]);
 
-			glBindAttribLocation(ProgramName[program::FEEDBACK], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::FEEDBACK], glf::semantic::attr::COLOR, "Color");
-			glBindFragDataLocation(ProgramName[program::FEEDBACK], glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName[program::FEEDBACK], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::FEEDBACK], semantic::attr::COLOR, "Color");
+			glBindFragDataLocation(ProgramName[program::FEEDBACK], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::FEEDBACK]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FEEDBACK]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FEEDBACK]);
 		}
 
 #		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
@@ -184,21 +184,21 @@ private:
 		// Build a vertex array object
 		glBindVertexArray(VertexArrayName[program::TRANSFORM]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[program::TRANSFORM]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		// Build a vertex array object
 		glBindVertexArray(VertexArrayName[program::FEEDBACK]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[program::FEEDBACK]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec4)));
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), BUFFER_OFFSET(sizeof(glm::vec4)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

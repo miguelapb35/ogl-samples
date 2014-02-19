@@ -86,21 +86,11 @@ private:
 	{
 		bool Validated = true;
 
-		glGenProgramPipelines(1, &PipelineName);
-		glBindProgramPipeline(PipelineName);
-
 		if(Validated)
 		{
 			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
-		}
-
-		if(Validated)
-		{
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-			Validated = Validated && this->checkError("initProgram - stage");
 		}
 
 		if(Validated)
@@ -108,20 +98,27 @@ private:
 			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
 		}
 
 		if(Validated)
 		{
-			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && this->checkError("initProgram - stage");
+			compiler Compiler;
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG]);
 		}
 
-		// Get variables locations
 		if(Validated)
 		{
 			UniformMVP = glGetUniformLocation(ProgramName[program::VERT], "MVP");
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
+		}
+
+		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
+			glBindProgramPipeline(PipelineName);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
+			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -148,10 +145,10 @@ private:
 
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::F64]);
-			glVertexAttribLPointer(glf::semantic::attr::POSITION, 3, GL_DOUBLE, sizeof(glm::dvec3), GLF_BUFFER_OFFSET(0));
+			glVertexAttribLPointer(semantic::attr::POSITION, 3, GL_DOUBLE, sizeof(glm::dvec3), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

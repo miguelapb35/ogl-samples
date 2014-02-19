@@ -76,7 +76,7 @@ private:
 	{
 		bool Validated = true;
 
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		glGenProgramPipelines(GLsizei(PIPELINE_MAX), PipelineName);
 
@@ -94,7 +94,7 @@ private:
 			glAttachShader(ProgramName[LAYERING], FragShaderName);
 			glLinkProgram(ProgramName[LAYERING]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
 		}
 
 		if(Validated)
@@ -114,7 +114,7 @@ private:
 			glAttachShader(ProgramName[VIEWPORT], FragShaderName);
 			glLinkProgram(ProgramName[VIEWPORT]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[VIEWPORT]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[VIEWPORT]);
 		}
 
 		if(Validated)
@@ -204,12 +204,12 @@ private:
 
 		glBindVertexArray(VertexArrayName[VIEWPORT]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[LAYERING]);

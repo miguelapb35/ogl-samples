@@ -23,6 +23,7 @@
 
 #include "test.hpp"
 #include "png.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace 
 {
@@ -63,7 +64,7 @@ namespace
 
 		if(Success)
 		{
-			gli::texture2D Template(glf::load_png((getDataDirectory() + "templates/" + vendor() + Title + ".png").c_str()));
+			gli::texture2D Template(load_png((getDataDirectory() + "templates/" + vendor() + Title + ".png").c_str()));
 
 			if(Success)
 				Success = Success && (!Template.empty());
@@ -73,7 +74,7 @@ namespace
 		}
 
 		if(!Success)
-			glf::save_png(Texture, (getBinaryDirectory() + Title + ".png").c_str());
+			save_png(Texture, (getBinaryDirectory() + Title + ".png").c_str());
 
 		return Success;
 	}
@@ -345,7 +346,7 @@ void test::logImplementationDependentLimit(GLenum Value, std::string const & Str
 {
 	GLint Result(0);
 	glGetIntegerv(Value, &Result);
-	std::string Message(glf::format("%s: %d", String.c_str(), Result));
+	std::string Message(format("%s: %d", String.c_str(), Result));
 #	if(!defined(__APPLE__) && defined(GL_ARB_debug_output))
 		glDebugMessageInsertARB(GL_DEBUG_SOURCE_APPLICATION_ARB, GL_DEBUG_TYPE_OTHER_ARB, 1, GL_DEBUG_SEVERITY_LOW_ARB, GLsizei(Message.size()), Message.c_str());
 #	endif

@@ -108,7 +108,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
 				"--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
@@ -121,7 +121,7 @@ private:
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
 
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -162,14 +162,14 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glVertexAttribDivisor(glf::semantic::attr::POSITION, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribDivisor(semantic::attr::POSITION, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR]);
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, 0, 0);
-			glVertexAttribDivisor(glf::semantic::attr::COLOR, 1);
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribDivisor(semantic::attr::COLOR, 1);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return Validated;
@@ -229,7 +229,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 

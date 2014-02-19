@@ -48,34 +48,30 @@ private:
 	{
 		bool Validated = true;
 	
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		// Create program
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-			
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
 
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		// Get variables locations
 		if(Validated)
 		{
-			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), glf::semantic::uniform::TRANSFORM0);
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -159,7 +155,7 @@ private:
 
 		glUseProgram(ProgramName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 

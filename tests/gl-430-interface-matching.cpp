@@ -105,7 +105,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER, "--version 420 --profile core");
 			GLuint ContShaderName = Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONT_SHADER, "--version 420 --profile core");
 			GLuint EvalShaderName = Compiler.create(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVAL_SHADER, "--version 420 --profile core");
@@ -127,8 +127,8 @@ private:
 			glAttachShader(ProgramName[program::FRAG], FragShaderName);
 			glLinkProgram(ProgramName[program::FRAG]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG]);
 		}
 
 		if(Validated)
@@ -145,22 +145,22 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION + 0, 2, GL_FLOAT, GL_FALSE,(GLint) sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::POSITION + 1, 2, GL_FLOAT, GL_FALSE,(GLint) sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(0));
-			glVertexAttribLPointer(glf::semantic::attr::COLOR, 4, GL_DOUBLE, (GLint)sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-			//glVertexAttribLPointer(glf::semantic::attr::COLOR, 4, GL_DOUBLE, (GLint)sizeof(glf::vertex_v2fc4d), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION + 0, 2, GL_FLOAT, GL_FALSE,(GLint) sizeof(glf::vertex_v2fc4d), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION + 1, 2, GL_FLOAT, GL_FALSE,(GLint) sizeof(glf::vertex_v2fc4d), BUFFER_OFFSET(0));
+			glVertexAttribLPointer(semantic::attr::COLOR, 4, GL_DOUBLE, (GLint)sizeof(glf::vertex_v2fc4d), BUFFER_OFFSET(sizeof(glm::vec2)));
+			//glVertexAttribLPointer(semantic::attr::COLOR, 4, GL_DOUBLE, (GLint)sizeof(glf::vertex_v2fc4d), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION + 0);
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION + 1);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION + 0);
+			glEnableVertexAttribArray(semantic::attr::POSITION + 1);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		std::vector<vertexattrib> Valid(16); 
-		Valid[glf::semantic::attr::POSITION + 0] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		Valid[glf::semantic::attr::POSITION + 1] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		Valid[glf::semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
-		//Valid[glf::semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_DOUBLE, GL_FALSE, GL_FALSE, GL_FALSE, 0, GLF_BUFFER_OFFSET(sizeof(glm::vec2)),NULL);
+		Valid[semantic::attr::POSITION + 0] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		Valid[semantic::attr::POSITION + 1] = vertexattrib(GL_TRUE, 2, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		Valid[semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, 0, NULL);
+		//Valid[semantic::attr::COLOR]        = vertexattrib(GL_TRUE, 4, (GLint)sizeof(glf::vertex_v2fc4d), GL_DOUBLE, GL_FALSE, GL_FALSE, GL_FALSE, 0, BUFFER_OFFSET(sizeof(glm::vec2)),NULL);
 
 		// TODO
 		//glf::validateVAO(VertexArrayName, Valid);
@@ -390,7 +390,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 		glPatchParameteri(GL_PATCH_VERTICES, VertexCount);
 

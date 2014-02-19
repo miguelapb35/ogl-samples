@@ -24,6 +24,9 @@
 #pragma once
 
 #include "csv.hpp"
+#include "compiler.hpp"
+#include "sementics.hpp"
+#include "vertex.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -33,16 +36,14 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <glf/compiler.hpp>
-#include <glf/sementics.hpp>
-#include <glf/vertex.hpp>
+#include <gli/gli.hpp>
 
 #include <memory>
 #include <array>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-#define GLF_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 struct vertexattrib
 {

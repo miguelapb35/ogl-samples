@@ -28,16 +28,6 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-320/draw-image-space.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/draw-image-space.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
 }//namespace
 
 class gl_320_draw_image_space : public test
@@ -53,7 +43,6 @@ public:
 	{}
 
 private:
-	std::array<GLuint, shader::MAX> ShaderName;
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
@@ -66,18 +55,20 @@ private:
 	
 		if(Validated)
 		{
-			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		return Validated;
@@ -145,8 +136,6 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
-		glDeleteShader(ShaderName[0]);
-		glDeleteShader(ShaderName[1]);
 
 		return true;
 	}
@@ -161,7 +150,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 

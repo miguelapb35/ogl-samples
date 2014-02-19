@@ -77,23 +77,23 @@ private:
 	{
 		bool Validated = true;
 	
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		if(Validated)
 		{
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE);
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE);
-			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName, glf::semantic::attr::TEXCOORD, "Texcoord");
+
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -177,12 +177,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

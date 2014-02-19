@@ -78,7 +78,7 @@ private:
 	
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
@@ -87,10 +87,10 @@ private:
 			glAttachShader(ProgramName, ShaderName[shader::VERT]);
 			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -155,10 +155,10 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

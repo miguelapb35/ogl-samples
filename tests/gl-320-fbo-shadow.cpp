@@ -134,7 +134,7 @@ private:
 		
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER, "--version 150 --profile core");
 			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
@@ -142,12 +142,12 @@ private:
 			ProgramName[program::RENDER] = glCreateProgram();
 			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::VERT_RENDER]);
 			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG_RENDER]);
-			glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::COLOR, "Color");
-			glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::COLOR, "Color");
+			glBindFragDataLocation(ProgramName[program::RENDER], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::RENDER]);
 		}
 
 		if(Validated)
@@ -158,16 +158,16 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::DEPTH] = glCreateProgram();
 			glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::VERT_DEPTH]);
-			glBindAttribLocation(ProgramName[program::DEPTH], glf::semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::DEPTH], semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName[program::DEPTH]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::DEPTH]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::DEPTH]);
 		}
 
 		if(Validated)
@@ -272,12 +272,12 @@ private:
 		glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 		glBindVertexArray(VertexArrayName[program::RENDER]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv4u8), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v3fv4u8), GLF_BUFFER_OFFSET(sizeof(glm::vec3)));
+			glVertexAttribPointer(semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv4u8), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v3fv4u8), BUFFER_OFFSET(sizeof(glm::vec3)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
@@ -349,7 +349,7 @@ private:
 
 		// Bind rendering objects
 		glUseProgram(ProgramName[program::DEPTH]);
-		glUniformBlockBinding(ProgramName[program::DEPTH], UniformTransform[program::DEPTH], glf::semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName[program::DEPTH], UniformTransform[program::DEPTH], semantic::uniform::TRANSFORM0);
 
 		glBindVertexArray(VertexArrayName[program::RENDER]);
 		
@@ -379,7 +379,7 @@ private:
 
 		glUseProgram(ProgramName[program::RENDER]);
 		glUniform1i(UniformShadow, 0);
-		glUniformBlockBinding(ProgramName[program::RENDER], UniformTransform[program::RENDER], glf::semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName[program::RENDER], UniformTransform[program::RENDER], semantic::uniform::TRANSFORM0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::SHADOWMAP]);
@@ -427,7 +427,7 @@ private:
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		renderShadow();
 		renderFramebuffer();
