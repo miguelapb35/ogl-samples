@@ -100,6 +100,7 @@ public:
 	gl_320_fbo(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-fbo", test::CORE, 3, 2),
 		FramebufferName(0),
+		FramebufferScale(2),
 		UniformTransform(-1)
 	{}
 
@@ -110,6 +111,7 @@ private:
 	std::array<GLuint, texture::MAX> TextureName;
 	std::array<GLint, program::MAX> UniformDiffuse;
 	GLuint FramebufferName;
+	int FramebufferScale;
 	GLint UniformTransform;
 
 	bool initProgram()
@@ -124,7 +126,6 @@ private:
 		{
 			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
 			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
@@ -140,7 +141,6 @@ private:
 		{
 			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
 			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
@@ -162,6 +162,13 @@ private:
 			UniformTransform = glGetUniformBlockIndex(ProgramName[program::TEXTURE], "transform");
 			UniformDiffuse[program::TEXTURE] = glGetUniformLocation(ProgramName[program::TEXTURE], "Diffuse");
 			UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
+
+			glUseProgram(ProgramName[program::TEXTURE]);
+			glUniform1i(UniformDiffuse[program::TEXTURE], 0);
+			glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, semantic::uniform::TRANSFORM0);
+
+			glUseProgram(ProgramName[program::SPLASH]);
+			glUniform1i(UniformDiffuse[program::SPLASH], 0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -222,7 +229,7 @@ private:
 				Texture[Level].data());
 		}
 	
-		glm::ivec2 WindowSize(this->getWindowSize());
+		glm::ivec2 WindowSize(this->getWindowSize() * this->FramebufferScale);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
@@ -330,7 +337,7 @@ private:
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 
-		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		float Depth(1.0f);
@@ -338,8 +345,6 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName[program::TEXTURE]);
-		glUniform1i(UniformDiffuse[program::TEXTURE], 0);
-		glUniformBlockBinding(ProgramName[program::TEXTURE], UniformTransform, semantic::uniform::TRANSFORM0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
@@ -350,9 +355,11 @@ private:
 
 		glDisable(GL_DEPTH_TEST);
 
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 		glUseProgram(ProgramName[program::SPLASH]);
-		glUniform1i(UniformDiffuse[program::SPLASH], 0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VertexArrayName[program::SPLASH]);
