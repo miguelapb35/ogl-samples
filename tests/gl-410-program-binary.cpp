@@ -125,7 +125,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getBinaryDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
@@ -136,7 +136,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getBinaryDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
@@ -147,7 +147,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getBinaryDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
@@ -201,9 +201,9 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		saveProgram(ProgramName[program::VERT], getDataDirectory() + VERT_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::GEOM], getDataDirectory() + GEOM_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::FRAG], getDataDirectory() + FRAG_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::VERT], getBinaryDirectory() + VERT_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::GEOM], getBinaryDirectory() + GEOM_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::FRAG], getBinaryDirectory() + FRAG_PROGRAM_BINARY);
 
 		return Validated && this->checkError("initProgram");
 	}
@@ -336,8 +336,12 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_410_program_binary Test(argc, argv);
-	Error += Test();
+	// Execute the test twice to test the generated binary
+	for(std::size_t i = 0; i < 2; ++i)
+	{
+		gl_410_program_binary Test(argc, argv);
+		Error += Test();
+	}
 
 	return Error;
 }
