@@ -607,7 +607,8 @@ void APIENTRY test::debugOutput
 	if(severity == GL_DEBUG_SEVERITY_HIGH_ARB)
 	{
 		strcpy(debSev, "high");
-		Test->Error = true;
+		if(Test->Success == GENERATE_ERROR || source != GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
+			Test->Error = true;
 	}
 	else if(severity == GL_DEBUG_SEVERITY_MEDIUM_ARB)
 		strcpy(debSev, "medium");
@@ -620,6 +621,6 @@ void APIENTRY test::debugOutput
 
 	fprintf(stderr,"%s: %s(%s) %d: %s\n", debSource, debType, debSev, id, message);
 
-	if(Test->Success != GENERATE_ERROR)
+	if(Test->Success != GENERATE_ERROR && source != GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
 		assert(!Test->Error);
 }

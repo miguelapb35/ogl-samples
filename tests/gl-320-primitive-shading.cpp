@@ -61,7 +61,6 @@ namespace
 	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
-	GLint UniformTransform(-1);
 }//namespace
 
 class gl_320_primitive_shading : public test
@@ -72,6 +71,17 @@ public:
 	{}
 
 private:
+	bool testError()
+	{
+
+
+		compiler Compiler;
+
+		Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 150 --profile core --define GEN_ERROR");
+
+		return !Compiler.check();
+	}
+
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -99,7 +109,9 @@ private:
 
 		if(Validated)
 		{
-			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			glUseProgram(ProgramName);
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+			glUseProgram(0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -151,7 +163,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		bool Validated = testError();
 
 		if(Validated)
 			Validated = initProgram();
@@ -196,7 +208,6 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
 
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
