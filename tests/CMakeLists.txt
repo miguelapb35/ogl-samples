@@ -8,9 +8,11 @@ function(glCreateSampleGTC NAME)
 
 	source_group("Shader Files" FILES ${SHADER_PATH})
 	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${SHADER_PATH})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
+	if(MSVC)
+		add_custom_command(
+			TARGET ${SAMPLE_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR})
+	endif()
 
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
 	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES} ${FRAMEWORK_NAME})

@@ -80,6 +80,8 @@ else()
 	set(FREEIMAGE_BINARY_FILE freeimage)
 endif()
 
+set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE})
+
 ################################
 # Add GLM 
 
