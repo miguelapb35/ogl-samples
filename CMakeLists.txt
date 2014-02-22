@@ -107,12 +107,6 @@ set(GLU_DIRECTORY glu-0.1.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLU_DIRECTORY})
 
 ################################
-# Add GLF
-
-set(GLF_DIRECTORY glf)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/)
-
-################################
 # Add OpenGL ES
 
 set(ES_DIRECTORY gles-2.0)
@@ -183,7 +177,6 @@ if(AUTOMATED_TESTS)
 	add_definitions(-DAUTOMATED_TESTS)
 endif()
 
-
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	if (NOT APPLE)
 		add_definitions(-fpermissive)
@@ -203,6 +196,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/framework)
 add_subdirectory(framework)
 
 ################################
+# Copy binary
+
+if(MSVC)
+	set(COPY_BINARY copy-binary)
+	add_custom_target(${COPY_BINARY}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/tests/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Debug/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Release/${FREEIMAGE_BINARY_FILE})
+endif()
+
+################################
 # Add subdirectory
 
 add_subdirectory(tests)
@@ -211,10 +215,8 @@ add_subdirectory(tests)
 ################################
 # Add install
 
-install (
-	DIRECTORY data
-	DESTINATION .
-)
+install (DIRECTORY data DESTINATION .)
+
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
 set (CPACK_PACKAGE_VERSION_MINOR "4")
