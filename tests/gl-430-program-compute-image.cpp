@@ -178,7 +178,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VS_SOURCE, "--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FS_SOURCE, "--version 420 --profile core");
 			GLuint CompShaderName = Compiler.create(GL_COMPUTE_SHADER, getDataDirectory() + CS_SOURCE, "--version 420 --profile core");
@@ -201,8 +201,8 @@ private:
 				glLinkProgram(ProgramName[program::COMPUTE]);
 			}
 
-			Validated = Validated && glf::checkProgram(ProgramName[program::GRAPHICS]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::COMPUTE]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::GRAPHICS]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::COMPUTE]);
 		}
 
 		if(Validated)
@@ -395,26 +395,26 @@ private:
 		glBindImageTexture(image::TEXCOORD_OUTPUT, TextureName[texture::TEXCOORD_OUTPUT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 		glBindImageTexture(image::COLOR_OUTPUT, TextureName[texture::COLOR_OUTPUT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glDispatchCompute(GLuint(VertexCount), 1, 1);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName[program::GRAPHICS]);
-		glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::DIFFUSE);
+		glActiveTexture(GL_TEXTURE0 + semantic::sampler::DIFFUSE);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-		glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::POSITION);
+		glActiveTexture(GL_TEXTURE0 + semantic::sampler::POSITION);
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_OUTPUT]);
-		glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::TEXCOORD);
+		glActiveTexture(GL_TEXTURE0 + semantic::sampler::TEXCOORD);
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::TEXCOORD_OUTPUT]);
-		glActiveTexture(GL_TEXTURE0 + glf::semantic::sampler::COLOR);
+		glActiveTexture(GL_TEXTURE0 + semantic::sampler::COLOR);
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::COLOR_OUTPUT]);
 
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, GLF_BUFFER_OFFSET(0), 1, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0), 1, 0, 0);
 
 		return true;
 	}

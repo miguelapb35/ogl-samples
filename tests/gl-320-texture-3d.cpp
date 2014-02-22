@@ -22,6 +22,8 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
+#include <glm/gtc/noise.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 namespace
 {
@@ -40,18 +42,7 @@ namespace
 		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
 		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
-	
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
 
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint BufferName(0);
@@ -74,18 +65,20 @@ private:
 	
 		if(Validated)
 		{
-			glf::compiler Compiler;
-			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, ShaderName[shader::VERT]);
-			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
-
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -140,8 +133,7 @@ private:
 			GLsizei(Size), 
 			GLsizei(Size), 
 			0,
-			GL_RED, 
-			GL_FLOAT, 
+			GL_RED, GL_FLOAT,
 			&Data[0]);
 
 		glGenerateMipmap(GL_TEXTURE_3D);
@@ -156,12 +148,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -185,9 +177,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
-
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &TextureName);

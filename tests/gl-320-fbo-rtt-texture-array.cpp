@@ -102,7 +102,7 @@ private:
 	{
 		bool Validated = true;
 
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		if(Validated)
 		{
@@ -113,18 +113,13 @@ private:
 			ProgramName[program::MULTIPLE] = glCreateProgram();
 			glAttachShader(ProgramName[program::MULTIPLE], VertShaderName);
 			glAttachShader(ProgramName[program::MULTIPLE], FragShaderName);
-			
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
-			glBindAttribLocation(ProgramName[program::MULTIPLE], glf::semantic::attr::POSITION, "Position");
-			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::RED, "Red");
-			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::GREEN, "Green");
-			glBindFragDataLocation(ProgramName[program::MULTIPLE], glf::semantic::frag::BLUE, "Blue");
+
+			glBindAttribLocation(ProgramName[program::MULTIPLE], semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName[program::MULTIPLE], semantic::frag::RED, "Red");
+			glBindFragDataLocation(ProgramName[program::MULTIPLE], semantic::frag::GREEN, "Green");
+			glBindFragDataLocation(ProgramName[program::MULTIPLE], semantic::frag::BLUE, "Blue");
 			glLinkProgram(ProgramName[program::MULTIPLE]);
-			Validated = glf::checkProgram(ProgramName[program::MULTIPLE]);
+			Validated = Compiler.checkProgram(ProgramName[program::MULTIPLE]);
 		}
 
 		if(Validated)
@@ -141,17 +136,12 @@ private:
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[program::SPLASH], FragShaderName);
-			
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
-			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
+
+			glBindAttribLocation(ProgramName[program::SPLASH], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::SPLASH], semantic::attr::TEXCOORD, "Texcoord");
+			glBindFragDataLocation(ProgramName[program::SPLASH], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
-			Validated = glf::checkProgram(ProgramName[program::SPLASH]);
+			Validated = Compiler.checkProgram(ProgramName[program::SPLASH]);
 		}
 
 		if(Validated)
@@ -228,20 +218,20 @@ private:
 
 		glBindVertexArray(VertexArrayName[program::MULTIPLE]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[program::SPLASH]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

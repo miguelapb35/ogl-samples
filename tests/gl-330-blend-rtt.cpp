@@ -108,7 +108,7 @@ private:
 
 		std::array<GLuint, shader::MAX> ShaderName;
 		
-		glf::compiler Compiler;
+		compiler Compiler;
 		ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 330 --profile core");
 		ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 330 --profile core");
 		ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 330 --profile core");
@@ -121,7 +121,7 @@ private:
 			glAttachShader(ProgramNameMultiple, ShaderName[shader::VERT1]);
 			glAttachShader(ProgramNameMultiple, ShaderName[shader::FRAG1]);
 			glLinkProgram(ProgramNameMultiple);
-			Validated = Validated && glf::checkProgram(ProgramNameMultiple);
+			Validated = Validated && Compiler.checkProgram(ProgramNameMultiple);
 		}
 
 		if(Validated)
@@ -136,7 +136,7 @@ private:
 			glAttachShader(ProgramNameSingle, ShaderName[shader::VERT2]);
 			glAttachShader(ProgramNameSingle, ShaderName[shader::FRAG2]);
 			glLinkProgram(ProgramNameSingle);
-			Validated = Validated && glf::checkProgram(ProgramNameSingle);
+			Validated = Validated && Compiler.checkProgram(ProgramNameSingle);
 		}
 
 		if(Validated)
@@ -145,11 +145,6 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(ProgramNameSingle, "Diffuse");
 		}
 
-#		ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-		for(std::size_t i = 0; i < ShaderName.size(); ++i)
-			glDeleteShader(ShaderName[i]);
-#		endif
-		
 		return this->checkError("initProgram");
 	}
 
@@ -265,12 +260,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

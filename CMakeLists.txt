@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(VERSION 2.8)
 
-project(ogl-samples-pack)
+set(OGL_SAMPLES_NAME ogl-samples)
+set(FRAMEWORK_NAME framework)
+
+project(${OGL_SAMPLES_NAME})
 enable_testing()
 
 #CMAKE_BUILD_TOOL
@@ -21,34 +24,13 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" 
 endif()
 
 add_definitions(-DOGL_SAMPLES_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
-
-################################
-# Add GLEXT 
-
-function(getKhronosGLHeader HEADER)
-	if(WIN32)
-		
-	elseif(UNIX)
-		file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER} khronos-headers/GL/${HEADER})
-	endif(WIN32)
-endfunction(getKhronosGLHeader)
-
-#download Updated OpenGL Extension headers.
-getKhronosGLHeader(glext.h)
-getKhronosGLHeader(glcorearb.h)
-getKhronosGLHeader(glxext.h)
-getKhronosGLHeader(wglext.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/khronos-headers/)
+add_definitions(-DOGL_SAMPLES_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 
 ################################
 # Add GLEW
 
-set(GLEW_DIRECTORY glew-1.10.0)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_definitions(-DGLEW_STATIC)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
 
 ################################
 # Add GLFW
@@ -98,6 +80,8 @@ else()
 	set(FREEIMAGE_BINARY_FILE freeimage)
 endif()
 
+set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE})
+
 ################################
 # Add GLM 
 
@@ -121,12 +105,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLO_DIRECTORY})
 
 set(GLU_DIRECTORY glu-0.1.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLU_DIRECTORY})
-
-################################
-# Add GLF
-
-set(GLF_DIRECTORY glf)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 
 ################################
 # Add OpenGL ES
@@ -171,7 +149,7 @@ set(EGL_LIBRARY libEGL)
 ################################
 # Add libraries to executables
 
-set(BINARY_FILES GLEW glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
+set(BINARY_FILES glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
 
 ################################
 # Add output directory
@@ -199,7 +177,6 @@ if(AUTOMATED_TESTS)
 	add_definitions(-DAUTOMATED_TESTS)
 endif()
 
-
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	if (NOT APPLE)
 		add_definitions(-fpermissive)
@@ -213,6 +190,23 @@ if(MSVC)
 endif(MSVC)
 
 ################################
+# Add framework
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/framework)
+add_subdirectory(framework)
+
+################################
+# Copy binary
+
+if(MSVC)
+	set(COPY_BINARY copy-binary)
+	add_custom_target(${COPY_BINARY}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/tests/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Debug/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Release/${FREEIMAGE_BINARY_FILE})
+endif()
+
+################################
 # Add subdirectory
 
 add_subdirectory(tests)
@@ -221,10 +215,8 @@ add_subdirectory(tests)
 ################################
 # Add install
 
-install (
-	DIRECTORY data
-	DESTINATION .
-)
+install (DIRECTORY data DESTINATION .)
+
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
 set (CPACK_PACKAGE_VERSION_MINOR "4")

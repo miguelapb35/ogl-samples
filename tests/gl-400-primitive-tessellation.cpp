@@ -61,17 +61,12 @@ private:
 	
 		if(Validated)
 		{
-			GLuint VertexShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERTEX_SHADER);
-			GLuint ControlShader = glf::createShader(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONTROL_SHADER);
-			GLuint EvaluationShader = glf::createShader(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVALUATION_SHADER);
-			GLuint GeometryShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOMETRY_SHADER);
-			GLuint FragmentShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAGMENT_SHADER);
-
-			Validated = Validated && glf::checkShader(VertexShader, SAMPLE_VERTEX_SHADER);
-			Validated = Validated && glf::checkShader(ControlShader, SAMPLE_CONTROL_SHADER);
-			Validated = Validated && glf::checkShader(EvaluationShader, SAMPLE_EVALUATION_SHADER);
-			Validated = Validated && glf::checkShader(GeometryShader, SAMPLE_GEOMETRY_SHADER);
-			Validated = Validated && glf::checkShader(FragmentShader, SAMPLE_FRAGMENT_SHADER);
+			compiler Compiler;
+			GLuint VertexShader = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERTEX_SHADER);
+			GLuint ControlShader = Compiler.create(GL_TESS_CONTROL_SHADER, getDataDirectory() + SAMPLE_CONTROL_SHADER);
+			GLuint EvaluationShader = Compiler.create(GL_TESS_EVALUATION_SHADER, getDataDirectory() + SAMPLE_EVALUATION_SHADER);
+			GLuint GeometryShader = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOMETRY_SHADER);
+			GLuint FragmentShader = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAGMENT_SHADER);
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertexShader);
@@ -79,17 +74,10 @@ private:
 			glAttachShader(ProgramName, EvaluationShader);
 			glAttachShader(ProgramName, GeometryShader);
 			glAttachShader(ProgramName, FragmentShader);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertexShader);
-				glDeleteShader(ControlShader);
-				glDeleteShader(EvaluationShader);
-				glDeleteShader(GeometryShader);
-				glDeleteShader(FragmentShader);
-#			endif
-
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -106,12 +94,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

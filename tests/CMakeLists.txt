@@ -6,17 +6,14 @@ function(glCreateSampleGTC NAME)
 		set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})
 	endforeach(FILE)
 
-	set(COMMON_SOURCE png.cpp png.hpp test.cpp test.hpp caps.cpp caps.hpp csv.cpp csv.hpp)
-
 	source_group("Shader Files" FILES ${SHADER_PATH})
-	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${COMMON_SOURCE} ${SHADER_PATH})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
-
+	
+	add_executable(${SAMPLE_NAME} ${GL_PROFILE_GTC}-${GL_VERSION_GTC}-${NAME}.cpp ${SHADER_PATH})
 	add_test(NAME ${SAMPLE_NAME} COMMAND $<TARGET_FILE:${SAMPLE_NAME}>)
-	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES})
-	add_dependencies(${SAMPLE_NAME} GLEW glfw)
+
+	target_link_libraries(${SAMPLE_NAME} ${BINARY_FILES} ${FRAMEWORK_NAME})
+	add_dependencies(${SAMPLE_NAME} glfw ${FRAMEWORK_NAME} ${COPY_BINARY})
+
 	install(TARGETS ${SAMPLE_NAME} DESTINATION .)
 endfunction(glCreateSampleGTC)
 
@@ -93,8 +90,12 @@ set(GL_SHADER_GTC fbo-rtt-multiple-output.vert fbo-rtt-multiple-output.frag fbo-
 glCreateSampleGTC(fbo-rtt-texture-array)
 set(GL_SHADER_GTC glsl-builtin-blocks.vert glsl-builtin-blocks.frag)
 glCreateSampleGTC(glsl-builtin-blocks)
+set(GL_SHADER_GTC glsl-cast-fail.vert glsl-cast-fail.frag)
+glCreateSampleGTC(glsl-cast-fail)
 set(GL_SHADER_GTC glsl-discard.vert glsl-discard.frag)
 glCreateSampleGTC(glsl-discard)
+set(GL_SHADER_GTC glsl-input-struct.vert glsl-input-struct.frag)
+glCreateSampleGTC(glsl-input-struct)
 set(GL_SHADER_GTC glsl-precision.vert glsl-precision.frag)
 glCreateSampleGTC(glsl-precision)
 set(GL_SHADER_GTC primitive-front-face.vert primitive-front-face.frag)

@@ -110,7 +110,7 @@ private:
 	
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
@@ -120,10 +120,8 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -222,13 +220,13 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glVertexAttribFormat(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
-			glVertexAttribBinding(glf::semantic::attr::POSITION, glf::semantic::buffer::STATIC);
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glVertexAttribFormat(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, semantic::buffer::STATIC);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 
-			glVertexAttribFormat(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
-			glVertexAttribBinding(glf::semantic::attr::TEXCOORD, glf::semantic::buffer::STATIC);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glVertexAttribFormat(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+			glVertexAttribBinding(semantic::attr::TEXCOORD, semantic::buffer::STATIC);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -296,10 +294,10 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glBindBuffersBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, 1, &BufferName[buffer::TRANSFORM]);
-		glBindTextures(glf::semantic::sampler::DIFFUSE, 1, &TextureName);
+		glBindBuffersBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, 1, &BufferName[buffer::TRANSFORM]);
+		glBindTextures(semantic::sampler::DIFFUSE, 1, &TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindVertexBuffer(glf::semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, GLsizei(sizeof(vertex)));
+		glBindVertexBuffer(semantic::buffer::STATIC, BufferName[buffer::VERTEX], 0, GLsizei(sizeof(vertex)));
 
 		for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 		{

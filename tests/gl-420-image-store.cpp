@@ -34,8 +34,10 @@ namespace
 	{
 		enum type
 		{
-			VERT,
-			FRAG,
+			VERT_SAVE,
+			FRAG_SAVE,
+			VERT_READ,
+			FRAG_READ,
 			MAX
 		};
 	}//namespace program
@@ -71,54 +73,50 @@ private:
 	{
 		bool Validated(true);
 
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
-
-		glBindProgramPipeline(PipelineName[pipeline::READ]);
 		if(Validated)
 		{
 			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE_READ);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
-			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
+			ProgramName[program::VERT_READ] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		}
 
 		if(Validated)
 		{
 			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE_READ);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
-			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+			ProgramName[program::FRAG_READ] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		}
 
-		if(Validated)
-		{
-			glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-			glUseProgramStages(PipelineName[pipeline::READ], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && this->checkError("initProgram - stage");
-		}
-
-		glBindProgramPipeline(PipelineName[pipeline::SAVE]);
 		if(Validated)
 		{
 			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE_SAVE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
-			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::VERT]);
+			ProgramName[program::VERT_SAVE] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		}
 
 		if(Validated)
 		{
 			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE_SAVE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
-			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-			Validated = Validated && glf::checkProgram(ProgramName[program::FRAG]);
+			ProgramName[program::FRAG_SAVE] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		}
 
 		if(Validated)
 		{
-			glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT]);
-			glUseProgramStages(PipelineName[pipeline::SAVE], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
-			Validated = Validated && this->checkError("initProgram - stage");
+			compiler Compiler;
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT_READ]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG_READ]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT_SAVE]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG_SAVE]);
+		}
+
+		if(Validated)
+		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT_READ]);
+			glUseProgramStages(PipelineName[pipeline::READ], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG_READ]);
+			glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT, ProgramName[program::VERT_SAVE]);
+			glUseProgramStages(PipelineName[pipeline::SAVE], GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG_SAVE]);
 		}
 
 		return Validated;
@@ -185,8 +183,10 @@ private:
 	{
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
-		glDeleteProgram(ProgramName[program::VERT]);
-		glDeleteProgram(ProgramName[program::FRAG]);
+		glDeleteProgram(ProgramName[program::VERT_SAVE]);
+		glDeleteProgram(ProgramName[program::FRAG_SAVE]);
+		glDeleteProgram(ProgramName[program::VERT_READ]);
+		glDeleteProgram(ProgramName[program::FRAG_READ]);
 		glDeleteProgramPipelines(pipeline::MAX, &PipelineName[0]);
 
 		return true;
@@ -205,7 +205,7 @@ private:
 			glDrawBuffer(GL_NONE);
 
 			glBindProgramPipeline(PipelineName[pipeline::SAVE]);
-			glBindImageTexture(glf::semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+			glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 			glBindVertexArray(VertexArrayName);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 		}
@@ -219,7 +219,7 @@ private:
 			glDrawBuffer(GL_BACK);
 
 			glBindProgramPipeline(PipelineName[pipeline::READ]);
-			glBindImageTexture(glf::semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+			glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
 			glBindVertexArray(VertexArrayName);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 

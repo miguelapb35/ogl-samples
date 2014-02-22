@@ -84,7 +84,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
 				"--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
@@ -97,7 +97,7 @@ private:
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
 
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -116,9 +116,9 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return Validated;
@@ -148,7 +148,7 @@ private:
 		{
 			glGetActiveUniformBlockiv(
 				ProgramName, 
-				glf::semantic::uniform::TRANSFORM0,
+				semantic::uniform::TRANSFORM0,
 				GL_UNIFORM_BLOCK_DATA_SIZE,
 				&UniformBlockSize);
 			UniformBufferOffset = glm::max(UniformBufferOffsetAlignment, UniformBlockSize);
@@ -163,7 +163,7 @@ private:
 
 			glGetActiveUniformBlockiv(
 				ProgramName, 
-				glf::semantic::uniform::MATERIAL,
+				semantic::uniform::MATERIAL,
 				GL_UNIFORM_BLOCK_DATA_SIZE,
 				&UniformBlockSize);
 
@@ -246,9 +246,9 @@ private:
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4));
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM1, BufferName[buffer::TRANSFORM], UniformBufferOffset, sizeof(glm::mat4));
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4));
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM1, BufferName[buffer::TRANSFORM], UniformBufferOffset, sizeof(glm::mat4));
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
 
 		for(GLint i = 0; i < 2; ++i)
 		{

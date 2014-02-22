@@ -90,32 +90,27 @@ private:
 		// Create program
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 			
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-			
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
 
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 		
 		// Get variables locations
 		if(Validated)
 		{
 			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
-			glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
+			glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -145,9 +140,9 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -201,7 +196,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
 		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x / 2), static_cast<GLsizei>(WindowSize.y));

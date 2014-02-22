@@ -88,42 +88,36 @@ private:
 	{
 		bool Validated = true;
 
+		compiler Compiler;
+
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1);
-			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE1);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1);
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE1);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1);
 		
-			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE1);
-			Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE1);
-			Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE1);
-
 			ProgramName[LAYERING] = glCreateProgram();
 			glAttachShader(ProgramName[LAYERING], VertShaderName);
 			glAttachShader(ProgramName[LAYERING], GeomShaderName);
 			glAttachShader(ProgramName[LAYERING], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(GeomShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[LAYERING]);
-			Validated = Validated && glf::checkProgram(ProgramName[LAYERING]);
 		}
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2);
-
-			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE2);
-			Validated = Validated && glf::checkShader(FragShaderName, FRAG_SHADER_SOURCE2);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2);
 
 			ProgramName[IMAGE_2D] = glCreateProgram();
 			glAttachShader(ProgramName[IMAGE_2D], VertShaderName);
 			glAttachShader(ProgramName[IMAGE_2D], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[IMAGE_2D]);
-			Validated = Validated && glf::checkProgram(ProgramName[IMAGE_2D]);
+		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[IMAGE_2D]);
 		}
 
 		if(Validated)
@@ -202,22 +196,22 @@ private:
 
 		glBindVertexArray(VertexArrayName[IMAGE_2D]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[LAYERING]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 		glBindVertexArray(0);

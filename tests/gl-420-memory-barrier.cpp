@@ -88,51 +88,46 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+		compiler Compiler;
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_UPDATE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_UPDATE);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_UPDATE);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_UPDATE);
 
 			ProgramName[program::UPDATE] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::UPDATE], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::UPDATE], VertShaderName);
 			glAttachShader(ProgramName[program::UPDATE], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[program::UPDATE]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::UPDATE]);
 		}
 
 		if(Validated)
 		{
-			glUseProgramStages(PipelineName[pipeline::UPDATE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::UPDATE]);
-			Validated = Validated && this->checkError("initProgram - stage");
-		}
-
-		if(Validated)
-		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_BLIT);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_BLIT);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SHADER_VERT_SOURCE_BLIT);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SHADER_FRAG_SOURCE_BLIT);
 
 			ProgramName[program::BLIT] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::BLIT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::BLIT], VertShaderName);
 			glAttachShader(ProgramName[program::BLIT], FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(ProgramName[program::BLIT]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::BLIT]);
 		}
 
 		if(Validated)
 		{
-			glUseProgramStages(PipelineName[pipeline::BLIT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::BLIT]);
-			Validated = Validated && this->checkError("initProgram - stage");
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::UPDATE]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::BLIT]);
 		}
 
-		return Validated;
+		if(Validated)
+		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::UPDATE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::UPDATE]);
+			glUseProgramStages(PipelineName[pipeline::BLIT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[program::BLIT]);
+		}
+
+		return Validated && this->checkError("initProgram - stage");
 	}
 
 	bool initSampler()

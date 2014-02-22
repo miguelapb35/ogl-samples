@@ -97,7 +97,7 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
@@ -107,7 +107,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -172,12 +172,12 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glVertexAttribFormatNV(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
-			glVertexAttribFormatNV(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
+			glVertexAttribFormatNV(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
+			glVertexAttribFormatNV(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
 
 			glEnableClientState(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV);
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return true;
@@ -234,11 +234,11 @@ private:
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
-		glBufferAddressRangeNV(GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, glf::semantic::attr::POSITION, Address, VertexSize);
-		glBufferAddressRangeNV(GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, glf::semantic::attr::TEXCOORD, Address + sizeof(glm::vec2), VertexSize - sizeof(glm::vec2));
+		glBufferAddressRangeNV(GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, semantic::attr::POSITION, Address, VertexSize);
+		glBufferAddressRangeNV(GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV, semantic::attr::TEXCOORD, Address + sizeof(glm::vec2), VertexSize - sizeof(glm::vec2));
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 

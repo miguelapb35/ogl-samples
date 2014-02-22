@@ -99,35 +99,31 @@ private:
 	bool initProgram()
 	{
 		bool Validated = true;
-	
-		// Create program
+
+		compiler Compiler;
+
 		if(Validated)
 		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
-
-			Validated = Validated && glf::checkShader(VertexShaderName, VERTEX_SHADER_SOURCE);
-			Validated = Validated && glf::checkShader(FragmentShaderName, FRAGMENT_SHADER_SOURCE);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertexShaderName);
-			glAttachShader(ProgramName, FragmentShaderName);
-
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertexShaderName);
-				glDeleteShader(FragmentShaderName);
-#			endif
-
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
 		}
 
-		// Get variables locations
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
+		}
+
 		if(Validated)
 		{
 			GLint ProgramVertSubroutine(0);
-			glGetProgramStageiv(ProgramName, GL_VERTEX_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &ProgramVertSubroutine);
 			GLint ProgramFragSubroutine(0);
+			glGetProgramStageiv(ProgramName, GL_VERTEX_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &ProgramVertSubroutine);
 			glGetProgramStageiv(ProgramName, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &ProgramFragSubroutine);
 
 			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
@@ -162,12 +158,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

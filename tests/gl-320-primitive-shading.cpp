@@ -61,7 +61,6 @@ namespace
 	GLuint ProgramName(0);
 	GLuint VertexArrayName(0);
 	std::vector<GLuint> BufferName(buffer::MAX);
-	GLint UniformTransform(-1);
 }//namespace
 
 class gl_320_primitive_shading : public test
@@ -72,41 +71,47 @@ public:
 	{}
 
 private:
+	bool testError()
+	{
+
+
+		compiler Compiler;
+
+		Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 150 --profile core --define GEN_ERROR");
+
+		return !Compiler.check();
+	}
+
 	bool initProgram()
 	{
 		bool Validated = true;
 	
-		// Create program
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + SAMPLE_VERT_SHADER, "--version 150 --profile core");
 			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, GeomShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 
-#			ifndef __APPLE__ // Workaround broken Apple driver, leak shader object or crash
-				glDeleteShader(VertShaderName);
-				glDeleteShader(GeomShaderName);
-				glDeleteShader(FragShaderName);
-#			endif
-			
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName, semantic::attr::COLOR, "Color");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
-		// Get variables locations
 		if(Validated)
 		{
-			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			glUseProgram(ProgramName);
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+			glUseProgram(0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -117,10 +122,10 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -158,7 +163,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		bool Validated = testError();
 
 		if(Validated)
 			Validated = initProgram();
@@ -203,10 +208,9 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
 
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 

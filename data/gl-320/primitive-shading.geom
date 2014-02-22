@@ -1,23 +1,16 @@
 #version 150 core
 
+#ifndef GEN_ERROR // If this is not declared, the compiler should generate an error
 layout(triangles) in;
+#endif
+
 layout(triangle_strip, max_vertices = 4) out;
-/*
-in gl_PerVertex
-{
-	vec4 gl_Position;
-} gl_in[];
-*/
+
 in block
 {
 	vec4 Color;
 } In[];
-/*
-out gl_PerVertex 
-{
-	vec4 gl_Position;
-};
-*/
+
 out block
 {
 	vec4 Color;

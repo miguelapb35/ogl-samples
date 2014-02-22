@@ -97,19 +97,20 @@ private:
 
 		if(Validated)
 		{
-			glf::compiler Compiler;
+			compiler Compiler;
 			ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 			ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, ShaderName[shader::VERT]);
 			glAttachShader(ProgramName, ShaderName[shader::FRAG]);
 
-			glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-			glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && glf::checkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
@@ -126,9 +127,9 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
@@ -188,8 +189,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG]);
-		glDeleteShader(ShaderName[shader::VERT]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
@@ -226,13 +225,13 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glUniformBlockBinding(ProgramName, UniformTransform, glf::semantic::uniform::TRANSFORM0);
-		glUniformBlockBinding(ProgramName, UniformMaterial, glf::semantic::uniform::MATERIAL);
+		glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName, UniformMaterial, semantic::uniform::MATERIAL);
 
-		// Attach the buffer to UBO binding point glf::semantic::uniform::TRANSFORM0
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::UNIFORM], 0, UniformBlockSizeTransform);
-		// Attach the buffer to UBO binding point glf::semantic::uniform::MATERIAL 
-		glBindBufferRange(GL_UNIFORM_BUFFER, glf::semantic::uniform::MATERIAL, BufferName[buffer::UNIFORM], UniformBlockSizeTransform, UniformBlockSizeMaterial);
+		// Attach the buffer to UBO binding point semantic::uniform::TRANSFORM0
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::UNIFORM], 0, UniformBlockSizeTransform);
+		// Attach the buffer to UBO binding point semantic::uniform::MATERIAL 
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::UNIFORM], UniformBlockSizeTransform, UniformBlockSizeMaterial);
 
 		// Bind vertex array & draw 
 		glBindVertexArray(VertexArrayName);

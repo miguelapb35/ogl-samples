@@ -93,45 +93,42 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+		compiler Compiler;
 
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_AA);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_AA);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_AA);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_AA);
 
 			ProgramName[pipeline::MULTISAMPLE] = glCreateProgram();
 			glProgramParameteri(ProgramName[pipeline::MULTISAMPLE], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[pipeline::MULTISAMPLE], VertShaderName);
 			glAttachShader(ProgramName[pipeline::MULTISAMPLE], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::MULTISAMPLE]);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::MULTISAMPLE]);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::MULTISAMPLE]);
 		}
 
 		if(Validated)
 		{
-			glUseProgramStages(PipelineName[pipeline::MULTISAMPLE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::MULTISAMPLE]);
-		}
-
-		if(Validated)
-		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH);
 
 			ProgramName[pipeline::SPLASH] = glCreateProgram();
 			glProgramParameteri(ProgramName[pipeline::SPLASH], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[pipeline::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::SPLASH]);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
 		}
 
 		if(Validated)
 		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::MULTISAMPLE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::MULTISAMPLE]);
 			glUseProgramStages(PipelineName[pipeline::SPLASH], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::SPLASH]);
 		}
 
@@ -170,10 +167,10 @@ private:
 
 		glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), GLF_BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
@@ -294,7 +291,7 @@ private:
 
 		glBindProgramPipeline(PipelineName[pipeline::MULTISAMPLE]);
 		glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glDrawArraysInstancedBaseInstance(GL_LINE_LOOP, 0, GLsizei(VertexData.size()), 3, 0);
 

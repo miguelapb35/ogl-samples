@@ -72,51 +72,44 @@ private:
 	{
 		bool Validated = true;
 	
-		// Create program
+		compiler Compiler;
+
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM);
-			GLuint GeomShaderName = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE_TRANSFORM);
-
-			Validated = Validated && glf::checkShader(VertShaderName, VERT_SHADER_SOURCE_TRANSFORM);
-			Validated = Validated && glf::checkShader(GeomShaderName, GEOM_SHADER_SOURCE_TRANSFORM);
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM);
+			GLuint GeomShaderName = Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE_TRANSFORM);
 
 			TransformProgramName = glCreateProgram();
 			glAttachShader(TransformProgramName, VertShaderName);
 			glAttachShader(TransformProgramName, GeomShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(GeomShaderName);
 
 			GLchar const * Strings[] = {"gl_Position", "block.Color"}; 
 			glTransformFeedbackVaryings(TransformProgramName, 2, Strings, GL_INTERLEAVED_ATTRIBS);
 			glLinkProgram(TransformProgramName);
-
-			Validated = Validated && glf::checkProgram(TransformProgramName);
 		}
 
-		// Get variables locations
+		if(Validated)
+		{
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK);
+
+			FeedbackProgramName = glCreateProgram();
+			glAttachShader(FeedbackProgramName, VertShaderName);
+			glAttachShader(FeedbackProgramName, FragShaderName);
+			glLinkProgram(FeedbackProgramName);
+		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(TransformProgramName);
+			Validated = Validated && Compiler.checkProgram(FeedbackProgramName);
+		}
+
 		if(Validated)
 		{
 			TransformUniformMVP = glGetUniformLocation(TransformProgramName, "MVP");
 			Validated = Validated && (TransformUniformMVP >= 0);
-		}
-
-		// Create program
-		if(Validated)
-		{
-			GLuint VertexShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK);
-			GLuint FragmentShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK);
-
-			Validated = Validated && glf::checkShader(VertexShaderName, VERT_SHADER_SOURCE_FEEDBACK);
-			Validated = Validated && glf::checkShader(FragmentShaderName, FRAG_SHADER_SOURCE_FEEDBACK);
-
-			FeedbackProgramName = glCreateProgram();
-			glAttachShader(FeedbackProgramName, VertexShaderName);
-			glAttachShader(FeedbackProgramName, FragmentShaderName);
-			glDeleteShader(VertexShaderName);
-			glDeleteShader(FragmentShaderName);
-			glLinkProgram(FeedbackProgramName);
-			Validated = Validated && glf::checkProgram(FeedbackProgramName);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -130,10 +123,10 @@ private:
 		glGenVertexArrays(1, &TransformVertexArrayName);
 		glBindVertexArray(TransformVertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, TransformArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		this->checkError("initVertexArray 1");
@@ -142,12 +135,12 @@ private:
 		glGenVertexArrays(1, &FeedbackVertexArrayName);
 		glBindVertexArray(FeedbackVertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, FeedbackArrayBufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec4)));
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), BUFFER_OFFSET(sizeof(glm::vec4)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");

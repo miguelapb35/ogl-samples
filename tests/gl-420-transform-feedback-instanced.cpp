@@ -95,7 +95,7 @@ private:
 	{
 		bool Validated(true);
 	
-		glf::compiler Compiler;
+		compiler Compiler;
 
 		// Create program
 		if(Validated)
@@ -113,7 +113,7 @@ private:
 			glTransformFeedbackVaryings(ProgramName[pipeline::TRANSFORM], 2, Strings, GL_INTERLEAVED_ATTRIBS);
 			glLinkProgram(ProgramName[pipeline::TRANSFORM]);
 
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::TRANSFORM]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::TRANSFORM]);
 		}
 
 		// Get variables locations
@@ -135,7 +135,7 @@ private:
 			glAttachShader(ProgramName[pipeline::FEEDBACK], VertShaderName);
 			glAttachShader(ProgramName[pipeline::FEEDBACK], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::FEEDBACK]);
-			Validated = Validated && glf::checkProgram(ProgramName[pipeline::FEEDBACK]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::FEEDBACK]);
 		}
 
 		// Get variables locations
@@ -162,22 +162,22 @@ private:
 
 		glBindVertexArray(VertexArrayName[pipeline::TRANSFORM]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TRANSFORM_VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::TRANSFORM_ELEMENT]);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[pipeline::FEEDBACK]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::FEEDBACK_VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
-			glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec4)));
+			glVertexAttribPointer(semantic::attr::POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), 0);
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v4fc4f), BUFFER_OFFSET(sizeof(glm::vec4)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::COLOR);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);

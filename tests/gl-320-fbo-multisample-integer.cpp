@@ -110,52 +110,50 @@ private:
 	{
 		bool Validated = true;
 	
-		glf::compiler Compiler;
+		compiler Compiler;
 
-		// Create program
 		if(Validated)
 		{
 			ShaderName[shader::VERT1] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 150 --profile core");
 			ShaderName[shader::FRAG1] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
 
 			ProgramName[program::RENDER] = glCreateProgram();
 			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::VERT1]);
 			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG1]);
-			glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::RENDER], glf::semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName[program::RENDER], glf::semantic::frag::COLOR, "Color");
 
+			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::TEXCOORD, "Texcoord");
+			glBindFragDataLocation(ProgramName[program::RENDER], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::RENDER]);
+		}
+
+		if(Validated)
+		{
+			ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
+			ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
+
+			ProgramName[program::SPLASH] = glCreateProgram();
+			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT2]);
+			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG2]);
+
+			glBindAttribLocation(ProgramName[program::SPLASH], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[program::SPLASH], semantic::attr::TEXCOORD, "Texcoord");
+			glBindFragDataLocation(ProgramName[program::SPLASH], semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName[program::SPLASH]);
+		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::RENDER]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::SPLASH]);
 		}
 
 		if(Validated)
 		{
 			UniformMVP[program::RENDER] = glGetUniformLocation(ProgramName[program::RENDER], "MVP");
 			UniformDiffuse[program::RENDER] = glGetUniformLocation(ProgramName[program::RENDER], "Diffuse");
-		}
 
-		// Create program
-		if(Validated)
-		{
-			ShaderName[shader::VERT2] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 150 --profile core");
-			ShaderName[shader::FRAG2] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 150 --profile core");
-			Validated = Validated && Compiler.check();
-
-			ProgramName[program::SPLASH] = glCreateProgram();
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT2]);
-			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG2]);
-			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::SPLASH], glf::semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName[program::SPLASH], glf::semantic::frag::COLOR, "Color");
-
-			glLinkProgram(ProgramName[program::SPLASH]);
-			Validated = Validated && glf::checkProgram(ProgramName[program::SPLASH]);
-		}
-
-		if(Validated)
-		{
 			UniformMVP[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "MVP");
 			UniformDiffuse[program::SPLASH] = glGetUniformLocation(ProgramName[program::SPLASH], "Diffuse");
 		}
@@ -254,12 +252,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -285,11 +283,6 @@ private:
 
 	bool end()
 	{
-		glDeleteShader(ShaderName[shader::FRAG1]);
-		glDeleteShader(ShaderName[shader::FRAG2]);
-		glDeleteShader(ShaderName[shader::VERT1]);
-		glDeleteShader(ShaderName[shader::VERT2]);
-
 		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName[program::RENDER]);
 		glDeleteProgram(ProgramName[program::SPLASH]);

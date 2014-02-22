@@ -94,19 +94,19 @@ private:
 	{
 		bool Validated = true;
 
-		// Create program
 		if(Validated)
 		{
-			GLuint VertShaderName = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
-			GLuint FragShaderName = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
+			compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERTEX_SHADER_SOURCE);
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 
 			UnifiedProgramName = glCreateProgram();
 			glAttachShader(UnifiedProgramName, VertShaderName);
 			glAttachShader(UnifiedProgramName, FragShaderName);
-			glDeleteShader(VertShaderName);
-			glDeleteShader(FragShaderName);
 			glLinkProgram(UnifiedProgramName);
-			Validated = Validated && glf::checkProgram(UnifiedProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(UnifiedProgramName);
 		}
 
 		if(Validated)
@@ -122,31 +122,35 @@ private:
 	{
 		bool Validated = true;
 
-		glGenProgramPipelines(1, &PipelineName);
+		compiler Compiler;
 
 		if(Validated)
 		{
 			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERTEX_SHADER_SOURCE);
 			char const * VertexSourcePointer = VertexSourceContent.c_str();
 			SeparateProgramName[program::VERTEX] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
-			Validated = glf::checkProgram(SeparateProgramName[program::VERTEX]);
 		}
-
-		if(Validated)
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, SeparateProgramName[program::VERTEX]);
 
 		if(Validated)
 		{
 			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAGMENT_SHADER_SOURCE);
 			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
 			SeparateProgramName[program::FRAGMENT] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
-			Validated = glf::checkProgram(SeparateProgramName[program::FRAGMENT]);
 		}
 
 		if(Validated)
-			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, SeparateProgramName[program::FRAGMENT]);
+		{
+			Validated = Validated && Compiler.checkProgram(SeparateProgramName[program::VERTEX]);
+			Validated = Validated && Compiler.checkProgram(SeparateProgramName[program::FRAGMENT]);
+		}
 
-		// Get variables locations
+		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, SeparateProgramName[program::VERTEX]);
+			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, SeparateProgramName[program::FRAGMENT]);
+		}
+
 		if(Validated)
 		{
 			SeparateUniformMVP = glGetUniformLocation(SeparateProgramName[program::VERTEX], "MVP");
@@ -207,12 +211,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(0));
-			glVertexAttribPointer(glf::semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-			glEnableVertexAttribArray(glf::semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
