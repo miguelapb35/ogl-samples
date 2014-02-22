@@ -61,7 +61,7 @@ MacOS instructions
 - Launch the sample from XCode
 
 ================================================================================
-OpenGL Samples Pack 4.4.1.3: 2014-0X-XX
+OpenGL Samples Pack 4.4.1.3: 2014-02-23
 --------------------------------------------------------------------------------
 - Improve compilation time
 
