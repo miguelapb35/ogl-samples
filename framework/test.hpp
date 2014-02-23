@@ -27,6 +27,7 @@
 #include "compiler.hpp"
 #include "sementics.hpp"
 #include "vertex.hpp"
+#include "caps.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -219,6 +220,7 @@ protected:
 	bool isKeyPressed(int Key) const;
 	glm::mat4 view() const;
 	float cameraDistance() const {return this->TranlationCurrent.y;}
+	glm::vec3 cameraPosition() const;
 
 protected:
 	void beginTimer();

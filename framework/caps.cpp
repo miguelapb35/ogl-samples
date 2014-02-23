@@ -504,8 +504,8 @@ void caps::initCompute()
 		glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &ComputeData.MAX_COMPUTE_UNIFORM_COMPONENTS);
 		glGetIntegerv(GL_MAX_COMPUTE_SHARED_MEMORY_SIZE, &ComputeData.MAX_COMPUTE_SHARED_MEMORY_SIZE);
 		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &ComputeData.MAX_COMPUTE_WORK_GROUP_INVOCATIONS);
-		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_COUNT, &ComputeData.MAX_COMPUTE_WORK_GROUP_COUNT);
-		glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &ComputeData.MAX_COMPUTE_WORK_GROUP_SIZE);
+		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &ComputeData.MAX_COMPUTE_WORK_GROUP_COUNT);
+		glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &ComputeData.MAX_COMPUTE_WORK_GROUP_SIZE);
 	}
 
 	if(check(4, 3) || (VersionData.GL.ARB_compute_shader && VersionData.GL.ARB_uniform_buffer_object))
@@ -667,6 +667,12 @@ void caps::initPulling()
 void caps::initRasterizer()
 {
 	memset(&RasterizerData, 0, sizeof(RasterizerData));
+
+	if(VersionData.Profile == caps::COMPATIBILITY)
+	{
+		glGetFloatv(GL_POINT_SIZE_MIN, &RasterizerData.POINT_SIZE_MIN);
+		glGetFloatv(GL_POINT_SIZE_MAX, &RasterizerData.POINT_SIZE_MAX);
+	}
 
 	if(check(2, 1))
 	{
@@ -935,9 +941,12 @@ void caps::initProgram()
 	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &ProgramData.MAX_UNIFORM_BUFFER_BINDINGS);
 	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &ProgramData.MAX_UNIFORM_BLOCK_SIZE);
 	glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &ProgramData.MAX_UNIFORM_LOCATIONS);
-	glGetIntegerv(GL_MAX_VARYING_COMPONENTS, &ProgramData.MAX_VARYING_COMPONENTS);
-	glGetIntegerv(GL_MAX_VARYING_VECTORS, &ProgramData.MAX_VARYING_VECTORS);
-	glGetIntegerv(GL_MAX_VARYING_FLOATS, &ProgramData.MAX_VARYING_FLOATS);
+	if(VersionData.Profile == caps::COMPATIBILITY)
+	{
+		glGetIntegerv(GL_MAX_VARYING_COMPONENTS, &ProgramData.MAX_VARYING_COMPONENTS);
+		glGetIntegerv(GL_MAX_VARYING_VECTORS, &ProgramData.MAX_VARYING_VECTORS);
+		glGetIntegerv(GL_MAX_VARYING_FLOATS, &ProgramData.MAX_VARYING_FLOATS);
+	}
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &ProgramData.MAX_SHADER_STORAGE_BUFFER_BINDINGS);
 	glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &ProgramData.MAX_SHADER_STORAGE_BLOCK_SIZE);
 	glGetIntegerv(GL_MAX_COMBINED_SHADER_OUTPUT_RESOURCES, &ProgramData.MAX_COMBINED_SHADER_OUTPUT_RESOURCES);

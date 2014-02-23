@@ -355,6 +355,8 @@ private:
 
 	struct rasterizer
 	{
+		GLfloat POINT_SIZE_MAX;
+		GLfloat POINT_SIZE_MIN;
 		GLint SUBPIXEL_BITS;
 		GLint MAX_CLIP_DISTANCES;
 		GLfloat MAX_VIEWPORT_DIMS;

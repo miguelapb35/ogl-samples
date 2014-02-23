@@ -302,6 +302,11 @@ glm::mat4 test::view() const
 	return View;
 }
 
+glm::vec3 test::cameraPosition() const
+{
+	return glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y);
+}
+
 void test::beginTimer()
 {
 	glBeginQuery(GL_TIME_ELAPSED, this->TimerQueryName);
