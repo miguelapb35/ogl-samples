@@ -674,6 +674,9 @@ void caps::initRasterizer()
 		glGetFloatv(GL_POINT_SIZE_MAX, &RasterizerData.POINT_SIZE_MAX);
 	}
 
+	glGetFloatv(GL_POINT_SIZE_RANGE, &RasterizerData.POINT_SIZE_RANGE[0]);
+	glGetFloatv(GL_POINT_SIZE_GRANULARITY, &RasterizerData.POINT_SIZE_GRANULARITY);
+
 	if(check(2, 1))
 	{
 		glGetIntegerv(GL_SUBPIXEL_BITS, &RasterizerData.SUBPIXEL_BITS);
