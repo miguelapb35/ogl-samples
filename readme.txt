@@ -61,6 +61,13 @@ MacOS instructions
 - Launch the sample from XCode
 
 ================================================================================
+OpenGL Samples Pack 4.4.2.0: 2014-0X-XX
+--------------------------------------------------------------------------------
+- Added 320-primitive-line-msaa sample
+- Added 320-primitive-point-clip sample
+- Added 320-primitive-point-quad sample
+
+================================================================================
 OpenGL Samples Pack 4.4.1.3: 2014-02-23
 --------------------------------------------------------------------------------
 - Improve compilation time
