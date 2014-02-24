@@ -28,29 +28,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ================================================================================
-OpenGL Samples Pack Usage
---------------------------------------------------------------------------------
-The OpenGL Samples Pack supports Windows build through Visual C++ only and 
-Linux build with G++.
-
-MacOSX or MinGW are not supported yet... 
-
-================================================================================
 Visual C++ instructions
 --------------------------------------------------------------------------------
-The OpenGL Samples Pack's project can be generated for Visual C++ 2008 and 2010,
-in 32 and 64 bits using CMake.
+A Visual C++ 32-bit or 64-bit solution solution can be generated using CMake.
 http://www.cmake.org/cmake/resources/software.html
 
-The samples run only when launched from Visual C++ IDE.
+The OpenGL Samples Pack requires at least Visual C++ 2013.
 
 ================================================================================
 Linux instructions
 --------------------------------------------------------------------------------
 - Install the GLFW library included in the external directory.
 -- sudo make x11-dist-install
-- Run CMake to create a makefile for G++
+- Run CMake to create a makefile for GCC
 - Launch the sample from the build output directory
+
+The OpenGL Samples Pack requires at least GCC 4.7.
 
 ================================================================================
 MacOS instructions
@@ -60,12 +53,13 @@ MacOS instructions
 - Run CMake to create a XCode project
 - Launch the sample from XCode
 
+The OpenGL Samples Pack requires at least Clang 3.0.
+
 ================================================================================
-OpenGL Samples Pack 4.4.2.0: 2014-0X-XX
+OpenGL Samples Pack 4.4.1.4: 2014-0X-XX
 --------------------------------------------------------------------------------
-- Added 320-primitive-line-msaa sample
-- Added 320-primitive-point-clip sample
-- Added 320-primitive-point-quad sample
+- Fixed linking error with FreeImage
+- Updated readme instructions
 
 ================================================================================
 OpenGL Samples Pack 4.4.1.3: 2014-02-23
