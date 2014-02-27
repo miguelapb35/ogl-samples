@@ -316,7 +316,7 @@ private:
 
 		{
 			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRangeEXT(
-				BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+				BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 ProjectionA = glm::scale(glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f), glm::vec3(1, -1, 1));
 			*reinterpret_cast<glm::mat4*>(Pointer + 0) = ProjectionA * this->view() * glm::mat4(1);
