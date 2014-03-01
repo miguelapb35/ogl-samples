@@ -73,7 +73,7 @@ class gl_430_draw_vertex_attrib_binding : public test
 {
 public:
 	gl_430_draw_vertex_attrib_binding(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-draw-vertex-attrib-binding", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-draw-vertex-attrib-binding", test::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -209,6 +209,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_vertex_attrib_binding");
 
 		if(Validated)
 			Validated = initProgram();

@@ -268,6 +268,8 @@ private:
 	{
 		bool Validated(true);
 
+		caps Caps(caps::CORE);
+
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)

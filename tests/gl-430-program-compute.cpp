@@ -89,7 +89,7 @@ class gl_430_program_compute : public test
 {
 public:
 	gl_430_program_compute(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-program-compute", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-program-compute", test::CORE, 4, 2),
 		TextureName(0),
 		VertexArrayName(0)
 	{}

@@ -67,7 +67,7 @@ class gl_430_texture_copy : public test
 {
 public:
 	gl_430_texture_copy(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-copy", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-texture-copy", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

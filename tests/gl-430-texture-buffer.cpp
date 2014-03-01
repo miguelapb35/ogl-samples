@@ -68,7 +68,7 @@ class gl_430_texture_buffer : public test
 {
 public:
 	gl_430_texture_buffer(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-buffer", test::CORE, 4, 3, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
+		test(argc, argv, "gl-430-texture-buffer", test::CORE, 4, 2, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformMVP(0)

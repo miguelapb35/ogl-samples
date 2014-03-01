@@ -45,7 +45,7 @@ class gl_430_image_store : public test
 {
 public:
 	gl_430_image_store(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-image-store", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-image-store", test::CORE, 4, 2),
 		VertexArrayName(0),
 		TextureName(0),
 		ImageSize(0)

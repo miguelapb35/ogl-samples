@@ -159,7 +159,7 @@ class gl_430_program_compute_image : public test
 {
 public:
 	gl_430_program_compute_image(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-program-compute-image", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-program-compute-image", test::CORE, 4, 2),
 		VertexArrayName(0)
 	{}
 
@@ -342,6 +342,7 @@ private:
 		this->logImplementationDependentLimit(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, "GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT");
 
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_compute_shader");
 
 		if(Validated)
 			Validated = initProgram();

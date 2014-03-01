@@ -73,7 +73,7 @@ class gl_430_debug : public test
 {
 public:
 	gl_430_debug(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-debug", test::CORE, 4, 3, glm::vec2(0), test::GENERATE_ERROR),
+		test(argc, argv, "gl-430-debug", test::CORE, 4, 2, glm::vec2(0), test::GENERATE_ERROR),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
