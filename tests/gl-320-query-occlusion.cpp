@@ -131,6 +131,9 @@ private:
 	{
 		bool Validated = true;
 
+		GLint QueryCounter(0);
+		glGetQueryiv(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &QueryCounter);
+
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
