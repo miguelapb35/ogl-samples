@@ -61,6 +61,7 @@ OpenGL Samples Pack 4.4.2.0: 2014-0X-XX
 - Added 320-primitive-line-msaa sample
 - Added 320-primitive-point-clip sample
 - Added 320-primitive-point-quad sample
+- Added "caps" samples for each version of OpenGL
 
 ================================================================================
 OpenGL Samples Pack 4.4.1.4: 2014-0X-XX

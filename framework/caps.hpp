@@ -241,15 +241,7 @@ private:
 		GLint MAX_SERVER_WAIT_TIMEOUT;
 	} DebugData;
 
-	void initDebug()
-	{
-		memset(&DebugData, 0, sizeof(DebugData));
-
-		glGetIntegerv(GL_CONTEXT_FLAGS, &DebugData.CONTEXT_FLAGS);
-		glGetIntegerv(GL_MAX_DEBUG_GROUP_STACK_DEPTH, &DebugData.MAX_DEBUG_GROUP_STACK_DEPTH);
-		glGetIntegerv(GL_MAX_LABEL_LENGTH, &DebugData.MAX_LABEL_LENGTH);
-		glGetIntegerv(GL_MAX_SERVER_WAIT_TIMEOUT, &DebugData.MAX_SERVER_WAIT_TIMEOUT);
-	}
+	void initDebug();
 
 	struct compute
 	{
@@ -464,6 +456,8 @@ private:
 
 	struct program
 	{
+		GLint MAX_PATCH_VERTICES;
+		GLint MAX_TESS_GEN_LEVEL;
 		GLint MAX_SUBROUTINES;
 		GLint MAX_SUBROUTINE_UNIFORM_LOCATIONS;
 		GLint MAX_COMBINED_ATOMIC_COUNTERS;
@@ -485,6 +479,7 @@ private:
 		GLint NUM_PROGRAM_BINARY_FORMATS;
 		GLint NUM_SHADER_BINARY_FORMATS;
 		GLint PROGRAM_BINARY_FORMATS;
+		GLint MAX_COMBINED_SHADER_OUTPUT_RESOURCES;
 	} ProgramData;
 
 	void initProgram();
