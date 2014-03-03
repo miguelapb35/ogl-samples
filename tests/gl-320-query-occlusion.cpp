@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/query-conditional.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/query-conditional.frag");
+	char const * VERT_SHADER_SOURCE("gl-320/query-occlusion.vert");
+	char const * FRAG_SHADER_SOURCE("gl-320/query-occlusion.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -40,22 +40,33 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	GLuint VertexArrayName(0);
-	GLuint ProgramName(0);
-	GLuint BufferName(0);
-	GLuint QueryName(0);
-	GLint UniformMVP(0);
-	GLint UniformColor(0);
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
 }//namespace
 
 class gl_320_query_occlusion : public test
 {
 public:
 	gl_320_query_occlusion(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-query-occlusion", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-query-occlusion", test::CORE, 3, 2),
+		VertexArrayName(0),
+		ProgramName(0),
+		QueryName(0)
 	{}
 
 private:
+	std::array<GLuint, buffer::MAX> BufferName;
+	GLuint VertexArrayName;
+	GLuint ProgramName;
+	GLuint QueryName;
+
 	bool initQuery()
 	{
 		glGenQueries(1, &QueryName);
@@ -87,37 +98,36 @@ private:
 		// Get variables locations
 		if(Validated)
 		{
-			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-			UniformColor = glGetUniformLocation(ProgramName, "Diffuse");
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
 		}
 
 		return Validated && this->checkError("initProgram");
 	}
 
-	// Buffer update using glBufferSubData
 	bool initBuffer()
 	{
-		// Generate a buffer object
-		glGenBuffers(1, &BufferName);
+		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		// Bind the buffer for use
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-
-		// Reserve buffer memory but and copy the values
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
-
-		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initArrayBuffer");
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		return this->checkError("initBuffer");
 	}
 
 	bool initVertexArray()
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			// Bind vertex attribute
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -148,7 +158,7 @@ private:
 
 	bool end()
 	{
-		glDeleteBuffers(1, &BufferName);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
@@ -159,9 +169,18 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * this->view() * Model;
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, static_cast<float>(WindowSize.x) / static_cast<float>(WindowSize.y), 0.1f, 100.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
+		
+			*Pointer = Projection * this->view() * Model;
+
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+		}
 
 		// Set the display viewport
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
@@ -169,18 +188,13 @@ private:
 		// Clear color buffer with black
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-		// Bind program
 		glUseProgram(ProgramName);
-		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-		glUniform4fv(UniformColor, 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-
-		// Beginning of the samples count query
-		glBeginQuery(GL_SAMPLES_PASSED, QueryName);
-
 		glBindVertexArray(VertexArrayName);
-		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		// End of the samples count query
+		// Samples count query
+		glBeginQuery(GL_SAMPLES_PASSED, QueryName);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		glEndQuery(GL_SAMPLES_PASSED);
 
 		// Get the count of samples. 

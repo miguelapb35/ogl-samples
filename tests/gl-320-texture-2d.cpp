@@ -67,23 +67,24 @@ namespace
 			MAX
 		};
 	}//namespace shader
-
-	GLuint VertexArrayName(0);
-	GLuint ProgramName(0);
-	GLuint TextureName(0);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	GLint UniformTransform(0);
-	GLint UniformDiffuse(0);
 }//namespace
 
 class gl_320_texture2d : public test
 {
 public:
 	gl_320_texture2d(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2),
+		VertexArrayName(0),
+		ProgramName(0),
+		TextureName(0)
 	{}
 
 private:
+	std::array<GLuint, buffer::MAX> BufferName;
+	GLuint VertexArrayName;
+	GLuint ProgramName;
+	GLuint TextureName;
+
 	bool initProgram()
 	{
 		bool Validated(true);
@@ -109,10 +110,13 @@ private:
 
 		if(Validated)
 		{
-			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
-			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+
+			glUseProgram(ProgramName);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse"), 0);
+			glUseProgram(0);
 		}
-	
+
 		Validated = Validated && this->checkError("initProgram");
 	
 		return Validated;
@@ -131,13 +135,11 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return this->checkError("initBuffer");
@@ -163,8 +165,7 @@ private:
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D,
+			glTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
 				gli::internal_format(Texture.format()),
 				GLsizei(Texture[Level].dimensions().x),
@@ -231,7 +232,7 @@ private:
 	{
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
@@ -247,8 +248,6 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glUniform1i(UniformDiffuse, 0);
-		glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);

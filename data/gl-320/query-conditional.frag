@@ -1,11 +1,14 @@
 #version 150 core
 
-uniform vec4 Diffuse;
+uniform material
+{
+	vec4 Diffuse;
+} Material;
 
 out vec4 Color;
 
 void main()
 {
-	Color = Diffuse;
+	Color = Material.Diffuse;
 }
 
