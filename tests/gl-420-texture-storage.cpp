@@ -27,16 +27,17 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-430/texture-storage.vert");
 	char const * FRAG_SHADER_SOURCE("gl-430/texture-storage.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	//char const * TEXTURE_DIFFUSE("kueken3-bgr8-mipmaps.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f * 3.0f / 4.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f * 3.0f / 4.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f * 3.0f / 4.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f * 3.0f / 4.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
@@ -157,18 +158,17 @@ private:
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexStorage2D(GL_TEXTURE_2D, 
-			GLint(Texture.levels()), 
-			gli::internal_format(Texture.format()),
+		glTexStorage2D(GL_TEXTURE_2D,
+			GLint(Texture.levels()), gli::internal_format(Texture.format()),
 			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -183,7 +183,7 @@ private:
 				gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
-	
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		return Validated;
