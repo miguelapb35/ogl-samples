@@ -214,6 +214,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_framebuffer_no_attachments");
 
 		if(Validated)
 			Validated = initProgram();

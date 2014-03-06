@@ -295,6 +295,8 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_framebuffer_no_attachments");
+		Validated = Validated && this->checkExtension("GL_ARB_clear_texture");
 
 		if(Validated)
 			Validated = initProgram();

@@ -393,6 +393,8 @@ set(GL_SHADER_GTC fbo-render.vert fbo-render.frag fbo-splash.vert fbo-splash.fra
 glCreateSampleGTC(fbo-without-attachment)
 set(GL_SHADER_GTC interface-matching.vert interface-matching.cont interface-matching.eval interface-matching.geom interface-matching.frag)
 glCreateSampleGTC(interface-matching)
+set(GL_SHADER_GTC query-occlusion.vert query-occlusion.frag)
+glCreateSampleGTC(query-occlusion)
 set(GL_SHADER_GTC sampler-wrap.vert sampler-wrap.frag)
 glCreateSampleGTC(sampler-wrap)
 set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
