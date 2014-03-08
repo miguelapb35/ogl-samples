@@ -713,11 +713,15 @@ void caps::initFramebuffer()
 	if(check(3, 0) || (VersionData.GL.ARB_framebuffer_object))
 	{
 		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &FramebufferData.MAX_COLOR_ATTACHMENTS);
+		glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &FramebufferData.MAX_RENDERBUFFER_SIZE);
+	}
+
+	if(check(3, 0) || (VersionData.GL.ARB_framebuffer_no_attachments))
+	{
 		glGetIntegerv(GL_MAX_FRAMEBUFFER_HEIGHT, &FramebufferData.MAX_FRAMEBUFFER_HEIGHT);
 		glGetIntegerv(GL_MAX_FRAMEBUFFER_WIDTH, &FramebufferData.MAX_FRAMEBUFFER_WIDTH);
 		glGetIntegerv(GL_MAX_FRAMEBUFFER_LAYERS, &FramebufferData.MAX_FRAMEBUFFER_LAYERS);
 		glGetIntegerv(GL_MAX_FRAMEBUFFER_SAMPLES, &FramebufferData.MAX_FRAMEBUFFER_SAMPLES);
-		glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &FramebufferData.MAX_RENDERBUFFER_SIZE);
 	}
 }
 

@@ -25,18 +25,18 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/texture-sparse.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-sparse.frag");
+	char const * VERT_SHADER_SOURCE("gl-440/texture-sparse.vert");
+	char const * FRAG_SHADER_SOURCE("gl-440/texture-sparse.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f) * 10.f, glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f) * 10.f, glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f * 10.f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f * 10.f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f) * 10.0f, glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f) * 10.0f, glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f) * 10.0f, glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f) * 10.0f, glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_texture_sparse_amd : public test
+class gl_440_texture_sparse_arb : public test
 {
 public:
-	gl_420_texture_sparse_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-sparse-amd", test::CORE, 4, 2),
+	gl_440_texture_sparse_arb(int argc, char* argv[]) :
+		test(argc, argv, "gl-420-texture-sparse-arb", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -151,16 +151,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
-
-		glTextureStorageSparseAMD(TextureName, GL_TEXTURE_2D, GL_RGBA8, Size, Size, GLsizei(1), GLsizei(1), GL_TEXTURE_STORAGE_SPARSE_BIT_AMD);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
+		glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
 
 		GLint PageSizeX(0);
 		GLint PageSizeY(0);
 		GLint PageSizeZ(0);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_AMD, 1, &PageSizeX);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_AMD, 1, &PageSizeY);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_AMD, 1, &PageSizeZ);
+		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSizeX);
+		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSizeY);
+		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSizeZ);
 
 		for(std::size_t Level = 0; Level < GLint(glm::log2(256.f)); ++Level)
 		{
@@ -173,19 +172,18 @@ private:
 				if(i % 2 && j % 2)
 					continue;
 
-				glTexSubImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
-					i * GLsizei(Texture[0].dimensions().x), 
-					j * GLsizei(Texture[0].dimensions().y), 
-					GLsizei(Texture[0].dimensions().x), 
-					GLsizei(Texture[0].dimensions().y), 
+				glTexPageCommitmentARB(GL_TEXTURE_2D, GLint(Level),
+					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y), 0,
+					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), 1,
+					GL_TRUE);
+
+				glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y),
+					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
 					GL_BGR, GL_UNSIGNED_BYTE, 
 					Texture[0].data());
 			}
 		}
-
-		//glGenerateMipmap(GL_TEXTURE_2D);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -213,7 +211,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_AMD_sparse_texture");
+		Validated = Validated && this->checkExtension("GL_ARB_sparse_texture");
 
 		if(Validated)
 			Validated = initProgram();
@@ -276,7 +274,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_texture_sparse_amd Test(argc, argv);
+	gl_440_texture_sparse_arb Test(argc, argv);
 	Error += Test();
 
 	return Error;

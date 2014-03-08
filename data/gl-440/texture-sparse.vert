@@ -1,14 +1,13 @@
 #version 420 core
 
-#include "texture-storage.glsl"
-#line 4
+#include "texture-2d.glsl"
 
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-layout(location = POSITION) in vec2 Position;
+layout(location = POSITION) in vec3 Position;
 layout(location = TEXCOORD) in vec2 Texcoord;
 
 out gl_PerVertex
@@ -22,7 +21,7 @@ out block
 } Out;
 
 void main()
-{
+{	
 	Out.Texcoord = Texcoord;
-	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
+	gl_Position = Transform.MVP * vec4(Position, 1.0);
 }

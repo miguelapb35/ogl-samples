@@ -234,6 +234,7 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_EXT_direct_state_access");
 
 		if(Validated)
 			Validated = initProgram();

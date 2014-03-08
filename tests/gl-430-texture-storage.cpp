@@ -212,9 +212,19 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_texture_query_levels");
-		Validated = Validated && this->checkExtension("GL_ARB_texture_view");
-		Validated = Validated && this->checkExtension("GL_ARB_fragment_layer_viewport");
+		Validated = Validated && this->checkExtension("GL_ARB_internalformat_query2");
+
+		GLint64 Query_COMPRESSED_RGB8_ETC2(0);
+		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGB4, GL_INTERNALFORMAT_PREFERRED, sizeof(GLint64), &Query_COMPRESSED_RGB8_ETC2);
+		GLint64 Query_RGBA8(0);
+		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_FILTER, sizeof(GLint64), &Query_RGBA8);
+		GLint64 Query_COMPRESSED_RGBA_BPTC_UNORM(0);
+		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_NUM_SAMPLE_COUNTS, sizeof(GLint64), &Query_COMPRESSED_RGBA_BPTC_UNORM);
+
+		std::vector<GLint64> Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM;
+		Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM.resize(Query_COMPRESSED_RGBA_BPTC_UNORM);
+		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_SAMPLES, sizeof(GLint64), &Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM[0]);
+
 
 		if(Validated)
 			Validated = initProgram();

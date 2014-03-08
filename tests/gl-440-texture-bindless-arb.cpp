@@ -25,18 +25,18 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/texture-sparse.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-sparse.frag");
+	char const * VERT_SHADER_SOURCE("gl-420/texture-bindless-nv.vert");
+	char const * FRAG_SHADER_SOURCE("gl-420/texture-bindless-nv.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f) * 10.f, glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f) * 10.f, glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f * 10.f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f * 10.f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
@@ -59,37 +59,37 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_texture_sparse_amd : public test
+class gl_420_texture_bindless_nv : public test
 {
 public:
-	gl_420_texture_sparse_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-sparse-amd", test::CORE, 4, 2),
+	gl_420_texture_bindless_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-420-texture-bindless-nv", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
-		TextureName(0)
+		TextureName(0),
+		TextureHandle(0),
+		TextureLocation(0)
 	{}
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint PipelineName;
 	GLuint ProgramName;
-	GLuint TextureName;
 	GLuint VertexArrayName;
+	GLuint TextureName;
+	GLuint64 TextureHandle;
+	GLint TextureLocation;
 
 	bool initProgram()
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -97,12 +97,20 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-
 			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
+		{
+			TextureLocation = glGetUniformLocation(ProgramName, "Diffuse");
+			Validated = Validated && (TextureLocation != -1);
+		}
+
+		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated;
 	}
@@ -120,7 +128,10 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+
+		glGetIntegerv(
+			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
+			&UniformBufferOffset);
 
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
@@ -133,12 +144,12 @@ private:
 
 	bool initTexture()
 	{
+		bool Validated(true);
+
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		GLsizei const Size(4096);
 
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
@@ -148,48 +159,38 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
 
-		glTextureStorageSparseAMD(TextureName, GL_TEXTURE_2D, GL_RGBA8, Size, Size, GLsizei(1), GLsizei(1), GL_TEXTURE_STORAGE_SPARSE_BIT_AMD);
+		glTexStorage2D(GL_TEXTURE_2D,
+			GLint(Texture.levels()),
+			gli::internal_format(Texture.format()),
+			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 
-		GLint PageSizeX(0);
-		GLint PageSizeY(0);
-		GLint PageSizeZ(0);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_AMD, 1, &PageSizeX);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_AMD, 1, &PageSizeY);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_AMD, 1, &PageSizeZ);
-
-		for(std::size_t Level = 0; Level < GLint(glm::log2(256.f)); ++Level)
+		for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 		{
-			GLsizei const Width = (Size >> Level) / Texture[0].dimensions().x;
-			GLsizei const Height = (Size >> Level) / Texture[0].dimensions().y;
-
-			for(GLsizei j = 0; j < Height; ++j)
-			for(GLsizei i = 0; i < Width; ++i)
-			{
-				if(i % 2 && j % 2)
-					continue;
-
-				glTexSubImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
-					i * GLsizei(Texture[0].dimensions().x), 
-					j * GLsizei(Texture[0].dimensions().y), 
-					GLsizei(Texture[0].dimensions().x), 
-					GLsizei(Texture[0].dimensions().y), 
-					GL_BGR, GL_UNSIGNED_BYTE, 
-					Texture[0].data());
-			}
+			glTexSubImage2D(
+				GL_TEXTURE_2D,
+				GLint(Level),
+				0, 0,
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
+				gli::external_format(Texture.format()),
+				gli::type_format(Texture.format()),
+				Texture[Level].data());
 		}
-
-		//glGenerateMipmap(GL_TEXTURE_2D);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return true;
+		// Query the texture handle and make the texture resident
+		TextureHandle = glGetTextureHandleNV(TextureName);
+		glMakeTextureHandleResidentNV(TextureHandle);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+
+		return Validated;
 	}
 
 	bool initVertexArray()
@@ -213,7 +214,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_AMD_sparse_texture");
+		Validated = Validated && this->checkExtension("GL_NV_bindless_texture");
 
 		if(Validated)
 			Validated = initProgram();
@@ -242,13 +243,14 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
+		// Update of the uniform buffer
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
 				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.001f, 100.0f);
+			glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, WindowSize.x, WindowSize.y, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
 		
 			*Pointer = Projection * this->view() * Model;
@@ -261,8 +263,9 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
+
+		glProgramUniformHandleui64NV(ProgramName, TextureLocation, TextureHandle);
+
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
@@ -276,7 +279,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_texture_sparse_amd Test(argc, argv);
+	gl_420_texture_bindless_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;
