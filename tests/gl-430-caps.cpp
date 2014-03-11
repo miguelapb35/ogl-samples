@@ -38,31 +38,31 @@ private:
 
 		bool Validated = true;
 
-		Validated = Validated && Caps.Vertex.MAX_VERTEX_UNIFORM_BLOCKS >= 14;
-		Validated = Validated && Caps.Control.MAX_TESS_CONTROL_UNIFORM_BLOCKS >= 14;
-		Validated = Validated && Caps.Evaluation.MAX_TESS_EVALUATION_UNIFORM_BLOCKS >= 14;
-		Validated = Validated && Caps.Geometry.MAX_GEOMETRY_UNIFORM_BLOCKS >= 14;
-		Validated = Validated && Caps.Fragment.MAX_FRAGMENT_UNIFORM_BLOCKS >= 14;
-		Validated = Validated && Caps.Compute.MAX_COMPUTE_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_TESS_CONTROL_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_GEOMETRY_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_BLOCKS >= 14;
+		Validated = Validated && Caps.Limits.MAX_COMPUTE_UNIFORM_BLOCKS >= 14;
 
-		Validated = Validated && Caps.Vertex.MAX_VERTEX_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Control.MAX_TESS_CONTROL_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Evaluation.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Geometry.MAX_GEOMETRY_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Fragment.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Compute.MAX_COMPUTE_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_TESS_CONTROL_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_GEOMETRY_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_COMPUTE_UNIFORM_COMPONENTS >= 1024;
 
-		Validated = Validated && Caps.Program.MAX_COMBINED_UNIFORM_BLOCKS >= 70;
-		Validated = Validated && Caps.Program.MAX_UNIFORM_BUFFER_BINDINGS >= 84;
-		Validated = Validated && Caps.Program.MAX_UNIFORM_BLOCK_SIZE >= 16384;
-		Validated = Validated && Caps.Program.MAX_SHADER_STORAGE_BLOCK_SIZE >= (1 << 24);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_UNIFORM_BLOCKS >= 70;
+		Validated = Validated && Caps.Limits.MAX_UNIFORM_BUFFER_BINDINGS >= 84;
+		Validated = Validated && Caps.Limits.MAX_UNIFORM_BLOCK_SIZE >= 16384;
+		Validated = Validated && Caps.Limits.MAX_SHADER_STORAGE_BLOCK_SIZE >= (1 << 24);
 
-		Validated = Validated && Caps.Vertex.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS == ((Caps.Vertex.MAX_VERTEX_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Vertex.MAX_VERTEX_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Control.MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS == ((Caps.Control.MAX_TESS_CONTROL_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Control.MAX_TESS_CONTROL_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Evaluation.MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS == ((Caps.Evaluation.MAX_TESS_EVALUATION_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Evaluation.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Geometry.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS == ((Caps.Geometry.MAX_GEOMETRY_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Geometry.MAX_GEOMETRY_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Fragment.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS == ((Caps.Fragment.MAX_FRAGMENT_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Fragment.MAX_FRAGMENT_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Compute.MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS == ((Caps.Compute.MAX_COMPUTE_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Compute.MAX_COMPUTE_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_VERTEX_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_TESS_CONTROL_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_TESS_CONTROL_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_GEOMETRY_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_GEOMETRY_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_FRAGMENT_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_COMPUTE_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_COMPUTE_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_COMPUTE_UNIFORM_COMPONENTS);
 		
 		return Validated;
 	}

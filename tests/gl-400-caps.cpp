@@ -38,14 +38,14 @@ private:
 
 		bool Validated = true;
 
-		Validated = Validated && Caps.Program.MAX_PATCH_VERTICES >= 32;
-		Validated = Validated && Caps.Program.MAX_TESS_GEN_LEVEL >= 64;
+		Validated = Validated && Caps.Limits.MAX_PATCH_VERTICES >= 32;
+		Validated = Validated && Caps.Limits.MAX_TESS_GEN_LEVEL >= 64;
 
-		Validated = Validated && Caps.Texture.MAX_TEXTURE_BUFFER_SIZE >= 65536;
-		Validated = Validated && Caps.Texture.MAX_TEXTURE_SIZE >= 16384;
-		Validated = Validated && Caps.Texture.MAX_3D_TEXTURE_SIZE >= 16384;
-		Validated = Validated && Caps.Texture.MAX_CUBE_MAP_TEXTURE_SIZE >= 16384;
-		Validated = Validated && Caps.Texture.MAX_TEXTURE_IMAGE_UNITS >= 16;
+		Validated = Validated && Caps.Limits.MAX_TEXTURE_BUFFER_SIZE >= 65536;
+		Validated = Validated && Caps.Values.MAX_TEXTURE_SIZE >= 16384;
+		Validated = Validated && Caps.Values.MAX_3D_TEXTURE_SIZE >= 2048;
+		Validated = Validated && Caps.Values.MAX_CUBE_MAP_TEXTURE_SIZE >= 16384;
+		Validated = Validated && Caps.Limits.MAX_TEXTURE_IMAGE_UNITS >= 16;
 
 		return Validated;
 	}

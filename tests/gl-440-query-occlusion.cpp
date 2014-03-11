@@ -145,7 +145,7 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_query_buffer_object");
+		Validated = Validated && this->checkExtension("GL_ARB_query_buffer_object");
 
 		GLint QueryCounter(0);
 		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryCounter);
