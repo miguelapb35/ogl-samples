@@ -38,21 +38,21 @@ private:
 
 		bool Validated = true;
 
-		Validated = Validated && Caps.Vertex.MAX_VERTEX_UNIFORM_BLOCKS >= 12;
-		Validated = Validated && Caps.Geometry.MAX_GEOMETRY_UNIFORM_BLOCKS >= 12;
-		Validated = Validated && Caps.Fragment.MAX_FRAGMENT_UNIFORM_BLOCKS >= 12;
+		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_BLOCKS >= 12;
+		Validated = Validated && Caps.Limits.MAX_GEOMETRY_UNIFORM_BLOCKS >= 12;
+		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_BLOCKS >= 12;
 
-		Validated = Validated && Caps.Vertex.MAX_VERTEX_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Geometry.MAX_GEOMETRY_UNIFORM_COMPONENTS >= 1024;
-		Validated = Validated && Caps.Fragment.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_GEOMETRY_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 1024;
 
-		Validated = Validated && Caps.Program.MAX_COMBINED_UNIFORM_BLOCKS >= 36;
-		Validated = Validated && Caps.Program.MAX_UNIFORM_BUFFER_BINDINGS >= 36;
-		Validated = Validated && Caps.Program.MAX_UNIFORM_BLOCK_SIZE >= 16384;
+		Validated = Validated && Caps.Limits.MAX_COMBINED_UNIFORM_BLOCKS >= 36;
+		Validated = Validated && Caps.Limits.MAX_UNIFORM_BUFFER_BINDINGS >= 36;
+		Validated = Validated && Caps.Limits.MAX_UNIFORM_BLOCK_SIZE >= 16384;
 
-		Validated = Validated && Caps.Vertex.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS == ((Caps.Vertex.MAX_VERTEX_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Vertex.MAX_VERTEX_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Geometry.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS == ((Caps.Geometry.MAX_GEOMETRY_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Geometry.MAX_GEOMETRY_UNIFORM_COMPONENTS);
-		Validated = Validated && Caps.Fragment.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS == ((Caps.Fragment.MAX_FRAGMENT_UNIFORM_BLOCKS * Caps.Program.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Fragment.MAX_FRAGMENT_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_VERTEX_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_GEOMETRY_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_GEOMETRY_UNIFORM_COMPONENTS);
+		Validated = Validated && Caps.Limits.MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS == ((Caps.Limits.MAX_FRAGMENT_UNIFORM_BLOCKS * Caps.Limits.MAX_UNIFORM_BLOCK_SIZE / 4) + Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS);
 
 		return Validated;
 	}

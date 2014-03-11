@@ -24,6 +24,7 @@
 #pragma once
 
 #include "test.hpp"
+#include <string>
 
 struct caps
 {
@@ -35,12 +36,51 @@ struct caps
 	};
 
 private:
-	struct extensionES
+	bool check(GLint MajorVersionRequire, GLint MinorVersionRequire);
+
+	struct version
 	{
+		version(profile const & Profile) :
+			PROFILE(Profile),
+			MINOR_VERSION(0),
+			MAJOR_VERSION(0),
+			CONTEXT_FLAGS(0),
+			NUM_EXTENSIONS(0)
+		{}
+		profile PROFILE;
+		GLint MINOR_VERSION;
+		GLint MAJOR_VERSION;
+		GLint CONTEXT_FLAGS;
+		GLint NUM_EXTENSIONS;
+		std::string RENDERER;
+		std::string VENDOR;
+		std::string VERSION;
+		GLint NUM_SHADING_LANGUAGE_VERSIONS;
+		bool GLSL100;
+		bool GLSL110;
+		bool GLSL120;
+		bool GLSL130;
+		bool GLSL140;
+		bool GLSL150Core;
+		bool GLSL150Comp;
+		bool GLSL300ES;
+		bool GLSL330Core;
+		bool GLSL330Comp;
+		bool GLSL400Core;
+		bool GLSL400Comp;
+		bool GLSL410Core;
+		bool GLSL410Comp;
+		bool GLSL420Core;
+		bool GLSL420Comp;
+		bool GLSL430Core;
+		bool GLSL430Comp;
+		bool GLSL440Core;
+		bool GLSL440Comp;
+	} VersionData;
 
-	};
+	void initVersion();
 
-	struct extensionGL
+	struct extensions
 	{
 		bool ARB_multitexture;
 		bool ARB_transpose_matrix;
@@ -187,6 +227,7 @@ private:
 		bool ARB_shader_group_vote;
 		bool ARB_sparse_texture;
 
+		bool EXT_texture_compression_latc;
 		bool EXT_transform_feedback;
 		bool EXT_direct_state_access;
 		bool EXT_texture_filter_anisotropic;
@@ -203,7 +244,9 @@ private:
 		bool NV_shader_buffer_store;
 		bool NV_bindless_multi_draw_indirect;
 		bool NV_blend_equation_advanced;
+		bool NV_deep_texture3D;
 
+		bool ATI_texture_compression_3dc;
 		bool AMD_depth_clamp_separate;
 		bool AMD_stencil_operation_extended;
 		bool AMD_vertex_shader_viewport_index;
@@ -211,27 +254,9 @@ private:
 		bool AMD_shader_trinary_minmax;
 		bool AMD_interleaved_elements;
 		bool AMD_shader_atomic_counter_ops;
-	};
+	} ExtensionData;
 
-	struct version
-	{
-		version(profile const & Profile) :
-			Profile(Profile)
-		{}
-		GLint Major;					// GL_MINOR_VERSION
-		GLint Minor;					// GL_MAJOR_VERSION
-		GLint NumExtensions;			// GL_NUM_EXTENSIONS
-		profile Profile;
-		union
-		{
-			extensionGL GL;
-			extensionES ES;
-		};
-	} VersionData;
-
-	bool check(GLint MajorVersionRequire, GLint MinorVersionRequire);
-
-	void initVersion();
+	void initExtensions();
 
 	struct debug
 	{
@@ -243,7 +268,7 @@ private:
 
 	void initDebug();
 
-	struct compute
+	struct limits
 	{
 		GLint MAX_COMPUTE_SHADER_STORAGE_BLOCKS;
 		GLint MAX_COMPUTE_UNIFORM_BLOCKS;
@@ -257,12 +282,7 @@ private:
 		GLint MAX_COMPUTE_WORK_GROUP_INVOCATIONS;
 		GLint MAX_COMPUTE_WORK_GROUP_COUNT;
 		GLint MAX_COMPUTE_WORK_GROUP_SIZE;
-	} ComputeData;
 
-	void initCompute();
-
-	struct vertex
-	{
 		GLint MAX_VERTEX_ATOMIC_COUNTERS;
 		GLint MAX_VERTEX_SHADER_STORAGE_BLOCKS;
 		GLint MAX_VERTEX_ATTRIBS;
@@ -272,12 +292,7 @@ private:
 		GLint MAX_VERTEX_UNIFORM_VECTORS;
 		GLint MAX_VERTEX_UNIFORM_BLOCKS;
 		GLint MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS;
-	} VertexData;
 
-	void initVertex();
-
-	struct control
-	{
 		GLint MAX_TESS_CONTROL_ATOMIC_COUNTERS;
 		GLint MAX_TESS_CONTROL_SHADER_STORAGE_BLOCKS;
 		GLint MAX_TESS_CONTROL_INPUT_COMPONENTS;
@@ -286,12 +301,7 @@ private:
 		GLint MAX_TESS_CONTROL_UNIFORM_BLOCKS;
 		GLint MAX_TESS_CONTROL_UNIFORM_COMPONENTS;
 		GLint MAX_COMBINED_TESS_CONTROL_UNIFORM_COMPONENTS;
-	} ControlData;
 
-	void initControl();
-
-	struct evaluation
-	{
 		GLint MAX_TESS_EVALUATION_ATOMIC_COUNTERS;
 		GLint MAX_TESS_EVALUATION_SHADER_STORAGE_BLOCKS;
 		GLint MAX_TESS_EVALUATION_INPUT_COMPONENTS;
@@ -300,12 +310,7 @@ private:
 		GLint MAX_TESS_EVALUATION_UNIFORM_BLOCKS;
 		GLint MAX_TESS_EVALUATION_UNIFORM_COMPONENTS;
 		GLint MAX_COMBINED_TESS_EVALUATION_UNIFORM_COMPONENTS;
-	} EvaluationData;
 
-	void initEvaluation();
-
-	struct geometry
-	{
 		GLint MAX_GEOMETRY_ATOMIC_COUNTERS;
 		GLint MAX_GEOMETRY_SHADER_STORAGE_BLOCKS;
 		GLint MAX_GEOMETRY_INPUT_COMPONENTS;
@@ -315,12 +320,7 @@ private:
 		GLint MAX_GEOMETRY_UNIFORM_COMPONENTS;
 		GLint MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS;
 		GLint MAX_VERTEX_STREAMS;
-	} GeometryData;
 
-	void initGeometry();
-
-	struct fragment
-	{
 		GLint MAX_FRAGMENT_ATOMIC_COUNTERS;
 		GLint MAX_FRAGMENT_SHADER_STORAGE_BLOCKS;
 		GLint MAX_FRAGMENT_INPUT_COMPONENTS;
@@ -330,68 +330,22 @@ private:
 		GLint MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS;
 		GLint MAX_DRAW_BUFFERS;
 		GLint MAX_DUAL_SOURCE_DRAW_BUFFERS;
-	} FragmentData;
 
-	void initFragment();
-
-	struct pulling
-	{
-		GLint MAX_ELEMENTS_INDICES;
-		GLint MAX_ELEMENTS_VERTICES;
-		GLint MAX_VERTEX_ATTRIB_RELATIVE_OFFSET;
-		GLint MAX_VERTEX_ATTRIB_BINDINGS;
-		GLint MAX_ELEMENT_INDEX;
-	} PullingData;
-
-	void initPulling();
-
-	struct rasterizer
-	{
-		GLfloat POINT_SIZE_MAX;
-		GLfloat POINT_SIZE_MIN;
-		GLfloat POINT_SIZE_GRANULARITY;
-		glm::vec2 POINT_SIZE_RANGE;
-		GLint SUBPIXEL_BITS;
-		GLint MAX_CLIP_DISTANCES;
-		GLfloat MAX_VIEWPORT_DIMS;
-		GLint MAX_VIEWPORTS;
-		GLint VIEWPORT_SUBPIXEL_BITS;
-		GLfloat VIEWPORT_BOUNDS_RANGE[2];
-	} RasterizerData;
-
-	void initRasterizer();
-
-	struct framebuffer
-	{
 		GLint MAX_COLOR_ATTACHMENTS;
 		GLint MAX_FRAMEBUFFER_WIDTH;
 		GLint MAX_FRAMEBUFFER_HEIGHT;
 		GLint MAX_FRAMEBUFFER_LAYERS;
 		GLint MAX_FRAMEBUFFER_SAMPLES;
-		GLint MAX_RENDERBUFFER_SIZE;
 		GLint MAX_SAMPLE_MASK_WORDS;
-	} FramebufferData;
 
-	void initFramebuffer();
-
-	struct buffer
-	{
 		GLint MAX_TRANSFORM_FEEDBACK_BUFFERS;
 		GLint MIN_MAP_BUFFER_ALIGNMENT;
-	} BufferData;
 
-	void initBuffer();
-
-	struct texture
-	{
 		GLint MAX_TEXTURE_IMAGE_UNITS;
 		GLint MAX_COMBINED_TEXTURE_IMAGE_UNITS;
-		GLint MAX_TEXTURE_LOD_BIAS;
-		GLint MAX_TEXTURE_SIZE;
 		GLint MAX_RECTANGLE_TEXTURE_SIZE;
-		GLint MAX_3D_TEXTURE_SIZE;
-		GLint MAX_ARRAY_TEXTURE_LAYERS;
-		GLint MAX_CUBE_MAP_TEXTURE_SIZE;
+		GLint MAX_DEEP_3D_TEXTURE_WIDTH_HEIGHT_NV;
+		GLint MAX_DEEP_3D_TEXTURE_DEPTH_NV;
 		GLint MAX_COLOR_TEXTURE_SAMPLES;
 		GLint MAX_DEPTH_TEXTURE_SAMPLES;
 		GLint MAX_INTEGER_SAMPLES;
@@ -399,63 +353,6 @@ private:
 		GLint NUM_COMPRESSED_TEXTURE_FORMATS;
 		GLint MAX_TEXTURE_MAX_ANISOTROPY_EXT;
 
-		bool COMPRESSED_RGB_S3TC_DXT1_EXT;
-		bool COMPRESSED_RGBA_S3TC_DXT1_EXT;
-		bool COMPRESSED_RGBA_S3TC_DXT3_EXT;
-		bool COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		bool COMPRESSED_RED_RGTC1;
-		bool COMPRESSED_SIGNED_RED_RGTC1;
-		bool COMPRESSED_RG_RGTC2;
-		bool COMPRESSED_SIGNED_RG_RGTC2;
-		bool COMPRESSED_RGBA_BPTC_UNORM;
-		bool COMPRESSED_SRGB_ALPHA_BPTC_UNORM;
-		bool COMPRESSED_RGB_BPTC_SIGNED_FLOAT;
-		bool COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT;
-		bool COMPRESSED_RGBA_ASTC_4x4_KHR;
-		bool COMPRESSED_RGBA_ASTC_5x4_KHR;
-		bool COMPRESSED_RGBA_ASTC_5x5_KHR;
-		bool COMPRESSED_RGBA_ASTC_6x5_KHR;
-		bool COMPRESSED_RGBA_ASTC_6x6_KHR;
-		bool COMPRESSED_RGBA_ASTC_8x5_KHR;
-		bool COMPRESSED_RGBA_ASTC_8x6_KHR;
-		bool COMPRESSED_RGBA_ASTC_8x8_KHR;
-		bool COMPRESSED_RGBA_ASTC_10x5_KHR;
-		bool COMPRESSED_RGBA_ASTC_10x6_KHR;
-		bool COMPRESSED_RGBA_ASTC_10x8_KHR;
-		bool COMPRESSED_RGBA_ASTC_10x10_KHR;
-		bool COMPRESSED_RGBA_ASTC_12x10_KHR;
-		bool COMPRESSED_RGBA_ASTC_12x12_KHR;
-		bool COMPRESSED_RGB8_ETC2;
-		bool COMPRESSED_SRGB8_ETC2;
-		bool COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-		bool COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
-		bool COMPRESSED_RGBA8_ETC2_EAC;
-		bool COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
-		bool COMPRESSED_R11_EAC;
-		bool COMPRESSED_SIGNED_R11_EAC;
-		bool COMPRESSED_RG11_EAC;
-		bool COMPRESSED_SIGNED_RG11_EAC;
-		bool PALETTE4_RGB8_OES;
-		bool PALETTE4_RGBA8_OES;
-		bool PALETTE4_R5_G6_B5_OES;
-		bool PALETTE4_RGBA4_OES;
-		bool PALETTE4_RGB5_A1_OES;
-		bool PALETTE8_RGB8_OES;
-		bool PALETTE8_RGBA8_OES;
-		bool PALETTE8_R5_G6_B5_OES;
-		bool PALETTE8_RGBA4_OES;
-		bool PALETTE8_RGB5_A1_OES;
-		bool ETC1_RGB8_OES;
-	} TextureData;
-
-#	ifndef GL_ETC1_RGB8_OES
-#		define GL_ETC1_RGB8_OES	0x8D64
-#	endif
-
-	void initTexture();
-
-	struct program
-	{
 		GLint MAX_PATCH_VERTICES;
 		GLint MAX_TESS_GEN_LEVEL;
 		GLint MAX_SUBROUTINES;
@@ -477,28 +374,148 @@ private:
 		GLint SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT;
 		GLint UNIFORM_BUFFER_OFFSET_ALIGNMENT;
 		GLint NUM_PROGRAM_BINARY_FORMATS;
-		GLint NUM_SHADER_BINARY_FORMATS;
 		GLint PROGRAM_BINARY_FORMATS;
-	} ProgramData;
+		GLint NUM_SHADER_BINARY_FORMATS;
+		GLint SHADER_BINARY_FORMATS;
+	} LimitsData;
 
-	void initProgram();
+	void initLimits();
+
+	struct values
+	{
+		GLint SUBPIXEL_BITS;
+		GLint MAX_CLIP_DISTANCES;
+		GLint64 MAX_ELEMENT_INDEX;
+		GLint MAX_ELEMENTS_INDICES;
+		GLint MAX_ELEMENTS_VERTICES;
+		GLenum IMPLEMENTATION_COLOR_READ_FORMAT;
+		GLenum IMPLEMENTATION_COLOR_READ_TYPE;
+		GLboolean PRIMITIVE_RESTART_FOR_PATCHES_SUPPORTED;
+
+		GLint MAX_3D_TEXTURE_SIZE;
+		GLint MAX_TEXTURE_SIZE;
+		GLint MAX_ARRAY_TEXTURE_LAYERS;
+		GLint MAX_CUBE_MAP_TEXTURE_SIZE;
+		GLint MAX_TEXTURE_LOD_BIAS;
+		GLint MAX_RENDERBUFFER_SIZE;
+
+		GLfloat MAX_VIEWPORT_DIMS;
+		GLint MAX_VIEWPORTS;
+		GLint VIEWPORT_SUBPIXEL_BITS;
+		glm::vec2 VIEWPORT_BOUNDS_RANGE;
+
+		GLenum LAYER_PROVOKING_VERTEX;
+		GLenum VIEWPORT_INDEX_PROVOKING_VERTEX;
+
+		GLfloat POINT_SIZE_MAX;
+		GLfloat POINT_SIZE_MIN;
+		glm::vec2 POINT_SIZE_RANGE;
+		GLfloat POINT_SIZE_GRANULARITY;
+
+		glm::vec2 ALIASED_LINE_WIDTH_RANGE;
+		glm::vec2 SMOOTH_LINE_WIDTH_RANGE;
+		GLfloat SMOOTH_LINE_WIDTH_GRANULARITY;
+
+		GLint MAX_VERTEX_ATTRIB_RELATIVE_OFFSET;
+		GLint MAX_VERTEX_ATTRIB_BINDINGS;
+
+		GLint TEXTURE_BUFFER_OFFSET_ALIGNMENT;
+	} ValuesData;
+
+	void initValues();
+
+	struct formats
+	{
+		bool COMPRESSED_RGB_S3TC_DXT1_EXT;
+		bool COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		bool COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		bool COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		bool COMPRESSED_SRGB_S3TC_DXT1_EXT;
+		bool COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT;
+		bool COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT;
+		bool COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
+
+		bool COMPRESSED_RED_RGTC1;
+		bool COMPRESSED_SIGNED_RED_RGTC1;
+		bool COMPRESSED_RG_RGTC2;
+		bool COMPRESSED_SIGNED_RG_RGTC2;
+		bool COMPRESSED_RGBA_BPTC_UNORM;
+		bool COMPRESSED_SRGB_ALPHA_BPTC_UNORM;
+		bool COMPRESSED_RGB_BPTC_SIGNED_FLOAT;
+		bool COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT;
+		bool COMPRESSED_R11_EAC;
+		bool COMPRESSED_SIGNED_R11_EAC;
+		bool COMPRESSED_RG11_EAC;
+		bool COMPRESSED_SIGNED_RG11_EAC;
+		bool COMPRESSED_RGB8_ETC2;
+		bool COMPRESSED_SRGB8_ETC2;
+		bool COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+		bool COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2;
+		bool COMPRESSED_RGBA8_ETC2_EAC;
+		bool COMPRESSED_SRGB8_ALPHA8_ETC2_EAC;
+
+		bool COMPRESSED_RGBA_ASTC_4x4_KHR;
+		bool COMPRESSED_RGBA_ASTC_5x4_KHR;
+		bool COMPRESSED_RGBA_ASTC_5x5_KHR;
+		bool COMPRESSED_RGBA_ASTC_6x5_KHR;
+		bool COMPRESSED_RGBA_ASTC_6x6_KHR;
+		bool COMPRESSED_RGBA_ASTC_8x5_KHR;
+		bool COMPRESSED_RGBA_ASTC_8x6_KHR;
+		bool COMPRESSED_RGBA_ASTC_8x8_KHR;
+		bool COMPRESSED_RGBA_ASTC_10x5_KHR;
+		bool COMPRESSED_RGBA_ASTC_10x6_KHR;
+		bool COMPRESSED_RGBA_ASTC_10x8_KHR;
+		bool COMPRESSED_RGBA_ASTC_10x10_KHR;
+		bool COMPRESSED_RGBA_ASTC_12x10_KHR;
+		bool COMPRESSED_RGBA_ASTC_12x12_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
+		bool COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
+
+		bool COMPRESSED_LUMINANCE_LATC1_EXT;
+		bool COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT;
+		bool COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
+		bool COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT;
+		bool COMPRESSED_LUMINANCE_ALPHA_3DC_ATI;
+
+		bool PALETTE4_RGB8_OES;
+		bool PALETTE4_RGBA8_OES;
+		bool PALETTE4_R5_G6_B5_OES;
+		bool PALETTE4_RGBA4_OES;
+		bool PALETTE4_RGB5_A1_OES;
+		bool PALETTE8_RGB8_OES;
+		bool PALETTE8_RGBA8_OES;
+		bool PALETTE8_R5_G6_B5_OES;
+		bool PALETTE8_RGBA4_OES;
+		bool PALETTE8_RGB5_A1_OES;
+		bool ETC1_RGB8_OES;
+	} FormatsData;
+
+#	ifndef GL_ETC1_RGB8_OES
+#		define GL_ETC1_RGB8_OES	0x8D64
+#	endif
+
+	void initFormats();
 
 public:
 	caps(profile const & Profile);
 
 	version const & Version;
+	extensions const & Extensions;
 	debug const & Debug;
-	compute const & Compute;
-	vertex const & Vertex;
-	control const & Control;
-	evaluation const & Evaluation;
-	geometry const & Geometry;
-	fragment const & Fragment;
-	pulling const & Pulling;
-	rasterizer const & Rasterizer;
-	framebuffer const & Framebuffer;
-	buffer const & Buffer;
-	texture const & Texture;
-	program const & Program;
+	limits const & Limits;
+	values const & Values;
+	formats const & Formats;
 };
 

@@ -78,6 +78,29 @@ namespace
 
 		return Success;
 	}
+
+	inline GLFWmonitor* GetMonitor(test::vendor const & Vendor)
+	{
+		if(Vendor == test::DEFAULT)
+		{
+			return glfwGetPrimaryMonitor();
+		}
+		else
+		{
+			int MonitorCount = 0;
+			GLFWmonitor** Monitors = glfwGetMonitors(&MonitorCount);
+
+			for(int MonitorIndex = 0; MonitorIndex < MonitorCount; ++MonitorIndex)
+			{
+				const char* MonitorName = glfwGetMonitorName(Monitors[MonitorIndex]);
+
+				if(1)
+					continue;
+
+				return Monitors[MonitorIndex];
+			}
+		}
+	}
 }//namespace
 
 std::string getDataDirectory()
@@ -163,7 +186,7 @@ test::test
 		int const DPI = 1;
 #	endif
 	
-	this->Window = glfwCreateWindow(WindowSize.x / DPI, WindowSize.y / DPI, argv[0], NULL,NULL);
+	this->Window = glfwCreateWindow(WindowSize.x / DPI, WindowSize.y / DPI, argv[0], nullptr, nullptr);
 
 	if(this->Window)
 	{
@@ -259,6 +282,24 @@ int test::operator()()
 void test::swap()
 {
 	glfwSwapBuffers(this->Window);
+}
+
+void test::sync(sync_mode const & Sync)
+{
+	switch(Sync)
+	{
+	case ASYNC:
+		glfwSwapInterval(0);
+		break;
+	case VSYNC:
+		glfwSwapInterval(1);
+		break;
+	case TEARING:
+		glfwSwapInterval(-1);
+		break;
+	default:
+		assert(0);
+	}
 }
 
 void test::stop()

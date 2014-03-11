@@ -128,11 +128,27 @@ std::string getBinaryDirectory();
 class test
 {
 public:
+	enum vendor
+	{
+		DEFAULT,
+		AMD,
+		INTEL,
+		NVIDIA,
+		VENDOR_MAX
+	};
+
 	enum profile
 	{
 		CORE = GLFW_OPENGL_CORE_PROFILE,
 		COMPATIBILITY = GLFW_OPENGL_COMPAT_PROFILE,
 		ES = GLFW_OPENGL_ES_PROFILE
+	};
+
+	enum sync_mode
+	{
+		VSYNC,
+		ASYNC,
+		TEARING
 	};
 
 	int operator()();
@@ -220,6 +236,7 @@ protected:
 	virtual bool render() = 0;
 
 	void swap();
+	void sync(sync_mode const & Sync);
 	void stop();
 	void log(csv & CSV, char const * String);
 
