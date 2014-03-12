@@ -63,7 +63,7 @@ class gl_440_texture_sparse_arb : public test
 {
 public:
 	gl_440_texture_sparse_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-sparse-arb", test::CORE, 4, 2),
+		test(argc, argv, "gl-440-texture-sparse-arb", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

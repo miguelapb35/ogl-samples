@@ -57,7 +57,7 @@ namespace semantic
 			TEXCOORD	= 5,
 			COLOR		= 6
 		};
-	}//namespace sampling
+	}//namespace sampler
 
 	namespace image
 	{
@@ -111,5 +111,12 @@ namespace semantic
 		};
 	}//namespace renderbuffer
 
+	namespace storage
+	{
+		enum type
+		{
+			VERTEX
+		};
+	}//namespace storage
 }//namespace semantic
 

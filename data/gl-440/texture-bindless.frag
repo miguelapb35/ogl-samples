@@ -1,9 +1,15 @@
 #version 420 core
+#extension GL_ARB_bindless_texture : require
 
-#include "texture-storage.glsl"
-#line 5
+#define FRAG_COLOR	0
+#define MATERIAL	0
 
-layout(binding = DIFFUSE) uniform sampler2D Diffuse;
+layout (bindless_sampler) uniform;
+
+layout(binding = MATERIAL) uniform material
+{
+	uvec2 Diffuse;
+} Material;
 
 in block
 {
@@ -14,5 +20,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord.st);
+	Color = texture(sampler2D(Material.Diffuse), In.Texcoord.st);
 }

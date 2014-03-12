@@ -232,7 +232,9 @@ private:
 			*UniformPointer = MVP;
 		}
 
-		glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		// Set the display viewport
 		glViewportIndexedf(0, 0.0f, 0.0f, WindowSize.x, WindowSize.y);
