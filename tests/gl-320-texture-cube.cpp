@@ -68,11 +68,11 @@ class gl_320_texture_cube : public test
 {
 public:
 	gl_320_texture_cube(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-cube", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-texture-cube", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.1f))
 	{}
 
 private:
-		bool initProgram()
+	bool initProgram()
 	{
 		bool Validated = true;
 	
@@ -116,12 +116,22 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(2));
+		assert(!Texture.empty());
+
+		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
+		Texture[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
+		Texture[2].clear<glm::u8vec4>(glm::u8vec4(255, 255,   0, 255));
+		Texture[3].clear<glm::u8vec4>(glm::u8vec4(  0, 255,   0, 255));
+		Texture[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
+		Texture[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
 
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &TextureName);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -133,18 +143,16 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		for(std::size_t Face = 0; Face < 6; ++Face)
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::textureCube::size_type Face = 0; Face < Texture.faces(); ++Face)
 		{
-			glCompressedTexImage2D(
+			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
-				GLint(Level),
-				GLenum(gli::internal_format(Texture.format())),
-				GLsizei(Texture[Face][Level].dimensions().x), 
-				GLsizei(Texture[Face][Level].dimensions().y), 
-				0, 
-				GLsizei(Texture[Face][Level].size()), 
-				Texture[Face][Level].data());
+				0,
+				GL_RGBA8,
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
+				0,
+				GL_RGBA, GL_UNSIGNED_BYTE,
+				Texture[Face].data());
 		}
 
 		return this->checkError("initTexture");
@@ -194,26 +202,33 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 1000.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 2.0f / 3.0f, 0.1f, 1000.0f);
 		glm::mat4 View = this->view();
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 		glm::mat4 MV = View * Model;
 
-		glViewport(0, 0, WindowSize.x, WindowSize.y);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 
-		// Bind the program for use
 		glUseProgram(ProgramName);
 		glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
 		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 		glUniform1i(UniformEnvironment, 0);
 		glUniform3fv(UniformCamera, 1, &glm::vec3(0.0f, 0.0f, -this->cameraDistance())[0]);
 
+		glBindVertexArray(VertexArrayName);
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
 
-		glBindVertexArray(VertexArrayName);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		glViewport(0, 0, WindowSize.x >> 1, WindowSize.y);
+
+		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+
+		glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		glViewport(WindowSize.x >> 1, 0, WindowSize.x >> 1, WindowSize.y);
+
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
 		return true;

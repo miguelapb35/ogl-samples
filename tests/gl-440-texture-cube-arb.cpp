@@ -173,7 +173,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(6, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(2));
+		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(2));
 		assert(!Texture.empty());
 
 		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
@@ -186,6 +186,8 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &TextureName);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
 		glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_RGBA8, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
@@ -279,12 +281,12 @@ private:
 		glBindVertexArray(VertexArrayName);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x * 0.5f, WindowSize.y);
-		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::NON_SEAMLESS]);
+		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::SEAMLESS]);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 
 		glViewportIndexedf(0, WindowSize.x * 0.5f, 0, WindowSize.x * 0.5f, WindowSize.y);
-		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::SEAMLESS]);
+		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::NON_SEAMLESS]);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 
