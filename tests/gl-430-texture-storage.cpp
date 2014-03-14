@@ -269,7 +269,7 @@ private:
 		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
 		glActiveTexture(GL_TEXTURE0);
