@@ -103,7 +103,8 @@ public:
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
-		UniformArrayStride(256)
+		UniformArrayStrideMat(256),
+		UniformArrayStrideInt(256)
 	{}
 
 private:
@@ -115,7 +116,8 @@ private:
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
-	GLint UniformArrayStride;
+	GLint UniformArrayStrideMat;
+	GLint UniformArrayStrideInt;
 
 	bool initProgram()
 	{
@@ -147,7 +149,10 @@ private:
 			std::string StringName(Name);
 
 			if(StringName == std::string("transform.MVP[0]"))
-				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStride);
+				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideMat);
+
+			if(StringName == std::string("indirection.Transform[0]"))
+				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideInt);
 		}
 	
 		if(Validated)
@@ -176,13 +181,17 @@ private:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		int VertexIndirection[3] = {0, 1, 2};
+		std::size_t PaddingInt = glm::max(sizeof(int), std::size_t(UniformArrayStrideInt));
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::VERTEX_INDIRECTION]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * 3, VertexIndirection, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, PaddingInt * 3, nullptr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 0, PaddingInt, &VertexIndirection[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 1, PaddingInt, &VertexIndirection[1]);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 2, PaddingInt, &VertexIndirection[2]);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
+		std::size_t PaddingMat = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, Padding * 3, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, PaddingMat * 3, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		DrawElementsIndirectCommand Commands[6];
@@ -350,6 +359,8 @@ private:
 		if(Success)
 			Success = initTexture();
 
+		caps Caps(caps::CORE);
+
 		glm::vec2 WindowSize(this->getWindowSize());
 		this->Viewport[0] = glm::vec4(WindowSize.x / 3.0f * 0.0f, 0, WindowSize.x / 3, WindowSize.y);
 		this->Viewport[1] = glm::vec4(WindowSize.x / 3.0f * 1.0f, 0, WindowSize.x / 3, WindowSize.y);
@@ -380,7 +391,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		{
-			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
+			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, Padding * 3, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
