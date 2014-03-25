@@ -42,7 +42,7 @@ class gl_440_atomic_counter : public test
 {
 public:
 	gl_440_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 3, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
+		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 2, glm::ivec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -103,7 +103,7 @@ private:
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
+		glBufferStorage(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_MAP_WRITE_BIT);
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
 
 		return Validated;
@@ -123,7 +123,6 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_clear_buffer_object");
 
 		if(Validated)
 			Validated = initBuffer();
@@ -149,9 +148,23 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glm::uint Data(0);
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
+
+		if(this->checkExtension("GL_ARB_clear_buffer_object"))
+		{
+			glm::uint Data(0);
+			glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
+		}
+		else
+		{
+			glm::uint32* Pointer = (glm::uint32*)glMapBufferRange(
+				GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(glm::uint32),
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
+			*Pointer = 0;
+
+			glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
+		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 

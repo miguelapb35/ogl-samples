@@ -47,7 +47,7 @@ class gl_440_shader_invocation_nv : public test
 {
 public:
 	gl_440_shader_invocation_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4, glm::ivec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		VertexArrayName(0)
 	{}
@@ -61,8 +61,6 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
@@ -85,6 +83,7 @@ private:
 
 		if(Validated)
 		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
 		}
