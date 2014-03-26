@@ -2,8 +2,16 @@
 #extension GL_NV_shader_thread_group : enable
 
 #define FRAG_COLOR	0
+#define CONSTANT	0
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
+
+layout(binding = CONSTANT) uniform constant
+{
+	int WrapSize;
+	int WrapsPerSM;
+	int SMCount;
+} Constant;
 
 vec3 rgbColor(vec3 hsvColor)
 {
@@ -64,7 +72,7 @@ vec3 rgbColor(vec3 hsvColor)
 void main()
 {
 	//vec3 hsv = vec3(float(gl_SMIDNV) / 8.0f * 60.f, 1.0f, 1.0f); // gl_SMIDNV Red - Orange - Yellow
-	//vec3 hsv = vec3(90.f, 1.0f, float(gl_SMIDNV) / 8.0f); // gl_SMIDNV - NVIDIA green
-	vec3 hsv = vec3(90.f, 1.0f, float(gl_WarpIDNV) / 64.0f); // NVIDIA green
+	//vec3 hsv = vec3(90.f, 1.0f, float(gl_SMIDNV) / float(Constant.SMCount)); // gl_SMIDNV - NVIDIA green
+	vec3 hsv = vec3(90.f, 1.0f, float(gl_WarpIDNV) / float(Constant.WrapsPerSM)); // NVIDIA green
 	Color = vec4(rgbColor(hsv), 1.0f);
 }

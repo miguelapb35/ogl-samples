@@ -37,6 +37,15 @@ namespace
 			MAX
 		};
 	}//namespace program
+
+	namespace buffer
+	{
+		enum type
+		{
+			CONSTANT,
+			MAX
+		};
+	}//namespace buffer
 }//namespace
 
 #define GL_WARP_SIZE_NV                                    0x9339
@@ -55,6 +64,7 @@ public:
 private:
 	GLuint PipelineName;
 	GLuint VertexArrayName;
+	std::array<GLuint, buffer::MAX> BufferName;
 	std::array<GLuint, program::MAX> ProgramName;
 
 	bool initProgram()
@@ -93,13 +103,27 @@ private:
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 		glBindVertexArray(0);
 
-		return Validated;
+		return true;
+	}
+
+	bool initBuffer()
+	{
+		std::array<GLint, 3> Constants;
+		glGetIntegerv(GL_WARP_SIZE_NV, &Constants[0]);
+		glGetIntegerv(GL_WARPS_PER_SM_NV, &Constants[1]);
+		glGetIntegerv(GL_SM_COUNT_NV, &Constants[2]);
+
+		glGenBuffers(buffer::MAX, &BufferName[0]);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::CONSTANT]);
+		glBufferData(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		return true;
 	}
 
 	bool begin()
@@ -107,13 +131,8 @@ private:
 		bool Validated(true);
 		Validated = Validated && this->checkExtension("GL_NV_shader_thread_group");
 
-		GLint WrapSize(0);
-		GLint WrapsPerSM(0);
-		GLint SMCount(0);
-		glGetIntegerv(GL_WARP_SIZE_NV, &WrapSize);
-		glGetIntegerv(GL_WARPS_PER_SM_NV, &WrapsPerSM);
-		glGetIntegerv(GL_SM_COUNT_NV, &SMCount);
-
+		if(Validated)
+			Validated = initBuffer();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -140,6 +159,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::CONSTANT, BufferName[buffer::CONSTANT]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
