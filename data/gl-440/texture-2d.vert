@@ -1,9 +1,9 @@
 #version 440 core
 
-#include "texture-2d.glsl"
-#line 5
-
-#define COUNT 24
+#define POSITION	0
+#define COLOR		3
+#define TEXCOORD	4
+#define TRANSFORM0	1
 
 layout(binding = TRANSFORM0) uniform transform
 {

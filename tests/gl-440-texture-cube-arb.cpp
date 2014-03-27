@@ -93,8 +93,6 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
@@ -112,7 +110,10 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated;
 	}
@@ -183,24 +184,21 @@ private:
 		Texture[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
 		Texture[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
 
-		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &TextureName);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureName);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, TextureName);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
-		glTexStorage2D(GL_TEXTURE_CUBE_MAP, GLint(Texture.levels()), GL_RGBA8, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+		glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, GLint(Texture.levels()),
+			GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.faces()));
 
-		for(gli::textureCube::size_type Face = 0; Face < Texture.faces(); ++Face)
-		{
-			glTexSubImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
-				0,
-				0, 0,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
-				GL_RGBA, GL_UNSIGNED_BYTE,
-				Texture[Face].data());
-		}
+		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
+			0, 0, 0,
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.faces()),
+			GL_RGBA, GL_UNSIGNED_BYTE,
+			Texture.data());
 
 		return true;
 	}
@@ -255,9 +253,8 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			transform* Pointer = (transform*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0, sizeof(transform),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			transform* Pointer = reinterpret_cast<transform*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+				0, sizeof(transform), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x * 0.5f / WindowSize.y, 0.1f, 1000.0f);
 			glm::mat4 View = this->view();

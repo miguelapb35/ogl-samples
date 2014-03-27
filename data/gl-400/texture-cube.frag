@@ -1,12 +1,8 @@
-#version 420 core
+#version 400 core
 
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define REFLECT		6
 #define FRAG_COLOR	0
 
-layout(binding = 0) uniform samplerCubeArray Environment;
+uniform samplerCubeArray Environment;
 
 in block
 {

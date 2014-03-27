@@ -25,21 +25,20 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/texture-cube.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-cube.frag");
-	char const * TEXTURE_DIFFUSE("cube.dds");//compressed
+	char const * VERT_SHADER_SOURCE("gl-400/texture-cube.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/texture-cube.frag");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
 	glm::vec2 const VertexData[VertexCount] =
 	{
-		glm::vec2(-1.0f,-1.0f) * 4.0f,
-		glm::vec2( 1.0f,-1.0f) * 4.0f,
-		glm::vec2( 1.0f, 1.0f) * 4.0f,
-		glm::vec2( 1.0f, 1.0f) * 4.0f,
-		glm::vec2(-1.0f, 1.0f) * 4.0f,
-		glm::vec2(-1.0f,-1.0f) * 4.0f
+		glm::vec2(-1.0f,-1.0f),
+		glm::vec2( 1.0f,-1.0f),
+		glm::vec2( 1.0f, 1.0f),
+		glm::vec2( 1.0f, 1.0f),
+		glm::vec2(-1.0f, 1.0f),
+		glm::vec2(-1.0f,-1.0f)
 	};
 
 	namespace buffer
@@ -60,12 +59,11 @@ namespace
 	};
 }//namespace
 
-class gl_420_texture_cube : public test
+class gl_400_texture_cube : public test
 {
 public:
-	gl_420_texture_cube(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-cube", test::CORE, 4, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.45f)),
-		PipelineName(0),
+	gl_400_texture_cube(int argc, char* argv[]) :
+		test(argc, argv, "gl-400-texture-cube", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.1f)),
 		ProgramName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -74,7 +72,6 @@ public:
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
-	GLuint PipelineName;
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
@@ -84,17 +81,14 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
@@ -103,7 +97,13 @@ private:
 		}
 
 		if(Validated)
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		{
+			glUseProgram(ProgramName);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse"), 0);
+			glUseProgram(0);
+
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+		}
 
 		return Validated;
 	}
@@ -117,15 +117,11 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(transform)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
@@ -134,8 +130,8 @@ private:
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerName);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -156,63 +152,26 @@ private:
 		glGenTextures(1, &TextureName);
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, TextureName);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 2);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
-		gli::textureCube TextureA(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(512));
-		assert(!TextureA.empty());
-		TextureA[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
-		TextureA[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
-		TextureA[2].clear<glm::u8vec4>(glm::u8vec4(255, 255,   0, 255));
-		TextureA[3].clear<glm::u8vec4>(glm::u8vec4(  0, 255,   0, 255));
-		TextureA[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
-		TextureA[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
+		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(8));
+		assert(!Texture.empty());
 
-		gli::textureCube TextureB(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(256));
-		assert(!TextureB.empty());
-		TextureB[0].clear<glm::u8vec4>(glm::u8vec4(255, 128, 128, 255));
-		TextureB[1].clear<glm::u8vec4>(glm::u8vec4(255, 192, 128, 255));
-		TextureB[2].clear<glm::u8vec4>(glm::u8vec4(255, 255, 128, 255));
-		TextureB[3].clear<glm::u8vec4>(glm::u8vec4(128, 255, 128, 255));
-		TextureB[4].clear<glm::u8vec4>(glm::u8vec4(128, 255, 255, 255));
-		TextureB[5].clear<glm::u8vec4>(glm::u8vec4(128, 128, 255, 255));
+		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
+		Texture[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
+		Texture[2].clear<glm::u8vec4>(glm::u8vec4(255, 255,   0, 255));
+		Texture[3].clear<glm::u8vec4>(glm::u8vec4(  0, 255,   0, 255));
+		Texture[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
+		Texture[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
 
-		gli::textureCube TextureC(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(128));
-		assert(!TextureC.empty());
-		TextureC[0].clear<glm::u8vec4>(glm::u8vec4(255, 192, 192, 255));
-		TextureC[1].clear<glm::u8vec4>(glm::u8vec4(255, 224, 192, 255));
-		TextureC[2].clear<glm::u8vec4>(glm::u8vec4(255, 255, 192, 255));
-		TextureC[3].clear<glm::u8vec4>(glm::u8vec4(192, 255, 192, 255));
-		TextureC[4].clear<glm::u8vec4>(glm::u8vec4(192, 255, 255, 255));
-		TextureC[5].clear<glm::u8vec4>(glm::u8vec4(192, 192, 255, 255));
-
-		glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 3,
-			GL_RGBA8, GLsizei(TextureA.dimensions().x), GLsizei(TextureA.dimensions().y), GLsizei(TextureA.faces()));
-
-		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
-			0, 0, 0,
-			static_cast<GLsizei>(TextureA.dimensions().x),
-			static_cast<GLsizei>(TextureA.dimensions().y),
-			static_cast<GLsizei>(TextureA.faces()),
+		glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
+			GL_RGBA8,
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.faces()),
+			0,
 			GL_RGBA, GL_UNSIGNED_BYTE,
-			TextureA.data());
-
-		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1,
-			0, 0, 0,
-			static_cast<GLsizei>(TextureB.dimensions().x),
-			static_cast<GLsizei>(TextureB.dimensions().y),
-			static_cast<GLsizei>(TextureB.faces()),
-			GL_RGBA, GL_UNSIGNED_BYTE,
-			TextureB.data());
-
-		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 2,
-			0, 0, 0,
-			static_cast<GLsizei>(TextureC.dimensions().x),
-			static_cast<GLsizei>(TextureC.dimensions().y),
-			static_cast<GLsizei>(TextureC.faces()),
-			GL_RGBA, GL_UNSIGNED_BYTE,
-			TextureC.data());
-
-		//glGenerateMipmap(GL_TEXTURE_CUBE_MAP_ARRAY);
+			Texture.data());
 
 		return true;
 	}
@@ -284,16 +243,16 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
-		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 
-		glBindProgramPipeline(PipelineName);
+		glUseProgram(ProgramName);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, TextureName);
 		glBindSampler(0, SamplerName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-
 		glBindVertexArray(VertexArrayName);
+
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 
 		return true;
@@ -304,7 +263,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_texture_cube Test(argc, argv);
+	gl_400_texture_cube Test(argc, argv);
 	Error += Test();
 
 	return Error;

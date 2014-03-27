@@ -1,9 +1,9 @@
 #version 420 core
 
-#include "texture-2d.glsl"
-#line 5
+#define FRAG_COLOR	0
+#define DIFFUSE		0
 
-layout(binding = DIFFUSE) uniform sampler2D Diffuse;
+layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 
 in block
 {
@@ -14,5 +14,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord.st);
+	Color = texture(Diffuse, vec3(In.Texcoord.st, 0.0));
 }
