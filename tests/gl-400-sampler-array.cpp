@@ -53,6 +53,7 @@ namespace
 		{
 			VERTEX,
 			ELEMENT,
+			TRANSFORM,
 			MAX
 		};
 	}//namespace buffer
@@ -66,28 +67,27 @@ namespace
 			MAX
 		};
 	}//namespace texture
-
-	GLuint VertexArrayName = 0;
-	GLuint ProgramName = 0;
-
-	GLuint BufferName[buffer::MAX];
-	GLuint TextureName[texture::MAX];
-	GLuint SamplerName = 0;
-
-	GLint UniformMVP = 0;
-	GLint UniformDiffuseRGB = 0;
-	GLint UniformDiffuseBGR = 0;
-	GLint UniformDiffuseIndex = 0;
 }//namespace
 
 class gl_400_sampler_array : public test
 {
 public:
 	gl_400_sampler_array(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-sampler-array", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.3f))
+		test(argc, argv, "gl-400-sampler-array", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.3f)),
+		VertexArrayName(0),
+		ProgramName(0),
+		SamplerName(0),
+		UniformDiffuseIndex(0)
 	{}
 
 private:
+	GLuint VertexArrayName;
+	GLuint ProgramName;
+	GLuint SamplerName;
+	GLint UniformDiffuseIndex;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, texture::MAX> TextureName;
+
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -109,10 +109,14 @@ private:
 
 		if(Validated)
 		{
-			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-			UniformDiffuseRGB = glGetUniformLocation(ProgramName, "Diffuse[0]");
-			UniformDiffuseBGR = glGetUniformLocation(ProgramName, "Diffuse[1]");
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+
 			UniformDiffuseIndex = glGetUniformLocation(ProgramName, "DiffuseIndex");
+
+			glUseProgram(ProgramName);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse[0]"), 0);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse[1]"), 1);
+			glUseProgram(0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -120,7 +124,7 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, BufferName);
+		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
@@ -129,6 +133,14 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return this->checkError("initBuffer");
 	}
@@ -153,55 +165,53 @@ private:
 
 	bool initTexture()
 	{
-		glGenTextures(texture::MAX, TextureName);
+		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGB]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
+				glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0, 
-					GLsizei(Texture[Level].size()), 
+					GLsizei(Texture[Level].dimensions().x),
+					GLsizei(Texture[Level].dimensions().y),
+					GLsizei(1),
+					0,
+					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
 
 		{
 			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, TextureName[texture::BGR]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BGR]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_RED);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
+				glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+					GLsizei(Texture[Level].dimensions().x),
+					GLsizei(Texture[Level].dimensions().y),
+					GLsizei(1),
 					0, 
 					GLsizei(Texture[Level].size()), 
 					Texture[Level].data());
 			}
 		}
 
-		return this->checkError("initTexture2D");
+		return this->checkError("initTexture");
 	}
 
 	bool initVertexArray()
@@ -241,9 +251,9 @@ private:
 
 	bool end()
 	{
-		glDeleteBuffers(buffer::MAX, BufferName);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
-		glDeleteTextures(texture::MAX, TextureName);
+		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteSamplers(1, &SamplerName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
@@ -257,25 +267,32 @@ private:
 		static int DiffuseIndex = 0;
 		++DiffuseIndex;
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 1000.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * this->view() * Model;
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
+		
+			*Pointer = Projection * this->view() * Model;
+
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+		}
 
 		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
-		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-		glUniform1i(UniformDiffuseRGB, 0);
-		glUniform1i(UniformDiffuseBGR, 1);
 		glUniform1ui(UniformDiffuseIndex, (DiffuseIndex / 100) % 2);
 
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGB]);
 		glBindSampler(0, SamplerName);
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::BGR]);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BGR]);
 		glBindSampler(1, SamplerName);
 
 		glBindVertexArray(VertexArrayName);

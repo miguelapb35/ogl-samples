@@ -391,6 +391,8 @@ set(GL_VERSION_GTC 440)
 
 set(GL_SHADER_GTC atomic-counter.vert atomic-counter.frag)
 glCreateSampleGTC(atomic-counter)
+set(GL_SHADER_GTC buffer-storage.vert buffer-storage.frag)
+glCreateSampleGTC(buffer-storage)
 set(GL_SHADER_GTC buffer-type.vert buffer-type.frag)
 glCreateSampleGTC(buffer-type)
 set(GL_SHADER_GTC )

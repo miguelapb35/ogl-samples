@@ -41,11 +41,21 @@ namespace
 		glm::vec4(-1.0f,-1.0f, 0.0f, 1.0f)
 	};
 
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
+
+
 	GLuint FeedbackName(0);
 	GLuint TransformProgramName(0);
 	GLuint TransformArrayBufferName(0);
 	GLuint TransformVertexArrayName(0);
-	GLint TransformUniformMVP(0);
 	GLuint FeedbackProgramName(0);
 	GLuint FeedbackArrayBufferName(0);
 	GLuint FeedbackVertexArrayName(0);
@@ -60,6 +70,8 @@ public:
 	{}
 
 private:
+	std::array<GLuint, buffer::MAX> BufferName;
+
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -91,8 +103,7 @@ private:
 
 		if(Validated)
 		{
-			TransformUniformMVP = glGetUniformLocation(TransformProgramName, "MVP");
-			Validated = Validated && (TransformUniformMVP >= 0);
+			glUniformBlockBinding(TransformProgramName, glGetUniformBlockIndex(TransformProgramName, "transform"), semantic::uniform::TRANSFORM0);
 		}
 
 		if(Validated)
@@ -147,9 +158,18 @@ private:
 		return this->checkError("initFeedback");
 	}
 
-	bool initArrayBuffer()
+	bool initBuffer()
 	{
-		// Generate a buffer object
+		glGenBuffers(buffer::MAX, &BufferName[0]);
+
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		glGenBuffers(1, &TransformArrayBufferName);
 		glBindBuffer(GL_ARRAY_BUFFER, TransformArrayBufferName);
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
@@ -172,7 +192,7 @@ private:
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
-			Validated = initArrayBuffer();
+			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
 		if(Validated)
@@ -202,9 +222,17 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		// Compute the MVP (Model View Projection matrix)
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * this->view() * Model;
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
+		
+			*Pointer = Projection * this->view() * Model;
+
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+		}
 
 		// Set the display viewport
 		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
@@ -217,9 +245,9 @@ private:
 		glEnable(GL_RASTERIZER_DISCARD);
 
 		glUseProgram(TransformProgramName);
-		glUniformMatrix4fv(TransformUniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
 		glBindVertexArray(TransformVertexArrayName);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, FeedbackName);
 		glBeginTransformFeedback(GL_TRIANGLES);
