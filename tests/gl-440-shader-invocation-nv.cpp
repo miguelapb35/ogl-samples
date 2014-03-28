@@ -139,8 +139,7 @@ private:
 	bool end()
 	{
 		glDeleteProgramPipelines(1, &PipelineName);
-		glDeleteProgram(ProgramName[program::FRAGMENT]);
-		glDeleteProgram(ProgramName[program::VERTEX]);
+		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
 		return true;

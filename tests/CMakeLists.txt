@@ -329,7 +329,7 @@ set(GL_SHADER_GTC texture-shadow-color.vert texture-shadow-color.frag texture-sh
 #glCreateSampleGTC(texture-shadow)
 set(GL_SHADER_GTC texture-sparse.vert texture-sparse.frag texture-sparse.glsl)
 glCreateSampleGTC(texture-sparse-amd)
-set(GL_SHADER_GTC texture-2d.vert texture-2d.frag texture-2d.glsl)
+set(GL_SHADER_GTC texture-storage.vert texture-storage.frag)
 glCreateSampleGTC(texture-storage)
 set(GL_SHADER_GTC texture-conversion.vert texture-conversion-uint.frag texture-conversion-normalized.frag)
 glCreateSampleGTC(texture-conversion)
