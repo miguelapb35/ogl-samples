@@ -103,10 +103,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE,
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -326,7 +324,6 @@ private:
 		Viewport[texture::BPTC] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
 
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_multi_bind");
 
 		if(Validated)
 			Validated = initProgram();

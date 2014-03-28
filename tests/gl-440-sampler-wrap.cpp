@@ -198,7 +198,6 @@ private:
 
 		glGenTextures(1, &TextureName);
 
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
@@ -291,8 +290,6 @@ private:
 
 			*UniformPointer = MVP;
 		}
-
-		glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 

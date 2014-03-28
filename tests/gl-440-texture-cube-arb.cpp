@@ -78,7 +78,8 @@ public:
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
-		TextureName(0)
+		TextureName(0),
+		TransformPointer(nullptr)
 	{}
 
 private:
@@ -88,6 +89,7 @@ private:
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
+	transform* TransformPointer;
 
 	bool initProgram()
 	{
@@ -122,16 +124,16 @@ private:
 	{
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferStorage(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(transform)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
@@ -221,6 +223,9 @@ private:
 	{
 		bool Validated = true;
 		Validated = Validated && this->checkExtension("GL_ARB_seamless_cubemap_per_texture");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
+		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
+		Validated = Validated && this->checkExtension("GL_ARB_multi_bind");
 
 		if(Validated)
 			Validated = initProgram();
@@ -233,11 +238,23 @@ private:
 		if(Validated)
 			Validated = initSampler();
 
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		TransformPointer = reinterpret_cast<transform*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+			0, sizeof(glm::mat4),
+			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
+
 		return Validated;
 	}
 
 	bool end()
 	{
+		if(!TransformPointer)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			TransformPointer = nullptr;
+		}
+
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(1, &TextureName);
@@ -252,22 +269,15 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			transform* Pointer = reinterpret_cast<transform*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, sizeof(transform), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x * 0.5f / WindowSize.y, 0.1f, 1000.0f);
 			glm::mat4 View = this->view();
 			glm::mat4 Model = glm::mat4(1.0f);
 			glm::mat4 MVP = Projection * View * Model;
 			glm::mat4 MV = View * Model;
 
-			Pointer->MVP = Projection * View * Model;
-			Pointer->MV = View * Model;
-			Pointer->Camera = glm::vec3(0.0f, 0.0f, -this->cameraDistance());
-
-			// Make sure the uniform buffer is uploaded
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			TransformPointer->MVP = Projection * View * Model;
+			TransformPointer->MV = View * Model;
+			TransformPointer->Camera = glm::vec3(0.0f, 0.0f, -this->cameraDistance());
 		}
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
@@ -277,11 +287,13 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
+		// Left side: seamless cubemap filtering
 		glViewportIndexedf(0, 0, 0, WindowSize.x * 0.5f, WindowSize.y);
 		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::SEAMLESS]);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 
+		// Right side: per face cubemap filtering
 		glViewportIndexedf(0, WindowSize.x * 0.5f, 0, WindowSize.x * 0.5f, WindowSize.y);
 		glBindSamplers(semantic::sampler::DIFFUSE, 1, &SamplerName[sampler::NON_SEAMLESS]);
 

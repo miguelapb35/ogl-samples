@@ -1,16 +1,18 @@
-#version 430 core
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
+#version 420 core
+#extension GL_ARB_shader_storage_buffer_object : require
 
 #define TRANSFORM0	1
+#define VERTEX		0
 
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-layout(location = POSITION) in vec4 Position;
+layout(binding = VERTEX) buffer mesh
+{
+	vec2 Position[];
+} Mesh;
 
 out gl_PerVertex
 {
@@ -19,6 +21,6 @@ out gl_PerVertex
 
 void main()
 {	
-	gl_Position = Transform.MVP * Position;
+	gl_Position = Transform.MVP * vec4(Mesh.Position[gl_VertexID], 0.0, 1.0);
 }
 

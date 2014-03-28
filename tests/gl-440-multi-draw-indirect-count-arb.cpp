@@ -164,9 +164,9 @@ private:
 	{
 		glGenBuffers(buffer::MAX, &this->BufferName[0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->BufferName[buffer::VERTEX]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[buffer::DRAW_ID]);
 		glBufferData(GL_ARRAY_BUFFER, DrawSize, DrawIDData, GL_STATIC_DRAW);
@@ -216,16 +216,11 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::DRAW_ID]);
 			glVertexAttribIPointer(semantic::attr::DRAW_ID, 1, GL_UNSIGNED_INT, sizeof(glm::uint), BUFFER_OFFSET(0));
 			glVertexAttribDivisor(semantic::attr::DRAW_ID, 1);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 			glEnableVertexAttribArray(semantic::attr::DRAW_ID);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]); 
@@ -346,6 +341,7 @@ private:
 		bool Success(true);
 		Success = Success && this->checkExtension("GL_ARB_multi_draw_indirect");
 		Success = Success && this->checkExtension("GL_ARB_indirect_parameters");
+		Success = Success && this->checkExtension("GL_ARB_shader_storage_buffer_object");
 		
 		if(Success)
 			Success = initProgram();
@@ -411,6 +407,7 @@ private:
 
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 

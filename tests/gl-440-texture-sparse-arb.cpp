@@ -86,10 +86,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -115,9 +113,9 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
@@ -125,7 +123,7 @@ private:
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
@@ -142,24 +140,24 @@ private:
 
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
+		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
 
 		GLint PageSizeX(0);
 		GLint PageSizeY(0);
 		GLint PageSizeZ(0);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSizeX);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSizeY);
-		glGetInternalformativ(GL_TEXTURE_2D, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSizeZ);
+		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSizeX);
+		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSizeY);
+		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSizeZ);
 
 		for(std::size_t Level = 0; Level < GLint(glm::log2(256.f)); ++Level)
 		{
@@ -172,14 +170,14 @@ private:
 				if(i % 2 && j % 2)
 					continue;
 
-				glTexPageCommitmentARB(GL_TEXTURE_2D, GLint(Level),
+				glTexPageCommitmentARB(GL_TEXTURE_2D_ARRAY, GLint(Level),
 					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y), 0,
 					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), 1,
 					GL_TRUE);
 
-				glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
-					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y),
-					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
+					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y), 0,
+					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), 1,
 					GL_BGR, GL_UNSIGNED_BYTE, 
 					Texture[0].data());
 			}
@@ -194,14 +192,6 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
-
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
@@ -212,6 +202,8 @@ private:
 	{
 		bool Validated(true);
 		Validated = Validated && this->checkExtension("GL_ARB_sparse_texture");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
+		Validated = Validated && this->checkExtension("GL_ARB_multi_bind");
 
 		if(Validated)
 			Validated = initProgram();
@@ -259,10 +251,10 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindVertexArray(VertexArrayName);
+		glBindTextures(semantic::sampler::DIFFUSE, 1, &TextureName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 

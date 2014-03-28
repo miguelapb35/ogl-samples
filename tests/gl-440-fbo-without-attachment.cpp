@@ -187,9 +187,9 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
@@ -255,14 +255,6 @@ private:
 		glGenVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
 		glBindVertexArray(VertexArrayName[pipeline::RENDER]);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
-
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
@@ -297,6 +289,7 @@ private:
 		bool Validated(true);
 		Validated = Validated && this->checkExtension("GL_ARB_framebuffer_no_attachments");
 		Validated = Validated && this->checkExtension("GL_ARB_clear_texture");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
 
 		if(Validated)
 			Validated = initProgram();
@@ -358,6 +351,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glBindImageTexture(semantic::image::DIFFUSE, TextureName[texture::COLORBUFFER], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 

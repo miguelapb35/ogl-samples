@@ -109,9 +109,9 @@ private:
 	{
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
@@ -132,11 +132,6 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
 		return this->checkError("initVertexArray");
@@ -205,6 +200,7 @@ private:
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 
 		// Samples count query
 		for(std::size_t i = 0; i < this->Viewports.size(); ++i)

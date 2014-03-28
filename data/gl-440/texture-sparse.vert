@@ -1,14 +1,24 @@
 #version 420 core
+#extension GL_ARB_shader_storage_buffer_object : require
 
-#include "texture-2d.glsl"
+#define VERTEX		0
+#define TRANSFORM0	1
 
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-layout(location = POSITION) in vec3 Position;
-layout(location = TEXCOORD) in vec2 Texcoord;
+struct vertex
+{
+	vec2 Position;
+	vec2 Texcoord;
+};
+
+layout(binding = VERTEX) buffer mesh
+{
+	vertex Vertex[];
+} Mesh;
 
 out gl_PerVertex
 {
@@ -22,6 +32,6 @@ out block
 
 void main()
 {	
-	Out.Texcoord = Texcoord;
-	gl_Position = Transform.MVP * vec4(Position, 1.0);
+	Out.Texcoord = Mesh.Vertex[gl_VertexID].Texcoord;
+	gl_Position = Transform.MVP * vec4(Mesh.Vertex[gl_VertexID].Position, 0.0, 1.0);
 }

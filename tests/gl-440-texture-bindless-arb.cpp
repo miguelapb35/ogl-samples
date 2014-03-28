@@ -213,6 +213,7 @@ private:
 		Validated = Validated && this->checkExtension("GL_ARB_multi_draw_indirect");
 		Validated = Validated && this->checkExtension("GL_ARB_bindless_texture");
 		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
 
 		this->sync(test::ASYNC);
 

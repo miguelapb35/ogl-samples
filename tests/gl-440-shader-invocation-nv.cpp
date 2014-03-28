@@ -58,14 +58,15 @@ public:
 	gl_440_shader_invocation_nv(int argc, char* argv[]) :
 		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4, glm::ivec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
+		ProgramName(0),
 		VertexArrayName(0)
 	{}
 
 private:
 	GLuint PipelineName;
+	GLuint ProgramName;
 	GLuint VertexArrayName;
 	std::array<GLuint, buffer::MAX> BufferName;
-	std::array<GLuint, program::MAX> ProgramName;
 
 	bool initProgram()
 	{
@@ -78,24 +79,18 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
-			ProgramName[program::VERTEX] = glCreateProgram();
-			glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::VERTEX], VertShaderName);
-			glLinkProgram(ProgramName[program::VERTEX]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERTEX]);
-
-			ProgramName[program::FRAGMENT] = glCreateProgram();
-			glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
-			glLinkProgram(ProgramName[program::FRAGMENT]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAGMENT]);
+			ProgramName = glCreateProgram();
+			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			glLinkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
 		{
 			glGenProgramPipelines(1, &PipelineName);
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
-			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
 		return Validated;
@@ -120,7 +115,7 @@ private:
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::CONSTANT]);
-		glBufferData(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], GL_STATIC_DRAW);
+		glBufferStorage(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], 0);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;

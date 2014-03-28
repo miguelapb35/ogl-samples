@@ -177,7 +177,7 @@ private:
 
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initArrayBuffer");
+		return this->checkError("initBuffer");
 	}
 
 	bool begin()
