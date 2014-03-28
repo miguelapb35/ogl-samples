@@ -47,16 +47,6 @@ namespace
 		2, 3, 0
 	};
 
-	namespace program
-	{
-		enum type
-		{
-			VERTEX,
-			FRAGMENT,
-			MAX
-		};
-	}//namespace program
-
 	namespace buffer
 	{
 		enum type
@@ -78,6 +68,7 @@ public:
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
+		ProgramName(0),
 		UniformPointer(nullptr)
 	{}
 
@@ -85,7 +76,7 @@ private:
 	GLuint PipelineName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
-	std::array<GLuint, program::MAX> ProgramName;
+	GLuint ProgramName;
 	std::array<GLuint, buffer::MAX> BufferName;
 	glm::mat4* UniformPointer;
 
@@ -100,24 +91,18 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
-			ProgramName[program::VERTEX] = glCreateProgram();
-			glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::VERTEX], VertShaderName);
-			glLinkProgram(ProgramName[program::VERTEX]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERTEX]);
-
-			ProgramName[program::FRAGMENT] = glCreateProgram();
-			glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
-			glLinkProgram(ProgramName[program::FRAGMENT]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAGMENT]);
+			ProgramName = glCreateProgram();
+			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+			glLinkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
 		if(Validated)
 		{
 			glGenProgramPipelines(1, &PipelineName);
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
-			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
 		return Validated;
@@ -207,14 +192,6 @@ private:
 
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
-
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
@@ -224,19 +201,8 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_internalformat_query2");
 		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
-
-		GLint64 Query_COMPRESSED_RGB8_ETC2(0);
-		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGB4, GL_INTERNALFORMAT_PREFERRED, sizeof(GLint64), &Query_COMPRESSED_RGB8_ETC2);
-		GLint64 Query_RGBA8(0);
-		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_FILTER, sizeof(GLint64), &Query_RGBA8);
-		GLint64 Query_COMPRESSED_RGBA_BPTC_UNORM(0);
-		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_NUM_SAMPLE_COUNTS, sizeof(GLint64), &Query_COMPRESSED_RGBA_BPTC_UNORM);
-
-		std::vector<GLint64> Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM;
-		Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM.resize(Query_COMPRESSED_RGBA_BPTC_UNORM);
-		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_SAMPLES, sizeof(GLint64), &Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM[0]);
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
 
 		if(Validated)
 			Validated = initProgram();
@@ -265,8 +231,7 @@ private:
 		}
 
 		glDeleteProgramPipelines(1, &PipelineName);
-		glDeleteProgram(ProgramName[program::FRAGMENT]);
-		glDeleteProgram(ProgramName[program::VERTEX]);
+		glDeleteProgram(ProgramName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
@@ -289,10 +254,10 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
+		glBindTextures(semantic::sampler::DIFFUSE, 1, &TextureName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 

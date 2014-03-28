@@ -115,7 +115,7 @@ namespace semantic
 	{
 		enum type
 		{
-			VERTEX
+			VERTEX	= 0
 		};
 	}//namespace storage
 }//namespace semantic
