@@ -298,6 +298,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_ES2_compatibility");
 
 		if(Validated)
 			Validated = initProgram();
