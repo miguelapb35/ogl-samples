@@ -56,13 +56,42 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.4.2.0: 2014-0X-XX
+OpenGL Samples Pack 4.4.2.0: 2014-03-29
 --------------------------------------------------------------------------------
 - Added 320-primitive-line-msaa sample
 - Added 320-primitive-point-clip sample
 - Added 320-primitive-point-quad sample
 - Added "caps" samples for each version of OpenGL
 - Added in source build option
+- Added 440-texture-sparse-arb sample
+- Added 440-texture-cube-arb sample
+- Added 440-texture-bindless-arb sample
+- Added 440-shader-invocation-nv sample
+- Added 440-query-occlusion sample
+- Added 440-multi-draw-indirect-id-arb sample
+- Added 440-multi-draw-indirect-count-arb sample
+- Added 440-glsl-vote-arb sample
+- Added 440-fbo-without-attachment sample
+- Added 440-caps
+- Added 440-buffer-storage
+- Added 440-atomic-counter
+- Added 430-query-occlusion sample
+- Added 430-query-conditional sample
+- Fixed 430-multi-draw-indirect sample, alignment access in shader issue
+- Added 430-fbo-without-attachment sample
+- Added 430-fbo-invalidate sample
+- Added 430-caps sample
+- Added 420-caps sample
+- Added 410-caps sample
+- Added 400-texture-cube sample
+- Added 400-caps sample
+- Added 330-query-occlusion sample
+- Added 330-query-conditional sample
+- Added 330-caps sample
+- Added 320-primitive-line-msaa sample
+- Added 320-caps sample
+- Updated multiple samples to use shader storage buffer instead of VAOs
+- Updated multiple samples to use texture 2d array instead if texture 2d
 
 ================================================================================
 OpenGL Samples Pack 4.4.1.4: 2014-0X-XX
