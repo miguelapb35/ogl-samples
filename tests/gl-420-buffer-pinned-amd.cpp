@@ -67,29 +67,33 @@ namespace
 			MAX
 		};
 	}//namespace buffer
-	 
-	GLuint PipelineName(0);
-	GLuint ProgramName(0);
-	GLuint VertexArrayName(0);
-	GLuint BufferName[buffer::MAX] = {0, 0, 0};
-	GLuint TextureName(0);
+
+	std::size_t const PAGE_SIZE = 4096;
 }//namespace
 
 class gl_420_buffer_pinned_amd : public test
 {
 public:
 	gl_420_buffer_pinned_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-buffer-pinned-amd", test::CORE, 4, 2)
+		test(argc, argv, "gl-420-buffer-pinned-amd", test::CORE, 4, 2) :
+		PipelineName(0),
+		ProgramName(0),
+		VertexArrayName(0),
+		TextureName(0)
 	{}
 
 private:
+	std::unique_ptr<glm::byte> ClientBufferAddress;
+	std::array<GLuint, buffer::MAX> BufferName;
+	GLuint PipelineName;
+	GLuint ProgramName;
+	GLuint VertexArrayName;
+	GLuint TextureName;
+
 	bool initProgram()
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-		glBindProgramPipeline(PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
@@ -107,25 +111,51 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
-
-		glBindProgramPipeline(0);
+		}
 
 		return Validated;
+	}
+
+	glm::byte* align(glm::byte* Address, std::size_t PageSize)
+	{
+		std::uintptr_t Tmp = reinterpret_cast<std::uintptr_t>(Address - 1);
+		return reinterpret_cast<glm::byte*>(Tmp + (PageSize - (Tmp % PageSize)));
+	}
+
+	void* initMemoryBuffer()
+	{
+		this->ClientBufferAddress.reset(new glm::byte[VertexSize + PAGE_SIZE - 1]);
+		glm::byte* UnalignAddress = this->ClientBufferAddress.get();
+		glm::byte* AlignAddress = align(UnalignAddress, PAGE_SIZE);
+		memcpy(AlignAddress, VertexData, VertexSize);
+		return reinterpret_cast<void*>(AlignAddress);
 	}
 
 	bool initBuffer()
 	{
 		bool Validated(true);
 
-		glGenBuffers(1, &BufferName[buffer::ELEMENT]);
+		glGenBuffers(buffer::MAX, &BufferName[0]);
+
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		glGenBuffers(1, &BufferName[buffer::VERTEX]);
+		void* Pointer = initMemoryBuffer();
+
 		glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, BufferName[buffer::VERTEX]);
-		glBufferData(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, VertexSize, VertexData, GL_STREAM_COPY);
+		glBufferData(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, VertexSize, Pointer, GL_STREAM_COPY);
 		glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
 		glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
 
@@ -188,28 +218,6 @@ private:
 		return Validated;
 	}
 
-	bool initUniformBuffer()
-	{
-		bool Validated(true);
-
-		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
-		{
-			GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
-
-			glGenBuffers(1, &BufferName[buffer::TRANSFORM]);
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
-		}
-
-		return Validated;
-	}
-
 	bool begin()
 	{
 		bool Validated(true);
@@ -223,8 +231,6 @@ private:
 			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
-		if(Validated)
-			Validated = initUniformBuffer();
 
 		return Validated;
 	}
