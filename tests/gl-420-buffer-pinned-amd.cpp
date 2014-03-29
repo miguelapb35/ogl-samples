@@ -75,7 +75,7 @@ class gl_420_buffer_pinned_amd : public test
 {
 public:
 	gl_420_buffer_pinned_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-buffer-pinned-amd", test::CORE, 4, 2) :
+		test(argc, argv, "gl-420-buffer-pinned-amd", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -239,7 +239,7 @@ private:
 	{
 		glDeleteProgramPipelines(1, &PipelineName);
 		glDeleteProgram(ProgramName);
-		glDeleteBuffers(buffer::MAX, BufferName);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
