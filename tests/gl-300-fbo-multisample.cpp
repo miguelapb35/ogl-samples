@@ -234,6 +234,8 @@ private:
 	{
 		bool Validated = true;
 
+		caps Caps(caps::COMPATIBILITY);
+
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
