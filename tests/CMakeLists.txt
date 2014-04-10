@@ -423,3 +423,9 @@ set(GL_SHADER_GTC texture-sparse.vert texture-sparse.frag texture-sparse.glsl)
 glCreateSampleGTC(texture-sparse-arb)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback)
+
+# OpenGL 4.5 samples
+set(GL_VERSION_GTC 450)
+
+set(GL_SHADER_GTC direct-state-access.frag direct-state-access.vert)
+glCreateSampleGTC(direct-state-access)
