@@ -29,12 +29,14 @@ private:
 
 public:
 	testDrawIndexing(
-		int argc, char* argv[], profile Profile,
+		int argc, char* argv[], profile Profile, std::size_t FrameCount,
 		indexing const Indexing,
 		std::size_t const DrawCount);
 	virtual ~testDrawIndexing();
 
-	virtual void render();
+	virtual bool begin();
+	virtual bool end();
+	virtual bool render();
 
 	bool initProgram();
 	bool initBuffer();

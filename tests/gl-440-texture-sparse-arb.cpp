@@ -159,6 +159,13 @@ private:
 		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &PageSizeY);
 		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &PageSizeZ);
 
+		GLint Page3DSizeX(0);
+		GLint Page3DSizeY(0);
+		GLint Page3DSizeZ(0);
+		glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &Page3DSizeX);
+		glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &Page3DSizeY);
+		glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &Page3DSizeZ);
+
 		for(std::size_t Level = 0; Level < GLint(glm::log2(256.f)); ++Level)
 		{
 			GLsizei const Width = (Size >> Level) / Texture[0].dimensions().x;
@@ -204,6 +211,8 @@ private:
 		Validated = Validated && this->checkExtension("GL_ARB_sparse_texture");
 		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
 		Validated = Validated && this->checkExtension("GL_ARB_multi_bind");
+
+
 
 		if(Validated)
 			Validated = initProgram();

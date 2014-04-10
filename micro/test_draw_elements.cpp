@@ -34,16 +34,22 @@ namespace
 }//namespace
 
 testDrawElements::testDrawElements(
-	int argc, char* argv[], profile Profile,
+	int argc, char* argv[], profile Profile, std::size_t FrameCount,
 	drawType const DrawType, vertexDataType const VertexDataType, std::size_t const DrawCount
 ) :
-	test(argc, argv, Profile, DEFAULT_MAX_FRAME, DEFAULT_WINDOW_SIZE),
+	test(argc, argv, "testDrawElements", Profile, 4, 2, FrameCount, glm::vec2(0, 0), glm::vec2(0, 512)),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
 	PipelineName(0),
 	ProgramName(0)
+{}
+
+testDrawElements::~testDrawElements()
+{}
+
+bool testDrawElements::begin()
 {
 	bool Success(true);
 	
@@ -59,21 +65,24 @@ testDrawElements::testDrawElements(
 	assert(Success);
 
 	glEnable(GL_DEPTH_TEST);
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::PER_FRAME, this->BufferName[buffer::BUFFER_FRAME]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::PER_FRAME, this->BufferName[buffer::BUFFER_FRAME]);
 	glBindProgramPipeline(this->PipelineName);
 	glBindVertexArray(this->VertexArrayName);
 
 	if(this->DrawType == MULTI_DISCARD || this->DrawType == MULTI_DRAW)
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[BUFFER_INDIRECT]);
+
+	return Success;
 }
 
-testDrawElements::~testDrawElements()
+bool testDrawElements::end()
 {
-	glDeleteQueries(1, &this->QueryName);
 	glDeleteBuffers(static_cast<GLsizei>(BUFFER_MAX), &this->BufferName[0]);
 	glDeleteProgramPipelines(1, &this->PipelineName);
 	glDeleteProgram(this->ProgramName);
 	glDeleteVertexArrays(1, &this->VertexArrayName);
+
+	return true;
 }
 
 bool testDrawElements::initProgram()
@@ -82,7 +91,7 @@ bool testDrawElements::initProgram()
 	
 	glGenProgramPipelines(1, &this->PipelineName);
 
-	glf::compiler Compiler;
+	compiler Compiler;
 	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
@@ -92,7 +101,7 @@ bool testDrawElements::initProgram()
 	glAttachShader(this->ProgramName, VertShaderName);
 	glAttachShader(this->ProgramName, FragShaderName);
 	glLinkProgram(this->ProgramName);
-	Validated = Validated && glf::checkProgram(this->ProgramName);
+	Validated = Validated && Compiler.checkProgram(this->ProgramName);
 
 	if(Validated)
 		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
@@ -105,7 +114,7 @@ bool testDrawElements::initBuffer()
 	glGenBuffers(BUFFER_MAX, &this->BufferName[0]);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[BUFFER_FRAME]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
@@ -177,10 +186,10 @@ bool testDrawElements::initVertexArray()
 	glGenVertexArrays(1, &this->VertexArrayName);
 	glBindVertexArray(this->VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[BUFFER_ARRAY]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+		glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+		glEnableVertexAttribArray(semantic::attr::POSITION);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]); 
 	glBindVertexArray(0);
@@ -188,8 +197,10 @@ bool testDrawElements::initVertexArray()
 	return true;
 }
 
-void testDrawElements::render()
+bool testDrawElements::render()
 {
+	glm::vec2 const & WindowSize(this->getWindowSize());
+
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
 	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
@@ -198,10 +209,8 @@ void testDrawElements::render()
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::BUFFER_FRAME]);
 		glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 2048.0f);
-		glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y - 512));
-		glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-		glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 2048.0f);
+		glm::mat4 View = this->view();
 		glm::mat4 Model = glm::mat4(1.0f);
 
 		*Pointer = Projection * View * Model;
@@ -235,4 +244,6 @@ void testDrawElements::render()
 		break;
 	}
 	this->endTimer();
+
+	return true;
 }

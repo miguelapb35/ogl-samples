@@ -17,13 +17,13 @@ namespace
 }//namespace
 
 testScreenspaceCoherence::testScreenspaceCoherence(
-	int argc, char* argv[], profile Profile,
+	int argc, char* argv[], profile Profile, std::size_t FrameCount,
 	glm::uvec2 const & WindowSize,
 	glm::uvec2 const & TileSize,
 	std::size_t const ViewportDrawCount,
 	std::size_t const TileDrawCount
 ) :
-	test(argc, argv, Profile, DEFAULT_MAX_FRAME, glm::ivec2(WindowSize)),
+	test(argc, argv, "testScreenspaceCoherence", Profile, 4, 2, FrameCount),
 	WindowSize(WindowSize),
 	TileSize(TileSize),
 	ViewportDrawCount(ViewportDrawCount),
@@ -32,6 +32,12 @@ testScreenspaceCoherence::testScreenspaceCoherence(
 	VertexArrayName(0),
 	PipelineName(0),
 	ProgramName(0)
+{}
+
+testScreenspaceCoherence::~testScreenspaceCoherence()
+{}
+
+bool testScreenspaceCoherence::begin()
 {
 	bool Success = true;
 	
@@ -51,16 +57,20 @@ testScreenspaceCoherence::testScreenspaceCoherence(
 	//glEnable(GL_DEPTH_TEST);
 	//glDepthFunc(GL_LEQUAL);
 	glBindProgramPipeline(this->PipelineName);
-	glBindBufferBase(GL_UNIFORM_BUFFER, glf::semantic::uniform::PER_FRAME, BufferName[buffer::BUFFER_FRAME]);
+	glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::PER_FRAME, BufferName[buffer::BUFFER_FRAME]);
 	glBindVertexArray(this->VertexArrayName);
+
+	return Success;
 }
 
-testScreenspaceCoherence::~testScreenspaceCoherence()
+bool testScreenspaceCoherence::end()
 {
 	glDeleteBuffers(buffer::BUFFER_MAX, &BufferName[0]);
 	glDeleteProgramPipelines(1, &this->PipelineName);
 	glDeleteProgram(this->ProgramName);
 	glDeleteVertexArrays(1, &this->VertexArrayName);
+
+	return true;
 }
 
 bool testScreenspaceCoherence::initProgram()
@@ -69,7 +79,7 @@ bool testScreenspaceCoherence::initProgram()
 	
 	glGenProgramPipelines(1, &this->PipelineName);
 
-	glf::compiler Compiler;
+	compiler Compiler;
 	GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
 	GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 	Validated = Validated && Compiler.check();
@@ -79,7 +89,7 @@ bool testScreenspaceCoherence::initProgram()
 	glAttachShader(this->ProgramName, VertShaderName);
 	glAttachShader(this->ProgramName, FragShaderName);
 	glLinkProgram(this->ProgramName);
-	Validated = Validated && glf::checkProgram(this->ProgramName);
+	Validated = Validated && Compiler.checkProgram(this->ProgramName);
 
 	if(Validated)
 		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
@@ -145,16 +155,16 @@ bool testScreenspaceCoherence::initVertexArray()
 	glGenVertexArrays(1, &this->VertexArrayName);
 	glBindVertexArray(this->VertexArrayName);
 		glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[buffer::BUFFER_ARRAY]);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
+		glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
+		glEnableVertexAttribArray(semantic::attr::POSITION);
 	glBindVertexArray(0);
 
 	return true;
 }
 
-void testScreenspaceCoherence::render()
+bool testScreenspaceCoherence::render()
 {
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);
@@ -167,4 +177,6 @@ void testScreenspaceCoherence::render()
 
 		//glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, ::VertexCount, 1, 0);
 	this->endTimer();
+
+	return true;
 }

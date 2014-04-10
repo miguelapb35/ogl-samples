@@ -15,14 +15,16 @@ private:
 
 public:
 	testScreenspaceCoherence(
-		int argc, char* argv[], profile Profile,
+		int argc, char* argv[], profile Profile, std::size_t FrameCount,
 		glm::uvec2 const & WindowSize,
 		glm::uvec2 const & TileSize,
 		std::size_t const ViewportDrawCount,
 		std::size_t const TileDrawCount);
 	virtual ~testScreenspaceCoherence();
 
-	virtual void render();
+	virtual bool begin();
+	virtual bool end();
+	virtual bool render();
 
 	bool initProgram();
 	bool initBuffer();

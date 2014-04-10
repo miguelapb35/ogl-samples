@@ -153,6 +153,7 @@ public:
 	};
 
 	int operator()();
+	void log(csv & CSV, char const * String);
 
 protected:
 	struct DrawArraysIndirectCommand
@@ -228,6 +229,13 @@ protected:
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
+		std::size_t FrameCount,
+		glm::ivec2 const & WindowSize = glm::ivec2(640, 480),
+		glm::vec2 const & Orientation = glm::vec2(0, 0),
+		glm::vec2 const & Position = glm::vec2(0, 4));
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
 	virtual ~test();
@@ -239,7 +247,6 @@ protected:
 	void swap();
 	void sync(sync_mode const & Sync);
 	void stop();
-	void log(csv & CSV, char const * String);
 
 	bool isExtensionSupported(char const * String);
 	glm::ivec2 getWindowSize() const;

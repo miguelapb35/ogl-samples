@@ -1,5 +1,5 @@
 #version 420 core
-#extension GL_AMD_sparse_texture : enable
+#extension GL_AMD_sparse_texture : require
 
 #include "texture-2d.glsl"
 

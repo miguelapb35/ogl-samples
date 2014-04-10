@@ -4,8 +4,6 @@
 #define FRAG_COLOR	0
 #define MATERIAL	0
 
-layout (bindless_sampler) uniform;
-
 layout(binding = MATERIAL) uniform material
 {
 	uvec2 Diffuse;

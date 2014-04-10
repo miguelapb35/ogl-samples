@@ -46,14 +46,16 @@ private:
 
 public:
 	testDrawArrays(
-		int argc, char* argv[], profile Profile,
+		int argc, char* argv[], profile Profile, std::size_t FrameCount,
 		drawType const DrawType,
 		vertexDataType const VertexDataType,
 		uniformUpdate const UniformUpdate,
 		std::size_t const DrawCount);
 	virtual ~testDrawArrays();
 
-	virtual void render();
+	virtual bool begin();
+	virtual bool end();
+	virtual bool render();
 
 	bool initProgram();
 	bool initBuffer();

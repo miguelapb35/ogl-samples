@@ -242,6 +242,8 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
+		glDrawBuffer(GL_BACK);
+
 		glm::ivec2 WindowSize = this->getWindowSize();
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);

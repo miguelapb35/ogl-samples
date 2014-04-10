@@ -12,20 +12,22 @@ namespace
 	};
 
 	GLsizei const VertexCount(6);
-
-	std::vector<std::string> VertShaderFile;
-	std::vector<GLuint> VertShaderName;
-	std::vector<std::string> FragShaderFile;
-	std::vector<GLuint> FragShaderName;
-	std::vector<GLuint> ProgramName;
 }//namespace
 
 testCompiler::testCompiler(
-	int argc, char* argv[], profile Profile, mode Mode
+	int argc, char* argv[], profile Profile, std::size_t FrameCount, mode Mode
 ) :
-	test(argc, argv, Profile, 1, this->DEFAULT_WINDOW_SIZE),
+	test(argc, argv, "testCompiler", Profile, 4, 2),
 	Mode(Mode)
+{}
+
+testCompiler::~testCompiler()
+{}
+
+bool testCompiler::begin()
 {
+	bool Success = true;
+
 	VertShaderFile.push_back("gl-320/texture-offset.vert");
 	VertShaderFile.push_back("gl-320/texture-derivative-x.vert");
 	VertShaderFile.push_back("gl-320/texture-derivative-y.vert");
@@ -65,14 +67,18 @@ testCompiler::testCompiler(
 	FragShaderName.resize(FragShaderFile.size());
 
 	ProgramName.resize(FragShaderFile.size());
+
+	return Success;
 }
 
-testCompiler::~testCompiler()
-{}
-
-void testCompiler::render()
+bool testCompiler::end()
 {
-	glf::compiler Compiler;
+	return true;
+}
+
+bool testCompiler::render()
+{
+	compiler Compiler;
 
 	this->beginTimer();
 
@@ -96,7 +102,7 @@ void testCompiler::render()
 
 			Compiler.check();
 			for(std::size_t ProgramIndex = 0; ProgramIndex < ProgramName.size(); ++ProgramIndex)
-				glf::checkProgram(ProgramName[ProgramIndex]);
+				Compiler.checkProgram(ProgramName[ProgramIndex]);
 		}
 		break;
 		case DUALTHREADED:
@@ -114,7 +120,7 @@ void testCompiler::render()
 				glAttachShader(ProgramName[ProgramIndex], VertShaderName[ProgramIndex]);
 				glAttachShader(ProgramName[ProgramIndex], FragShaderName[ProgramIndex]);
 				glLinkProgram(ProgramName[ProgramIndex]);
-				glf::checkProgram(ProgramName[ProgramIndex]);
+				Compiler.checkProgram(ProgramName[ProgramIndex]);
 			}
 		}
 		break;
@@ -130,7 +136,7 @@ void testCompiler::render()
 				glAttachShader(ProgramName[ProgramIndex], VertShaderName[ProgramIndex]);
 				glAttachShader(ProgramName[ProgramIndex], FragShaderName[ProgramIndex]);
 				glLinkProgram(ProgramName[ProgramIndex]);
-				glf::checkProgram(ProgramName[ProgramIndex]);
+				Compiler.checkProgram(ProgramName[ProgramIndex]);
 			}
 		}
 		break;
@@ -140,4 +146,6 @@ void testCompiler::render()
 		glUseProgram(ProgramName[ProgramIndex]);
 
 	this->endTimer();
+
+	return true;
 }

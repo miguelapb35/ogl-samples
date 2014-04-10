@@ -127,6 +127,18 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
+	std::size_t FrameCount,
+	glm::ivec2 const & WindowSize,
+	glm::vec2 const & Orientation,
+	glm::vec2 const & Position
+) :
+	test(argc, argv, Title, Profile, Major, Minor, WindowSize, Orientation, Position, FrameCount, RUN_ONLY)
+{}
+
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
 	glm::ivec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
 	std::size_t FrameCount, success Success
 ) :
@@ -150,6 +162,8 @@ test::test
 	MouseButtonFlags(0),
 	Error(false)
 {
+	assert(WindowSize.x > 0 && WindowSize.y > 0);
+
 	memset(&KeyPressed[0], 0, sizeof(KeyPressed));
 
 	glfwInit();
