@@ -150,7 +150,7 @@ private:
 	{
 		glGenTransformFeedbacks(1, &FeedbackName);
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, FeedbackName);
-		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, BufferName[buffer::FEEDBACK]); 
+		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, BufferName[buffer::FEEDBACK]);
 		glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
 
 		return this->checkError("initFeedback");

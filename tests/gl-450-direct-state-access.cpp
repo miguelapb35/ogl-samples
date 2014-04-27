@@ -22,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
+#include "dsa.hpp"
 
 namespace
 {
@@ -90,137 +91,6 @@ namespace
 		};
 	}//namespace texture
 }//namespace
-
-std::vector<GLenum> TextureTargets;
-
-void glCreateBuffers(GLsizei n, GLuint* buffers)
-{
-	glGenBuffers(n, buffers);
-}
-
-void glNamedBufferStorage(GLuint buffer, GLsizeiptr size, const void * data, GLbitfield flags)
-{
-	glNamedBufferStorageEXT(buffer, size, data, flags);
-}
-
-void glTextureParameteri(GLuint texture, GLenum pname, GLint param)
-{
-	glTextureParameteriEXT(texture, TextureTargets[texture], pname, param);
-}
-
-void glTextureStorage2D(GLuint texture, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height)
-{
-	glTextureStorage2DEXT(texture, TextureTargets[texture], levels, internalformat, width, height);
-}
-
-void glTextureSubImage2D(GLuint texture, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels)
-{
-	glTextureSubImage2DEXT(texture, TextureTargets[texture], level, xoffset, yoffset, width, height, format, type, pixels);
-}
-
-void glTextureStorage2DMultisample(GLuint texture, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations)
-{
-	glTextureStorage2DMultisampleEXT(texture, TextureTargets[texture], samples, internalformat, width, height, fixedsamplelocations);
-}
-
-void glCreateTextures(GLenum target, GLsizei n, GLuint* textures)
-{
-	glGenTextures(n, textures);
-
-	for(GLsizei i = 0; i < n; ++i)
-	{
-		GLuint Name = textures[i];
-		if(Name >= ::TextureTargets.size())
-			TextureTargets.resize(Name + 1);
-		::TextureTargets[Name] = target;
-	}
-}
-
-void glNamedFramebufferTexture(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level)
-{
-	glNamedFramebufferTextureEXT(framebuffer, attachment, texture, level);
-}
-
-GLenum glCheckNamedFramebufferStatus(GLuint framebuffer, GLenum target)
-{
-	return glCheckNamedFramebufferStatusEXT(framebuffer, target);
-}
-
-void glVertexArrayElementBuffer(GLuint vaobj, GLuint buffer)
-{
-	GLint restaure = 0;
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &restaure);
-	glBindVertexArray(vaobj);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer);
-	glBindVertexArray(restaure);
-}
-
-void glVertexArrayVertexAttribOffset(GLuint vaobj, GLuint buffer, GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, GLintptr offset)
-{
-	glVertexArrayVertexAttribOffsetEXT(vaobj, buffer, index, size, type, normalized, stride, offset);
-}
-
-void glEnableVertexArrayAttrib(GLuint vaobj, GLuint index)
-{
-	glEnableVertexArrayAttribEXT(vaobj, index);
-}
-
-void glInvalidateNamedFramebuffer(GLuint name, GLsizei numAttachments, const GLenum* attachments)
-{
-	GLint Restaure = 0;
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &Restaure);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, name);
-	glInvalidateFramebuffer(GL_DRAW_FRAMEBUFFER, numAttachments, attachments);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Restaure);
-}
-
-void *glMapNamedBufferRange(GLuint buffer, GLintptr offset, GLsizeiptr length, GLbitfield access)
-{
-	return glMapNamedBufferRangeEXT(buffer, offset, length, access);
-}
-
-GLboolean glUnmapNamedBuffer(GLuint buffer)
-{
-	return glUnmapNamedBufferEXT(buffer);
-}
-
-void glFramebufferDrawBuffer(GLuint framebuffer, GLenum buf)
-{
-	GLint restaure = 0;
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &restaure);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
-	glDrawBuffer(buf);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, restaure);
-}
-
-void glFramebufferReadBuffer(GLuint framebuffer, GLenum buf)
-{
-	GLint restaure = 0;
-	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &restaure);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-	glDrawBuffer(buf);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, restaure);
-}
-
-void glBlitNamedFramebuffer(GLuint readFramebuffer, GLuint drawFramebuffer,
-	int srcX0, int srcY0,
-	int srcX1, int srcY1,
-	int dstX0, int dstY0,
-	int dstX1, int dstY1,
-	GLbitfield mask, GLenum filter)
-{
-	GLint readRestaure = 0;
-	GLint drawRestaure = 0;
-	glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readRestaure);
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawRestaure);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, readFramebuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawFramebuffer);
-	glBlitFramebuffer(
-		srcX0, srcY0, srcX1, srcY1,
-		dstX0, dstY0, dstX1, dstY1, mask, filter);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, readRestaure);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, drawRestaure);
-}
 
 class gl_450_direct_state_access_ext : public test
 {
@@ -366,6 +236,8 @@ private:
 
 	bool begin()
 	{
+		initDSA();
+
 		bool Validated = true;
 		//Validated = Validated && this->checkExtension("GL_ARB_direct_state_access");
 
@@ -436,7 +308,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
-		glBindMultiTextureEXT(GL_TEXTURE0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+		glBindTextures(0, 1, &TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
@@ -446,9 +318,6 @@ private:
 
 	bool render()
 	{
-		GLenum MaxColorAttachment = GL_COLOR_ATTACHMENT0;
-		glInvalidateNamedFramebuffer(FramebufferName[framebuffer::RENDER], 1, &MaxColorAttachment);
-		
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
@@ -476,6 +345,9 @@ private:
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+		GLenum MaxColorAttachment = GL_COLOR_ATTACHMENT0;
+		glInvalidateNamedFramebuffer(FramebufferName[framebuffer::RENDER], GL_READ_FRAMEBUFFER, 1, &MaxColorAttachment);
 
 		// Pass 2, render the colorbuffer from the multisampled framebuffer
 		renderFB();
