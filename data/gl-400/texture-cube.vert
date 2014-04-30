@@ -1,5 +1,10 @@
 #version 400 core
+
 #define POSITION	0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 uniform transform
 {

@@ -2,6 +2,10 @@
 
 #include "debug.glsl"
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
 in block

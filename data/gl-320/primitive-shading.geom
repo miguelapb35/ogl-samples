@@ -4,6 +4,9 @@
 layout(triangles) in;
 #endif
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 layout(triangle_strip, max_vertices = 4) out;
 
 in block

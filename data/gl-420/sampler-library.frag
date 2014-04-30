@@ -1,7 +1,5 @@
 #version 420 core
 
-precision highp int;
-
 vec4 hermite(in vec4 A, in vec4 B, in vec4 C, in vec4 D, in float s)
 {
 	mat4 Hermite = mat4(

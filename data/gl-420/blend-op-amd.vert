@@ -3,9 +3,12 @@
 #define POSITION		0
 #define COLOR			3
 #define TEXCOORD		4
-#define INSTANCE		7
 
 #define TRANSFORM0		1
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = TRANSFORM0) uniform transform
 {

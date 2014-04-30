@@ -12,6 +12,10 @@
 #define SUBROUTINE_DXT1	0
 #define SUBROUTINE_RGB8	1
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 subroutine vec4 diffuse();
 
 layout(location = 0) subroutine uniform diffuse Diffuse;

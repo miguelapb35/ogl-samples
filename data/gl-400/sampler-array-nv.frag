@@ -1,11 +1,11 @@
 #version 400 core
 #extension GL_NV_gpu_shader5 : require
 
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define INSTANCE	7
 #define FRAG_COLOR	0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 uniform sampler2D Diffuse[2];
 

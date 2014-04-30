@@ -1,5 +1,9 @@
 #version 150 core
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform usampler2D Diffuse;
 
 in block

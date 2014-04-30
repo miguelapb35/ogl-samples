@@ -1,12 +1,8 @@
 #version 410 core
 
-#define POSITION	0
-#define COLOR		3
-#define TEXCOORD	4
-#define FRAG_COLOR	0
-
+precision highp float;
 precision highp int;
-
+layout(std140, column_major) uniform;
 layout(triangles, invocations = 4) in;
 layout(triangle_strip, max_vertices = 3) out;
 

@@ -1,6 +1,8 @@
 #version 150 core
 
+precision highp float;
 precision highp int;
+layout(std140, column_major) uniform;
 
 uniform sampler2D Diffuse;
 uniform ivec2 Offset;

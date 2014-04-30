@@ -1,5 +1,7 @@
 #version 150 core
 
+layout(std140) uniform;
+
 out vec4 Color;
 
 void main()

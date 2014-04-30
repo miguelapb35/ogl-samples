@@ -7,6 +7,10 @@
 
 uniform dmat4 MVP;
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(location = POSITION) in dvec3 Position;
 
 out gl_PerVertex

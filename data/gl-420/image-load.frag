@@ -7,6 +7,10 @@
 #define TRANSFORM0	1
 #define TRANSFORM1	2	
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = DIFFUSE, rgba8) coherent uniform image2D Diffuse;
 
 layout(binding = MATERIAL) uniform material

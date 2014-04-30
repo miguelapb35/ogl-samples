@@ -3,9 +3,11 @@
 #define POSITION	0
 #define COLOR		3
 #define TEXCOORD	4
-#define FRAG_COLOR	0
 #define TRANSFORM0	1
-#define DIFFUSE		0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = TRANSFORM0) uniform transform
 {
@@ -30,4 +32,3 @@ void main()
 	Vert.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }
-

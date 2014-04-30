@@ -3,12 +3,11 @@
 #define POSITION	0
 #define COLOR		3
 #define TEXCOORD	4
-#define COMMON		0
-#define FRAG_COLOR	0
-
-#define MATERIAL	0
 #define TRANSFORM0	1
-#define TRANSFORM1	2	
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = TRANSFORM0) uniform transform
 {
@@ -20,7 +19,7 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 out block

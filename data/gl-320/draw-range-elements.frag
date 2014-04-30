@@ -2,6 +2,7 @@
 
 precision highp float;
 precision highp int;
+layout(std140) uniform;
 
 out vec4 Color;
 

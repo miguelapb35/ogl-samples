@@ -1,5 +1,7 @@
 #version 150 core
 
+layout(std140) uniform;
+
 uniform transform
 {
 	mat4 MVP;

@@ -7,6 +7,10 @@
 
 uniform dvec4 Diffuse;
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()

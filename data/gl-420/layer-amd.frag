@@ -2,7 +2,9 @@
 
 #define FRAG_COLOR	0
 
+precision highp float;
 precision highp int;
+layout(std140, column_major) uniform;
 
 const vec4 ColorArray[4] = vec4[]
 (

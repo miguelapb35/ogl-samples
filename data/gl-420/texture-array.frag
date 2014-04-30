@@ -8,6 +8,10 @@
 
 #define DIFFUSE			0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 
 in block

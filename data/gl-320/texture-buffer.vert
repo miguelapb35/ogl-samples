@@ -1,6 +1,8 @@
 #version 150
 
+precision highp float;
 precision highp int;
+layout(std140, column_major) uniform;
 
 uniform samplerBuffer Displacement;
 uniform mat4 MVP;
