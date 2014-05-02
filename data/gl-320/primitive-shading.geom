@@ -9,6 +9,13 @@ precision highp int;
 layout(std140, column_major) uniform;
 layout(triangle_strip, max_vertices = 4) out;
 
+/*
+const vec4 Diffuse[] = {
+	vec4(1.0, 0.0, 0.0, 1.0),
+	vec4(0.0, 1.0, 0.0, 1.0),
+	vec4(0.0, 0.0, 1.0, 1.0)
+};
+*/
 in block
 {
 	vec4 Color;
