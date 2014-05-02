@@ -4,6 +4,10 @@
 #define COLOR		3
 #define FRAG_COLOR	0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform transform
 {
 	mat4 MVP;

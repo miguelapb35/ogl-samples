@@ -14,6 +14,10 @@
 #define FRAG_BLUE		2
 #define FRAG_ALPHA		3
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform sampler2D Diffuse;
 
 in block

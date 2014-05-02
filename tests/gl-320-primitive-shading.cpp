@@ -73,8 +73,6 @@ public:
 private:
 	bool testError()
 	{
-
-
 		compiler Compiler;
 
 		Compiler.create(GL_GEOMETRY_SHADER, getDataDirectory() + SAMPLE_GEOM_SHADER, "--version 150 --profile core --define GEN_ERROR");

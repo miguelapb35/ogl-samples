@@ -10,6 +10,9 @@
 #define TEXCOORD_OUTPUT		4
 #define COLOR_OUTPUT		5
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 layout (local_size_x = 8) in;
 
 layout(binding = TRANSFORM0) uniform transform

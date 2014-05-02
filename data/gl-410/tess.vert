@@ -4,12 +4,11 @@
 #define COLOR			3
 #define FRAG_COLOR		0
 
-uniform mat4 MVP;
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
-struct vertex
-{
-	vec4 Color;
-};
+uniform mat4 MVP;
 
 layout(location = POSITION) in vec2 Position;
 layout(location = COLOR) in vec4 Color;
@@ -19,6 +18,11 @@ out gl_PerVertex
 	vec4 gl_Position;
 	float gl_PointSize;
 	float gl_ClipDistance[];
+};
+
+struct vertex
+{
+	vec4 Color;
 };
 
 layout(location = 0) out vertex Out;

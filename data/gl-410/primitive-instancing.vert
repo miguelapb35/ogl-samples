@@ -5,6 +5,10 @@
 #define TEXCOORD	4
 #define FRAG_COLOR	0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(location = POSITION) in vec2 Position;
 layout(location = COLOR) in vec4 Color;
 layout(location = COLOR) out vec4 VertColor;

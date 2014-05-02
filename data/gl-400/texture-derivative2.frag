@@ -1,6 +1,10 @@
 #version 150 core
 //#define FUNCTION
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform sampler2D Diffuse;
 uniform bool UseGrad;
 

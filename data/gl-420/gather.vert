@@ -6,6 +6,10 @@
 #define INSTANCE	7
 #define FRAG_COLOR	0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform mat4 MVP;
 
 layout(location = POSITION) in vec2 Position;

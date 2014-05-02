@@ -5,6 +5,10 @@
 #define TEXCOORD		4
 #define FRAG_COLOR		0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform sampler2D Diffuse;
 
 layout(location = COLOR) in vec3 Color;

@@ -1,5 +1,7 @@
 #version 150 core
 
+layout(std140) uniform;
+
 uniform sampler2D Diffuse;
 
 in vec4 gl_FragCoord;

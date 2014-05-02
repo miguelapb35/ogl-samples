@@ -1,9 +1,9 @@
 #version 440 core
 
-#define POSITION		0
-#define COLOR			3
-#define FRAG_COLOR		0
-
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+layout(std430, column_major) buffer;
 layout(quads, equal_spacing, ccw) in;
 
 struct vertex
@@ -49,10 +49,10 @@ vec4 interpolate(in vec4 v0, in vec4 v1, in vec4 v2, in vec4 v3)
 }
 
 void main()
-{	
+{
 	gl_Position = interpolate(gl_in[0].gl_Position, gl_in[1].gl_Position, gl_in[2].gl_Position, gl_in[3].gl_Position);
 	st_Out[0].Color = interpolate(st_In[0][0].Color, st_In[1][0].Color, st_In[2][0].Color, st_In[3][0].Color);
-        st_Out[1].Color = interpolate(st_In[0][1].Color, st_In[1][1].Color, st_In[2][1].Color, st_In[3][1].Color);
+	st_Out[1].Color = interpolate(st_In[0][1].Color, st_In[1][1].Color, st_In[2][1].Color, st_In[3][1].Color);
 	bl_Out.Color = interpolate(bl_In[0].Color, bl_In[1].Color, bl_In[2].Color, bl_In[3].Color);
 }
 

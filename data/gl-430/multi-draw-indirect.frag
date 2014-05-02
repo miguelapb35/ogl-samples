@@ -14,6 +14,10 @@ in block
 	flat int DrawID;
 } In;
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 layout(binding = 0) uniform sampler2D Diffuse[3];
