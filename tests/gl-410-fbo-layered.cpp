@@ -195,14 +195,19 @@ private:
 
 	bool initFramebuffer()
 	{
+		GLenum const BuffersRender = GL_COLOR_ATTACHMENT0;
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureColorbufferName, 0);
-
+		glDrawBuffers(1, &BuffersRender);
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_BACK);
+		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return false;
+
 		return this->checkError("initFramebuffer");
 	}
 

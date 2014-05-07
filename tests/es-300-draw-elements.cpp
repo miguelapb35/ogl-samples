@@ -166,6 +166,9 @@ private:
 
 	bool render()
 	{
+		GLenum const Buffers = GL_BACK;
+		glDrawBuffers(1, &Buffers);
+
 		// Compute the MVP (Model View Projection matrix)
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 		glm::mat4 Model = glm::mat4(1.0f);

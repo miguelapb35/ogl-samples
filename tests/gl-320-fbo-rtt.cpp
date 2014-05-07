@@ -218,11 +218,15 @@ private:
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, TextureName[2], 0);
 		GLenum DrawBuffers[3] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
 		glDrawBuffers(3, DrawBuffers);
-
 		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		GLenum const Buffers = GL_BACK;
+		glDrawBuffers(1, &Buffers);
+		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return false;
+
 		return this->checkError("initFramebuffer");
 	}
 

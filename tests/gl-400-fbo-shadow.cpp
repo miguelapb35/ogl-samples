@@ -278,20 +278,25 @@ private:
 
 		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 
+		GLenum const BuffersRender = GL_COLOR_ATTACHMENT0;
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		glDrawBuffers(1, &BuffersRender);
 		if(this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-		//glDrawBuffer(GL_NONE);
+		glDrawBuffer(GL_NONE);
 		if(this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		
+		glDrawBuffer(GL_BACK);
+		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return false;
+
 		return this->checkError("initFramebuffer");
 	}
 
