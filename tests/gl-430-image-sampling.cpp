@@ -78,7 +78,7 @@ class gl_430_image_sampling : public test
 {
 public:
 	gl_430_image_sampling(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-image-sampling", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-image-sampling", test::CORE, 4, 2),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

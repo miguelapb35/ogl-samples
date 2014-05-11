@@ -36,7 +36,7 @@ testDrawArrays::testDrawArrays(
 	uniformUpdate const UniformUpdate,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::vec2(0, 0), glm::vec2(0, 512)),
+	test(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::vec2(640, 480), glm::vec2(0), glm::vec2(0, 4)),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
 	UniformUpdate(UniformUpdate),
@@ -44,7 +44,9 @@ testDrawArrays::testDrawArrays(
 	VertexArrayName(0),
 	PipelineName(0),
 	ProgramName(0)
-{}
+{
+	assert(1);
+}
 
 testDrawArrays::~testDrawArrays()
 {}

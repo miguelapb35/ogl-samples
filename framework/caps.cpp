@@ -37,6 +37,7 @@ void caps::initVersion()
 	this->VersionData.RENDERER = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
 	this->VersionData.VENDOR = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 	this->VersionData.VERSION = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+	this->VersionData.SHADING_LANGUAGE_VERSION = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	if(this->check(4, 3) || Extensions.KHR_debug)
 		glGetIntegerv(GL_CONTEXT_FLAGS, &VersionData.CONTEXT_FLAGS);

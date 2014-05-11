@@ -212,11 +212,13 @@ private:
 			Validated = initVertexArray();
 		if(Validated)
 			Validated = initTexture();
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		UniformPointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+		if(Validated)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			UniformPointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+		}
 
 		return Validated;
 	}
@@ -254,7 +256,8 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-		glBindTextures(semantic::sampler::DIFFUSE, 1, &TextureName);
+		glActiveTexture(GL_TEXTURE0 + semantic::sampler::DIFFUSE);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);

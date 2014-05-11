@@ -140,10 +140,14 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_ARB_ES3_compatibility");
 
-		GLint QueryCounter(0);
-		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryCounter);
-		assert(QueryCounter > 0);
+		if(Validated)
+		{
+			GLint QueryCounter(0);
+			glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryCounter);
+			assert(QueryCounter > 0);
+		}
 
 		if(Validated)
 			Validated = initProgram();

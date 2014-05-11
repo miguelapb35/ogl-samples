@@ -29,6 +29,47 @@ namespace
 
 namespace gl
 {
+	map_ptr::map_ptr(name_t Name, std::size_t Offset, std::size_t Length, std::uint32_t Access) :
+		Name(Name),
+		Offset(Offset),
+		Length(Length),
+		Access(Access)
+	{
+		glMapNamedBufferRangeEXT(Name, Offset, Length, Access);
+	}
+
+	map_ptr::~map_ptr()
+	{
+		this->unmap();
+	}
+
+	void map_ptr::flush(std::size_t Offset, std::size_t Length) const
+	{
+		glFlushMappedNamedBufferRangeEXT(this->Name, Offset, Length);
+	}
+
+	void map_ptr::unmap() const
+	{
+		glUnmapNamedBufferEXT(this->Name);
+	}
+
+	buffer::buffer(std::size_t Size, const void* Data, std::uint32_t Flags)
+	{
+		glGenBuffers(1, &this->Name);
+		glNamedBufferStorageEXT(this->Name, static_cast<GLsizeiptr>(Size), Data, Flags);
+	}
+
+	buffer::~buffer()
+	{
+		glDeleteBuffers(1, &this->Name);
+		this->Name = 0;	
+	}
+
+	map_ptr const & buffer::map(GLintptr Offset, GLsizeiptr Length, GLbitfield Flags)
+	{
+		return map_ptr(this->Name, Offset, Length, Flags);
+	}
+/*
 	buffer::buffer(std::uint32_t Flags, std::size_t Size) :
 		buffer(Flags, Size, nullptr)
 	{}
@@ -81,5 +122,6 @@ namespace gl
 			Buffer.Handle, this->Handle, 
 			static_cast<GLintptr>(ReadOffset), static_cast<GLintptr>(WriteOffset), static_cast<GLsizeiptr>(Size));
 	}
+*/
 }//namespace gl
 

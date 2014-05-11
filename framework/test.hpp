@@ -27,6 +27,7 @@
 #include "compiler.hpp"
 #include "sementics.hpp"
 #include "vertex.hpp"
+#include "buffer.hpp"
 #include "caps.hpp"
 
 #include <GL/glew.h>

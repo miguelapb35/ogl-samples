@@ -237,6 +237,7 @@ private:
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		glDrawBuffer(GL_NONE);
 
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
