@@ -463,13 +463,13 @@ int main(int argc, char* argv[])
 
 	csv CSV;
 
-	//Error += drawArrays(argc, argv, CSV);
+	Error += drawArrays(argc, argv, CSV);
 	//Error += drawElements(argc, argv, CSV);
 	//Error += drawArraysUniform(argc, argv, CSV);
 	//Error += drawArraysVAOs(argc, argv, CSV);
 	//Error += drawScreenspaceCoherence(argc, argv, CSV);
 	//Error += compiler(argc, argv, CSV);
-	Error += drawIndexing(argc, argv, CSV);
+	//Error += drawIndexing(argc, argv, CSV);
 
 	CSV.print();
 	CSV.save("../draws.csv");

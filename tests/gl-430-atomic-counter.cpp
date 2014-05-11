@@ -63,7 +63,7 @@ class gl_430_atomic_counter : public test
 {
 public:
 	gl_430_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-atomic-counter", test::CORE, 4, 3, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
+		test(argc, argv, "gl-430-atomic-counter", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

@@ -8,11 +8,57 @@
 
 namespace gl
 {
-	class buffer
-	{
-		buffer(buffer const &) = delete;
-		buffer& operator=(buffer const &) = delete;
+	typedef std::uint32_t name_t;
 
+	class noncopyable
+	{
+	protected:
+		noncopyable() = default;
+		~noncopyable() = default;
+
+		noncopyable(noncopyable const &) = delete;
+		noncopyable& operator=(noncopyable const &) = delete;
+	};
+
+	class buffer;
+
+	class map_ptr : noncopyable
+	{
+		friend class buffer;
+
+	private:
+		map_ptr(name_t Name, std::size_t Offset, std::size_t Length, std::uint32_t Access);
+		map_ptr(map_ptr const &);
+		map_ptr& operator=(map_ptr const &);
+
+	public:
+		~map_ptr();
+
+		void flush(std::size_t Offset, std::size_t Length) const;
+		void unmap() const;
+
+	private:
+		name_t const Name;
+		std::size_t const Offset;
+		std::size_t const Length;
+		std::uint32_t const Access;
+	};
+
+	class buffer : noncopyable
+	{
+	public:
+		buffer(std::size_t Size, const void* Data, std::uint32_t Flags);
+		~buffer();
+
+		map_ptr const & map(GLintptr Offset, GLsizeiptr Length, GLbitfield Flags);
+
+	private:
+		name_t Name;
+	};
+
+/*
+	class buffer : public noncopyable
+	{
 		typedef GLuint handle;
 
 		struct mapping
@@ -44,12 +90,10 @@ namespace gl
 			SPARSE_BIT = (1 << 8)
 		};
 
-/*
-		enum usage
-		{
-			GL_DYNAMIC_STORAGE_BIT, GL_MAP_READ_BIT GL_MAP_WRITE_BIT, GL_MAP_PERSISTENT_BIT, GL_MAP_COHERENT_BIT, and GL_CLIENT_STORAGE_BIT
-		};
-*/
+//		enum usage
+//		{
+//			GL_DYNAMIC_STORAGE_BIT, GL_MAP_READ_BIT GL_MAP_WRITE_BIT, GL_MAP_PERSISTENT_BIT, GL_MAP_COHERENT_BIT, and GL_CLIENT_STORAGE_BIT
+//		};
 
 		buffer(std::uint32_t Flags, std::size_t Size);
 		buffer(std::uint32_t Flags, std::size_t Size, void const * Data);
@@ -68,6 +112,7 @@ namespace gl
 		handle Handle;
 		std::vector<mapping> Mappings;
 	};
+*/
 }//namespace gl
 
 #endif//BUFFER_INCLUDED

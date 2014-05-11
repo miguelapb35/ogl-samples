@@ -7,7 +7,7 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-layout(std430, column_major) buffer;
+//layout(std430, column_major) buffer; AMD bug
 
 layout(location = POSITION) in vec4 Position;
 layout(location = COLOR) in vec4 Color;

@@ -265,7 +265,10 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		caps Caps(caps::CORE);
+
+		// Multisample integer texture is optional
+		bool Validated = Caps.Limits.MAX_INTEGER_SAMPLES > 1;
 
 		if(Validated)
 			Validated = initProgram();

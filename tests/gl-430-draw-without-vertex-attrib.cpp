@@ -56,7 +56,7 @@ class gl_430_draw_without_vertex_attrib : public test
 {
 public:
 	gl_430_draw_without_vertex_attrib(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-draw-without-vertex-attrib", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-draw-without-vertex-attrib", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

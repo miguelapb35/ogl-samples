@@ -35,6 +35,8 @@ private:
 	{
 		caps Caps(caps::CORE);
 
+		//Caps.Version.SHADING_LANGUAGE_VERSION
+
 		return true;
 	}
 

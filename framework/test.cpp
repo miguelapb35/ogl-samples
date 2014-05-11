@@ -34,8 +34,8 @@ namespace
 #		ifdef __APPLE__
 		std::string os("apple-");
 #		elif __linux__
-        std::string os("linux-");
-#       else
+		std::string os("linux-");
+#		else
 		std::string os;
 #		endif
 		
@@ -189,9 +189,9 @@ test::test
 #				endif
 			}	
 #			if defined(_DEBUG) || defined(__linux__)
-                glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#           else
-                glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#			else
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 #			endif
 #		endif
 	}

@@ -280,7 +280,7 @@ private:
 
 		glEnable(GL_SCISSOR_TEST);
 		glDisable(GL_FRAMEBUFFER_SRGB);
-		glScissorIndexed(0, 0, 0, WindowSize.x, WindowSize.y);
+		glScissorIndexed(0, 0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 		glBindProgramPipeline(PipelineName);
 

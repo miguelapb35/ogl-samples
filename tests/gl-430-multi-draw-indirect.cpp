@@ -328,21 +328,25 @@ private:
 	void validate()
 	{
 		GLint Status(0);
-		GLint LengthMax(0);
 		glValidateProgramPipeline(PipelineName);
 		glGetProgramPipelineiv(PipelineName, GL_VALIDATE_STATUS, &Status);
-		glGetProgramPipelineiv(PipelineName, GL_INFO_LOG_LENGTH, &LengthMax);
 
-		GLsizei LengthQuery(0);
-		std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
-		glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
+		if(Status != GL_TRUE)
+		{
+			GLint LengthMax(0);
+			glGetProgramPipelineiv(PipelineName, GL_INFO_LOG_LENGTH, &LengthMax);
+			
+			GLsizei LengthQuery(0);
+			std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
+			glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
 
-		glDebugMessageInsertARB(
-			GL_DEBUG_SOURCE_APPLICATION_ARB, 
-			GL_DEBUG_TYPE_OTHER_ARB, 76,
-			GL_DEBUG_SEVERITY_LOW_ARB,
-			LengthQuery, 
-			&InfoLog[0]);
+			glDebugMessageInsertARB(
+				GL_DEBUG_SOURCE_APPLICATION_ARB, 
+				GL_DEBUG_TYPE_OTHER_ARB, 76,
+				GL_DEBUG_SEVERITY_LOW_ARB,
+				LengthQuery, 
+				&InfoLog[0]);
+		}
 	}
 
 	bool begin()
