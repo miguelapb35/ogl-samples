@@ -33,7 +33,9 @@ namespace
 
 #		ifdef __APPLE__
 		std::string os("apple-");
-#		else
+#		elif __linux__
+        std::string os("linux-");
+#       else
 		std::string os;
 #		endif
 		
@@ -172,10 +174,10 @@ test::test
 					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
 #				endif
 			}	
-#			if !defined(_DEBUG) || defined(__APPLE__)
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
-#			else
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#			if defined(_DEBUG) || defined(__linux__)
+                glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#           else
+                glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
 #			endif
 #		endif
 	}
@@ -264,6 +266,7 @@ int test::operator()()
 		}
 
 		this->swap();
+
 
 #		ifdef AUTOMATED_TESTS
 			if(FrameCount > 0)

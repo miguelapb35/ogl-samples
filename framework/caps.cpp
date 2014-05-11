@@ -761,7 +761,6 @@ void caps::initLimits()
 		glGetIntegerv(GL_MAX_COMBINED_UNIFORM_BLOCKS, &LimitsData.MAX_COMBINED_UNIFORM_BLOCKS);
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &LimitsData.MAX_UNIFORM_BUFFER_BINDINGS);
 		glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &LimitsData.MAX_UNIFORM_BLOCK_SIZE);
-		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &LimitsData.MAX_UNIFORM_LOCATIONS);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &LimitsData.UNIFORM_BUFFER_OFFSET_ALIGNMENT);
 	}
 
@@ -793,9 +792,14 @@ void caps::initLimits()
 		glGetIntegerv(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &LimitsData.SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT);
 	}
 
-	if(check(4, 3))
+    if(check(4, 3))
 	{
 		glGetIntegerv(GL_MAX_COMBINED_SHADER_OUTPUT_RESOURCES, &LimitsData.MAX_COMBINED_SHADER_OUTPUT_RESOURCES);
+    }
+
+    if(check(4, 3) || ExtensionData.ARB_explicit_uniform_location)
+    {
+        glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &LimitsData.MAX_UNIFORM_LOCATIONS);
 	}
 }
 
@@ -1060,6 +1064,13 @@ void caps::initFormats()
 		case GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI:
 			FormatsData.COMPRESSED_LUMINANCE_ALPHA_3DC_ATI = true;
 			break;
+
+        case GL_COMPRESSED_RGB_FXT1_3DFX:
+            FormatsData.COMPRESSED_RGB_FXT1_3DFX = true;
+            break;
+        case GL_COMPRESSED_RGBA_FXT1_3DFX:
+            FormatsData.COMPRESSED_RGBA_FXT1_3DFX = true;
+            break;
 
 		case GL_PALETTE4_RGB8_OES:
 			FormatsData.PALETTE4_RGB8_OES = true;

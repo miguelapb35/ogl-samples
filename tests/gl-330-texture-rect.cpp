@@ -110,21 +110,38 @@ private:
 		return this->checkError("initBuffer");
 	}
 
-	bool initTexture2D()
+    bool initTexture()
 	{
+        this->checkError("initTexture 1");
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		GLint TextureSize = 0;
 		glGetIntegerv(GL_MAX_RECTANGLE_TEXTURE_SIZE, &TextureSize);
 
+        this->checkError("initTexture 2");
+
 		glGenTextures(1, &TextureRectName);
+
+        this->checkError("initTexture 3");
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_RECTANGLE, TextureRectName);
+
+        this->checkError("initTexture 4");
+
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_BASE_LEVEL, 0);
+
+        this->checkError("initTexture 5");
+
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAX_LEVEL, 0);
+
+        this->checkError("initTexture 6");
+
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        this->checkError("initTexture 7");
 
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
@@ -141,6 +158,8 @@ private:
 			0,
 			GL_BGR, GL_UNSIGNED_BYTE,
 			Texture.data());
+
+        this->checkError("initTexture 8");
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -174,7 +193,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 		if(Validated)
-			Validated = initTexture2D();
+            Validated = initTexture();
 
 		return Validated && this->checkError("begin");;
 	}
