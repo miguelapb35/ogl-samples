@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-430/query-occlusion.vert");
-	char const * FRAG_SHADER_SOURCE("gl-430/query-occlusion.frag");
+	char const * VERT_SHADER_SOURCE("gl-330/query-counter.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/query-counter.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -40,43 +40,29 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
-	namespace buffer
-	{
-		enum type
-		{
-			VERTEX,
-			TRANSFORM,
-			MAX
-		};
-	}//namespace buffer
+	GLuint VertexArrayName = 0;
+	GLuint ProgramName = 0;
+	GLuint BufferName = 0;
+	GLuint QueryName = 0;
+	GLint UniformMVP = 0;
 }//namespace
 
-class gl_320_query_occlusion : public test
+class gl_330_query_timer : public test
 {
 public:
-	gl_320_query_occlusion(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-occlusion", test::CORE, 4, 2),
-		VertexArrayName(0),
-		PipelineName(0),
-		ProgramName(0),
-		QueryName(0)
+	gl_330_query_timer(int argc, char* argv[]) :
+		test(argc, argv, "gl-330-query-counter", test::CORE, 3, 3)
 	{}
 
 private:
-	std::array<GLuint, buffer::MAX> BufferName;
-	GLuint VertexArrayName;
-	GLuint PipelineName;
-	GLuint ProgramName;
-	GLuint QueryName;
-
 	bool initQuery()
 	{
 		glGenQueries(1, &QueryName);
 
 		int QueryBits(0);
-		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryBits);
+		glGetQueryiv(GL_TIMESTAMP, GL_QUERY_COUNTER_BITS, &QueryBits);
 
-		bool Validated = QueryBits >= 32;
+		bool Validated = QueryBits >= 30;
 
 		return Validated && this->checkError("initQuery");
 	}
@@ -88,42 +74,41 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 330 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 330 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
 			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
+		// Get variables locations
 		if(Validated)
 		{
-			glGenProgramPipelines(1, &PipelineName);
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
+			glUniform4fv(glGetUniformLocation(ProgramName, "Diffuse"), 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 		}
 
 		return Validated && this->checkError("initProgram");
 	}
 
+	// Buffer update using glBufferSubData
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
+		// Generate a buffer object
+		glGenBuffers(1, &BufferName);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+		// Bind the buffer for use
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+
+		// Reserve buffer memory but and copy the values
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
+
+		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		GLint UniformBufferOffset(0);
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return this->checkError("initBuffer");
 	}
@@ -132,7 +117,7 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
 			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -145,10 +130,7 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_ARB_ES3_compatibility");
 
-		if(Validated)
-			Validated = initQuery();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -163,8 +145,7 @@ private:
 
 	bool end()
 	{
-		glDeleteProgramPipelines(1, &PipelineName);
-		glDeleteBuffers(buffer::MAX, &BufferName[0]);
+		glDeleteBuffers(1, &BufferName);
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
@@ -175,39 +156,30 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * this->view() * Model;
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, static_cast<float>(WindowSize.x) / static_cast<float>(WindowSize.y), 0.1f, 100.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
-		
-			*Pointer = Projection * this->view() * Model;
 
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
-		}
+		glQueryCounter(GL_TIMESTAMP, QueryName);
 
-		// Set the display viewport
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
-		// Clear color buffer with black
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-		glBindProgramPipeline(PipelineName);
-		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glUseProgram(ProgramName);
+		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
-		// Samples count query
-		glBeginQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, QueryName);
-			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-		glEndQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE);
+		glBindVertexArray(VertexArrayName);
+		glDrawArrays(GL_TRIANGLES, 0, VertexCount);
+
+		glQueryCounter(GL_TIMESTAMP, QueryName);
 
 		// Get the count of samples. 
 		// If the result of the query isn't here yet, we wait here...
-		GLuint SamplesCount = 0;
-		glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &SamplesCount);
-		fprintf(stdout, "Samples count: %d\r", SamplesCount);
+		GLuint Time = 0;
+		glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &Time);
+		fprintf(stdout, "Time: %f ms   \r", Time / 1000.f / 1000.f);
 
 		return true;
 	}
@@ -217,9 +189,8 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_query_occlusion Test(argc, argv);
+	gl_330_query_timer Test(argc, argv);
 	Error += Test();
 
 	return Error;
 }
-
