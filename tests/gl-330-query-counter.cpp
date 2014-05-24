@@ -40,10 +40,19 @@ namespace
 		glm::vec2(-1.0f,-1.0f)
 	};
 
+	namespace query
+	{
+		enum type
+		{
+			BEGIN,
+			END,
+			MAX
+		};
+	}//namespace query
+
 	GLuint VertexArrayName = 0;
 	GLuint ProgramName = 0;
 	GLuint BufferName = 0;
-	GLuint QueryName = 0;
 	GLint UniformMVP = 0;
 }//namespace
 
@@ -55,14 +64,16 @@ public:
 	{}
 
 private:
+	std::array<GLuint, query::MAX> QueryName;
+
 	bool initQuery()
 	{
-		glGenQueries(1, &QueryName);
-
 		int QueryBits(0);
 		glGetQueryiv(GL_TIMESTAMP, GL_QUERY_COUNTER_BITS, &QueryBits);
 
 		bool Validated = QueryBits >= 30;
+		if(Validated)
+			glGenQueries(static_cast<GLsizei>(QueryName.size()), &QueryName[0]);
 
 		return Validated && this->checkError("initQuery");
 	}
@@ -89,7 +100,9 @@ private:
 		if(Validated)
 		{
 			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
+			glUseProgram(ProgramName);
 			glUniform4fv(glGetUniformLocation(ProgramName, "Diffuse"), 1, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glUseProgram(0);
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -160,8 +173,7 @@ private:
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * this->view() * Model;
 
-
-		glQueryCounter(GL_TIMESTAMP, QueryName);
+		glQueryCounter(QueryName[query::BEGIN], GL_TIMESTAMP);
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
@@ -173,15 +185,30 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glDrawArrays(GL_TRIANGLES, 0, VertexCount);
 
-		glQueryCounter(GL_TIMESTAMP, QueryName);
+		glQueryCounter(QueryName[query::END], GL_TIMESTAMP);
 
-		// Get the count of samples. 
-		// If the result of the query isn't here yet, we wait here...
-		GLuint Time = 0;
-		glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &Time);
-		fprintf(stdout, "Time: %f ms   \r", Time / 1000.f / 1000.f);
+		while(true)
+		{
+			GLint Available = GL_FALSE;
+			glGetQueryObjectiv(QueryName[query::BEGIN], GL_QUERY_RESULT_AVAILABLE, &Available);
+			if(!Available)
+				continue;
 
-		return true;
+			glGetQueryObjectiv(QueryName[query::END], GL_QUERY_RESULT_AVAILABLE, &Available);
+			if(Available)
+				break;
+		}
+
+		GLint64 TimeBegin = 0, TimeEnd = 0;
+		glGetQueryObjecti64v(QueryName[query::BEGIN], GL_QUERY_RESULT, &TimeBegin);
+		glGetQueryObjecti64v(QueryName[query::END], GL_QUERY_RESULT, &TimeEnd);
+
+		//glGetInteger64v(GL_TIMESTAMP, &TimeBegin);
+		//glGetInteger64v(GL_TIMESTAMP, &TimeEnd);
+
+		fprintf(stdout, "Time stamp: %f ms   \r", (TimeEnd - TimeBegin) / 1000.f / 1000.f);
+
+		return TimeEnd - TimeBegin > 0;
 	}
 };
 
