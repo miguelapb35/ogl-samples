@@ -39,6 +39,15 @@ namespace
 		glf::vertex_v2fc4ub(glm::vec2(-1.0f, 1.0f), glm::u8vec4(  0,   0, 255, 255))
 	};
 
+	GLsizei const ColorCount(3);
+	GLsizeiptr const ColorSize = ColorCount * sizeof(glm::vec4);
+	glm::vec4 const ColorData[ColorCount] =
+	{
+		glm::vec4(0.5, 0.5, 0.5, 1.0),
+		glm::vec4(0.7, 0.7, 0.7, 1.0),
+		glm::vec4(0.3, 0.3, 0.3, 1.0)
+	};
+
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
@@ -54,6 +63,7 @@ namespace
 			VERTEX,
 			ELEMENT,
 			TRANSFORM,
+			CONSTANT,
 			MAX
 		};
 	}//namespace buffer
@@ -112,6 +122,7 @@ private:
 		{
 			glUseProgram(ProgramName);
 			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
+			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "constant"), semantic::uniform::CONSTANT);
 			glUseProgram(0);
 		}
 
@@ -153,6 +164,10 @@ private:
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::CONSTANT]);
+		glBufferData(GL_UNIFORM_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return this->checkError("initBuffer");
@@ -222,6 +237,7 @@ private:
 
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::CONSTANT, BufferName[buffer::CONSTANT]);
 
 		glBeginQuery(GL_PRIMITIVES_GENERATED, QueryName); 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);

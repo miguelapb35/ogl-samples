@@ -9,13 +9,11 @@ precision highp int;
 layout(std140, column_major) uniform;
 layout(triangle_strip, max_vertices = 4) out;
 
-/*
-const vec4 Diffuse[] = {
-	vec4(1.0, 0.0, 0.0, 1.0),
-	vec4(0.0, 1.0, 0.0, 1.0),
-	vec4(0.0, 0.0, 1.0, 1.0)
-};
-*/
+uniform constant
+{
+	vec4 Color[3];
+} Constant;
+
 in block
 {
 	vec4 Color;
@@ -31,7 +29,7 @@ void main()
 	for(int i = 0; i < gl_in.length(); ++i)
 	{
 		gl_Position = gl_in[i].gl_Position;
-		Out.Color = In[i].Color;
+		Out.Color = (In[i].Color + Constant.Color[i]) * 0.5;
 		EmitVertex();
 	}
 	EndPrimitive();
