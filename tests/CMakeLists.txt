@@ -76,6 +76,8 @@ set(GL_SHADER_GTC fbo-depth-multisample.vert fbo-depth-multisample.frag texture-
 glCreateSampleGTC(fbo-depth-multisample)
 set(GL_SHADER_GTC fbo-integer-render.vert fbo-integer-render.frag fbo-integer-splash.vert fbo-integer-splash.frag)
 glCreateSampleGTC(fbo-integer)
+set(GL_SHADER_GTC fbo-integer-render.vert fbo-integer-render.frag fbo-integer-splash.vert fbo-integer-splash.frag)
+glCreateSampleGTC(fbo-integer-blit)
 set(GL_SHADER_GTC fbo-layered-rtt-array.vert fbo-layered-rtt-array.frag fbo-layered.vert fbo-layered.geom fbo-layered.frag)
 glCreateSampleGTC(fbo-layered)
 set(GL_SHADER_GTC fbo-multisample.vert fbo-multisample.frag)

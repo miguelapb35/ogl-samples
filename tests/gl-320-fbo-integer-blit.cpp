@@ -51,6 +51,7 @@ namespace
 		{
 			DIFFUSE,
 			RENDERBUFFER,
+			SPLASHBUFFER,
 			MAX
 		};
 	}//namespace texture
@@ -65,6 +66,16 @@ namespace
 		};
 	}//namespace buffer
 
+	namespace framebuffer
+	{
+		enum type
+		{
+			RENDER,
+			RESOLVE,
+			MAX
+		};
+	}//namespace framebuffer
+
 	namespace shader
 	{
 		enum type
@@ -77,8 +88,11 @@ namespace
 		};
 	}//namespace shader
 
+	GLuint VertexArrayName(0);
+	GLuint BufferName(0);
 	std::vector<GLuint> ShaderName(shader::MAX);
 	std::vector<GLuint> TextureName(texture::MAX);
+	std::vector<GLuint> FramebufferName(framebuffer::MAX);
 	std::vector<GLuint> ProgramName(program::MAX);
 	std::vector<GLuint> UniformMVP(program::MAX);
 	std::vector<GLuint> UniformDiffuse(program::MAX);
@@ -88,17 +102,10 @@ class gl_320_fbo_multisample_integer : public test
 {
 public:
 	gl_320_fbo_multisample_integer(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-multisample-integer", test::CORE, 3, 2),
-		VertexArrayName(0),
-		BufferName(0),
-		FramebufferName(0)
+		test(argc, argv, "gl-320-fbo-multisample-integer", test::CORE, 3, 2)
 	{}
 
 private:
-	GLuint VertexArrayName;
-	GLuint BufferName;
-	GLuint FramebufferName;
-
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -210,15 +217,33 @@ private:
 			0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+		glBindTexture(GL_TEXTURE_2D, TextureName[texture::SPLASHBUFFER]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI,
+			WindowSize.x / FRAMEBUFFER_SIZE,
+			WindowSize.y / FRAMEBUFFER_SIZE,
+			0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 		return this->checkError("initTexture");
 	}
 
 	bool initFramebuffer()
 	{
-		glGenFramebuffers(1, &FramebufferName);
+		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::RENDERBUFFER], 0);
+		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return false;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::SPLASHBUFFER], 0);
 		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -268,7 +293,7 @@ private:
 		glDeleteProgram(ProgramName[program::RENDER]);
 		glDeleteProgram(ProgramName[program::SPLASH]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
-		glDeleteFramebuffers(1, &FramebufferName);
+		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
 		return this->checkError("end");
@@ -283,7 +308,7 @@ private:
 			glViewport(0, 0,
 				WindowSize.x / FRAMEBUFFER_SIZE,
 				WindowSize.y / FRAMEBUFFER_SIZE);
-			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 			glClearBufferuiv(GL_COLOR, 0, &glm::uvec4(0, 128, 255, 255)[0]);
 
 			glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(WindowSize.x) / WindowSize.y, 0.1f, 100.0f);
@@ -304,6 +329,21 @@ private:
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		}
 
+		// Resolved multisampling
+		{
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
+			glBlitFramebuffer(
+				0, 0,
+				WindowSize.x / FRAMEBUFFER_SIZE,
+				WindowSize.y / FRAMEBUFFER_SIZE,
+				0, 0,
+				WindowSize.x / FRAMEBUFFER_SIZE,
+				WindowSize.y / FRAMEBUFFER_SIZE,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+
 		// Pass 2
 		{
 			glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(WindowSize.x) / WindowSize.y, 0.1f, 100.0f);
@@ -319,7 +359,7 @@ private:
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::SPLASHBUFFER]);
 			glBindVertexArray(VertexArrayName);
 
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
