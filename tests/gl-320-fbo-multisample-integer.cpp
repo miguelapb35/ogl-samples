@@ -383,7 +383,7 @@ private:
 		// Render the colorbuffer from the multisampled framebuffer
 		renderFB(TextureName[texture::COLORBUFFER]);
 
-		return true;
+		return this->checkError("render");;
 	}
 };
 

@@ -323,7 +323,7 @@ private:
 		glBindVertexArray(VertexArrayName[program::TEXTURE]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawArraysInstancedBaseInstance(GL_LINE_LOOP, 0, this->VertexCount, 1, 0);
+		glDrawArraysInstanced(GL_LINE_LOOP, 0, this->VertexCount, 1);
 
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[texture::RENDERBUFFER]);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[texture::COLORBUFFER]);
