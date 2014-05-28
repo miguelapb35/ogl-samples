@@ -60,7 +60,12 @@ private:
 	{
 		glGenQueries(1, &QueryName);
 
-		return this->checkError("initQuery");
+		int QueryBits(0);
+		glGetQueryiv(GL_TIME_ELAPSED, GL_QUERY_COUNTER_BITS, &QueryBits);
+
+		bool Validated = QueryBits >= 30;
+
+		return Validated && this->checkError("initQuery");
 	}
 
 	bool initProgram()

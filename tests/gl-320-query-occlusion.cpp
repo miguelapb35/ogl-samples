@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Samples Pack (ogl-samples.g-truc.net)
 ///
 /// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
@@ -71,7 +71,12 @@ private:
 	{
 		glGenQueries(1, &QueryName);
 
-		return this->checkError("initQuery");
+		int QueryBits(0);
+		glGetQueryiv(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &QueryBits);
+
+		bool Validated = QueryBits >= 32;
+
+		return Validated && this->checkError("initQuery");
 	}
 
 	bool initProgram()
@@ -140,9 +145,6 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
-
-		GLint QueryCounter(0);
-		glGetQueryiv(GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &QueryCounter);
 
 		if(Validated)
 			Validated = initProgram();

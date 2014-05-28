@@ -67,10 +67,13 @@ class gl_320_primitive_shading : public test
 {
 public:
 	gl_320_primitive_shading(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-shading", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-primitive-shading", test::CORE, 3, 2),
+		QueryName(0)
 	{}
 
 private:
+	GLuint QueryName;
+
 	bool testError()
 	{
 		compiler Compiler;
@@ -145,11 +148,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -159,10 +158,24 @@ private:
 		return this->checkError("initBuffer");
 	}
 
+	bool initQuery()
+	{
+		glGenQueries(1, &QueryName);
+
+		int QueryBits(0);
+		glGetQueryiv(GL_PRIMITIVES_GENERATED, GL_QUERY_COUNTER_BITS, &QueryBits);
+
+		bool Validated = QueryBits >= 32;
+
+		return Validated && this->checkError("initQuery");
+	}
+
 	bool begin()
 	{
 		bool Validated = testError();
 
+		if(Validated)
+			Validated = initQuery();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -210,9 +223,14 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+		glBeginQuery(GL_PRIMITIVES_GENERATED, QueryName); 
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+		glEndQuery(GL_PRIMITIVES_GENERATED); 
 
-		return true;
+		GLuint64 PrimitivesGenerated = 0;
+		glGetQueryObjectui64v(this->QueryName, GL_QUERY_RESULT, &PrimitivesGenerated);
+
+		return PrimitivesGenerated > 0;
 	}
 };
 
