@@ -140,6 +140,12 @@ private:
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
+
+		GLuint FramebufferName = 0;
+		glGenFramebuffers(1, &FramebufferName);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName, 0);
+
 		return this->checkError("initTexture");
 	}
 

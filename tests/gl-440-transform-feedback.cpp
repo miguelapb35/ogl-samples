@@ -173,7 +173,7 @@ private:
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -196,7 +196,7 @@ private:
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		UniformPointer = (glm::mat4*)glMapBufferRange(
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_UNSYNCHRONIZED_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		return Validated;
 	}
@@ -231,10 +231,6 @@ private:
 
 			*UniformPointer = MVP;
 		}
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		// Set the display viewport
 		glViewportIndexedf(0, 0.0f, 0.0f, WindowSize.x, WindowSize.y);

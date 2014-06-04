@@ -296,7 +296,7 @@ private:
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		UniformPointer = (glm::mat4*)glMapBufferRange(
 			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 		return Validated;
 	}
@@ -330,8 +330,6 @@ private:
 
 			*UniformPointer = MVP;
 		}
-
-		glFlushMappedBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4));
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
