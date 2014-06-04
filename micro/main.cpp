@@ -463,7 +463,7 @@ int main(int argc, char* argv[])
 
 	csv CSV;
 
-	Error += drawArrays(argc, argv, CSV);
+	//Error += drawArrays(argc, argv, CSV);
 	//Error += drawElements(argc, argv, CSV);
 	//Error += drawArraysUniform(argc, argv, CSV);
 	//Error += drawArraysVAOs(argc, argv, CSV);

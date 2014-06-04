@@ -11,7 +11,7 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-layout(std430, column_major) buffer;
+//layout(std430) buffer;
 
 layout(binding = INDIRECTION) uniform indirection
 {
@@ -29,7 +29,7 @@ struct vertex
 	vec2 Texcoord;
 };
 
-layout(binding = VERTEX) buffer mesh
+layout(std430, binding = VERTEX) buffer mesh
 {
 	vertex Vertex[];
 } Mesh;

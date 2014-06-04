@@ -112,7 +112,7 @@ private:
 	std::array<GLuint, texture::MAX> TextureName;
 	std::array<glm::vec4, IndirectBufferCount> Viewport;
 	std::array<std::size_t, IndirectBufferCount> DrawOffset;
-	std::array<GLsizei, IndirectBufferCount> DrawCount;
+	std::array<GLintptr, IndirectBufferCount> DrawCount;
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
@@ -194,6 +194,14 @@ private:
 		Commands[4] = DrawElementsIndirectCommand(ElementCount >> 1, 1, 6, 4, 1);
 		Commands[5] = DrawElementsIndirectCommand(ElementCount, 1, 9, 7, 2);
 
+/*
+		Commands[0] = DrawElementsIndirectCommand(ElementCount, 1, 0, 0, 0);
+		Commands[1] = DrawElementsIndirectCommand(ElementCount >> 1, 1, 6, 4, 1);
+		Commands[2] = DrawElementsIndirectCommand(ElementCount, 1, 9, 7, 2);
+		Commands[3] = DrawElementsIndirectCommand(ElementCount, 1, 0, 0, 0);
+		Commands[4] = DrawElementsIndirectCommand(ElementCount >> 1, 1, 6, 4, 1);
+		Commands[5] = DrawElementsIndirectCommand(ElementCount, 1, 9, 7, 2);
+*/
 		this->DrawCount[0] = 3;
 		this->DrawCount[1] = 2;
 		this->DrawCount[2] = 1;
@@ -421,8 +429,9 @@ private:
 			glViewportIndexedfv(0, &this->Viewport[i][0]);
 			
 			glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]),
-				0, IndirectBufferCount, sizeof(DrawElementsIndirectCommand));
+				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]), // Offset in the indirect draw buffer
+				sizeof(GLintptr) * i, // Offset in the paramter buffer
+				IndirectBufferCount, sizeof(DrawElementsIndirectCommand));
 		}
 
 		return true;
