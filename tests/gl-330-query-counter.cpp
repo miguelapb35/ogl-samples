@@ -187,18 +187,13 @@ private:
 
 		glQueryCounter(QueryName[query::END], GL_TIMESTAMP);
 
-		while(true)
-		{
-			GLint Available = GL_FALSE;
-			glGetQueryObjectiv(QueryName[query::BEGIN], GL_QUERY_RESULT_AVAILABLE, &Available);
-			if(!Available)
-				continue;
+		GLint AvailableBegin = GL_FALSE;
+		glGetQueryObjectiv(QueryName[query::BEGIN], GL_QUERY_RESULT_AVAILABLE, &AvailableBegin);
 
-			glGetQueryObjectiv(QueryName[query::END], GL_QUERY_RESULT_AVAILABLE, &Available);
-			if(Available)
-				break;
-		}
+		GLint AvailableEnd = GL_FALSE;
+		glGetQueryObjectiv(QueryName[query::END], GL_QUERY_RESULT_AVAILABLE, &AvailableEnd);
 
+		// The OpenGL implementations will wait for the query if it's not available
 		GLint64 TimeBegin = 0, TimeEnd = 0;
 		glGetQueryObjecti64v(QueryName[query::BEGIN], GL_QUERY_RESULT, &TimeBegin);
 		glGetQueryObjecti64v(QueryName[query::END], GL_QUERY_RESULT, &TimeEnd);
@@ -206,7 +201,7 @@ private:
 		//glGetInteger64v(GL_TIMESTAMP, &TimeBegin);
 		//glGetInteger64v(GL_TIMESTAMP, &TimeEnd);
 
-		fprintf(stdout, "Time stamp: %f ms   \r", (TimeEnd - TimeBegin) / 1000.f / 1000.f);
+		fprintf(stdout, "%d, %d / Time stamp: %f ms   \r", AvailableBegin, AvailableEnd, (TimeEnd - TimeBegin) / 1000.f / 1000.f);
 
 		return TimeEnd - TimeBegin > 0;
 	}
