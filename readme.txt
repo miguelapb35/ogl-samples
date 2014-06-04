@@ -59,6 +59,13 @@ The OpenGL Samples Pack requires at least Clang 3.0.
 OpenGL Samples Pack 4.4.3.0: 2014-06-XX
 --------------------------------------------------------------------------------
 - Fixed buffer storage flags
+- Fixed samples using newer API than expected
+- Added 320-fbo-integer sample
+- Added 320-fbo-integer-blit sample
+- Added 330-query-counter sample
+- Fixed 320-fbo-multisample-integer sample, GL_NEAREST is required
+- Updated 4.3 samples to run on Intel 4.2 drivers
+- Fixed GL_MAX_UNIFORM_LOCATIONS caps query
 
 ================================================================================
 OpenGL Samples Pack 4.4.2.0: 2014-03-29
