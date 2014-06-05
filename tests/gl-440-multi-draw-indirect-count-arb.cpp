@@ -111,8 +111,6 @@ private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	std::array<GLuint, texture::MAX> TextureName;
 	std::array<glm::vec4, IndirectBufferCount> Viewport;
-	std::array<std::size_t, IndirectBufferCount> DrawOffset;
-	std::array<GLintptr, IndirectBufferCount> DrawCount;
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
@@ -202,19 +200,17 @@ private:
 		Commands[4] = DrawElementsIndirectCommand(ElementCount >> 1, 1, 6, 4, 1);
 		Commands[5] = DrawElementsIndirectCommand(ElementCount, 1, 9, 7, 2);
 */
-		this->DrawCount[0] = 3;
-		this->DrawCount[1] = 2;
-		this->DrawCount[2] = 1;
-		this->DrawOffset[0] = 0;
-		this->DrawOffset[1] = 1;
-		this->DrawOffset[2] = 3;
+		GLintptr DrawCount[IndirectBufferCount];
+		DrawCount[0] = 0;
+		DrawCount[1] = 4;
+		DrawCount[2] = 4;
 
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, this->BufferName[buffer::INDIRECT]);
 		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(Commands), Commands, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
 		glBindBuffer(GL_PARAMETER_BUFFER_ARB, this->BufferName[buffer::PARAMETER]);
-		glBufferData(GL_PARAMETER_BUFFER_ARB, sizeof(this->DrawCount), &this->DrawCount[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_PARAMETER_BUFFER_ARB, sizeof(DrawCount), DrawCount, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_PARAMETER_BUFFER_ARB, 0);
 
 		return true;
@@ -429,7 +425,7 @@ private:
 			glViewportIndexedfv(0, &this->Viewport[i][0]);
 			
 			glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]), // Offset in the indirect draw buffer
+				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * i), // Offset in the indirect draw buffer
 				sizeof(GLintptr) * i, // Offset in the paramter buffer
 				IndirectBufferCount, sizeof(DrawElementsIndirectCommand));
 		}
