@@ -12,6 +12,10 @@
 
 #define MAX_DRAW		3
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = INDIRECTION) uniform indirection
 {
 	int Transform[MAX_DRAW];
@@ -34,7 +38,7 @@ out gl_PerVertex
 out block
 {
 	vec2 Texcoord;
-	flat uint DrawID;
+	flat int DrawID;
 } Out;
 
 void main()

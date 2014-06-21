@@ -9,6 +9,10 @@
 #define TRANSFORM0	1
 #define TRANSFORM1	2	
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = MATERIAL) uniform material
 {
 	vec4 Diffuse;

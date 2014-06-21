@@ -1,8 +1,11 @@
 #version 420 core
 
 #define POSITION	0
-
 #define TRANSFORM0	1
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = TRANSFORM0) uniform transform
 {

@@ -2,10 +2,11 @@
 
 #define FRAG_COLOR		0
 #define DIFFUSE			0
+#define MATERIAL		0
 
-#define MATERIAL	0
-#define TRANSFORM0	1
-#define TRANSFORM1	2	
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = DIFFUSE, r32ui) coherent uniform uimage2D ImageData;
 

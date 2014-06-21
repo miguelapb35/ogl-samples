@@ -1,6 +1,10 @@
 #version 150 core
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 layout(origin_upper_left) in vec4 gl_FragCoord;
+
 uniform sampler2D Diffuse;
 
 in block

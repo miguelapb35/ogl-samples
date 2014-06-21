@@ -4,11 +4,9 @@
 #define COLOR			3
 #define FRAG_COLOR		0
 
-struct vertex
-{
-	vec4 Color;
-};
-
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 layout(triangles, invocations = 1) in;
 layout(triangle_strip, max_vertices = 4) out;
 
@@ -18,6 +16,11 @@ in gl_PerVertex
 	float gl_PointSize;
 	float gl_ClipDistance[];
 } gl_in[];
+
+struct vertex
+{
+	vec4 Color;
+};
 
 layout(location = 0) in vertex In[];
 

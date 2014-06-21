@@ -1,7 +1,8 @@
 #version 150 core
 
-precision mediump float;
+precision highp float;
 precision highp int;
+layout(std140, column_major) uniform;
 
 #define COUNT 4
 

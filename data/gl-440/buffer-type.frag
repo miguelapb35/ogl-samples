@@ -2,6 +2,8 @@
 
 #define FRAG_COLOR		0
 
+precision highp float;
+
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()

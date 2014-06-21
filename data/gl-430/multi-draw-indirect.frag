@@ -11,8 +11,12 @@
 in block
 {
 	vec2 Texcoord;
-	flat uint DrawID;
+	flat int DrawID;
 } In;
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 

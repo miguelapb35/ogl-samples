@@ -4,7 +4,14 @@
 #define COLOR		3
 #define FRAG_COLOR	0
 
-uniform mat4 MVP;
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
+uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 layout(location = POSITION) in vec4 Position;
 
@@ -15,6 +22,6 @@ out block
 
 void main()
 {	
-	gl_Position = MVP * Position;
+	gl_Position = Transform.MVP * Position;
 	Out.Color = vec4(clamp(vec2(Position), 0.0, 1.0), 0.0, 1.0);
 }

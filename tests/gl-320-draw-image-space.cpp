@@ -1,179 +1,170 @@
-//**********************************
-// OpenGL Image Space Rendering
-// 01/11/2012 - 28/12/2012
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
-#include <glf/compiler.hpp>
+#include "test.hpp"
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Image Space Rendering");
 	char const * VERT_SHADER_SOURCE("gl-320/draw-image-space.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/draw-image-space.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
-
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
-	GLuint ProgramName(0);
-	GLuint VertexArrayName(0);
-	GLuint TextureName(0);
-	GLint UniformTransform(-1);
 }//namespace
 
-bool initProgram()
+class gl_320_draw_image_space : public test
 {
-	bool Validated(true);
+public:
+	gl_320_draw_image_space(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-draw-image-space", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+		ProgramName(0),
+		VertexArrayName(0),
+		TextureName(0),
+		BufferName(0),
+		UniformTransform(-1)
+	{}
+
+private:
+	GLuint ProgramName;
+	GLuint VertexArrayName;
+	GLuint TextureName;
+	GLuint BufferName;
+	GLint UniformTransform;
+
+	bool initProgram()
+	{
+		bool Validated(true);
 	
-	if(Validated)
-	{
-		glf::compiler Compiler;
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, 
-			"--version 150 --profile core");
-		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE,
-			"--version 150 --profile core");
-		Validated = Validated && Compiler.check();
+		if(Validated)
+		{
+			compiler Compiler;
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			Validated = Validated && Compiler.check();
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, ShaderName[shader::VERT]);
-		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+			ProgramName = glCreateProgram();
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
 
-		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName);
+
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
+		}
+
+		return Validated;
 	}
 
-	if(Validated)
+	bool initTexture()
 	{
-		UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
-	}
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		assert(!Texture.empty());
 
-	return Validated;
-}
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-bool initTexture()
-{
-	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
-	assert(!Texture.empty());
+		glGenTextures(1, &TextureName);
 
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glGenTextures(1, &TextureName);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
-	{
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			GLint(Level),
-			GL_RGBA8,
-			GLsizei(Texture[Level].dimensions().x),
-			GLsizei(Texture[Level].dimensions().y),
-			0,
-			GL_BGR,
-			GL_UNSIGNED_BYTE,
-			Texture[Level].data());
-	}
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		{
+			glTexImage2D(GL_TEXTURE_2D,
+				GLint(Level),
+				GL_RGBA8,
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
+				0,
+				GL_BGR,
+				GL_UNSIGNED_BYTE,
+				Texture[Level].data());
+		}
 	
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return true;
-}
+		return true;
+	}
 
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
-	glBindVertexArray(0);
+	bool initVertexArray()
+	{
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+		glBindVertexArray(0);
 
-	return true;
-}
+		return true;
+	}
 
-bool initDebugOutput()
-{
-#	ifdef GL_ARB_debug_output
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-#	endif
+	bool begin()
+	{
+		bool Validated(true);
 
-	return true;
-}
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initVertexArray();
+		if(Validated)
+			Validated = initTexture();
 
-bool begin()
-{
-	bool Validated(true);
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+		return Validated;
+	}
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initVertexArray();
-	if(Validated)
-		Validated = initTexture();
+	bool end()
+	{
+		glDeleteProgram(ProgramName);
+		glDeleteTextures(1, &TextureName);
+		glDeleteVertexArrays(1, &VertexArrayName);
 
-	return Validated;
-}
+		return true;
+	}
 
-bool end()
-{
-	for(std::size_t i = 0; 0 < shader::MAX; ++i)
-		glDeleteShader(ShaderName[i]);
-	glDeleteProgram(ProgramName);
-	glDeleteTextures(1, &TextureName);
-	glDeleteVertexArrays(1, &VertexArrayName);
+	bool render()
+	{
+		glm::vec2 WindowSize(this->getWindowSize());
+		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
-	return glf::checkError("end");
-}
+		glUseProgram(ProgramName);
 
-void display()
-{
-	glUseProgram(ProgramName);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glBindVertexArray(VertexArrayName);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindVertexArray(VertexArrayName);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
-
-	glf::swapBuffers();
-}
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION, ::SAMPLE_MINOR_VERSION);
+	int Error(0);
+
+	gl_320_draw_image_space Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

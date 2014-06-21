@@ -28,29 +28,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ================================================================================
-OpenGL Samples Pack Usage
---------------------------------------------------------------------------------
-The OpenGL Samples Pack supports Windows build through Visual C++ only and 
-Linux build with G++.
-
-MacOSX or MinGW are not supported yet... 
-
-================================================================================
 Visual C++ instructions
 --------------------------------------------------------------------------------
-The OpenGL Samples Pack's project can be generated for Visual C++ 2008 and 2010,
-in 32 and 64 bits using CMake.
+A Visual C++ 32-bit or 64-bit solution solution can be generated using CMake.
 http://www.cmake.org/cmake/resources/software.html
 
-The samples run only when launched from Visual C++ IDE.
+The OpenGL Samples Pack requires at least Visual C++ 2013.
 
 ================================================================================
 Linux instructions
 --------------------------------------------------------------------------------
 - Install the GLFW library included in the external directory.
 -- sudo make x11-dist-install
-- Run CMake to create a makefile for G++
+- Run CMake to create a makefile for GCC
 - Launch the sample from the build output directory
+
+The OpenGL Samples Pack requires at least GCC 4.7.
 
 ================================================================================
 MacOS instructions
@@ -60,16 +53,94 @@ MacOS instructions
 - Run CMake to create a XCode project
 - Launch the sample from XCode
 
+The OpenGL Samples Pack requires at least Clang 3.0.
+
+================================================================================
+OpenGL Samples Pack 4.4.3.0: 2014-06-XX
+--------------------------------------------------------------------------------
+- Fixed buffer storage flags
+- Fixed samples using newer API than expected
+- Added 320-fbo-integer sample
+- Added 320-fbo-integer-blit sample
+- Added 330-query-counter sample
+- Fixed 320-fbo-multisample-integer sample, GL_NEAREST is required
+- Updated 4.3 samples to run on Intel 4.2 drivers
+- Fixed GL_MAX_UNIFORM_LOCATIONS caps query
+
+================================================================================
+OpenGL Samples Pack 4.4.2.0: 2014-03-29
+--------------------------------------------------------------------------------
+- Added 'caps' samples for each version of OpenGL
+- Added in source build option
+- Added 440-texture-sparse-arb sample
+- Added 440-texture-cube-arb sample
+- Added 440-texture-bindless-arb sample
+- Added 440-shader-invocation-nv sample
+- Added 440-query-occlusion sample
+- Added 440-multi-draw-indirect-id-arb sample
+- Added 440-multi-draw-indirect-count-arb sample
+- Added 440-glsl-vote-arb sample
+- Added 440-fbo-without-attachment sample
+- Added 440-buffer-storage
+- Added 440-atomic-counter
+- Added 430-query-occlusion sample
+- Added 430-query-conditional sample
+- Fixed 430-multi-draw-indirect sample, alignment access in shader issue
+- Added 430-fbo-without-attachment sample
+- Added 430-fbo-invalidate sample
+- Added 400-texture-cube sample
+- Added 330-query-occlusion sample
+- Added 330-query-conditional sample
+- Added 320-primitive-line-msaa sample
+- Added 320-primitive-point-clip sample
+- Added 320-primitive-point-quad sample
+- Updated multiple samples to use shader storage buffer instead of VAOs
+- Updated multiple samples to use texture 2d array instead if texture 2d
+- Fixed FreeImage link issue
+
+================================================================================
+OpenGL Samples Pack 4.4.1.4: 2014-0X-XX
+--------------------------------------------------------------------------------
+- Fixed linking error with FreeImage
+- Updated readme instructions
+
+================================================================================
+OpenGL Samples Pack 4.4.1.3: 2014-02-23
+--------------------------------------------------------------------------------
+- Improve compilation time
+
+================================================================================
+OpenGL Samples Pack 4.4.1.2: 2014-02-18
+--------------------------------------------------------------------------------
+- Added missing image templates
+
+================================================================================
+OpenGL Samples Pack 4.4.1.1: 2014-02-17
+--------------------------------------------------------------------------------
+- Fixed MacOSX and linux build
+- Remove shaders and textures copy, loaded from source
+
+================================================================================
+OpenGL Samples Pack 4.4.1.0: 2014-02-11
+--------------------------------------------------------------------------------
+- Added automated tests with reference images
+- Fixed many samples
+
 ================================================================================
 OpenGL Samples Pack 4.4.0.3: 2013-10-17
 --------------------------------------------------------------------------------
-- Fixed MacOSX port.
+- Fixed MacOSX port
+
+================================================================================
+OpenGL Samples Pack 4.4.0.3: 2013-10-17
+--------------------------------------------------------------------------------
+- Fixed MacOSX port
 
 ================================================================================
 OpenGL Samples Pack 4.4.0.2: 2013-10-16
 --------------------------------------------------------------------------------
-- Fixed Linux port.
-- Upgraded to GLFW 3.0.
+- Fixed Linux port
+- Upgraded to GLFW 3.0
 
 ================================================================================
 OpenGL Samples Pack 4.4.0.1: 2013-09-14

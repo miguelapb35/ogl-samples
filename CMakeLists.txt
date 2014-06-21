@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(VERSION 2.8)
 
-project(ogl-samples-pack)
+set(OGL_SAMPLES_NAME ogl-samples)
+set(FRAMEWORK_NAME framework)
+
+project(${OGL_SAMPLES_NAME})
 enable_testing()
 
 #CMAKE_BUILD_TOOL
@@ -10,33 +13,30 @@ if(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 	message(FATAL_ERROR "Source and binary directories must be different")
 endif(CMAKE_CURRENT_SOURCE_DIR EQUAL CMAKE_CURRENT_BINARY_DIR)
 
-################################
-# Add GLEXT 
+if(MSVC)
+	set(BINARY_DIRECTORY build)
+endif()
 
-function(getKhronosGLHeader HEADER)
-	if(WIN32)
-		
-	elseif(UNIX)
-		file(DOWNLOAD http://www.opengl.org/registry/api/GL/${HEADER} khronos-headers/GL/${HEADER})
-	endif(WIN32)
-endfunction(getKhronosGLHeader)
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR (("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel") AND UNIX))
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+	set(CMAKE_CXX_FLAGS "-std=c++11")
+endif()
 
-#download Updated OpenGL Extension headers.
-getKhronosGLHeader(glext.h)
-getKhronosGLHeader(glcorearb.h)
-getKhronosGLHeader(glxext.h)
-getKhronosGLHeader(wglext.h)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/khronos-headers/)
+option(OGL_SAMPLES_IN_SOURCE_BUILD "OGL_SAMPLES_IN_SOURCE_BUILD" OFF)
+if(OGL_SAMPLES_IN_SOURCE_BUILD)
+	add_definitions(-DOGL_SAMPLES_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+	add_definitions(-DOGL_SAMPLES_BINARY_DIR="../")
+else()
+	add_definitions(-DOGL_SAMPLES_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+	add_definitions(-DOGL_SAMPLES_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
+endif()
 
 ################################
 # Add GLEW
 
-set(GLEW_DIRECTORY glew-1.10.0)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_definitions(-DGLEW_STATIC)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY}/include)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLEW_DIRECTORY})
 
 ################################
 # Add GLFW
@@ -51,15 +51,53 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLFW_DIRECTORY}/include)
 
 ################################
+# Add freeimage 
+
+if(MSVC AND NOT CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "win32")
+endif()
+
+if(MSVC AND CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "win64")
+endif()
+
+if(APPLE)
+	set(FREEIMAGE_BINARY_DIRECTORY "macosx")
+endif()
+
+if(UNIX AND NOT APPLE AND CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "linux64")
+endif()
+
+if(UNIX AND NOT APPLE AND NOT CMAKE_CL_64)
+	set(FREEIMAGE_BINARY_DIRECTORY "linux64")
+endif()
+
+set(FREEIMAGE_DIRECTORY FreeImage-3.15.4)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY})
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY})
+
+if(MSVC)
+	set(FREEIMAGE_LIBRARY FreeImage.lib)
+	set(FREEIMAGE_BINARY_FILE FreeImage.dll)
+else()
+	add_definitions(-DFREEIMAGE_LIB)
+	set(FREEIMAGE_LIBRARY freeimage)
+	set(FREEIMAGE_BINARY_FILE freeimage)
+endif()
+
+set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE})
+
+################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.5.B)
+set(GLM_DIRECTORY glm-0.9.5.3)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################
 # Add GLI 
 
-set(GLI_DIRECTORY gli-0.5.0.B)
+set(GLI_DIRECTORY gli-0.5.1.A)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
 
 ################################
@@ -73,12 +111,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLO_DIRECTORY})
 
 set(GLU_DIRECTORY glu-0.1.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLU_DIRECTORY})
-
-################################
-# Add GLF
-
-set(GLF_DIRECTORY glf)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/)
 
 ################################
 # Add OpenGL ES
@@ -123,52 +155,33 @@ set(EGL_LIBRARY libEGL)
 ################################
 # Add libraries to executables
 
-set(BINARY_FILES GLEW glfw ${GLFW_LIBRARIES})
+set(BINARY_FILES glfw ${GLFW_LIBRARIES} ${FREEIMAGE_LIBRARY})
 
 ################################
 # Add output directory
 
 if(MSVC)
 	set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/)
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(COPY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/Debug/ )
+	else(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		set(COPY_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/Release/ )
+	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 else(MSVC)
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/debug )
+		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/Debug )
 	else(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/release )
+		set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR}/build/Release )
 	endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(MSVC)
 
 ################################
-# Add custom target to copy all data
-
-if(APPLE)
-	add_custom_target(
-		${TARGET_DATA_COPY}
-		COMMAND ls)
-
-else(APPLE)
-	set(TARGET_DATA_COPY DATA_COPY)
-	if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-		add_custom_target(
-			${TARGET_DATA_COPY}
-			COMMAND ${CMAKE_COMMAND} -E echo "In source build")
-	else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-		add_custom_target(
-			${TARGET_DATA_COPY}
-			COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-endif(APPLE)
-
-set(OGL_DATA_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
-
-################################
 # Add options
 
-option(OGL_SAMPLES_STATUS "OGL_SAMPLES_STATUS" OFF)
-if(OGL_SAMPLES_STATUS)
-	add_definitions(-DGLF_AUTO_STATUS)
+option(OGL_SAMPLES_AUTOMATED_TESTS "OGL_SAMPLES_AUTOMATED_TESTS" OFF)
+if(OGL_SAMPLES_AUTOMATED_TESTS)
+	add_definitions(-DAUTOMATED_TESTS)
 endif()
-
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
 	if (NOT APPLE)
@@ -183,73 +196,37 @@ if(MSVC)
 endif(MSVC)
 
 ################################
-# function to create a project for the sample in the solution
+# Add framework
 
-function(createSample NAME)
-	file(GLOB PROJECT_SOURCE *.cpp)
-	file(GLOB_RECURSE PROJECT_SHADER *.vert *.frag *.geom *.cont *.eval *.glsl *.vs *.fs *.gs *.ps *.es)
-	file(GLOB PROJECT_INLINE *.inl)
-	file(GLOB PROJECT_HEADER *.hpp)
-	file(GLOB PROJECT_TEXT readme.txt)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/framework)
+add_subdirectory(framework)
 
-	source_group("Text Files" FILES ${PROJECT_TEXT})
-	source_group("Inline Files" FILES ${PROJECT_INLINE})
-	source_group("Shader Files" FILES ${PROJECT_SHADER})
+################################
+# Copy binary
 
-	add_executable(${NAME} ${PROJECT_SOURCE} ${PROJECT_INLINE} ${PROJECT_HEADER} ${PROJECT_SHADER} ${PROJECT_TEXT})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
-
-	add_dependencies(${NAME} glfw GLEW)
-	target_link_libraries(${NAME} ${BINARY_FILES})
-	install ( TARGETS ${NAME} DESTINATION .)
-endfunction(createSample)
-
-function(createSampleWGL NAME)
-	file(GLOB PROJECT_SOURCE *.cpp)
-	file(GLOB_RECURSE PROJECT_SHADER *.vert *.frag *.geom *.cont *.eval *.glsl)
-	file(GLOB PROJECT_INLINE *.inl)
-	file(GLOB PROJECT_HEADER *.hpp)
-	file(GLOB PROJECT_TEXT readme.txt)
-
-	source_group("Text Files" FILES ${PROJECT_TEXT})
-	source_group("Inline Files" FILES ${PROJECT_INLINE})
-	source_group("Shader Files" FILES ${PROJECT_SHADER})
-
-	add_executable(${NAME} WIN32 ${PROJECT_SOURCE} ${PROJECT_INLINE} ${PROJECT_HEADER} ${PROJECT_SHADER} ${PROJECT_TEXT})
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-	add_custom_command(
-		TARGET ${NAME} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${ASSIMP_BINARY} ${CMAKE_CURRENT_BINARY_DIR})
-
-	add_dependencies(${NAME} GLEW glfw)
-	target_link_libraries(${NAME} ${BINARY_FILES})
-	install ( TARGETS ${NAME} DESTINATION .)
-endfunction(createSampleWGL)
+if(MSVC)
+	set(COPY_BINARY copy-binary)
+	add_custom_target(${COPY_BINARY}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/tests/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Debug/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Release/${FREEIMAGE_BINARY_FILE})
+endif()
 
 ################################
 # Add subdirectory
 
 add_subdirectory(tests)
-add_subdirectory(perfs)
+add_subdirectory(micro)
 
 ################################
 # Add install
 
-install (
-	DIRECTORY data
-	DESTINATION .
-)
+install (DIRECTORY data DESTINATION .)
+
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
 set (CPACK_PACKAGE_VERSION_MINOR "4")
-set (CPACK_PACKAGE_VERSION_PATCH "0")
+set (CPACK_PACKAGE_VERSION_PATCH "2")
 # Use current date in YYYYMMDD format as patch number
 
 # cpack mistakenly detects Mingw-w64 as win32

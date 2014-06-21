@@ -1,31 +1,33 @@
-//**********************************
-// OpenGL Samples Pack
-// ogl-samples.g-truc.net
-//**********************************
-// OpenGL Point Sprite
-// 18/07/2011 - 16/02/2013
-//**********************************
-// Christophe Riccio
-// ogl-samples@g-truc.net
-//**********************************
-// G-Truc Creation
-// www.g-truc.net
-//**********************************
+///////////////////////////////////////////////////////////////////////////////////
+/// OpenGL Samples Pack (ogl-samples.g-truc.net)
+///
+/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+/// 
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+/// 
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////////
 
-#include <glf/glf.hpp>
+#include "test.hpp"
 
 namespace
 {
-	char const * SAMPLE_NAME("OpenGL Point Sprite");
 	char const * VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
-	int const SAMPLE_SIZE_WIDTH(640);
-	int const SAMPLE_SIZE_HEIGHT(480);
-	int const SAMPLE_MAJOR_VERSION(3);
-	int const SAMPLE_MINOR_VERSION(2);
-
-	glf::window Window(glm::ivec2(SAMPLE_SIZE_WIDTH, SAMPLE_SIZE_HEIGHT));
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4f);
@@ -37,17 +39,6 @@ namespace
 		glf::vertex_v2fc4f(glm::vec2(-1.0f, 1.0f), glm::vec4(0, 0, 1, 1))
 	};
 
-	namespace shader
-	{
-		enum type
-		{
-			VERT,
-			FRAG,
-			MAX
-		};
-	}//namespace shader
-
-	std::vector<GLuint> ShaderName(shader::MAX);
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);
 	GLuint BufferName(0);
@@ -57,204 +48,200 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-bool initDebugOutput()
+class gl_320_primitive_sprite : public test
 {
-#	ifdef GL_ARB_debug_output
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-#	endif
+public:
+	gl_320_primitive_sprite(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-primitive-sprite", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+	{}
 
-	return true;
-}
-
-bool initProgram()
-{
-	bool Validated = true;
-	
-	// Create program
-	if(Validated)
+private:
+	bool initProgram()
 	{
-		glf::compiler Compiler;
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE, "--version 150 --profile core");
-		ShaderName[shader::FRAG] = Compiler.create(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE, "--version 150 --profile core");
-		Validated = Validated && Compiler.check();
+		bool Validated = true;
 
-		ProgramName = glCreateProgram();
-		glAttachShader(ProgramName, ShaderName[shader::VERT]);
-		glAttachShader(ProgramName, ShaderName[shader::FRAG]);
+		compiler Compiler;
 
-		glBindAttribLocation(ProgramName, glf::semantic::attr::POSITION, "Position");
-		glBindAttribLocation(ProgramName, glf::semantic::attr::COLOR, "Color");
-		glBindFragDataLocation(ProgramName, glf::semantic::frag::COLOR, "Color");
-		glLinkProgram(ProgramName);
-		Validated = Validated && glf::checkProgram(ProgramName);
+		if(Validated)
+		{
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+
+			ProgramName = glCreateProgram();
+			glAttachShader(ProgramName, VertShaderName);
+			glAttachShader(ProgramName, FragShaderName);
+
+			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName, semantic::attr::COLOR, "Color");
+			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName);
+		}
+
+		if(Validated)
+		{
+			Validated = Validated && Compiler.check();
+			Validated = Validated && Compiler.checkProgram(ProgramName);
+		}
+
+		if(Validated)
+		{
+			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
+			UniformMV = glGetUniformLocation(ProgramName, "MV");
+			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+		}
+
+		return Validated && this->checkError("initProgram");
 	}
 
-	// Get variables locations
-	if(Validated)
+	// Buffer update using glBufferSubData
+	bool initBuffer()
 	{
-		UniformMVP = glGetUniformLocation(ProgramName, "MVP");
-		UniformMV = glGetUniformLocation(ProgramName, "MV");
-		UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
-	}
+		// Generate a buffer object
+		glGenBuffers(1, &BufferName);
 
-	return Validated && glf::checkError("initProgram");
-}
-
-// Buffer update using glBufferSubData
-bool initBuffer()
-{
-	// Generate a buffer object
-	glGenBuffers(1, &BufferName);
-
-	// Bind the buffer for use
-	glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-
-	// Reserve buffer memory but don't copy the values
-	glBufferData(GL_ARRAY_BUFFER, VertexSize, NULL, GL_STATIC_DRAW);
-
-	// Copy the vertex data in the buffer, in this sample for the whole range of data.
-	glBufferSubData(GL_ARRAY_BUFFER, 0, VertexSize, &VertexData[0]);
-
-	// Unbind the buffer
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	return glf::checkError("initBuffer");
-}
-
-bool initVertexArray()
-{
-	glGenVertexArrays(1, &VertexArrayName);
-	glBindVertexArray(VertexArrayName);
+		// Bind the buffer for use
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-		glVertexAttribPointer(glf::semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(0));
-		glVertexAttribPointer(glf::semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), GLF_BUFFER_OFFSET(sizeof(glm::vec2)));
+
+		// Reserve buffer memory but don't copy the values
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, NULL, GL_STATIC_DRAW);
+
+		// Copy the vertex data in the buffer, in this sample for the whole range of data.
+		glBufferSubData(GL_ARRAY_BUFFER, 0, VertexSize, &VertexData[0]);
+
+		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glEnableVertexAttribArray(glf::semantic::attr::POSITION);
-		glEnableVertexAttribArray(glf::semantic::attr::COLOR);
-	glBindVertexArray(0);
-
-	return glf::checkError("initVertexArray");
-}
-
-bool initTexture()
-{
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-	glGenTextures(1, &TextureName);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	gli::texture2D Texture(gli::load_dds((glf::DATA_DIRECTORY + TEXTURE_DIFFUSE).c_str()));
-	assert(!Texture.empty());
-	assert(!gli::is_compressed(Texture.format()));
-
-	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-	{
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			GLint(Level),
-			gli::internal_format(Texture.format()),
-			GLsizei(Texture[Level].dimensions().x),
-			GLsizei(Texture[Level].dimensions().y),
-			0,
-			gli::external_format(Texture.format()),
-			gli::type_format(Texture.format()),
-			Texture[Level].data());
+		return this->checkError("initBuffer");
 	}
+
+	bool initVertexArray()
+	{
+		glGenVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4f), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
+		glBindVertexArray(0);
+
+		return this->checkError("initVertexArray");
+	}
+
+	bool initTexture()
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		glGenTextures(1, &TextureName);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		assert(!Texture.empty());
+		assert(!gli::is_compressed(Texture.format()));
+
+		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		{
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				GLint(Level),
+				gli::internal_format(Texture.format()),
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
+				0,
+				gli::external_format(Texture.format()),
+				gli::type_format(Texture.format()),
+				Texture[Level].data());
+		}
 	
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-	return glf::checkError("initTexture2D");
-}
+		return this->checkError("initTexture2D");
+	}
 
-bool begin()
-{
-	bool Validated = true;
-	Validated = Validated && glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool begin()
+	{
+		bool Validated = true;
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_PROGRAM_POINT_SIZE);
-	glEnable(GL_POINT_SPRITE);
-	//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
-	glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
-	
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
-	if(Validated)
-		Validated = initTexture();
-	if(Validated)
-		Validated = initProgram();
-	if(Validated)
-		Validated = initBuffer();
-	if(Validated)
-		Validated = initVertexArray();
+		if(Validated)
+			Validated = initTexture();
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
 
-	return Validated && glf::checkError("begin");
-}
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glEnable(GL_PROGRAM_POINT_SIZE);
+		//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
 
-bool end()
-{
-	for(std::size_t i = 0; 0 < shader::MAX; ++i)
-		glDeleteShader(ShaderName[i]);
-	glDeleteBuffers(1, &BufferName);
-	glDeleteTextures(1, &TextureName);
-	glDeleteProgram(ProgramName);
-	glDeleteVertexArrays(1, &VertexArrayName);
+		return Validated && this->checkError("begin");
+	}
 
-	return glf::checkError("end");
-}
+	bool end()
+	{
+		glDeleteBuffers(1, &BufferName);
+		glDeleteTextures(1, &TextureName);
+		glDeleteProgram(ProgramName);
+		glDeleteVertexArrays(1, &VertexArrayName);
 
-void display()
-{
-	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Window.TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, Window.RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, Window.RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
-	glm::mat4 MV = View * Model;
+		return this->checkError("end");
+	}
 
-	float Depth(1.0f);
-	glViewport(0, 0, Window.Size.x, Window.Size.y);
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-	glClearBufferfv(GL_DEPTH, 0, &Depth);
+	bool render()
+	{
+		glm::ivec2 WindowSize(this->getWindowSize());
 
-	glEnable(GL_SCISSOR_TEST);
-	glScissor(Window.Size.x / 4, Window.Size.y / 4, Window.Size.x / 2, Window.Size.y / 2);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 View = this->view();
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * View * Model;
+		glm::mat4 MV = View * Model;
 
-	glViewport(GLint(Window.Size.x * 0.25f), GLint(Window.Size.y * 0.25f), GLsizei(Window.Size.x * 0.5f), GLsizei(Window.Size.y * 0.5f));
-	glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
-	glClearBufferfv(GL_DEPTH, 0, &Depth);
+		float Depth(1.0f);
+		glViewport(0, 0, WindowSize.x, WindowSize.y);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_DEPTH, 0, &Depth);
 
-	glDisable(GL_SCISSOR_TEST);
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(WindowSize.x / 4, WindowSize.y / 4, WindowSize.x / 2, WindowSize.y / 2);
 
-	glUseProgram(ProgramName);
-	glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
-	glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
-	glUniform1i(UniformDiffuse, 0);
+		glViewport(GLint(WindowSize.x * 0.25f), GLint(WindowSize.y * 0.25f), GLsizei(WindowSize.x * 0.5f), GLsizei(WindowSize.y * 0.5f));
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
+		glClearBufferfv(GL_DEPTH, 0, &Depth);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TextureName);
-	glBindVertexArray(VertexArrayName);
+		glDisable(GL_SCISSOR_TEST);
 
-	glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
+		glUseProgram(ProgramName);
+		glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
+		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(UniformDiffuse, 0);
 
-	glf::swapBuffers();
-}
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glBindVertexArray(VertexArrayName);
+
+		glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
+
+		return true;
+	}
+};
 
 int main(int argc, char* argv[])
 {
-	return glf::run(
-		argc, argv,
-		glm::ivec2(::SAMPLE_SIZE_WIDTH, ::SAMPLE_SIZE_HEIGHT), 
-		glf::CORE,
-		::SAMPLE_MAJOR_VERSION,
-		::SAMPLE_MINOR_VERSION);
+	int Error(0);
+
+	gl_320_primitive_sprite Test(argc, argv);
+	Error += Test();
+
+	return Error;
 }
+

@@ -2,6 +2,10 @@
 
 #include "draw-image-space-rendering.glsl"
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
 in vec4 gl_FragCoord;

@@ -6,6 +6,10 @@
 
 #define COUNT 2
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform mat4 MVP;
 
 struct my_vertex

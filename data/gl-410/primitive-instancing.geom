@@ -5,6 +5,9 @@
 #define TEXCOORD	4
 #define FRAG_COLOR	0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 layout(triangles, invocations = 5) in;
 layout(triangle_strip, max_vertices = 4) out;
 
@@ -15,7 +18,7 @@ in gl_PerVertex
 	float gl_ClipDistance[];
 } gl_in[];
 
-layout(location = COLOR) flat in vec4 Color[];
+layout(location = COLOR) in vec4 Color[];
 
 out gl_PerVertex 
 {
@@ -24,7 +27,7 @@ out gl_PerVertex
 	float gl_ClipDistance[];
 };
 
-layout(location = COLOR) flat out vec4 GeomColor;
+layout(location = COLOR) out vec4 GeomColor;
 
 uniform mat4 MVP;
 

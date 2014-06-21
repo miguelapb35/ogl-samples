@@ -1,11 +1,18 @@
 #version 150 core
 
-uniform mat4 MVP;
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
+uniform transform
+{
+	mat4 MVP;
+} Transform;
 
 in vec4 Position;
 
 void main()
 {	
-	gl_Position = MVP * Position;
+	gl_Position = Transform.MVP * Position;
 }
 

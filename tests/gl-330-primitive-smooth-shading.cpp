@@ -60,17 +60,6 @@ namespace
 	GLint UniformDiffuse[2] = {0, 0};
 }//namespace
 
-bool initDebugOutput()
-{
-	bool Validated(true);
-
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-	glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-	glDebugMessageCallbackARB(&glf::debugOutput, NULL);
-
-	return Validated;
-}
-
 bool initProgram()
 {
 	bool Validated = true;
@@ -78,8 +67,8 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE1);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE1);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE1);
 		Validated = Validated && glf::checkShader(FragShader, FRAG_SHADER_SOURCE1);
@@ -104,9 +93,9 @@ bool initProgram()
 	// Create program
 	if(Validated)
 	{
-		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, glf::DATA_DIRECTORY + VERT_SHADER_SOURCE2);
-		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, glf::DATA_DIRECTORY + GEOM_SHADER_SOURCE2);
-		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, glf::DATA_DIRECTORY + FRAG_SHADER_SOURCE2);
+		GLuint VertShader = glf::createShader(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2);
+		GLuint GeomShader = glf::createShader(GL_GEOMETRY_SHADER, getDataDirectory() + GEOM_SHADER_SOURCE2);
+		GLuint FragShader = glf::createShader(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2);
 
 		Validated = Validated && glf::checkShader(VertShader, VERT_SHADER_SOURCE2);
 		Validated = Validated && glf::checkShader(GeomShader, GEOM_SHADER_SOURCE2);
@@ -168,10 +157,8 @@ bool initArrayBuffer()
 
 bool begin()
 {
-	bool Validated = glf::checkGLVersion(SAMPLE_MAJOR_VERSION, SAMPLE_MINOR_VERSION);
+	bool Validated = true;
 
-	if(Validated && glf::checkExtension("GL_ARB_debug_output"))
-		Validated = initDebugOutput();
 	if(Validated)
 		Validated = initProgram();
 	if(Validated)

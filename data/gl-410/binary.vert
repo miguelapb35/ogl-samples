@@ -3,8 +3,10 @@
 #define POSITION	0
 #define COLOR		3
 #define TEXCOORD	4
-#define COMMON		0
-#define FRAG_COLOR	0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 uniform mat4 MVP;
 
@@ -13,7 +15,7 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 out block

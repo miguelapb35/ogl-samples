@@ -2,6 +2,10 @@
 
 #include "debug.glsl"
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;

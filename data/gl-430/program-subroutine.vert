@@ -7,6 +7,10 @@
 
 #define TRANSFORM0		1
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
@@ -18,7 +22,6 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 out block
 {
 	vec2 Texcoord;
-	flat int Instance;
 } Out;
 
 out gl_PerVertex
@@ -27,8 +30,7 @@ out gl_PerVertex
 };
 
 void main()
-{	
-	Out.Instance = gl_InstanceID;
+{
 	Out.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

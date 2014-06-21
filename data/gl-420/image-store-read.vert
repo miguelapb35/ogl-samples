@@ -1,8 +1,12 @@
 #version 420 core
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 out gl_PerVertex
 {
-    vec4 gl_Position;
+	vec4 gl_Position;
 };
 
 void main()

@@ -1,7 +1,12 @@
-#version 420 core
+#version 440 core
 
-#include "texture-2d.glsl"
-#line 5
+#define FRAG_COLOR	0
+#define DIFFUSE		0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+//layout(std430, column_major) buffer; AMD bug
 
 layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 

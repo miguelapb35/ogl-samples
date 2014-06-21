@@ -1,7 +1,8 @@
 #version 420 core
 
 precision highp float;
-
+precision highp int;
+layout(std140, column_major) uniform;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
 

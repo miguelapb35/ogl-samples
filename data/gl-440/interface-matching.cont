@@ -4,6 +4,10 @@
 #define COLOR			3
 #define FRAG_COLOR		0
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+layout(std430, column_major) buffer;
 layout(vertices = 4) out;
 
 in gl_PerVertex
@@ -20,7 +24,8 @@ struct vertex
 
 layout(location = 0) in vertex st_In[][2];
 
-layout(location = 0 + 1 * st_In.length()) in block
+//layout(location = 0 + 1 * st_In.length()) in block
+layout(location = 0 + 1 * 2) in block
 {
 	vec4 Color;
 	mediump float Lumimance[2];
@@ -35,7 +40,8 @@ out gl_PerVertex
 
 layout(location = 0) out vertex st_Out[][2];
 
-layout(location = 0 + 1 * st_Out.length()) out block
+//layout(location = 0 + 1 * st_Out.length()) out block
+layout(location = 0 + 1 * 2) out block
 {
 	vec4 Color;
 } bl_Out[]; 

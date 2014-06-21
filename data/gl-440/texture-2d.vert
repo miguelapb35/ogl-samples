@@ -1,9 +1,14 @@
-#version 420 core
+#version 440 core
 
-#include "texture-2d.glsl"
-#line 5
+#define POSITION	0
+#define COLOR		3
+#define TEXCOORD	4
+#define TRANSFORM0	1
 
-#define COUNT 24
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+//layout(std430, column_major) buffer; AMD bug
 
 layout(binding = TRANSFORM0) uniform transform
 {

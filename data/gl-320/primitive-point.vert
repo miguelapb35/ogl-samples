@@ -1,5 +1,9 @@
 #version 150 core
 
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
 uniform mat4 MVP;
 uniform mat4 MV;
 
@@ -15,5 +19,5 @@ void main()
 {
 	Out.Color = Color;
 	gl_Position = MVP * Position;
-	gl_PointSize = 1.f / -(MV * Position).z;
+	gl_PointSize = 16.f / -(MV * Position).z;
 }

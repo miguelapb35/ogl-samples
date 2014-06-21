@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 #define POSITION		0
 #define COLOR			3
@@ -6,9 +6,12 @@
 #define INSTANCE		7
 #define FRAG_COLOR		0
 
+precision highp float;
 precision highp int;
+layout(std140, column_major) uniform;
+layout(std430, column_major) buffer;
 
-uniform samplerBuffer Diffuse;
+layout(binding = 1) uniform samplerBuffer Diffuse;
 
 in block
 {
