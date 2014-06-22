@@ -35,15 +35,15 @@ namespace
 
 		vertex
 		(
-			glm::vec2 const & Position,
-			glm::vec2 const & Texcoord
+			glm::vec3 const & Position,
+			glm::u8vec4 const & Color
 		) :
 			Position(Position),
-			Texcoord(Texcoord)
+			Color(Color)
 		{}
 
-		glm::vec2 Position;
-		glm::vec2 Texcoord;
+		glm::vec3 Position;
+		glm::u8vec4 Color;
 	};
 
 	namespace buffer
@@ -115,19 +115,20 @@ private:
 	{
 		glm::uvec2 const WindowSize(this->getWindowSize());
 
-		glm::uvec2 const TileCount = (WindowSize + (this->TileSize >> 1u)) / this->TileSize;
+		glm::uvec2 const TileCount = (WindowSize / this->TileSize) + glm::mix(glm::uvec2(0), glm::uvec2(1), glm::greaterThan(WindowSize % this->TileSize, glm::uvec2(0)));
 		std::vector<vertex> Vertices;
 		Vertices.resize(TileCount.x * TileCount.y * 6);
 		for(glm::uint TileIndexY = 0; TileIndexY < TileCount.y; ++TileIndexY)
 		for(glm::uint TileIndexX = 0; TileIndexX < TileCount.x; ++TileIndexX)
 		{
 			glm::uint const TileIndex = (TileIndexX + TileIndexY * TileCount.x);
-			Vertices[TileIndex * 6 + 0] = vertex(glm::vec2((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y), glm::vec2(0.0f, 1.0f));
-			Vertices[TileIndex * 6 + 1] = vertex(glm::vec2((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y), glm::vec2(1.0f, 1.0f));
-			Vertices[TileIndex * 6 + 2] = vertex(glm::vec2((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y), glm::vec2(1.0f, 0.0f));
-			Vertices[TileIndex * 6 + 3] = vertex(glm::vec2((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y), glm::vec2(1.0f, 0.0f));
-			Vertices[TileIndex * 6 + 4] = vertex(glm::vec2((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y), glm::vec2(0.0f, 0.0f));
-			Vertices[TileIndex * 6 + 5] = vertex(glm::vec2((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y), glm::vec2(0.0f, 1.0f));
+			glm::u8vec4 Color(255, 128, 0, 255);
+			Vertices[TileIndex * 6 + 0] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
+			Vertices[TileIndex * 6 + 1] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
+			Vertices[TileIndex * 6 + 2] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, 0.0f), Color);
+			Vertices[TileIndex * 6 + 3] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, 0.0f), Color);
+			Vertices[TileIndex * 6 + 4] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, 0.0f), Color);
+			Vertices[TileIndex * 6 + 5] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
 		}
 
 		VertexCount = static_cast<GLsizei>(Vertices.size());
@@ -152,12 +153,12 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+			glEnableVertexAttribArray(semantic::attr::COLOR);
 		glBindVertexArray(0);
 
 		return true;
@@ -181,7 +182,7 @@ private:
 
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
 
@@ -248,6 +249,7 @@ int main_draw_array1(int argc, char* argv[])
 	Entries.push_back(entry("tile(32, 32)", glm::uvec2(1920, 1080), glm::uvec2(32, 32), 1));
 	Entries.push_back(entry("tile(64, 64)", glm::uvec2(1920, 1080), glm::uvec2(64, 64), 1));
 	Entries.push_back(entry("tile(128, 128)", glm::uvec2(1920, 1080), glm::uvec2(128, 128), 1));
+	Entries.push_back(entry("tile(1920, 1080)", glm::uvec2(1920, 1080), glm::uvec2(1920, 1080), 1));
 
 	csv CSV;
 	int Error(0);

@@ -5,7 +5,7 @@
 #define TEXCOORD		4
 #define INSTANCE		7
 #define FRAG_COLOR		0
-#define TRANSFORM0	1
+#define TRANSFORM0		1
 
 precision highp float;
 precision highp int;
@@ -16,8 +16,8 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP;
 } Transform;
 
-layout(location = POSITION) in vec2 Position;
-layout(location = TEXCOORD) in vec2 Texcoord;
+layout(location = POSITION) in vec3 Position;
+layout(location = COLOR) in vec4 Color;
 
 out gl_PerVertex
 {
@@ -28,8 +28,7 @@ out gl_PerVertex
 
 out block
 {
-	vec2 Texcoord;
-	float Instance;
+	vec4 Color;
 } Out;
 
 mat4 ortho(float left, float right, float bottom, float top)
@@ -47,9 +46,8 @@ mat4 ortho(float left, float right, float bottom, float top)
 
 void main()
 {	
-	Out.Instance = gl_InstanceID;
-	Out.Texcoord = Texcoord;
-	//gl_Position = vec4(Position / vec2(160, 120) - vec2(1, 1), 0, 1);
-	//gl_Position = ortho(0.0, 320.0, 0.0, 240.0) * vec4(Position, 0, 1);
-	gl_Position = Transform.MVP * vec4(Position, 0, 1);
+	Out.Color = Color;
+	
+	//gl_Position = ortho(0.0, 320.0, 0.0, 240.0) * vec4(Position, 1);
+	gl_Position = Transform.MVP * vec4(Position, 1);
 }
