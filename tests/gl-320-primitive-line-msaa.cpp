@@ -110,7 +110,7 @@ private:
 	std::array<GLint, program::MAX> UniformDiffuse;
 	std::array<GLuint, texture::MAX> FramebufferName;
 	GLsizei VertexCount;
-	int FramebufferScale;
+	glm::uint FramebufferScale;
 	GLint UniformTransform;
 
 	bool initProgram()

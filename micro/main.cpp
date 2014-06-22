@@ -457,9 +457,15 @@ int drawIndexing(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
+int main_draw_array1(int argc, char* argv[]);
+int main_draw_array2(int argc, char* argv[]);
+
 int main(int argc, char* argv[])
 {
 	int Error(0);
+
+	Error += main_draw_array1(argc, argv);
+	Error += main_draw_array2(argc, argv);
 
 	csv CSV;
 
@@ -476,3 +482,4 @@ int main(int argc, char* argv[])
 
 	return Error;
 }
+

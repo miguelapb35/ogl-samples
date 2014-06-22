@@ -222,7 +222,7 @@ protected:
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
-		glm::ivec2 const & WindowSize = glm::ivec2(640, 480),
+		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
 		std::size_t FrameCount = 2,
@@ -231,7 +231,13 @@ protected:
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
 		std::size_t FrameCount,
-		glm::ivec2 const & WindowSize = glm::ivec2(640, 480),
+		success Success,
+		glm::uvec2 const & WindowSize);
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
+		std::size_t FrameCount,
+		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4));
 	test(
@@ -250,7 +256,7 @@ protected:
 	void stop();
 
 	bool isExtensionSupported(char const * String);
-	glm::ivec2 getWindowSize() const;
+	glm::uvec2 getWindowSize() const;
 	bool isKeyPressed(int Key) const;
 	glm::mat4 view() const;
 	float cameraDistance() const {return this->TranlationCurrent.y;}

@@ -119,6 +119,17 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
+	std::size_t FrameCount,
+	success Success,
+	glm::uvec2 const & WindowSize
+) :
+	test(argc, argv, Title, Profile, Major, Minor, WindowSize, glm::vec2(0), glm::vec2(0), FrameCount, Success)
+{}
+
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
 	glm::vec2 const & Orientation,
 	success Success
 ) :
@@ -130,7 +141,7 @@ test::test
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
 	std::size_t FrameCount,
-	glm::ivec2 const & WindowSize,
+	glm::uvec2 const & WindowSize,
 	glm::vec2 const & Orientation,
 	glm::vec2 const & Position
 ) :
@@ -141,7 +152,7 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
-	glm::ivec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
+	glm::uvec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
 	std::size_t FrameCount, success Success
 ) :
 	Window(nullptr),
@@ -155,8 +166,8 @@ test::test
 	TimeSum(0.0),
 	TimeMin(std::numeric_limits<double>::max()),
 	TimeMax(0.0),
-	MouseOrigin(WindowSize >> 1),
-	MouseCurrent(WindowSize >> 1),
+	MouseOrigin(WindowSize >> 1u),
+	MouseCurrent(WindowSize >> 1u),
 	TranlationOrigin(Position),
 	TranlationCurrent(Position),
 	RotationOrigin(Orientation), 
@@ -169,6 +180,9 @@ test::test
 	memset(&KeyPressed[0], 0, sizeof(KeyPressed));
 
 	glfwInit();
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
+	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
 	glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
 
 	if(version(this->Major, this->Minor) >= version(3, 2) || (Profile == ES))
@@ -206,9 +220,8 @@ test::test
 
 	if(this->Window)
 	{
+		glfwSetWindowPos(this->Window, 64, 64);
 		glfwSetWindowUserPointer(this->Window, this);
-		assert(this->Window != nullptr);
-
 		glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
 		glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
 		glfwSetKeyCallback(this->Window, test::keyCallback);
@@ -261,6 +274,9 @@ int test::operator()()
 		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
 	std::size_t FrameNum = 0;
+#	ifdef AUTOMATED_TESTS
+		FrameCount = 10;
+#	endif//AUTOMATED_TESTS
 
 	while(true && Result == EXIT_SUCCESS && !this->Error)
 	{
@@ -268,7 +284,7 @@ int test::operator()()
 		Result = Result && this->checkError("render");
 
 		glfwPollEvents();
-		if(glfwWindowShouldClose(this->Window) || (FrameNum >= this->FrameCount))
+		if(glfwWindowShouldClose(this->Window) || ((FrameNum >= this->FrameCount) && (this->FrameCount != 0)))
 		{
 			if(this->Success == MATCH_TEMPLATE && this->Profile == CORE)
 			{
@@ -281,11 +297,8 @@ int test::operator()()
 
 		this->swap();
 
-
-#		ifdef AUTOMATED_TESTS
-			if(FrameCount > 0)
-				++FrameNum;
-#		endif//AUTOMATED_TESTS
+		if(FrameCount > 0)
+			++FrameNum;
 	}
 
 	Result = this->end() && (Result == EXIT_SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
@@ -340,11 +353,11 @@ bool test::isExtensionSupported(char const * String)
 	return false;
 }
 
-glm::ivec2 test::getWindowSize() const
+glm::uvec2 test::getWindowSize() const
 {
 	glm::ivec2 WindowSize(0);
 	glfwGetFramebufferSize(this->Window, &WindowSize.x, &WindowSize.y);
-	return WindowSize;
+	return glm::uvec2(WindowSize);
 }
 
 bool test::isKeyPressed(int Key) const
