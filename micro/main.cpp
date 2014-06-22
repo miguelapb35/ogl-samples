@@ -5,6 +5,9 @@
 #include "test_draw_indexing.hpp"
 #include "test_screenspace_coherence.hpp"
 
+
+#include "test_draw_array.hpp"
+
 std::size_t const TEST_DUPLICATE_COUNT(1);
 std::size_t const TEST_FRAME_PER_RUN(100);
 
@@ -457,15 +460,15 @@ int drawIndexing(int argc, char* argv[], csv & CSV)
 	return Error;
 }
 
-int main_draw_array1(int argc, char* argv[]);
-int main_draw_array2(int argc, char* argv[]);
-
 int main(int argc, char* argv[])
 {
 	int Error(0);
 
+	//Error += main_draw_array_debug(argc, argv);
 	Error += main_draw_array1(argc, argv);
 	Error += main_draw_array2(argc, argv);
+	Error += main_draw_array3(argc, argv);
+	//Error += main_draw_array4_memory_layout(argc, argv);
 
 	csv CSV;
 

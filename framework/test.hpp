@@ -39,6 +39,8 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/random.hpp>
+#include <glm/gtx/color_space.hpp>
 #include <glm/gtx/integer.hpp>
 #include <glm/gtx/multiple.hpp>
 

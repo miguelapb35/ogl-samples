@@ -22,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
+#include "test_draw_array.hpp"
 
 namespace
 {
@@ -60,7 +61,7 @@ namespace
 class test_draw_array : public test
 {
 public:
-	test_draw_array(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::uvec2 const & TileSize, std::size_t DrawCount) :
+	test_draw_array(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t DrawCount, layout Layout) :
 		test(argc, argv, "test_draw_array", test::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
@@ -68,8 +69,11 @@ public:
 		TextureName(0),
 		VertexCount(0),
 		TileSize(TileSize),
-		DrawCount(DrawCount)
-	{}
+		DrawCount(DrawCount),
+		Layout(Layout)
+	{
+		assert((Layout == LAYOUT_MORTON && TileSize.x == TileSize.y && glm::bitCount(glm::uint(TileSize.x)) == 1u) || Layout != LAYOUT_MORTON);
+	}
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
@@ -79,8 +83,9 @@ private:
 	GLuint SamplerName;
 	GLuint TextureName;
 	GLsizei VertexCount;
-	glm::uvec2 const TileSize;
+	glm::vec2 const TileSize;
 	std::size_t const DrawCount;
+	layout const Layout;
 
 	bool initProgram()
 	{
@@ -113,16 +118,44 @@ private:
 
 	bool initBuffer()
 	{
-		glm::uvec2 const WindowSize(this->getWindowSize());
+		std::size_t tileAddress();
+		
+		glm::vec2 const WindowSize(this->getWindowSize());
 
-		glm::uvec2 const TileCount = (WindowSize / this->TileSize) + glm::mix(glm::uvec2(0), glm::uvec2(1), glm::greaterThan(WindowSize % this->TileSize, glm::uvec2(0)));
+		glm::uvec2 const TileCount((WindowSize / this->TileSize) + glm::mix(glm::vec2(0), glm::vec2(1), glm::greaterThan(glm::mod(glm::vec2(WindowSize), this->TileSize), glm::vec2(0))));
 		std::vector<vertex> Vertices;
 		Vertices.resize(TileCount.x * TileCount.y * 6);
+		VertexCount = static_cast<GLsizei>(Vertices.size());
+
 		for(glm::uint TileIndexY = 0; TileIndexY < TileCount.y; ++TileIndexY)
 		for(glm::uint TileIndexX = 0; TileIndexX < TileCount.x; ++TileIndexX)
 		{
-			glm::uint const TileIndex = (TileIndexX + TileIndexY * TileCount.x);
-			glm::u8vec4 Color(255, 128, 0, 255);
+			glm::uint TileIndex = 0;
+
+			switch(this->Layout)
+			{
+			case LAYOUT_LINEAR:
+				TileIndex = (TileIndexX + TileIndexY * TileCount.x);
+				break;
+			case LAYOUT_MORTON:
+				TileIndex = glm::bitfieldInterleave(TileIndexY, TileIndexX);
+				break;
+			case LAYOUT_RANDOM:
+			{
+				glm::uvec2 RandTileIndex = glm::clamp(glm::linearRand(glm::vec2(0.0f), glm::vec2(TileCount - 1u)), glm::vec2(0.0f), glm::vec2(TileCount - 1u));
+				TileIndex = (RandTileIndex.x + RandTileIndex.y * TileCount.x);
+				break;
+			}
+			default: // Unknown layout
+				assert(0);
+			}
+
+			//glm::vec4 const RGBA(glm::rgbColor(glm::vec3(float(TileIndex % 255) / 255.f * 360.f, 1.0f, 1.0f)), 1.0f);
+			//glm::u8vec4 Color(RGBA * 255.f);
+
+			glm::vec4 const RandColor = glm::linearRand(glm::vec4(0.0), glm::vec4(255.0));
+			glm::u8vec4 Color(glm::clamp(RandColor, glm::vec4(0.0), glm::vec4(255.0)));
+
 			Vertices[TileIndex * 6 + 0] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
 			Vertices[TileIndex * 6 + 1] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
 			Vertices[TileIndex * 6 + 2] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, 0.0f), Color);
@@ -131,7 +164,6 @@ private:
 			Vertices[TileIndex * 6 + 5] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, 0.0f), Color);
 		}
 
-		VertexCount = static_cast<GLsizei>(Vertices.size());
 		GLsizei VertexSize = static_cast<GLsizei>(Vertices.size() * sizeof(vertex));
 
 		glm::mat4 Perspective = glm::ortho(0.0f, static_cast<float>(WindowSize.x), 0.0f, static_cast<float>(WindowSize.y));
@@ -222,34 +254,67 @@ struct entry
 	entry(
 		std::string const & String,
 		glm::uvec2 const & WindowSize,
-		glm::uvec2 const & TileSize,
-		std::size_t const & DrawCount
+		glm::vec2 const & TileSize,
+		std::size_t const & DrawCount,
+		layout Layout
 	) :
 		String(String),
 		WindowSize(WindowSize),
 		TileSize(TileSize),
-		DrawCount(DrawCount)
+		DrawCount(DrawCount),
+		Layout(Layout)
 	{}
 
 	std::string const String;
 	glm::uvec2 const WindowSize;
-	glm::uvec2 const TileSize;
+	glm::vec2 const TileSize;
 	std::size_t const DrawCount;
+	layout Layout;
 };
+
+int main_draw_array_debug(int argc, char* argv[])
+{
+	std::vector<entry> Entries;
+
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(640, 480), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 2)", glm::uvec2(640, 480), glm::uvec2(32, 2), 1, LAYOUT_LINEAR));
+
+	csv CSV;
+	int Error(0);
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	{
+		test_draw_array Test(
+			argc, argv,
+			0,
+			Entries[EntryIndex].WindowSize,
+			Entries[EntryIndex].TileSize,
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
+
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	CSV.save("../main_draw_array_debug.csv");
+
+	return Error;
+}
 
 int main_draw_array1(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1920, 1080), glm::uvec2(1, 1), 1));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1920, 1080), glm::uvec2(2, 2), 1));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1));
-	Entries.push_back(entry("tile(32, 32)", glm::uvec2(1920, 1080), glm::uvec2(32, 32), 1));
-	Entries.push_back(entry("tile(64, 64)", glm::uvec2(1920, 1080), glm::uvec2(64, 64), 1));
-	Entries.push_back(entry("tile(128, 128)", glm::uvec2(1920, 1080), glm::uvec2(128, 128), 1));
-	Entries.push_back(entry("tile(1920, 1080)", glm::uvec2(1920, 1080), glm::uvec2(1920, 1080), 1));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1920, 1080), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1920, 1080), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 32)", glm::uvec2(1920, 1080), glm::uvec2(32, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 64)", glm::uvec2(1920, 1080), glm::uvec2(64, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(128, 128)", glm::uvec2(1920, 1080), glm::uvec2(128, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1920, 1080)", glm::uvec2(1920, 1080), glm::uvec2(1920, 1080), 1, LAYOUT_LINEAR));
 
 	csv CSV;
 	int Error(0);
@@ -261,7 +326,8 @@ int main_draw_array1(int argc, char* argv[])
 			1000,
 			Entries[EntryIndex].WindowSize,
 			Entries[EntryIndex].TileSize,
-			Entries[EntryIndex].DrawCount);
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
 
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -276,29 +342,29 @@ int main_draw_array2(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1));
-	Entries.push_back(entry("tile(2, 8)", glm::uvec2(1920, 1080), glm::uvec2(2, 8), 1));
-	Entries.push_back(entry("tile(8, 2)", glm::uvec2(1920, 1080), glm::uvec2(8, 2), 1));
-	Entries.push_back(entry("tile(1, 16)", glm::uvec2(1920, 1080), glm::uvec2(1, 16), 1));
-	Entries.push_back(entry("tile(16, 1)", glm::uvec2(1920, 1080), glm::uvec2(16, 1), 1));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 8)", glm::uvec2(1920, 1080), glm::uvec2(2, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 2)", glm::uvec2(1920, 1080), glm::uvec2(8, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 16)", glm::uvec2(1920, 1080), glm::uvec2(1, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 1)", glm::uvec2(1920, 1080), glm::uvec2(16, 1), 1, LAYOUT_LINEAR));
 
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1));
-	Entries.push_back(entry("tile(4, 16)", glm::uvec2(1920, 1080), glm::uvec2(4, 16), 1));
-	Entries.push_back(entry("tile(16, 4)", glm::uvec2(1920, 1080), glm::uvec2(16, 4), 1));
-	Entries.push_back(entry("tile(2, 32)", glm::uvec2(1920, 1080), glm::uvec2(2, 32), 1));
-	Entries.push_back(entry("tile(32, 2)", glm::uvec2(1920, 1080), glm::uvec2(32, 2), 1));
-	Entries.push_back(entry("tile(1, 64)", glm::uvec2(1920, 1080), glm::uvec2(1, 64), 1));
-	Entries.push_back(entry("tile(64, 1)", glm::uvec2(1920, 1080), glm::uvec2(64, 1), 1));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 16)", glm::uvec2(1920, 1080), glm::uvec2(4, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 4)", glm::uvec2(1920, 1080), glm::uvec2(16, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 32)", glm::uvec2(1920, 1080), glm::uvec2(2, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 2)", glm::uvec2(1920, 1080), glm::uvec2(32, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 64)", glm::uvec2(1920, 1080), glm::uvec2(1, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 1)", glm::uvec2(1920, 1080), glm::uvec2(64, 1), 1, LAYOUT_LINEAR));
 
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1));
-	Entries.push_back(entry("tile(8, 32)", glm::uvec2(1920, 1080), glm::uvec2(8, 32), 1));
-	Entries.push_back(entry("tile(32, 8)", glm::uvec2(1920, 1080), glm::uvec2(32, 8), 1));
-	Entries.push_back(entry("tile(4, 64)", glm::uvec2(1920, 1080), glm::uvec2(4, 64), 1));
-	Entries.push_back(entry("tile(64, 4)", glm::uvec2(1920, 1080), glm::uvec2(64, 4), 1));
-	Entries.push_back(entry("tile(2, 128)", glm::uvec2(1920, 1080), glm::uvec2(2, 128), 1));
-	Entries.push_back(entry("tile(128, 2)", glm::uvec2(1920, 1080), glm::uvec2(128, 2), 1));
-	Entries.push_back(entry("tile(1, 256)", glm::uvec2(1920, 1080), glm::uvec2(1, 256), 1));
-	Entries.push_back(entry("tile(256, 1)", glm::uvec2(1920, 1080), glm::uvec2(256, 1), 1));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 32)", glm::uvec2(1920, 1080), glm::uvec2(8, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 8)", glm::uvec2(1920, 1080), glm::uvec2(32, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 64)", glm::uvec2(1920, 1080), glm::uvec2(4, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 4)", glm::uvec2(1920, 1080), glm::uvec2(64, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 128)", glm::uvec2(1920, 1080), glm::uvec2(2, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(128, 2)", glm::uvec2(1920, 1080), glm::uvec2(128, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 256)", glm::uvec2(1920, 1080), glm::uvec2(1, 256), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(256, 1)", glm::uvec2(1920, 1080), glm::uvec2(256, 1), 1, LAYOUT_LINEAR));
 
 	csv CSV;
 	int Error(0);
@@ -310,7 +376,8 @@ int main_draw_array2(int argc, char* argv[])
 			1000,
 			Entries[EntryIndex].WindowSize,
 			Entries[EntryIndex].TileSize,
-			Entries[EntryIndex].DrawCount);
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
 
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -321,4 +388,75 @@ int main_draw_array2(int argc, char* argv[])
 	return Error;
 }
 
+int main_draw_array3(int argc, char* argv[])
+{
+	std::vector<entry> Entries;
 
+	Entries.push_back(entry("tile(0.125, 0.125)", glm::uvec2(320, 240), glm::vec2(0.125, 0.125), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(0.25, 0.25)", glm::uvec2(320, 240), glm::vec2(0.25, 0.25), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(0.5, 0.5)", glm::uvec2(320, 240), glm::vec2(0.5, 0.5), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(320, 240), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
+
+	csv CSV;
+	int Error(0);
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	{
+		test_draw_array Test(
+			argc, argv,
+			1000,
+			Entries[EntryIndex].WindowSize,
+			Entries[EntryIndex].TileSize,
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
+
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	CSV.save("../main_draw_array3.csv");
+
+	return Error;
+}
+
+int main_draw_array4_memory_layout(int argc, char* argv[])
+{
+	std::vector<entry> Entries;
+
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_RANDOM));
+
+	csv CSV;
+	int Error(0);
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	{
+		test_draw_array Test(
+			argc, argv,
+			1000,
+			Entries[EntryIndex].WindowSize,
+			Entries[EntryIndex].TileSize,
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
+
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	CSV.save("../main_draw_array4.csv");
+
+	return Error;
+}
