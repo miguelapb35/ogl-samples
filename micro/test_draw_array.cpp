@@ -460,3 +460,41 @@ int main_draw_array4_memory_layout(int argc, char* argv[])
 
 	return Error;
 }
+
+int main_draw_array5(int argc, char* argv[])
+{
+	std::vector<entry> Entries;
+
+	Entries.push_back(entry("tile(128, 128)", glm::uvec2(640, 480), glm::uvec2(128, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 64)", glm::uvec2(640, 480), glm::uvec2(64, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 32)", glm::uvec2(640, 480), glm::uvec2(32, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(640, 480), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(640, 480), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(640, 480), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(640, 480), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(0.5, 0.5)", glm::uvec2(640, 480), glm::vec2(0.5, 0.5), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(0.25, 0.25)", glm::uvec2(640, 480), glm::vec2(0.25, 0.25), 1, LAYOUT_LINEAR));
+	//Entries.push_back(entry("tile(0.125, 0.125)", glm::uvec2(640, 480), glm::vec2(0.125, 0.125), 1, LAYOUT_LINEAR));
+
+	csv CSV;
+	int Error(0);
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	{
+		test_draw_array Test(
+			argc, argv,
+			100,
+			Entries[EntryIndex].WindowSize,
+			Entries[EntryIndex].TileSize,
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
+
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	CSV.save("../main_draw_array5.csv");
+
+	return Error;
+}

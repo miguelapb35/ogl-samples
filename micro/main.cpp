@@ -465,10 +465,11 @@ int main(int argc, char* argv[])
 	int Error(0);
 
 	//Error += main_draw_array_debug(argc, argv);
-	Error += main_draw_array1(argc, argv);
-	Error += main_draw_array2(argc, argv);
-	Error += main_draw_array3(argc, argv);
+	//Error += main_draw_array1(argc, argv);
+	//Error += main_draw_array2(argc, argv);
+	//Error += main_draw_array3(argc, argv);
 	//Error += main_draw_array4_memory_layout(argc, argv);
+	Error += main_draw_array5(argc, argv);
 
 	csv CSV;
 
