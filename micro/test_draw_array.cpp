@@ -215,6 +215,7 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
+		glDrawBuffer(GL_NONE);
 
 		glUseProgram(ProgramName);
 
@@ -498,3 +499,99 @@ int main_draw_array5(int argc, char* argv[])
 
 	return Error;
 }
+
+int main_draw_array6(int argc, char* argv[])
+{
+	std::vector<entry> Entries;
+
+	for(std::size_t i = 8; i <= 1024; i *= 2)
+	{
+		//Entries.push_back(entry("(2048, 1024) tile(32, 32)", glm::uvec2(2048, 1024), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1536, 768) tile(24, 24)", glm::uvec2(1536, 768), glm::uvec2(24, 24), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1024, 512) tile(16, 16)", glm::uvec2(1024, 512), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(768, 384) tile(12, 12)", glm::uvec2(768, 384), glm::uvec2(12, 12), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(512, 256) tile(8, 8)", glm::uvec2(512, 256), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(384, 192) tile(6, 6)", glm::uvec2(384, 192), glm::uvec2(6, 6), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(256, 128) tile(4, 4)", glm::uvec2(256, 128), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+	}
+
+/*
+	for(std::size_t i = 1; i <= 256; i *= 2)
+	{
+		Entries.push_back(entry("(2048, 1024) tile(64, 64)", glm::uvec2(2048, 1024), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1536, 768) tile(48, 48)", glm::uvec2(1536, 768), glm::uvec2(48, 48), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1024, 512) tile(32, 32)", glm::uvec2(1024, 512), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(768, 384) tile(24, 24)", glm::uvec2(768, 384), glm::uvec2(24, 24), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(512, 256) tile(16, 16)", glm::uvec2(512, 256), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(384, 192) tile(12, 12)", glm::uvec2(384, 192), glm::uvec2(12, 12), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(256, 128) tile(8, 8)", glm::uvec2(256, 128), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+	}
+*/
+/*
+	for(std::size_t i = 1; i < 32; i *= 2)
+	{
+		Entries.push_back(entry("(1920, 1200) tile(64, 64)", glm::uvec2(1920, 1200), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1920, 1200) tile(32, 32)", glm::uvec2(1920, 1200), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1920, 1200) tile(16, 16)", glm::uvec2(1920, 1200), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1920, 1200) tile(8, 8)", glm::uvec2(1920, 1200), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1920, 1200) tile(4, 4)", glm::uvec2(1920, 1200), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(1440, 900) tile(64, 64)", glm::uvec2(1440, 900), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1440, 900) tile(32, 32)", glm::uvec2(1440, 900), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1440, 900) tile(16, 16)", glm::uvec2(1440, 900), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1440, 900) tile(8, 8)", glm::uvec2(1440, 900), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1440, 900) tile(4, 4)", glm::uvec2(1440, 900), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(960, 600) tile(64, 64)", glm::uvec2(960, 600), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(960, 600) tile(32, 32)", glm::uvec2(960, 600), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(960, 600) tile(16, 16)", glm::uvec2(960, 600), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(960, 600) tile(8, 8)", glm::uvec2(960, 600), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(960, 600) tile(4, 4)", glm::uvec2(960, 600), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(720, 450) tile(64, 64)", glm::uvec2(720, 450), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(720, 450) tile(32, 32)", glm::uvec2(720, 450), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(720, 450) tile(16, 16)", glm::uvec2(720, 450), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(720, 450) tile(8, 8)", glm::uvec2(720, 450), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(720, 450) tile(4, 4)", glm::uvec2(720, 450), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(480, 300) tile(64, 64)", glm::uvec2(480, 300), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(480, 300) tile(32, 32)", glm::uvec2(480, 300), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(480, 300) tile(16, 16)", glm::uvec2(480, 300), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(480, 300) tile(8, 8)", glm::uvec2(480, 300), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(480, 300) tile(4, 4)", glm::uvec2(480, 300), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(360, 240) tile(64, 64)", glm::uvec2(360, 240), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(360, 240) tile(32, 32)", glm::uvec2(360, 240), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(360, 240) tile(16, 16)", glm::uvec2(360, 240), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(360, 240) tile(8, 8)", glm::uvec2(360, 240), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(360, 240) tile(4, 4)", glm::uvec2(360, 240), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+
+		Entries.push_back(entry("(240, 160) tile(64, 64)", glm::uvec2(240, 160), glm::uvec2(64, 64), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(240, 160) tile(32, 32)", glm::uvec2(240, 160), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(240, 160) tile(16, 16)", glm::uvec2(240, 160), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(240, 160) tile(8, 8)", glm::uvec2(240, 160), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(240, 160) tile(4, 4)", glm::uvec2(240, 160), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+	}
+*/
+	csv CSV;
+	int Error(0);
+
+	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
+	{
+		test_draw_array Test(
+			argc, argv,
+			200,
+			Entries[EntryIndex].WindowSize,
+			Entries[EntryIndex].TileSize,
+			Entries[EntryIndex].DrawCount,
+			Entries[EntryIndex].Layout);
+
+		Error += Test();
+		Test.log(CSV, Entries[EntryIndex].String.c_str());
+	}
+
+	CSV.save("../main_draw_array6.csv");
+
+	return Error;
+}
+
