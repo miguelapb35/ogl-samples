@@ -6,7 +6,8 @@
 #include "test_screenspace_coherence.hpp"
 
 
-#include "test_draw_array.hpp"
+#include "test_draw_call.hpp"
+#include "test_small_primitive.hpp"
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
 std::size_t const TEST_FRAME_PER_RUN(100);
@@ -464,26 +465,15 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	//Error += main_draw_array_debug(argc, argv);
-	//Error += main_draw_array1(argc, argv);
-	//Error += main_draw_array2(argc, argv);
-	//Error += main_draw_array3(argc, argv);
-	//Error += main_draw_array4_memory_layout(argc, argv);
-	//Error += main_draw_array5(argc, argv);
-	Error += main_draw_array6(argc, argv);
+	//Error += main_small_primitive_debug(argc, argv);
+	//Error += main_small_primitive1(argc, argv);
+	//Error += main_small_primitive2(argc, argv);
+	//Error += main_small_primitive3(argc, argv);
+	//Error += main_small_primitive4_memory_layout(argc, argv);
+	//Error += main_small_primitive5(argc, argv);
+	//Error += main_small_primitive6(argc, argv);
 
-	csv CSV;
-
-	//Error += drawArrays(argc, argv, CSV);
-	//Error += drawElements(argc, argv, CSV);
-	//Error += drawArraysUniform(argc, argv, CSV);
-	//Error += drawArraysVAOs(argc, argv, CSV);
-	//Error += drawScreenspaceCoherence(argc, argv, CSV);
-	//Error += compiler(argc, argv, CSV);
-	//Error += drawIndexing(argc, argv, CSV);
-
-	CSV.print();
-	CSV.save("../draws.csv");
+	Error += main_draw_call(argc, argv);
 
 	return Error;
 }

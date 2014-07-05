@@ -29,6 +29,7 @@
 #include "vertex.hpp"
 #include "buffer.hpp"
 #include "caps.hpp"
+#include "util.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

@@ -22,13 +22,12 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
-#include "test_draw_array.hpp"
+#include "test_small_primitive.hpp"
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("micro/texture-array.vert");
-	char const * FRAG_SHADER_SOURCE("micro/texture-array.frag");
-	char const * TEXTURE_DIFFUSE("array.dds");
+	char const * VERT_SHADER_SOURCE("micro/test_small_primitive.vert");
+	char const * FRAG_SHADER_SOURCE("micro/test_small_primitive.frag");
 
 	struct vertex
 	{
@@ -56,13 +55,20 @@ namespace
 			MAX
 		};
 	}//namespace buffer
+
+	enum layout
+	{
+		LAYOUT_LINEAR,
+		LAYOUT_MORTON,
+		LAYOUT_RANDOM
+	};
 }//namespace
 
-class test_draw_array : public test
+class test_small_primitive : public test
 {
 public:
-	test_draw_array(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t DrawCount, layout Layout) :
-		test(argc, argv, "test_draw_array", test::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
+	test_small_primitive(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t DrawCount, layout Layout) :
+		test(argc, argv, "test_small_primitive", test::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),
@@ -215,7 +221,6 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
-		glDrawBuffer(GL_NONE);
 
 		glUseProgram(ProgramName);
 
@@ -273,7 +278,7 @@ struct entry
 	layout Layout;
 };
 
-int main_draw_array_debug(int argc, char* argv[])
+int main_small_primitive_debug(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -286,7 +291,7 @@ int main_draw_array_debug(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			0,
 			Entries[EntryIndex].WindowSize,
@@ -298,12 +303,12 @@ int main_draw_array_debug(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array_debug.csv");
+	CSV.save("../main_small_primitive_debug.csv");
 
 	return Error;
 }
 
-int main_draw_array1(int argc, char* argv[])
+int main_small_primitive1(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -322,7 +327,7 @@ int main_draw_array1(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			1000,
 			Entries[EntryIndex].WindowSize,
@@ -334,12 +339,12 @@ int main_draw_array1(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array1.csv");
+	CSV.save("../main_small_primitive1.csv");
 
 	return Error;
 }
 
-int main_draw_array2(int argc, char* argv[])
+int main_small_primitive2(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -372,7 +377,7 @@ int main_draw_array2(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			1000,
 			Entries[EntryIndex].WindowSize,
@@ -384,12 +389,12 @@ int main_draw_array2(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array2.csv");
+	CSV.save("../main_small_primitive2.csv");
 
 	return Error;
 }
 
-int main_draw_array3(int argc, char* argv[])
+int main_small_primitive3(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -403,7 +408,7 @@ int main_draw_array3(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			1000,
 			Entries[EntryIndex].WindowSize,
@@ -415,12 +420,12 @@ int main_draw_array3(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array3.csv");
+	CSV.save("../main_small_primitive3.csv");
 
 	return Error;
 }
 
-int main_draw_array4_memory_layout(int argc, char* argv[])
+int main_small_primitive4_memory_layout(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -445,7 +450,7 @@ int main_draw_array4_memory_layout(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			1000,
 			Entries[EntryIndex].WindowSize,
@@ -457,12 +462,12 @@ int main_draw_array4_memory_layout(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array4.csv");
+	CSV.save("../main_small_primitive4.csv");
 
 	return Error;
 }
 
-int main_draw_array5(int argc, char* argv[])
+int main_small_primitive5(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -483,7 +488,7 @@ int main_draw_array5(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			100,
 			Entries[EntryIndex].WindowSize,
@@ -495,12 +500,12 @@ int main_draw_array5(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array5.csv");
+	CSV.save("../main_small_primitive5.csv");
 
 	return Error;
 }
 
-int main_draw_array6(int argc, char* argv[])
+int main_small_primitive6(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
@@ -578,7 +583,7 @@ int main_draw_array6(int argc, char* argv[])
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_array Test(
+		test_small_primitive Test(
 			argc, argv,
 			200,
 			Entries[EntryIndex].WindowSize,
@@ -590,7 +595,7 @@ int main_draw_array6(int argc, char* argv[])
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_array6.csv");
+	CSV.save("../main_small_primitive6.csv");
 
 	return Error;
 }

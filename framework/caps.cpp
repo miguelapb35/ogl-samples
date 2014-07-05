@@ -1065,14 +1065,12 @@ void caps::initFormats()
 		case GL_COMPRESSED_LUMINANCE_ALPHA_3DC_ATI:
 			FormatsData.COMPRESSED_LUMINANCE_ALPHA_3DC_ATI = true;
 			break;
-
-        case GL_COMPRESSED_RGB_FXT1_3DFX:
-            FormatsData.COMPRESSED_RGB_FXT1_3DFX = true;
-            break;
-        case GL_COMPRESSED_RGBA_FXT1_3DFX:
-            FormatsData.COMPRESSED_RGBA_FXT1_3DFX = true;
-            break;
-
+		case GL_COMPRESSED_RGB_FXT1_3DFX:
+			FormatsData.COMPRESSED_RGB_FXT1_3DFX = true;
+			break;
+		case GL_COMPRESSED_RGBA_FXT1_3DFX:
+			FormatsData.COMPRESSED_RGBA_FXT1_3DFX = true;
+			break;
 		case GL_PALETTE4_RGB8_OES:
 			FormatsData.PALETTE4_RGB8_OES = true;
 			break;
