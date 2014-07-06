@@ -1,4 +1,5 @@
-#version 420 core
+#version 330 core
+#extension GL_ARB_shading_language_420pack : require
 
 #define POSITION		0
 #define COLOR			3

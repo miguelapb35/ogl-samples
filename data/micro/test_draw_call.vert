@@ -1,4 +1,5 @@
-#version 420 core
+#version 330 core
+#extension GL_ARB_shading_language_420pack : require
 
 #define POSITION		0
 #define COLOR			3
@@ -22,8 +23,6 @@ layout(location = COLOR) in vec4 Color;
 out gl_PerVertex
 {
 	vec4 gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[];
 };
 
 out block

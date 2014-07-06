@@ -74,7 +74,7 @@ class test_draw_call : public test
 {
 public:
 	test_draw_call(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, std::size_t DrawPerTile, layout Layout, drawMode DrawMode) :
-		test(argc, argv, "test_draw_call", test::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
+		test(argc, argv, "test_draw_call", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),
@@ -210,17 +210,20 @@ private:
 	{
 		bool Validated = this->init();
 
-		glm::vec2 WindowSize(this->getWindowSize());
+		if(Validated)
+		{
+			glm::vec2 WindowSize(this->getWindowSize());
 
-		glUseProgram(ProgramName);
+			glUseProgram(ProgramName);
 
-		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+			glBindVertexArray(VertexArrayName);
+			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
+			glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
+		}
 
 		return Validated;
 	}
@@ -246,17 +249,17 @@ private:
 		{
 			case DRAW_SINGLE:
 			{
-				glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
+				glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 			}
 			break;
 			case DRAW_PER_TILE:
 			{
 				for(std::size_t i = 0; i < VertexCount; i += 6 * this->TrianglePairPerTile / this->DrawPerTile)
 				{
-					glDrawArraysInstancedBaseInstance(GL_TRIANGLES,
+					glDrawArraysInstanced(GL_TRIANGLES,
 						static_cast<GLint>(i),
 						static_cast<GLsizei>(6 * this->TrianglePairPerTile / this->DrawPerTile),
-						1, 0);
+						1);
 				}
 			}
 			break;
@@ -306,7 +309,7 @@ int main_draw_call(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	for(glm::uint TileSizeIndex = 1; TileSizeIndex < 16; ++TileSizeIndex)
+	for(glm::uint TileSizeIndex = 3; TileSizeIndex < 4; ++TileSizeIndex)
 	{	
 		for(std::size_t DrawPerTile = 1; DrawPerTile <= 512; DrawPerTile <<= 1)
 			Entries.push_back(entry(
