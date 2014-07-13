@@ -7,7 +7,7 @@ ogl-samples@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,8 +56,9 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.4.3.0: 2014-06-XX
+OpenGL Samples Pack 4.4.2.1: 2014-07-XX
 --------------------------------------------------------------------------------
+- Added draw_array and draw_call microbenchmark tests
 - Fixed buffer storage flags
 - Fixed samples using newer API than expected
 - Added 320-fbo-integer sample
@@ -97,10 +98,6 @@ OpenGL Samples Pack 4.4.2.0: 2014-03-29
 - Updated multiple samples to use shader storage buffer instead of VAOs
 - Updated multiple samples to use texture 2d array instead if texture 2d
 - Fixed FreeImage link issue
-
-================================================================================
-OpenGL Samples Pack 4.4.1.4: 2014-0X-XX
---------------------------------------------------------------------------------
 - Fixed linking error with FreeImage
 - Updated readme instructions
 
