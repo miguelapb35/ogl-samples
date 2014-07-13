@@ -273,9 +273,9 @@ int test::operator()()
 	if(Result == EXIT_SUCCESS)
 		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
-	std::size_t FrameNum = 0;
+	std::size_t FrameNum = this->FrameCount;
 #	ifdef AUTOMATED_TESTS
-		FrameCount = 10;
+		FrameNum = 10;
 #	endif//AUTOMATED_TESTS
 
 	while(true && Result == EXIT_SUCCESS && !this->Error)
