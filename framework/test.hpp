@@ -229,7 +229,7 @@ protected:
 		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
-		std::size_t FrameCount = 2,
+		std::size_t FrameCount = 0,
 		success Success = MATCH_TEMPLATE);
 	test(
 		int argc, char* argv[], char const * Title,

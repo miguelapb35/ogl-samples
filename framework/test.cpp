@@ -133,7 +133,7 @@ test::test
 	glm::vec2 const & Orientation,
 	success Success
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, Success)
+	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 0, Success)
 {}
 
 test::test
