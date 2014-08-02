@@ -133,7 +133,7 @@ test::test
 	glm::vec2 const & Orientation,
 	success Success
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 0, Success)
+	test(argc, argv, Title, Profile, Major, Minor, glm::ivec2(640, 480), Orientation, glm::vec2(0, 4), 2, Success)
 {}
 
 test::test
@@ -273,9 +273,11 @@ int test::operator()()
 	if(Result == EXIT_SUCCESS)
 		Result = this->begin() ? EXIT_SUCCESS : EXIT_FAILURE;
 
-	std::size_t FrameNum = this->FrameCount;
+	std::size_t FrameNum = 0;
+	bool Automated = false;
 #	ifdef AUTOMATED_TESTS
-		FrameNum = 10;
+		Automated = true;
+		FrameNum = this->FrameCount;
 #	endif//AUTOMATED_TESTS
 
 	while(true && Result == EXIT_SUCCESS && !this->Error)
@@ -284,7 +286,7 @@ int test::operator()()
 		Result = Result && this->checkError("render");
 
 		glfwPollEvents();
-		if(glfwWindowShouldClose(this->Window) || ((FrameNum >= this->FrameCount) && (this->FrameCount != 0)))
+		if(glfwWindowShouldClose(this->Window) || (Automated && FrameNum == 0))
 		{
 			if(this->Success == MATCH_TEMPLATE && this->Profile == CORE)
 			{
@@ -297,8 +299,8 @@ int test::operator()()
 
 		this->swap();
 
-		if(FrameCount > 0)
-			++FrameNum;
+		if(Automated)
+			--FrameNum;
 	}
 
 	Result = this->end() && (Result == EXIT_SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
