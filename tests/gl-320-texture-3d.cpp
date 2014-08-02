@@ -125,13 +125,12 @@ private:
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		glTexImage3D(
-			GL_TEXTURE_3D, 
+		glTexImage3D(GL_TEXTURE_3D,
 			0, 
 			GL_R32F, 
-			GLsizei(Size), 
-			GLsizei(Size), 
-			GLsizei(Size), 
+			GLsizei(Size),
+			GLsizei(Size),
+			GLsizei(Size),
 			0,
 			GL_RED, GL_FLOAT,
 			&Data[0]);
@@ -139,12 +138,6 @@ private:
 		glGenerateMipmap(GL_TEXTURE_3D);
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-
-		GLuint FramebufferName = 0;
-		glGenFramebuffers(1, &FramebufferName);
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName, 0);
 
 		return this->checkError("initTexture");
 	}

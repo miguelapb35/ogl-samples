@@ -221,6 +221,8 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_AMD_vertex_shader_viewport_index");
+		Validated = Validated && this->checkExtension("GL_AMD_vertex_shader_layer");
 
 		if(Validated)
 			Validated = initProgram();
