@@ -28,6 +28,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 ================================================================================
+Micro beanchmarks instructions
+--------------------------------------------------------------------------------
+It is required to generate the solution using enabling AUTOMATED_TESTS option
+
+================================================================================
 Visual C++ instructions
 --------------------------------------------------------------------------------
 A Visual C++ 32-bit or 64-bit solution solution can be generated using CMake.
@@ -56,7 +61,7 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.4.2.1: 2014-07-XX
+OpenGL Samples Pack 4.4.3.0: 2014-08-03
 --------------------------------------------------------------------------------
 - Added draw_array and draw_call microbenchmark tests
 - Fixed buffer storage flags

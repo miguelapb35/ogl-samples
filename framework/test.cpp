@@ -280,7 +280,7 @@ int test::operator()()
 		FrameNum = this->FrameCount;
 #	endif//AUTOMATED_TESTS
 
-	while(true && Result == EXIT_SUCCESS && !this->Error)
+	while(Result == EXIT_SUCCESS && !this->Error)
 	{
 		Result = this->render() ? EXIT_SUCCESS : EXIT_FAILURE;
 		Result = Result && this->checkError("render");

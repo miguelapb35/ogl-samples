@@ -174,7 +174,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 		if(Validated)
-            Validated = initTexture();
+			Validated = initTexture();
 
 		return Validated && this->checkError("begin");;
 	}
