@@ -172,9 +172,9 @@ private:
 
 		if(1) // Manual guard band clipping, don't clip the points on the sides
 		{
-			Projection = glm::ortho(-3.0f, 3.0f,-3.0f, 3.0f, 1.0f, -1.0f) * glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+			Projection = glm::ortho(-2.0f, 2.0f,-2.0f, 2.0f, 1.0f, -1.0f) * glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 
-			glViewport(-WindowSize.x, -WindowSize.y, WindowSize.x * 3, WindowSize.y * 3);
+			glViewport(-WindowSize.x / 2, -WindowSize.y / 2, WindowSize.x * 2, WindowSize.y * 2);
 			glScissor(0, 0, WindowSize.x, WindowSize.y);
 			glEnable(GL_SCISSOR_TEST);
 		}
