@@ -253,7 +253,7 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
-		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 
 		return true;
 	}

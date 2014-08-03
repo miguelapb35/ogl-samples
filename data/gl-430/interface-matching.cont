@@ -1,5 +1,4 @@
-#version 420 core
-#extension GL_ARB_arrays_of_arrays : require
+#version 430 core
 
 #define POSITION		0
 #define COLOR			3

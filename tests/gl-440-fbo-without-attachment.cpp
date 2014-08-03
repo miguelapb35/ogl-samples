@@ -196,7 +196,7 @@ private:
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return Validated;
@@ -222,13 +222,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), 
-			gli::internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), gli::internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x),
+			static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D,
-				GLint(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x),
 				static_cast<GLsizei>(Texture[Level].dimensions().y),
@@ -241,7 +241,9 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(WindowSize.x * this->Supersampling), GLsizei(WindowSize.y * this->Supersampling));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(1), GL_RGBA8,
+			static_cast<GLsizei>(WindowSize.x * this->Supersampling),
+			static_cast<GLsizei>(WindowSize.y * this->Supersampling));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -334,7 +336,6 @@ private:
 			glm::mat4 Model = glm::mat4(1.0f);
 			*Pointer = Projection * this->view() * Model;
 
-			// Make sure the uniform buffer is uploaded
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 

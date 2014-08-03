@@ -78,17 +78,19 @@ namespace
 	std::vector<GLuint> ProgramName(program::MAX);
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
-	GLuint Query(0);
 }//namespace
 
 class gl_320_transform_feedback_separated : public test
 {
 public:
 	gl_320_transform_feedback_separated(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-transform-feedback-separated", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-transform-feedback-separated", test::CORE, 3, 2),
+		QueryName(0)
 	{}
 
 private:
+	GLuint QueryName;
+
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -208,12 +210,24 @@ private:
 		return this->checkError("initBuffer");
 	}
 
+	bool initQuery()
+	{
+		glGenQueries(1, &QueryName);
+
+		int QueryBits(0);
+		glGetQueryiv(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, GL_QUERY_COUNTER_BITS, &QueryBits);
+
+		bool Validated = QueryBits >= 1;
+
+		return Validated && this->checkError("initQuery");
+	}
+
 	bool begin()
 	{
 		bool Validated = true;
 
-		glGenQueries(1, &Query);
-
+		if(Validated)
+			Validated = initQuery();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -230,7 +244,7 @@ private:
 			glDeleteProgram(ProgramName[i]);
 		glDeleteVertexArrays(program::MAX, &VertexArrayName[0]);
 		glDeleteBuffers(program::MAX, &BufferName[0]);
-		glDeleteQueries(1, &Query);
+		glDeleteQueries(1, &QueryName);
 
 		return this->checkError("end");
 	}
@@ -263,7 +277,7 @@ private:
 
 			glBindVertexArray(VertexArrayName[program::TRANSFORM]);
 
-			glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, Query); 
+			glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, QueryName); 
 			glBeginTransformFeedback(GL_TRIANGLES);
 				glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 			glEndTransformFeedback();
@@ -277,7 +291,7 @@ private:
 			glUseProgram(ProgramName[program::FEEDBACK]);
 
 			GLuint PrimitivesWritten = 0;
-			glGetQueryObjectuiv(Query, GL_QUERY_RESULT, &PrimitivesWritten);
+			glGetQueryObjectuiv(QueryName, GL_QUERY_RESULT, &PrimitivesWritten);
 
 			glBindVertexArray(VertexArrayName[program::FEEDBACK]);
 			glDrawArraysInstanced(GL_TRIANGLES, 0, PrimitivesWritten * 3, 1);

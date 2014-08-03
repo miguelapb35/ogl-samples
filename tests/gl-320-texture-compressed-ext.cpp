@@ -143,6 +143,8 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
 
+        this->checkError("initTexture 1");
+
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
 
@@ -163,7 +165,7 @@ private:
 					Texture[Level].data());
 			}
 		}
-		glGenerateMipmap(GL_TEXTURE_2D);
+        this->checkError("initTexture 3");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC3).c_str()));
@@ -186,6 +188,8 @@ private:
 			}
 		}
 
+        this->checkError("initTexture 4");
+
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC4).c_str()));
 
@@ -206,6 +210,8 @@ private:
 					Texture[Level].data());
 			}
 		}
+
+        this->checkError("initTexture 5");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC5).c_str()));
@@ -259,7 +265,7 @@ private:
 		Viewport[TEXTURE_BC5] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
 
 		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_EXT_texture_compression_s3tc");
+        //Validated = Validated && this->checkExtension("GL_EXT_texture_compression_s3tc");
 
 		if(Validated)
 			Validated = initProgram();

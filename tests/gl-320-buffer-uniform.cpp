@@ -216,6 +216,11 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_BACK);
+		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			return false;
+
 		return Validated && this->checkError("begin");
 	}
 

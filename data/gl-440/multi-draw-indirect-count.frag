@@ -11,7 +11,6 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-layout(std430, column_major) buffer;
 
 in block
 {

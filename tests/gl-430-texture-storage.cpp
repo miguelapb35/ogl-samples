@@ -73,7 +73,7 @@ class gl_430_texture_storage : public test
 {
 public:
 	gl_430_texture_storage(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-storage", test::CORE, 4, 3),
+		test(argc, argv, "gl-430-texture-storage", test::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -90,13 +90,11 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::VERTEX] = glCreateProgram();
@@ -114,6 +112,7 @@ private:
 
 		if(Validated)
 		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT, ProgramName[program::VERTEX]);
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAGMENT]);
 		}
@@ -221,10 +220,12 @@ private:
 		GLint64 Query_COMPRESSED_RGBA_BPTC_UNORM(0);
 		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_NUM_SAMPLE_COUNTS, sizeof(GLint64), &Query_COMPRESSED_RGBA_BPTC_UNORM);
 
-		std::vector<GLint64> Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM;
-		Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM.resize(Query_COMPRESSED_RGBA_BPTC_UNORM);
-		glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_SAMPLES, sizeof(GLint64), &Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM[0]);
-
+		if(Query_COMPRESSED_RGBA_BPTC_UNORM > 0)
+		{
+			std::vector<GLint64> Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM;
+			Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM.resize(Query_COMPRESSED_RGBA_BPTC_UNORM);
+			glGetInternalformati64v(GL_TEXTURE_2D, GL_RGBA8, GL_SAMPLES, sizeof(GLint64), &Query_SamplesCOMPRESSED_RGBA_BPTC_UNORM[0]);
+		}
 
 		if(Validated)
 			Validated = initProgram();

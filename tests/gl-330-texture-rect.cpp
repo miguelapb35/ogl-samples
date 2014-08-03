@@ -110,7 +110,7 @@ private:
 		return this->checkError("initBuffer");
 	}
 
-	bool initTexture2D()
+	bool initTexture()
 	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -174,7 +174,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 		if(Validated)
-			Validated = initTexture2D();
+			Validated = initTexture();
 
 		return Validated && this->checkError("begin");;
 	}

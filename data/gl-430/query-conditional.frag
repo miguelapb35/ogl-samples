@@ -1,4 +1,4 @@
-#version 430 core
+#version 420 core
 #define FRAG_COLOR	0
 
 #define MATERIAL 0
@@ -6,7 +6,6 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-layout(std430, column_major) buffer;
 
 layout(binding = MATERIAL) uniform material
 {

@@ -216,6 +216,8 @@ private:
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI,
 			WindowSize.x / FRAMEBUFFER_SIZE,
 			WindowSize.y / FRAMEBUFFER_SIZE,
@@ -265,7 +267,10 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		caps Caps(caps::CORE);
+
+		// Multisample integer texture is optional
+		bool Validated = Caps.Limits.MAX_INTEGER_SAMPLES > 1;
 
 		if(Validated)
 			Validated = initProgram();
@@ -378,7 +383,7 @@ private:
 		// Render the colorbuffer from the multisampled framebuffer
 		renderFB(TextureName[texture::COLORBUFFER]);
 
-		return true;
+		return this->checkError("render");;
 	}
 };
 

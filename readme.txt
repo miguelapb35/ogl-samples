@@ -7,7 +7,7 @@ ogl-samples@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2013 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+================================================================================
+Micro beanchmarks instructions
+--------------------------------------------------------------------------------
+It is required to generate the solution using enabling AUTOMATED_TESTS option
 
 ================================================================================
 Visual C++ instructions
@@ -54,6 +59,19 @@ MacOS instructions
 - Launch the sample from XCode
 
 The OpenGL Samples Pack requires at least Clang 3.0.
+
+================================================================================
+OpenGL Samples Pack 4.4.3.0: 2014-08-03
+--------------------------------------------------------------------------------
+- Added draw_array and draw_call microbenchmark tests
+- Fixed buffer storage flags
+- Fixed samples using newer API than expected
+- Added 320-fbo-integer sample
+- Added 320-fbo-integer-blit sample
+- Added 330-query-counter sample
+- Fixed 320-fbo-multisample-integer sample, GL_NEAREST is required
+- Updated 4.3 samples to run on Intel 4.2 drivers
+- Fixed GL_MAX_UNIFORM_LOCATIONS caps query
 
 ================================================================================
 OpenGL Samples Pack 4.4.2.0: 2014-03-29
@@ -85,10 +103,6 @@ OpenGL Samples Pack 4.4.2.0: 2014-03-29
 - Updated multiple samples to use shader storage buffer instead of VAOs
 - Updated multiple samples to use texture 2d array instead if texture 2d
 - Fixed FreeImage link issue
-
-================================================================================
-OpenGL Samples Pack 4.4.1.4: 2014-0X-XX
---------------------------------------------------------------------------------
 - Fixed linking error with FreeImage
 - Updated readme instructions
 

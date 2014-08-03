@@ -73,7 +73,12 @@ private:
 	{
 		glGenQueries(1, &QueryName);
 
-		return this->checkError("initQuery");
+		int QueryBits(0);
+		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryBits);
+
+		bool Validated = QueryBits >= 32;
+
+		return Validated && this->checkError("initQuery");
 	}
 
 	bool initProgram()
@@ -140,11 +145,10 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_ARB_ES3_compatibility");
 
-		GLint QueryCounter(0);
-		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryCounter);
-		assert(QueryCounter > 0);
-
+		if(Validated)
+			Validated = initQuery();
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)

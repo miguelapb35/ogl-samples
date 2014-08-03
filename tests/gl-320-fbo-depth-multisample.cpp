@@ -263,9 +263,10 @@ private:
 		bool Validated(true);
 
 		glGenFramebuffers(GLsizei(framebuffer::MAX), &FramebufferName[0]);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::DEPTH_MULTISAMPLE]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::MULTISAMPLE], 0);
+		glDrawBuffer(GL_NONE);
+
 		if(this->checkFramebuffer(FramebufferName[framebuffer::DEPTH_MULTISAMPLE]))
 			return false;
 
@@ -276,6 +277,8 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+
+		
 
 		if(Validated)
 			Validated = initProgram();

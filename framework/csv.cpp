@@ -47,7 +47,7 @@ void csv::log(char const * String, double Convergent, double Min, double Max)
 
 void csv::save(char const * Filename)
 {
-	FILE* File(fopen(Filename, "w+"));
+	FILE* File(fopen(Filename, "a+"));
 	assert(File);
 	fprintf(File, "%s;%s;%s;%s\n", "Tests", "average", "max", "min");
 

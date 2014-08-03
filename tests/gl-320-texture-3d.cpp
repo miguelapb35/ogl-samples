@@ -125,13 +125,12 @@ private:
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-		glTexImage3D(
-			GL_TEXTURE_3D, 
+		glTexImage3D(GL_TEXTURE_3D,
 			0, 
 			GL_R32F, 
-			GLsizei(Size), 
-			GLsizei(Size), 
-			GLsizei(Size), 
+			GLsizei(Size),
+			GLsizei(Size),
+			GLsizei(Size),
 			0,
 			GL_RED, GL_FLOAT,
 			&Data[0]);

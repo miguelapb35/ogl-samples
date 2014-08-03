@@ -1,4 +1,4 @@
-#version 430 core
+#version 420 core
 #define POSITION	0
 #define COLOR		3
 #define TEXCOORD	4
@@ -8,7 +8,6 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-layout(std430, column_major) buffer;
 
 layout(binding = TRANSFORM0) uniform transform
 {
