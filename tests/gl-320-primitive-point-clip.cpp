@@ -168,18 +168,31 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Projection;
+
+		if(1) // Manual guard band clipping, don't clip the points on the sides
+		{
+			Projection = glm::ortho(-3.0f, 3.0f,-3.0f, 3.0f, 1.0f, -1.0f) * glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+
+			glViewport(-WindowSize.x, -WindowSize.y, WindowSize.x * 3, WindowSize.y * 3);
+			glScissor(0, 0, WindowSize.x, WindowSize.y);
+			glEnable(GL_SCISSOR_TEST);
+		}
+		else
+		{
+			Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+
+			glViewport(0, 0, WindowSize.x, WindowSize.y);
+		}
+
 		glm::mat4 View = this->view();
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * View * Model;
 		glm::mat4 MV = View * Model;
 
 		float Depth(1.0f);
-		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 		glClearBufferfv(GL_DEPTH, 0, &Depth);
-
-		glDisable(GL_SCISSOR_TEST);
 
 		glUseProgram(ProgramName);
 		glUniformMatrix4fv(UniformMV, 1, GL_FALSE, &MV[0][0]);
