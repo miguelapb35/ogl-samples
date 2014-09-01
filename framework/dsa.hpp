@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-
+/*
 #include "test.hpp"
 
 void initDSA();
@@ -293,4 +293,4 @@ extern PFNGLVERTEXARRAYVERTEXATTRIBOFFSETIPROC glVertexArrayVertexAttribIOffset;
 
 typedef void (GLAPIENTRY * PFNGLVERTEXARRAYVERTEXATTRIBOFFSETLPROC) (GLuint vaobj, GLuint buffer, GLuint index, GLint size, GLenum type, GLsizei stride, GLintptr offset);
 extern PFNGLVERTEXARRAYVERTEXATTRIBOFFSETLPROC glVertexArrayVertexAttribLOffset;
-
+*/

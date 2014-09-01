@@ -1,6 +1,6 @@
 #include "test.hpp"
 #include "dsa.hpp"
-
+/*
 namespace
 {
 	std::vector<GLenum> TextureTargets;
@@ -1271,4 +1271,4 @@ void initDSA()
 	glVertexArrayVertexAttribIOffset = ::vertexArrayVertexAttribIOffset;
 	glVertexArrayVertexAttribLOffset = ::vertexArrayVertexAttribLOffset;
 }
-
+*/

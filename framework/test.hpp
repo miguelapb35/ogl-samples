@@ -308,6 +308,6 @@ private:
 	static void keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods);
 
 public:
-	static void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam);
+	static void APIENTRY debugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
 };
 

@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
-#include "dsa.hpp"
+//#include "dsa.hpp"
 
 namespace
 {
@@ -92,11 +92,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_450_direct_state_access_ext : public test
+class gl_450_direct_state_access : public test
 {
 public:
-	gl_450_direct_state_access_ext(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-direct-state-access-ext", test::CORE, 4, 3, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
+	gl_450_direct_state_access(int argc, char* argv[]) :
+		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -159,7 +159,7 @@ private:
 
 	bool initSampler()
 	{
-		glGenSamplers(1, &SamplerName);
+		glCreateSamplers(1, &SamplerName);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -210,7 +210,7 @@ private:
 
 	bool initFramebuffer()
 	{
-		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
+		glCreateFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glNamedFramebufferTexture(FramebufferName[framebuffer::RENDER], GL_COLOR_ATTACHMENT0, TextureName[texture::MULTISAMPLE], 0);
 		glNamedFramebufferTexture(FramebufferName[framebuffer::RESOLVE], GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 
@@ -224,6 +224,26 @@ private:
 
 	bool initVertexArray()
 	{
+		bool Validated(true);
+
+		glCreateVertexArrays(1, &VertexArrayName);
+		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+		glBindVertexArray(0);
+
+		return Validated;
+	}
+/*
+	bool initVertexArray()
+	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
 		glVertexArrayVertexAttribOffset(VertexArrayName, BufferName[buffer::VERTEX], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), 0);
@@ -233,13 +253,11 @@ private:
 
 		return this->checkError("initVertexArray");
 	}
+*/
 
 	bool begin()
 	{
-		initDSA();
-
 		bool Validated = true;
-		//Validated = Validated && this->checkExtension("GL_ARB_direct_state_access");
 
 		if(Validated)
 			Validated = initProgram();
@@ -347,7 +365,7 @@ private:
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		GLenum MaxColorAttachment = GL_COLOR_ATTACHMENT0;
-		glInvalidateNamedFramebuffer(FramebufferName[framebuffer::RENDER], GL_READ_FRAMEBUFFER, 1, &MaxColorAttachment);
+		glInvalidateNamedFramebufferData(FramebufferName[framebuffer::RENDER], 1, &MaxColorAttachment);
 
 		// Pass 2, render the colorbuffer from the multisampled framebuffer
 		renderFB();
@@ -360,7 +378,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_direct_state_access_ext Test(argc, argv);
+	gl_450_direct_state_access Test(argc, argv);
 	Error += Test();
 
 	return Error;
