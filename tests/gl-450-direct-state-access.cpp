@@ -101,7 +101,8 @@ public:
 		PipelineName(0),
 		ProgramName(0),
 		SamplerName(0),
-		UniformBlockSize(0)
+		UniformBlockSize(0),
+		UniformPointer(nullptr)
 	{}
 
 private:
@@ -113,6 +114,7 @@ private:
 	GLuint ProgramName;
 	GLuint SamplerName;
 	GLint UniformBlockSize;
+	glm::uint8* UniformPointer;
 
 	bool initProgram()
 	{
@@ -136,7 +138,7 @@ private:
 
 		if(Validated)
 		{
-			glGenProgramPipelines(1, &PipelineName);
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
@@ -147,12 +149,15 @@ private:
 	{
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+		this->UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
 		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
 		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
-		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], this->UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+
+		this->UniformPointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRange(
+			BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 		return true;
 	}
@@ -160,7 +165,7 @@ private:
 	bool initSampler()
 	{
 		glCreateSamplers(1, &SamplerName);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -180,11 +185,8 @@ private:
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
-		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &TextureName[texture::MULTISAMPLE]);
-		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::COLORBUFFER]);
-
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
-		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), gli::internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
@@ -197,10 +199,12 @@ private:
 				Texture[Level].data());
 		}
 
+		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &TextureName[texture::MULTISAMPLE]);
 		glTextureParameteri(TextureName[texture::MULTISAMPLE], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::MULTISAMPLE], GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureStorage2DMultisample(TextureName[texture::MULTISAMPLE], 4, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_FALSE);
 
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::COLORBUFFER]);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y));
@@ -227,33 +231,20 @@ private:
 		bool Validated(true);
 
 		glCreateVertexArrays(1, &VertexArrayName);
-		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::TEXCOORD, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::TEXCOORD);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindVertexArray(0);
+		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
+		glVertexArrayVertexBuffer(VertexArrayName, 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 		return Validated;
 	}
-/*
-	bool initVertexArray()
-	{
-		glGenVertexArrays(1, &VertexArrayName);
-		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
-		glVertexArrayVertexAttribOffset(VertexArrayName, BufferName[buffer::VERTEX], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), 0);
-		glVertexArrayVertexAttribOffset(VertexArrayName, BufferName[buffer::VERTEX], semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), sizeof(glm::vec2));
-		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);
-		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::TEXCOORD);
-
-		return this->checkError("initVertexArray");
-	}
-*/
 
 	bool begin()
 	{
@@ -280,6 +271,8 @@ private:
 
 	bool end()
 	{
+		glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
+
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
@@ -292,13 +285,11 @@ private:
 
 	void renderFBO()
 	{
-		//glEnable(GL_SAMPLE_MASK);
-		//glSampleMaski(0, 0xFF);
-
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_SAMPLE_SHADING);
 		glMinSampleShading(4.0f);
 
+		glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, static_cast<float>(FRAMEBUFFER_SIZE.x), static_cast<float>(FRAMEBUFFER_SIZE.y));
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
@@ -321,6 +312,7 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
+		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
@@ -339,17 +331,11 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRange(
-				BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-
 			glm::mat4 ProjectionA = glm::scale(glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f), glm::vec3(1, -1, 1));
-			*reinterpret_cast<glm::mat4*>(Pointer + 0) = ProjectionA * this->view() * glm::mat4(1);
+			*reinterpret_cast<glm::mat4*>(this->UniformPointer + 0) = ProjectionA * this->view() * glm::mat4(1);
 
 			glm::mat4 ProjectionB = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-			*reinterpret_cast<glm::mat4*>(Pointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::mat4(1);
-
-			// Make sure the uniform buffer is uploaded
-			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
+			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::mat4(1);
 		}
 
 		glBindProgramPipeline(PipelineName);

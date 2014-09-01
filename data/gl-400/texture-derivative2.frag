@@ -1,4 +1,5 @@
 #version 150 core
+
 //#define FUNCTION
 
 precision highp float;
@@ -32,11 +33,10 @@ void main()
 		Color = texture(Diffuse, In.Texcoord);
 	}
 }
-
 /*
 void main()
 {
-	Color = vec4(fwidth(interpolateAtCentroid(In.Texcoord)), 0.0, 1.0);
+	Color = vec4(fwidthFine(interpolateAtCentroid(In.Texcoord)), 0.0, 1.0);
 }
 */
 #else//FUNCTION
