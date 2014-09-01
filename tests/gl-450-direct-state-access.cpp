@@ -142,7 +142,7 @@ private:
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -177,12 +177,14 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initTexture()
 	{
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		if(Texture.empty())
+			return false;
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
@@ -209,7 +211,7 @@ private:
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y));
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initFramebuffer()
@@ -223,7 +225,7 @@ private:
 		if(glCheckNamedFramebufferStatus(FramebufferName[framebuffer::RESOLVE], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
-		return this->checkError("initFramebuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -304,8 +306,6 @@ private:
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
 
 		glDisable(GL_MULTISAMPLE);
-
-		this->checkError("renderFBO");
 	}
 
 	void renderFB()
@@ -322,8 +322,6 @@ private:
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
-
-		this->checkError("renderFB");
 	}
 
 	bool render()

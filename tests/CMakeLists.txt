@@ -433,5 +433,7 @@ glCreateSampleGTC(transform-feedback)
 # OpenGL 4.5 samples
 set(GL_VERSION_GTC 450)
 
+set(GL_SHADER_GTC )
+glCreateSampleGTC(caps)
 set(GL_SHADER_GTC direct-state-access.frag direct-state-access.vert)
 glCreateSampleGTC(direct-state-access)
