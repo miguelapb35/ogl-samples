@@ -435,5 +435,7 @@ set(GL_VERSION_GTC 450)
 
 set(GL_SHADER_GTC )
 glCreateSampleGTC(caps)
+set(GL_SHADER_GTC clip-control.frag clip-control.vert)
+glCreateSampleGTC(clip-control)
 set(GL_SHADER_GTC direct-state-access.frag direct-state-access.vert)
 glCreateSampleGTC(direct-state-access)

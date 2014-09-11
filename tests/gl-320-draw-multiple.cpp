@@ -85,8 +85,6 @@ private:
 	{
 		bool Validated = true;
 	
-		compiler Compiler;
-
 		// Create program
 		if(Validated)
 		{

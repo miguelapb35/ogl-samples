@@ -137,13 +137,25 @@ private:
 
 	bool initBuffer()
 	{
-		std::size_t const Count(360);
-		float const Step(360.f / float(Count));
+		std::size_t const Count(1000);
+		float const Step(glm::pi<float>() * 2.0f / float(Count));
 
 		VertexData.resize(Count);
 		for(std::size_t i = 0; i < Count; ++i)
-			VertexData[i] = glm::vec2(glm::sin(glm::radians(Step * float(i))), glm::cos(glm::radians(Step * float(i))));
-
+			//VertexData[i] = glm::vec2(glm::fastSin(glm::radians(Step * float(i))), glm::fastCos(glm::radians(Step * float(i))));
+			/*
+			VertexData[i] = glm::vec2(
+				glm::fastSin(glm::mod(Step * float(i), glm::pi<float>())),
+				glm::fastCos(glm::mod(Step * float(i), glm::pi<float>())));
+			*/
+			VertexData[i] = glm::vec2(
+				glm::sin(Step * float(i)),
+				glm::fastCos(glm::mod(Step * float(i), glm::pi<float>())));
+			/*
+			VertexData[i] = glm::vec2(
+				glm::sin(Step * float(i)),
+				glm::cos(Step * float(i)));
+				*/
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -293,7 +305,7 @@ private:
 		glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawArraysInstancedBaseInstance(GL_LINE_LOOP, 0, GLsizei(VertexData.size()), 3, 0);
+		glDrawArraysInstancedBaseInstance(GL_LINE_LOOP, 0, GLsizei(VertexData.size()), 1, 0);
 
 		//////////////////////////
 		// Resolving multisampling

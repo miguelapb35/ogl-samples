@@ -22,6 +22,9 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#pragma warning(disable:4456)
+#pragma warning(disable:4458)
+#pragma warning(disable:4459)
 
 #include "csv.hpp"
 #include "compiler.hpp"
@@ -44,6 +47,7 @@
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/integer.hpp>
 #include <glm/gtx/multiple.hpp>
+#include <glm/gtx/fast_trigonometry.hpp>
 
 #include <gli/gli.hpp>
 
