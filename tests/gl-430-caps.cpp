@@ -45,11 +45,11 @@ private:
 		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_BLOCKS >= 14;
 		Validated = Validated && Caps.Limits.MAX_COMPUTE_UNIFORM_BLOCKS >= 14;
 
-		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS >= 512;
-		Validated = Validated && Caps.Limits.MAX_TESS_CONTROL_UNIFORM_COMPONENTS >= 512;
-		Validated = Validated && Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS >= 512;
+		Validated = Validated && Caps.Limits.MAX_VERTEX_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_TESS_CONTROL_UNIFORM_COMPONENTS >= 1024;
+		Validated = Validated && Caps.Limits.MAX_TESS_EVALUATION_UNIFORM_COMPONENTS >= 1024;
 		Validated = Validated && Caps.Limits.MAX_GEOMETRY_UNIFORM_COMPONENTS >= 512;
-		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 512;
+		Validated = Validated && Caps.Limits.MAX_FRAGMENT_UNIFORM_COMPONENTS >= 1024;
 		Validated = Validated && Caps.Limits.MAX_COMPUTE_UNIFORM_COMPONENTS >= 512;
 
 		Validated = Validated && Caps.Limits.MAX_COMBINED_UNIFORM_BLOCKS >= 70;
