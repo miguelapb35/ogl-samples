@@ -793,14 +793,14 @@ void caps::initLimits()
 		glGetIntegerv(GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &LimitsData.SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT);
 	}
 
-    if(check(4, 3))
+	if(check(4, 3))
 	{
 		glGetIntegerv(GL_MAX_COMBINED_SHADER_OUTPUT_RESOURCES, &LimitsData.MAX_COMBINED_SHADER_OUTPUT_RESOURCES);
-    }
+	}
 
-    if(check(4, 3) || ExtensionData.ARB_explicit_uniform_location)
-    {
-        glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &LimitsData.MAX_UNIFORM_LOCATIONS);
+	if(check(4, 3) || ExtensionData.ARB_explicit_uniform_location)
+	{
+		glGetIntegerv(GL_MAX_UNIFORM_LOCATIONS, &LimitsData.MAX_UNIFORM_LOCATIONS);
 	}
 }
 
@@ -1106,7 +1106,7 @@ void caps::initFormats()
 			break;
 
 		default:
-			assert(0);
+			// Unknown formats
 			break;
 		}
 	}
