@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-430/query-conditional.vert");
-	char const * FRAG_SHADER_SOURCE("gl-430/query-conditional.frag");
+	char const * VERT_SHADER_SOURCE("gl-450/query-conditional.vert");
+	char const * FRAG_SHADER_SOURCE("gl-450/query-conditional.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);
@@ -61,7 +61,8 @@ public:
 		PipelineName(0),
 		ProgramName(0),
 		QueryName(0),
-		UniformMaterialOffset(0)
+		UniformMaterialOffset(0),
+		UniformTransformOffset(0)
 	{}
 
 private:
@@ -71,6 +72,7 @@ private:
 	GLuint ProgramName;
 	GLuint QueryName;
 	GLuint UniformMaterialOffset;
+	GLuint UniformTransformOffset;
 
 	bool initQuery()
 	{
@@ -79,9 +81,7 @@ private:
 		int QueryBits(0);
 		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryBits);
 
-		bool Validated = QueryBits >= 1;
-
-		return Validated && this->checkError("initQuery");
+		return QueryBits >= 1;
 	}
 
 	bool initProgram()
@@ -123,10 +123,10 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, &PositionData[0][0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		GLint UniformTransformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+		this->UniformTransformOffset = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformTransformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, this->UniformTransformOffset * 2, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		this->UniformMaterialOffset = glm::max(GLint(sizeof(glm::vec4)), UniformBufferOffset);
@@ -163,7 +163,7 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_ARB_ES3_compatibility");
+		Validated = Validated && this->checkExtension("GL_ARB_conditional_render_inverted");
 
 		if(Validated)
 			Validated = initQuery();
@@ -196,20 +196,21 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glm::byte* Pointer = reinterpret_cast<glm::byte*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+				0, this->UniformTransformOffset * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, static_cast<float>(WindowSize.x) / static_cast<float>(WindowSize.y), 0.1f, 100.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 Model0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 8.0f));
+			glm::mat4 Model1 = glm::mat4(1.0f);
 		
-			*Pointer = Projection * this->view() * Model;
+			*reinterpret_cast<glm::mat4*>(Pointer + this->UniformTransformOffset * 0) = Projection * this->view() * Model0;
+			*reinterpret_cast<glm::mat4*>(Pointer + this->UniformTransformOffset * 1) = Projection * this->view() * Model1;
 
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
 		// Set the display viewport
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		// Clear color buffer with black
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
@@ -217,7 +218,8 @@ private:
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL], 0, sizeof(glm::vec4));
-	
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4));
+
 		// The first orange quad is not written in the framebuffer.
 		glColorMaski(0, GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
@@ -231,15 +233,22 @@ private:
 		// The second blue quad is written in the framebuffer only if a sample pass the occlusion query.
 		glColorMaski(0, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	
-		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL], this->UniformMaterialOffset, sizeof(glm::vec4));
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformTransformOffset, sizeof(glm::mat4));
 
 		// Draw only if one sample went through the tests, 
 		// we don't need to get the query result which prevent the rendering pipeline to stall.
 		glBeginConditionalRender(QueryName, GL_QUERY_WAIT);
-
 			// Clear color buffer with white
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
+			glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL], 0, sizeof(glm::vec4));
+			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+		glEndConditionalRender();
+		glBeginConditionalRender(QueryName, GL_QUERY_WAIT_INVERTED);
+			// Clear color buffer with white
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
+
+			glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL], this->UniformMaterialOffset, sizeof(glm::vec4));
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		glEndConditionalRender();
 

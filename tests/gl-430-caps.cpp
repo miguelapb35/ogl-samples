@@ -27,7 +27,7 @@ class gl_430_caps : public test
 {
 public:
 	gl_430_caps(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-caps", test::CORE, 4, 2)
+		test(argc, argv, "gl-430-caps", test::CORE, 4, 3)
 	{}
 
 private:
