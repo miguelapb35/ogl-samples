@@ -1,4 +1,7 @@
-#version 150 core
+#version 430 core
+
+#define POSITION	0
+#define TEXCOORD	4
 
 precision highp float;
 precision highp int;
@@ -6,13 +9,18 @@ layout(std140, column_major) uniform;
 
 uniform mat4 MVP;
 
-in vec2 Position;
-in vec2 Texcoord;
+layout(location = POSITION) in vec2 Position;
+layout(location = TEXCOORD) in vec2 Texcoord;
 
 out block
 {
 	vec2 Texcoord;
 } Out;
+
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
 
 void main()
 {	

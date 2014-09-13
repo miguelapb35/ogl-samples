@@ -275,6 +275,7 @@ private:
 	{
 		glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 
+		glDeleteProgramPipelines(1, &PipelineName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgram(ProgramName);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
