@@ -348,7 +348,7 @@ private:
 		{
 			glViewportIndexedfv(0, &this->Viewports[i][0]);
 			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
-			//glTextureBarrier();
+			glTextureBarrier();
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
