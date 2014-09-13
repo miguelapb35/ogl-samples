@@ -141,10 +141,10 @@ std::string compiler::parser::operator()(commandline const & CommandLine, std::s
 			for(std::size_t i = 0; i < Includes.size(); ++i)
 			{
 				std::string PathName = Includes[i] + Include;
-				std::string Source = loadFile(PathName);
-				if(!Source.empty())
+				std::string IncludeSource = loadFile(PathName);
+				if (!IncludeSource.empty())
 				{
-					Text += Source;
+					Text += IncludeSource;
 					break;
 				}
 			}

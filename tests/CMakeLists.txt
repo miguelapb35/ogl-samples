@@ -443,5 +443,7 @@ set(GL_SHADER_GTC fbo-multisample-explicit.vert fbo-multisample-explicit-box.fra
 glCreateSampleGTC(fbo-multisample-explicit)
 set(GL_SHADER_GTC query-conditional.vert query-conditional.frag)
 glCreateSampleGTC(query-conditional)
-set(GL_SHADER_GTC texture-derivative1.vert texture-derivative1.frag texture-derivative2.vert texture-derivative2.frag)
+set(GL_SHADER_GTC texture-barrier-blend.vert texture-barrier-blend.frag texture-barrier-blend.glsl texture-barrier-splash.vert texture-barrier-splash.frag texture-barrier-splash.glsl)
+glCreateSampleGTC(texture-barrier)
+set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-derivative-y.vert texture-derivative-y.frag)
 glCreateSampleGTC(texture-derivative)
