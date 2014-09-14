@@ -194,7 +194,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		bool Validated = this->checkExtension("GL_ARB_transform_feedback_overflow_query");
 
 		if (Validated)
 			Validated = initQuery();
