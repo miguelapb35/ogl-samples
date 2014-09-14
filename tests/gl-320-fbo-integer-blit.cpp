@@ -102,7 +102,7 @@ class gl_320_fbo_multisample_integer : public test
 {
 public:
 	gl_320_fbo_multisample_integer(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-multisample-integer", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-fbo-integer-blit", test::CORE, 3, 2)
 	{}
 
 private:

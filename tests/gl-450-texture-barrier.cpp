@@ -89,11 +89,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_420_fbo : public test
+class gl_450_texture_barrier : public test
 {
 public:
-	gl_420_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-fbo", test::CORE, 4, 2, glm::vec2(0.0f))
+	gl_450_texture_barrier(int argc, char* argv[]) :
+		test(argc, argv, "gl-450-texture-barrier", test::CORE, 4, 2, glm::vec2(0.0f))
 	{}
 
 private:
@@ -364,7 +364,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_fbo Test(argc, argv);
+	gl_450_texture_barrier Test(argc, argv);
 	Error += Test();
 
 	return Error;

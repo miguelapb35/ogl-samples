@@ -52,11 +52,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_query_conditional : public test
+class gl_450_query_conditional : public test
 {
 public:
-	gl_320_query_conditional(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-conditional", test::CORE, 4, 2),
+	gl_450_query_conditional(int argc, char* argv[]) :
+		test(argc, argv, "gl-450-query-conditional", test::CORE, 4, 2),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -143,7 +143,7 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -157,7 +157,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;;
 	}
 
 	bool begin()
@@ -176,7 +176,7 @@ private:
 		if(Validated)
 			Validated = initQuery();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -187,7 +187,7 @@ private:
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteQueries(1, &QueryName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -260,7 +260,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_query_conditional Test(argc, argv);
+	gl_450_query_conditional Test(argc, argv);
 	Error += Test();
 
 	return Error;

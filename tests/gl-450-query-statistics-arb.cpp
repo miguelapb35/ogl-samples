@@ -92,7 +92,7 @@ class gl_450_query_statistics : public test
 {
 public:
 	gl_450_query_statistics(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-statistics-arb", test::CORE, 4, 2),
+		test(argc, argv, "gl-450-query-statistics-arb", test::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)

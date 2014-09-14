@@ -16,8 +16,10 @@ in block
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 vec4 textureTrilinear(in sampler2D Sampler, in vec2 Texcoord);
+vec4 textureBicubicLod(in sampler2D Sampler, in vec2 Texcoord, in int Lod);
 
 void main()
 {
-	Color = textureTrilinear(Diffuse, In.Texcoord);
+	//Color = textureTrilinear(Diffuse, In.Texcoord);
+	Color = textureBicubicLod(Diffuse, In.Texcoord, 0);
 }

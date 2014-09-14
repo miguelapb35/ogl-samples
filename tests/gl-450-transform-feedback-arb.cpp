@@ -67,7 +67,7 @@ class gl_450_transform_feedback : public test
 {
 public:
 	gl_450_transform_feedback(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-transform-feedback", test::CORE, 4, 4),
+		test(argc, argv, "gl-450-transform-feedback-arb", test::CORE, 4, 4),
 		QueryName(0),
 		FeedbackName(0),
 		UniformPointer(nullptr)
