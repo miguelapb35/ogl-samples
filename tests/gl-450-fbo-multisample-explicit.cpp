@@ -120,7 +120,6 @@ private:
 	std::array<GLuint, program::MAX> PipelineName;
 	std::array<GLuint, program::MAX> ProgramName;
 	std::array<GLuint, texture::MAX> TextureName;
-	//std::array<GLint, program::MAX> UniformMVP;
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint VertexArrayName;
 	GLint UniformBlockSize;
@@ -152,15 +151,7 @@ private:
 			for(int i = 0; i < program::MAX; ++i)
 				Validated = Validated && Compiler.checkProgram(ProgramName[i]);
 		}
-/*
-		if(Validated)
-		{
-			for(int i = 0; i < program::MAX; ++i)
-			{
-				UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
-			}
-		}
-*/
+
 		if (Validated)
 		{
 			glGenProgramPipelines(program::MAX, &PipelineName[0]);

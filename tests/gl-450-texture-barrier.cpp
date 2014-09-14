@@ -103,15 +103,11 @@ private:
 	{
 		bool Validated(true);
 
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
-
 		if (Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE,
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::TEXTURE] = glCreateProgram();
@@ -124,15 +120,10 @@ private:
 		}
 
 		if (Validated)
-			glUseProgramStages(PipelineName[pipeline::TEXTURE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::TEXTURE]);
-
-		if (Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH,
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::SPLASH] = glCreateProgram();
@@ -145,7 +136,11 @@ private:
 		}
 
 		if (Validated)
+		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
 			glUseProgramStages(PipelineName[pipeline::SPLASH], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::SPLASH]);
+			glUseProgramStages(PipelineName[pipeline::TEXTURE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::TEXTURE]);
+		}
 
 		return Validated;
 	}

@@ -268,7 +268,7 @@ private:
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()

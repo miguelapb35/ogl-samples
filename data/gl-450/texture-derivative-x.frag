@@ -1,18 +1,21 @@
-#version 150 core
+#version 430 core
 #extension GL_ARB_derivative_control : require
+
+#define FRAG_COLOR	0
+#define DIFFUSE		0
 
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2D Diffuse;
+layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
 in block
 {
 	vec2 Texcoord;
 } In;
 
-out vec4 Color;
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 float textureLevel(in sampler2D Sampler, in vec2 Texcoord)
 {

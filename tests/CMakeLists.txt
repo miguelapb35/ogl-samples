@@ -449,3 +449,5 @@ set(GL_SHADER_GTC texture-barrier-blend.vert texture-barrier-blend.frag texture-
 glCreateSampleGTC(texture-barrier)
 set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-derivative-y.vert texture-derivative-y.frag)
 glCreateSampleGTC(texture-derivative)
+set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
+glCreateSampleGTC(transform-feedback-arb)
