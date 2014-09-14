@@ -86,6 +86,16 @@ namespace
 		};
 	}//namespace framebuffer
 
+	namespace buffer
+	{
+		enum type
+		{
+			VERTEX,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
+
 	char const * VERT_SHADER_SOURCE("gl-450/fbo-multisample-explicit.vert");
 	char const * FRAG_SHADER_SOURCE[program::MAX] = 
 	{
@@ -99,9 +109,10 @@ class gl_450_fbo_multisample_explicit : public test
 {
 public:
 	gl_450_fbo_multisample_explicit(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-fbo-multisample-explicit", test::CORE, 4, 3, glm::vec2(glm::pi<float>() * 0.2f)),
+		test(argc, argv, "gl-450-fbo-multisample-explicit", test::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
-		BufferName(0)
+		UniformBlockSize(0),
+		UniformPointer(nullptr)
 	{}
 
 private:
@@ -109,10 +120,11 @@ private:
 	std::array<GLuint, program::MAX> PipelineName;
 	std::array<GLuint, program::MAX> ProgramName;
 	std::array<GLuint, texture::MAX> TextureName;
-	std::array<GLint, program::MAX> UniformMVP;
-
+	//std::array<GLint, program::MAX> UniformMVP;
+	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint VertexArrayName;
-	GLuint BufferName;
+	GLint UniformBlockSize;
+	glm::uint8* UniformPointer;
 
 	bool initProgram()
 	{
@@ -121,11 +133,11 @@ private:
 		std::array<GLuint, shader::MAX> ShaderName;
 
 		compiler Compiler;
-		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
+		ShaderName[shader::VERT] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
 
 		for(int i = 0; i < program::MAX; ++i)
 		{
-			ShaderName[shader::FRAG_TEXTURE + i] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE[i], "--version 430 --profile core");
+			ShaderName[shader::FRAG_TEXTURE + i] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE[i], "--version 440 --profile core");
 
 			ProgramName[i] = glCreateProgram();
 			glProgramParameteri(ProgramName[i], GL_PROGRAM_SEPARABLE, GL_TRUE);
@@ -140,7 +152,7 @@ private:
 			for(int i = 0; i < program::MAX; ++i)
 				Validated = Validated && Compiler.checkProgram(ProgramName[i]);
 		}
-
+/*
 		if(Validated)
 		{
 			for(int i = 0; i < program::MAX; ++i)
@@ -148,7 +160,7 @@ private:
 				UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			}
 		}
-
+*/
 		if (Validated)
 		{
 			glGenProgramPipelines(program::MAX, &PipelineName[0]);
@@ -161,10 +173,22 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(1, &BufferName);
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		this->UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferStorage(GL_ARRAY_BUFFER, VertexSize, VertexData, 0);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+		glBufferStorage(GL_UNIFORM_BUFFER, this->UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+
+		this->UniformPointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+			0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
 	}
@@ -228,7 +252,7 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
 			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -264,7 +288,7 @@ private:
 			glDeleteProgram(ProgramName[i]);
 		
 		glDeleteProgramPipelines(program::MAX, &PipelineName[0]);
-		glDeleteBuffers(1, &BufferName);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(texture::MAX, &TextureName[0]);
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
@@ -274,14 +298,10 @@ private:
 
 	void renderFBO(GLuint Framebuffer)
 	{
-		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
-		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
-		glm::mat4 MVP = Perspective * this->view() * Model;
-
 		glEnable(GL_DEPTH_TEST);
 
 		glBindProgramPipeline(PipelineName[program::THROUGH]);
-		glProgramUniformMatrix4fv(ProgramName[program::THROUGH], UniformMVP[program::THROUGH], 1, GL_FALSE, &MVP[0][0]);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
 
 		glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 
@@ -290,8 +310,7 @@ private:
 		glClearBufferfv(GL_DEPTH, 0, &Depth);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
+		glBindTextures(0, 1, &TextureName[texture::DIFFUSE]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
@@ -303,19 +322,12 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Perspective = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, 0.0f, 100.0f);
-		glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
-		glm::mat4 View = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -this->cameraDistance() * 2.0));
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Perspective * View * Model;
-
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE_COLORBUFFER]);
-
+		glBindTextures(0, 1, &TextureName[texture::MULTISAMPLE_COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
 
 		glEnable(GL_SCISSOR_TEST);
 
@@ -324,8 +336,6 @@ private:
 			glScissor(1, 1, WindowSize.x  / 2 - 2, WindowSize.y - 2);
 
 			glBindProgramPipeline(PipelineName[program::RESOLVE_BOX]);
-			glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_BOX], UniformMVP[program::RESOLVE_BOX], 1, GL_FALSE, &MVP[0][0]);
-
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 		}
 
@@ -334,8 +344,6 @@ private:
 			glScissor(WindowSize.x / 2 + 1, 1, WindowSize.x / 2 - 2, WindowSize.y - 2);
 
 			glBindProgramPipeline(PipelineName[program::RESOLVE_NEAR]);
-			glProgramUniformMatrix4fv(ProgramName[program::RESOLVE_NEAR], UniformMVP[program::RESOLVE_NEAR], 1, GL_FALSE, &MVP[0][0]);
-
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);
 		}
 
@@ -345,6 +353,22 @@ private:
 	bool render()
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
+
+		{
+			glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
+			glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
+			glm::mat4 MVP = Perspective * this->view() * Model;
+			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize * 0) = MVP;
+		}
+
+		{
+			glm::mat4 Perspective = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, 0.0f, 100.0f);
+			glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
+			glm::mat4 View = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -this->cameraDistance() * 2.0));
+			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 MVP = Perspective * View * Model;
+			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize * 1) = MVP;
+		}
 
 		// Clear the framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
