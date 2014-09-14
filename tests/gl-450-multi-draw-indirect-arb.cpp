@@ -336,17 +336,17 @@ private:
 
 	bool begin()
 	{
-		bool Success(true);
-		//Success = Success && this->checkExtension("GL_ARB_shader_draw_parameters");
+		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_shader_draw_parameters");
 
-		if(Success)
-			Success = initProgram();
-		if(Success)
-			Success = initBuffer();
-		if(Success)
-			Success = initVertexArray();
-		if(Success)
-			Success = initTexture();
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
+		if(Validated)
+			Validated = initTexture();
 
 		caps Caps(caps::CORE);
 
@@ -358,7 +358,7 @@ private:
 		glEnable(GL_DEPTH_TEST);
 		glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
-		return Success;
+		return Validated;
 	}
 
 	bool end()

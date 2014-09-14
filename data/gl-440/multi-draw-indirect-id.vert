@@ -11,7 +11,7 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-//layout(std430, column_major) buffer; AMD bug
+layout(std430, column_major) buffer; //AMD bug
 
 layout(binding = INDIRECTION) uniform indirection
 {
@@ -44,10 +44,6 @@ out block
 	vec2 Texcoord;
 	flat int DrawID;
 } Out;
-
-in int gl_DrawIDARB;
-in int gl_BaseVertexARB;
-in int gl_BaseInstanceARB;
 
 void main()
 {

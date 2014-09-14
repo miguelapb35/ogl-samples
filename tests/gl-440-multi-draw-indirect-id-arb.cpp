@@ -315,20 +315,20 @@ private:
 
 	bool begin()
 	{
-		bool Success(true);
-		Success = Success && this->checkExtension("GL_ARB_multi_draw_indirect");
-		Success = Success && this->checkExtension("GL_ARB_shader_draw_parameters");
-		Success = Success && this->checkExtension("GL_ARB_shader_storage_buffer_object");
-		Success = Success && this->checkExtension("GL_ARB_buffer_storage");
+		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_multi_draw_indirect");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_draw_parameters");
+		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
+		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
 
-		if(Success)
-			Success = initProgram();
-		if(Success)
-			Success = initBuffer();
-		if(Success)
-			Success = initVertexArray();
-		if(Success)
-			Success = initTexture();
+		if(Validated)
+			Validated = initProgram();
+		if(Validated)
+			Validated = initBuffer();
+		if(Validated)
+			Validated = initVertexArray();
+		if(Validated)
+			Validated = initTexture();
 
 		glm::vec2 WindowSize(this->getWindowSize());
 		this->Viewport[0] = glm::vec4(WindowSize.x / 3.0f * 0.0f, 0, WindowSize.x / 3, WindowSize.y);
@@ -338,7 +338,7 @@ private:
 		glEnable(GL_DEPTH_TEST);
 		glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
-		return Success;
+		return Validated;
 	}
 
 	bool end()
