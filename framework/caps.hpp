@@ -227,10 +227,10 @@ private:
 		bool ARB_shader_draw_parameters;
 		bool ARB_shader_group_vote;
 		bool ARB_sparse_texture;
-
 		bool ARB_ES3_1_compatibility;
 		bool ARB_clip_control;
 		bool ARB_conditional_render_inverted;
+		bool ARB_cull_distance;
 		bool ARB_derivative_control;
 		bool ARB_direct_state_access;
 		bool ARB_get_texture_sub_image;

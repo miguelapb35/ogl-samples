@@ -229,160 +229,314 @@ void caps::initExtensions()
 				ExtensionData.ARB_texture_rectangle = true;
 				continue;
 			}
-			if(!strcmp("GL_ARB_color_buffer_float", Extension))
+			if(!strcmp("GL_ARB_color_buffer_float", Extension)) {
 				ExtensionData.ARB_color_buffer_float = true;
-			else if(!strcmp("GL_ARB_half_float_pixel", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_half_float_pixel", Extension)) {
 				ExtensionData.ARB_half_float_pixel = true;
-			else if(!strcmp("GL_ARB_texture_float", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_float", Extension)) {
 				ExtensionData.ARB_texture_float = true;
-			else if(!strcmp("GL_ARB_pixel_buffer_object", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_pixel_buffer_object", Extension)) {
 				ExtensionData.ARB_pixel_buffer_object = true;
-			else if(!strcmp("GL_ARB_depth_buffer_float", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_depth_buffer_float", Extension)) {
 				ExtensionData.ARB_depth_buffer_float = true;
-			else if(!strcmp("GL_ARB_draw_instanced", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_draw_instanced", Extension)) {
 				ExtensionData.ARB_draw_instanced = true;
-			else if(!strcmp("GL_ARB_framebuffer_object", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_framebuffer_object", Extension)) {
 				ExtensionData.ARB_framebuffer_object = true;
-			else if(!strcmp("GL_ARB_framebuffer_sRGB", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_framebuffer_sRGB", Extension)) {
 				ExtensionData.ARB_framebuffer_sRGB = true;
-			else if(!strcmp("GL_ARB_geometry_shader4", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_geometry_shader4", Extension)) {
 				ExtensionData.ARB_geometry_shader4 = true;
-			else if(!strcmp("GL_ARB_half_float_vertex", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_half_float_vertex", Extension)) {
 				ExtensionData.ARB_half_float_vertex = true;
-			else if(!strcmp("GL_ARB_instanced_arrays", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_instanced_arrays", Extension)) {
 				ExtensionData.ARB_instanced_arrays = true;
-			else if(!strcmp("GL_ARB_map_buffer_range", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_map_buffer_range", Extension)) {
 				ExtensionData.ARB_map_buffer_range = true;
-			else if(!strcmp("GL_ARB_texture_buffer_object", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_buffer_object", Extension)) {
 				ExtensionData.ARB_texture_buffer_object = true;
-			else if(!strcmp("GL_ARB_texture_compression_rgtc", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_compression_rgtc", Extension)) {
 				ExtensionData.ARB_texture_compression_rgtc = true;
-			else if(!strcmp("GL_ARB_texture_rg", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_rg", Extension)) {
 				ExtensionData.ARB_texture_rg = true;
-			else if(!strcmp("GL_ARB_vertex_array_object", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_vertex_array_object", Extension)) {
 				ExtensionData.ARB_vertex_array_object = true;
-			else if(!strcmp("GL_ARB_uniform_buffer_object", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_uniform_buffer_object", Extension)) {
 				ExtensionData.ARB_uniform_buffer_object = true;
-			else if(!strcmp("GL_ARB_compatibility", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_compatibility", Extension)) {
 				ExtensionData.ARB_compatibility = true;
-			else if(!strcmp("GL_ARB_copy_buffer", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_copy_buffer", Extension)) {
 				ExtensionData.ARB_copy_buffer = true;
-			else if(!strcmp("GL_ARB_shader_texture_lod", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shader_texture_lod", Extension)) {
 				ExtensionData.ARB_shader_texture_lod = true;
-			else if(!strcmp("GL_ARB_depth_clamp", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_depth_clamp", Extension)) {
 				ExtensionData.ARB_depth_clamp = true;
-			else if(!strcmp("GL_ARB_draw_elements_base_vertex", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_draw_elements_base_vertex", Extension)) {
 				ExtensionData.ARB_draw_elements_base_vertex = true;
-			else if(!strcmp("GL_ARB_fragment_coord_conventions", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_fragment_coord_conventions", Extension)) {
 				ExtensionData.ARB_fragment_coord_conventions = true;
-			else if(!strcmp("GL_ARB_provoking_vertex", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_provoking_vertex", Extension)) {
 				ExtensionData.ARB_provoking_vertex = true;
-			else if(!strcmp("GL_ARB_seamless_cube_map", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_seamless_cube_map", Extension)) {
 				ExtensionData.ARB_seamless_cube_map = true;
-			else if(!strcmp("GL_ARB_sync", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_sync", Extension)) {
 				ExtensionData.ARB_sync = true;
-			else if(!strcmp("GL_ARB_texture_multisample", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_multisample", Extension)) {
 				ExtensionData.ARB_texture_multisample = true;
-			else if(!strcmp("GL_ARB_vertex_array_bgra", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_vertex_array_bgra", Extension)) {
 				ExtensionData.ARB_vertex_array_bgra = true;
-			else if(!strcmp("GL_ARB_draw_buffers_blend", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_draw_buffers_blend", Extension)) {
 				ExtensionData.ARB_draw_buffers_blend = true;
-			else if(!strcmp("GL_ARB_sample_shading", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_sample_shading", Extension)) {
 				ExtensionData.ARB_sample_shading = true;
-			else if(!strcmp("GL_ARB_texture_cube_map_array", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_cube_map_array", Extension)) {
 				ExtensionData.ARB_texture_cube_map_array = true;
-			else if(!strcmp("GL_ARB_texture_gather", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_gather", Extension)) {
 				ExtensionData.ARB_texture_gather = true;
-			else if(!strcmp("GL_ARB_texture_query_lod", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_query_lod", Extension)) {
 				ExtensionData.ARB_texture_query_lod = true;
-			else if(!strcmp("GL_ARB_shading_language_include", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shading_language_include", Extension)) {
 				ExtensionData.ARB_shading_language_include = true;
-			else if(!strcmp("GL_ARB_texture_compression_bptc", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_compression_bptc", Extension)) {
 				ExtensionData.ARB_texture_compression_bptc = true;
-			else if(!strcmp("GL_ARB_blend_func_extended", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_blend_func_extended", Extension)) {
 				ExtensionData.ARB_blend_func_extended = true;
-			else if(!strcmp("GL_ARB_explicit_attrib_location", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_explicit_attrib_location", Extension)) {
 				ExtensionData.ARB_explicit_attrib_location = true;
-			else if(!strcmp("GL_ARB_occlusion_query2", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_occlusion_query2", Extension)) {
 				ExtensionData.ARB_occlusion_query2 = true;
-			else if(!strcmp("GL_ARB_sampler_objects", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_sampler_objects", Extension)) {
 				ExtensionData.ARB_sampler_objects = true;
-			else if(!strcmp("GL_ARB_shader_bit_encoding", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shader_bit_encoding", Extension)) {
 				ExtensionData.ARB_shader_bit_encoding = true;
-			else if(!strcmp("GL_ARB_texture_rgb10_a2ui", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_rgb10_a2ui", Extension)) {
 				ExtensionData.ARB_texture_rgb10_a2ui = true;
-			else if(!strcmp("GL_ARB_texture_swizzle", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_swizzle", Extension)) {
 				ExtensionData.ARB_texture_swizzle = true;
-			else if(!strcmp("GL_ARB_timer_query", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_timer_query", Extension)) {
 				ExtensionData.ARB_timer_query = true;
-			else if(!strcmp("GL_ARB_vertex_type_2_10_10_10_rev", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_vertex_type_2_10_10_10_rev", Extension)) {
 				ExtensionData.ARB_vertex_type_2_10_10_10_rev = true;
-			else if(!strcmp("GL_ARB_draw_indirect", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_draw_indirect", Extension)) {
 				ExtensionData.ARB_draw_indirect = true;
-			else if(!strcmp("GL_ARB_gpu_shader5", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_gpu_shader5", Extension)) {
 				ExtensionData.ARB_gpu_shader5 = true;
-			else if(!strcmp("GL_ARB_gpu_shader_fp64", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_gpu_shader_fp64", Extension)) {
 				ExtensionData.ARB_gpu_shader_fp64 = true;
-			else if(!strcmp("GL_ARB_shader_subroutine", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shader_subroutine", Extension)) {
 				ExtensionData.ARB_shader_subroutine = true;
-			else if(!strcmp("GL_ARB_tessellation_shader", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_tessellation_shader", Extension)) {
 				ExtensionData.ARB_tessellation_shader = true;
-			else if(!strcmp("GL_ARB_texture_buffer_object_rgb32", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_texture_buffer_object_rgb32", Extension)) {
 				ExtensionData.ARB_texture_buffer_object_rgb32 = true;
-			else if(!strcmp("GL_ARB_transform_feedback2", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_transform_feedback2", Extension)) {
 				ExtensionData.ARB_transform_feedback2 = true;
-			else if(!strcmp("GL_ARB_transform_feedback3", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_transform_feedback3", Extension)) {
 				ExtensionData.ARB_transform_feedback3 = true;
-			else if(!strcmp("GL_ARB_ES2_compatibility", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_ES2_compatibility", Extension)) {
 				ExtensionData.ARB_ES2_compatibility = true;
-			else if(!strcmp("GL_ARB_get_program_binary", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_get_program_binary", Extension)) {
 				ExtensionData.ARB_get_program_binary = true;
-			else if(!strcmp("GL_ARB_separate_shader_objects", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_separate_shader_objects", Extension)) {
 				ExtensionData.ARB_separate_shader_objects = true;
-			else if(!strcmp("GL_ARB_shader_precision", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shader_precision", Extension)) {
 				ExtensionData.ARB_shader_precision = true;
-			else if(!strcmp("GL_ARB_vertex_attrib_64bit", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_vertex_attrib_64bit", Extension)) {
 				ExtensionData.ARB_vertex_attrib_64bit = true;
-			else if(!strcmp("GL_ARB_viewport_array", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_viewport_array", Extension)) {
 				ExtensionData.ARB_viewport_array = true;
-			else if(!strcmp("GL_ARB_cl_event", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_cl_event", Extension)) {
 				ExtensionData.ARB_cl_event = true;
-			else if(!strcmp("GL_ARB_debug_output", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_debug_output", Extension)) {
 				ExtensionData.ARB_debug_output = true;
-			else if(!strcmp("GL_ARB_robustness", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_robustness", Extension)) {
 				ExtensionData.ARB_robustness = true;
-			else if(!strcmp("GL_ARB_shader_stencil_export", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_shader_stencil_export", Extension)) {
 				ExtensionData.ARB_shader_stencil_export = true;
-			else if(!strcmp("GL_ARB_base_instance", Extension))
+				continue;
+			}
+			if(!strcmp("GL_ARB_base_instance", Extension)) {
 				ExtensionData.ARB_base_instance = true;
-			else if(!strcmp("GL_ARB_shading_language_420pack", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_shading_language_420pack", Extension)) {
 				ExtensionData.ARB_shading_language_420pack = true;
-			else if(!strcmp("GL_ARB_transform_feedback_instanced", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_transform_feedback_instanced", Extension)) {
 				ExtensionData.ARB_transform_feedback_instanced = true;
-			else if(!strcmp("GL_ARB_compressed_texture_pixel_storage", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_compressed_texture_pixel_storage", Extension)) {
 				ExtensionData.ARB_compressed_texture_pixel_storage = true;
-			else if(!strcmp("GL_ARB_conservative_depth", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_conservative_depth", Extension)) {
 				ExtensionData.ARB_conservative_depth = true;
-			else if(!strcmp("GL_ARB_internalformat_query", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_internalformat_query", Extension)) {
 				ExtensionData.ARB_internalformat_query = true;
-			else if(!strcmp("GL_ARB_map_buffer_alignment", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_map_buffer_alignment", Extension)) {
 				ExtensionData.ARB_map_buffer_alignment = true;
-			else if(!strcmp("GL_ARB_shader_atomic_counters", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_shader_atomic_counters", Extension)) {
 				ExtensionData.ARB_shader_atomic_counters = true;
-			else if(!strcmp("GL_ARB_shader_image_load_store", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_shader_image_load_store", Extension)) {
 				ExtensionData.ARB_shader_image_load_store = true;
-			else if(!strcmp("GL_ARB_shading_language_packing", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_shading_language_packing", Extension)) {
 				ExtensionData.ARB_shading_language_packing = true;
-			else if(!strcmp("GL_ARB_texture_storage", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_texture_storage", Extension)) {
 				ExtensionData.ARB_texture_storage = true;
-			else if(!strcmp("GL_KHR_texture_compression_astc_hdr", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_KHR_texture_compression_astc_hdr", Extension)) {
 				ExtensionData.KHR_texture_compression_astc_hdr = true;
-			else if(!strcmp("GL_KHR_texture_compression_astc_ldr", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_KHR_texture_compression_astc_ldr", Extension)) {
 				ExtensionData.KHR_texture_compression_astc_ldr = true;
-			else if(!strcmp("GL_KHR_debug", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_KHR_debug", Extension)) {
 				ExtensionData.KHR_debug = true;
-			else if(!strcmp("GL_ARB_arrays_of_arrays", Extension))
+				continue;
+			}
+			else if(!strcmp("GL_ARB_arrays_of_arrays", Extension)) {
 				ExtensionData.ARB_arrays_of_arrays = true;
+				continue;
+			}
 			else if(!strcmp("GL_ARB_clear_buffer_object", Extension))
 				ExtensionData.ARB_clear_buffer_object = true;
 			else if(!strcmp("GL_ARB_compute_shader", Extension))
