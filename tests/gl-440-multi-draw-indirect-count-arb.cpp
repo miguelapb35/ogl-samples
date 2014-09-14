@@ -201,8 +201,8 @@ private:
 		Commands[5] = DrawElementsIndirectCommand(ElementCount, 1, 9, 7, 2);
 */
 		GLintptr DrawCount[IndirectBufferCount];
-		DrawCount[0] = 0;
-		DrawCount[1] = 4;
+		DrawCount[0] = 1;
+		DrawCount[1] = 2;
 		DrawCount[2] = 4;
 
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, this->BufferName[buffer::INDIRECT]);

@@ -228,6 +228,21 @@ private:
 		bool ARB_shader_group_vote;
 		bool ARB_sparse_texture;
 
+		bool ARB_ES3_1_compatibility;
+		bool ARB_clip_control;
+		bool ARB_conditional_render_inverted;
+		bool ARB_derivative_control;
+		bool ARB_direct_state_access;
+		bool ARB_get_texture_sub_image;
+		bool ARB_shader_texture_image_samples;
+		bool ARB_texture_barrier;
+		bool KHR_context_flush_control;
+		bool KHR_robust_buffer_access_behavior;
+		bool KHR_robustness;
+		bool ARB_pipeline_statistics_query;
+		bool ARB_sparse_buffer;
+		bool ARB_transform_feedback_overflow_query;
+
 		bool EXT_texture_compression_latc;
 		bool EXT_transform_feedback;
 		bool EXT_direct_state_access;
@@ -238,6 +253,8 @@ private:
 		bool EXT_texture_sRGB_decode;
 		bool EXT_framebuffer_multisample_blit_scaled;
 		bool EXT_shader_integer_mix;
+		bool EXT_shader_image_load_formatted;
+		bool EXT_polygon_offset_clamp;
 
 		bool NV_explicit_multisample;
 		bool NV_shader_buffer_load;
@@ -246,6 +263,11 @@ private:
 		bool NV_bindless_multi_draw_indirect;
 		bool NV_blend_equation_advanced;
 		bool NV_deep_texture3D;
+		bool NV_shader_thread_group;
+		bool NV_shader_thread_shuffle;
+		bool NV_shader_atomic_int64;
+		bool NV_bindless_multi_draw_indirect_count;
+		bool NV_uniform_buffer_unified_memory;
 
 		bool ATI_texture_compression_3dc;
 		bool AMD_depth_clamp_separate;
@@ -255,6 +277,15 @@ private:
 		bool AMD_shader_trinary_minmax;
 		bool AMD_interleaved_elements;
 		bool AMD_shader_atomic_counter_ops;
+		bool AMD_occlusion_query_event;
+		bool AMD_shader_stencil_value_export;
+		bool AMD_transform_feedback4;
+		bool AMD_gpu_shader_int64;
+		bool AMD_gcn_shader;
+
+		bool INTEL_map_texture;
+		bool INTEL_fragment_shader_ordering;
+		bool INTEL_performance_query;
 	} ExtensionData;
 
 	void initExtensions();
@@ -386,6 +417,8 @@ private:
 	{
 		GLint SUBPIXEL_BITS;
 		GLint MAX_CLIP_DISTANCES;
+		GLint MAX_CULL_DISTANCES;
+		GLint MAX_COMBINED_CLIP_AND_CULL_DISTANCES;
 		GLint64 MAX_ELEMENT_INDEX;
 		GLint MAX_ELEMENTS_INDICES;
 		GLint MAX_ELEMENTS_VERTICES;

@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-440/multi-draw-indirect-id.vert");
-	char const * FRAG_SHADER_SOURCE("gl-440/multi-draw-indirect-id.frag");
+	char const * VERT_SHADER_SOURCE("gl-450/multi-draw-indirect.vert");
+	char const * FRAG_SHADER_SOURCE("gl-450/multi-draw-indirect.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const ElementCount(15);
@@ -93,16 +93,17 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_440_multi_draw_indirect_id : public test
+class gl_450_multi_draw_indirect : public test
 {
 public:
-	gl_440_multi_draw_indirect_id(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-multi-draw-indirect-id", test::CORE, 4, 3, glm::ivec2(640, 480),
+	gl_450_multi_draw_indirect(int argc, char* argv[]) :
+		test(argc, argv, "gl-450-multi-draw-indirect-arb", test::CORE, 4, 3, glm::ivec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
-		UniformArrayStride(256)
+		UniformArrayStrideMat(256),
+		UniformArrayStrideInt(256)
 	{}
 
 private:
@@ -114,7 +115,8 @@ private:
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
-	GLint UniformArrayStride;
+	GLint UniformArrayStrideMat;
+	GLint UniformArrayStrideInt;
 
 	bool initProgram()
 	{
@@ -146,9 +148,12 @@ private:
 			std::string StringName(Name);
 
 			if(StringName == std::string("transform.MVP[0]"))
-				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStride);
+				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideMat);
+
+			if(StringName == std::string("indirection.Transform[0]"))
+				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideInt);
 		}
-	
+
 		if(Validated)
 		{
 			glGenProgramPipelines(1, &PipelineName);
@@ -162,22 +167,26 @@ private:
 	{
 		glGenBuffers(buffer::MAX, &this->BufferName[0]);
 
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, this->BufferName[buffer::VERTEX]);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, this->BufferName[buffer::VERTEX]);
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->BufferName[buffer::ELEMENT]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		int VertexIndirection[3] = {0, 1, 2};
+		std::size_t PaddingInt = glm::max(sizeof(int), std::size_t(UniformArrayStrideInt));
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::VERTEX_INDIRECTION]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(int) * 3, VertexIndirection, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, PaddingInt * 3, nullptr, GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 0, PaddingInt, &VertexIndirection[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 1, PaddingInt, &VertexIndirection[1]);
+		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 2, PaddingInt, &VertexIndirection[2]);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
+		std::size_t PaddingMat = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, Padding * 3, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, PaddingMat * 3, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		DrawElementsIndirectCommand Commands[6];
@@ -206,6 +215,14 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+			glEnableVertexAttribArray(semantic::attr::POSITION);
+			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]); 
 		glBindVertexArray(0);
 
@@ -233,13 +250,13 @@ private:
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GL_BGR, GL_UNSIGNED_BYTE,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
+				GL_BGR, GL_UNSIGNED_BYTE, 
 				Texture[Level].data());
 		}
 	
@@ -258,9 +275,9 @@ private:
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
-				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level), 
+				0, 0,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				GL_BGR, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
 		}
@@ -280,9 +297,9 @@ private:
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				GL_BGR, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
 		}
@@ -296,30 +313,31 @@ private:
 	void validate()
 	{
 		GLint Status(0);
-		GLint LengthMax(0);
 		glValidateProgramPipeline(PipelineName);
 		glGetProgramPipelineiv(PipelineName, GL_VALIDATE_STATUS, &Status);
-		glGetProgramPipelineiv(PipelineName, GL_INFO_LOG_LENGTH, &LengthMax);
 
-		GLsizei LengthQuery(0);
-		std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
-		glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
+		if(Status != GL_TRUE)
+		{
+			GLint LengthMax(0);
+			glGetProgramPipelineiv(PipelineName, GL_INFO_LOG_LENGTH, &LengthMax);
+			
+			GLsizei LengthQuery(0);
+			std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
+			glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
 
-		glDebugMessageInsert(
-			GL_DEBUG_SOURCE_APPLICATION,
-			GL_DEBUG_TYPE_OTHER, 76,
-			GL_DEBUG_SEVERITY_LOW,
-			LengthQuery,
-			&InfoLog[0]);
+			glDebugMessageInsertARB(
+				GL_DEBUG_SOURCE_APPLICATION_ARB, 
+				GL_DEBUG_TYPE_OTHER_ARB, 76,
+				GL_DEBUG_SEVERITY_LOW_ARB,
+				LengthQuery, 
+				&InfoLog[0]);
+		}
 	}
 
 	bool begin()
 	{
 		bool Success(true);
-		Success = Success && this->checkExtension("GL_ARB_multi_draw_indirect");
-		Success = Success && this->checkExtension("GL_ARB_shader_draw_parameters");
-		Success = Success && this->checkExtension("GL_ARB_shader_storage_buffer_object");
-		Success = Success && this->checkExtension("GL_ARB_buffer_storage");
+		//Success = Success && this->checkExtension("GL_ARB_shader_draw_parameters");
 
 		if(Success)
 			Success = initProgram();
@@ -329,6 +347,8 @@ private:
 			Success = initVertexArray();
 		if(Success)
 			Success = initTexture();
+
+		caps Caps(caps::CORE);
 
 		glm::vec2 WindowSize(this->getWindowSize());
 		this->Viewport[0] = glm::vec4(WindowSize.x / 3.0f * 0.0f, 0, WindowSize.x / 3, WindowSize.y);
@@ -360,7 +380,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		{
-			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStride));
+			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, Padding * 3, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
@@ -385,7 +405,6 @@ private:
 
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, semantic::storage::VERTEX, BufferName[buffer::VERTEX]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 
@@ -408,7 +427,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_multi_draw_indirect_id Test(argc, argv);
+	gl_450_multi_draw_indirect Test(argc, argv);
 	Error += Test();
 
 	return Error;

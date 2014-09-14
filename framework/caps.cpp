@@ -457,7 +457,35 @@ void caps::initExtensions()
 				ExtensionData.ARB_shader_group_vote = true;
 			else if(!strcmp("GL_ARB_sparse_texture", Extension))
 				ExtensionData.ARB_sparse_texture = true;
-				
+			else if(!strcmp("GL_ARB_ES3_1_compatibility", Extension))
+				ExtensionData.ARB_ES3_1_compatibility = true;
+			else if(!strcmp("GL_ARB_clip_control", Extension))
+				ExtensionData.ARB_clip_control = true;
+			else if(!strcmp("GL_ARB_conditional_render_inverted", Extension))
+				ExtensionData.ARB_conditional_render_inverted = true;
+			else if(!strcmp("GL_ARB_derivative_control", Extension))
+				ExtensionData.ARB_derivative_control = true;
+			else if(!strcmp("GL_ARB_direct_state_access", Extension))
+				ExtensionData.ARB_direct_state_access = true;
+			else if(!strcmp("GL_ARB_get_texture_sub_image", Extension))
+				ExtensionData.ARB_get_texture_sub_image = true;
+			else if(!strcmp("GL_ARB_shader_texture_image_samples", Extension))
+				ExtensionData.ARB_shader_texture_image_samples = true;
+			else if(!strcmp("GL_ARB_texture_barrier", Extension))
+				ExtensionData.ARB_texture_barrier = true;
+			else if(!strcmp("GL_KHR_context_flush_control", Extension))
+				ExtensionData.KHR_context_flush_control = true;
+			else if(!strcmp("GL_KHR_robust_buffer_access_behavior", Extension))
+				ExtensionData.KHR_robust_buffer_access_behavior = true;
+			else if(!strcmp("GL_KHR_robustness", Extension))
+				ExtensionData.KHR_robustness = true;
+			else if(!strcmp("GL_ARB_pipeline_statistics_query", Extension))
+				ExtensionData.ARB_pipeline_statistics_query = true;
+			else if(!strcmp("GL_ARB_sparse_buffer", Extension))
+				ExtensionData.ARB_sparse_buffer = true;
+			else if(!strcmp("GL_ARB_transform_feedback_overflow_query", Extension))
+				ExtensionData.ARB_transform_feedback_overflow_query = true;
+
 			// EXT
 			if(!strcmp("GL_EXT_texture_compression_s3tc", Extension)) {
 				ExtensionData.EXT_texture_compression_s3tc = true;
@@ -503,6 +531,10 @@ void caps::initExtensions()
 				ExtensionData.EXT_shader_integer_mix = true;
 				continue;
 			}
+			if(!strcmp("GL_EXT_polygon_offset_clamp", Extension)) {
+				ExtensionData.EXT_polygon_offset_clamp = true;
+				continue;
+			}
 
 			// NV
 			if(!strcmp("GL_NV_explicit_multisample", Extension)) {
@@ -531,6 +563,26 @@ void caps::initExtensions()
 			}
 			if(!strcmp("GL_NV_deep_texture3D", Extension)) {
 				ExtensionData.NV_deep_texture3D = true;
+				continue;
+			}
+			if(!strcmp("GL_NV_shader_thread_group", Extension)) {
+				ExtensionData.NV_shader_thread_group = true;
+				continue;
+			}
+			if(!strcmp("GL_NV_shader_thread_shuffle", Extension)) {
+				ExtensionData.NV_shader_thread_shuffle = true;
+				continue;
+			}
+			if(!strcmp("GL_NV_shader_atomic_int64", Extension)) {
+				ExtensionData.NV_shader_atomic_int64 = true;
+				continue;
+			}
+			if(!strcmp("GL_NV_bindless_multi_draw_indirect_count", Extension)) {
+				ExtensionData.NV_bindless_multi_draw_indirect_count = true;
+				continue;
+			}
+			if(!strcmp("GL_NV_uniform_buffer_unified_memory", Extension)) {
+				ExtensionData.NV_uniform_buffer_unified_memory = true;
 				continue;
 			}
 
@@ -566,6 +618,36 @@ void caps::initExtensions()
 			}
 			if(!strcmp("GL_AMD_shader_atomic_counter_ops", Extension)) {
 				ExtensionData.AMD_shader_atomic_counter_ops = true;
+				continue;
+			}
+			if(!strcmp("GL_AMD_shader_stencil_value_export", Extension)) {
+				ExtensionData.AMD_shader_stencil_value_export = true;
+				continue;
+			}
+			if(!strcmp("GL_AMD_transform_feedback4", Extension)) {
+				ExtensionData.AMD_transform_feedback4 = true;
+				continue;
+			}
+			if(!strcmp("GL_AMD_gpu_shader_int64", Extension)) {
+				ExtensionData.AMD_gpu_shader_int64 = true;
+				continue;
+			}
+			if(!strcmp("GL_AMD_gcn_shader", Extension)) {
+				ExtensionData.AMD_gcn_shader = true;
+				continue;
+			}
+
+			// Intel
+			if(!strcmp("GL_INTEL_map_texture", Extension)) {
+				ExtensionData.INTEL_map_texture = true;
+				continue;
+			}
+			if(!strcmp("GL_INTEL_fragment_shader_ordering", Extension)) {
+				ExtensionData.INTEL_fragment_shader_ordering = true;
+				continue;
+			}
+			if(!strcmp("GL_INTEL_performance_query", Extension)) {
+				ExtensionData.INTEL_performance_query = true;
 				continue;
 			}
 		}
@@ -844,6 +926,12 @@ void caps::initValues()
 	if(check(3, 0))
 	{
 		glGetIntegerv(GL_MAX_CLIP_DISTANCES, &ValuesData.MAX_CLIP_DISTANCES);
+	}
+
+	if(check(4, 5) || (ExtensionData.ARB_cull_distance))
+	{
+		glGetIntegerv(GL_MAX_CULL_DISTANCES, &ValuesData.MAX_CULL_DISTANCES);
+		glGetIntegerv(GL_MAX_COMBINED_CLIP_AND_CULL_DISTANCES, &ValuesData.MAX_COMBINED_CLIP_AND_CULL_DISTANCES);
 	}
 
 	if(check(4, 1) || (ExtensionData.ARB_viewport_array))
