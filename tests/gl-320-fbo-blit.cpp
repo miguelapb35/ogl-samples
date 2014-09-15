@@ -163,9 +163,8 @@ private:
 		{
 			glTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
-				GL_RGB8, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				GL_RGB8,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
 				GL_BGR, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
@@ -174,14 +173,14 @@ private:
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initFramebuffer()

@@ -28,7 +28,7 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-420/fbo-srgb-decode.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/fbo-srgb-decode.frag");
 	char const * TEXTURE_DIFFUSE("kueken2-dxt1.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
+	glm::ivec2 const FRAMEBUFFER_SIZE(1024);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -116,11 +116,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -190,18 +186,15 @@ private:
 	{
 		bool Validated(true);
 
-		glGenFramebuffers(1, &FramebufferName);
 		glGenTextures(1, &ColorbufferName);
-
-		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			return false;
-
 		glBindTexture(GL_TEXTURE_2D, ColorbufferName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
+		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ColorbufferName, 0);
-
 		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
@@ -225,7 +218,7 @@ private:
 		return this->checkError("initVertexArray");
 	}
 
-	void renderScene(glm::vec4 const & ClearColor, glm::mat4 const & MVP, GLuint const & TextureName)
+	void renderScene(glm::mat4 const & MVP, GLuint const & TextureName)
 	{
 		glProgramUniformMatrix4fv(ProgramName, UniformMVP, 1, GL_FALSE, &MVP[0][0]);
 
@@ -278,9 +271,7 @@ private:
 		glm::mat4 View = this->view();
 		glm::mat4 Model = glm::mat4(1.0f);
 
-		glEnable(GL_SCISSOR_TEST);
 		glDisable(GL_FRAMEBUFFER_SRGB);
-		glScissorIndexed(0, 0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 		glBindProgramPipeline(PipelineName);
 
@@ -289,12 +280,10 @@ private:
 			glm::mat4 MVP = Projection * View * Model;
 
 			glViewportIndexedf(0, 0, 0, float(FRAMEBUFFER_SIZE.x), float(FRAMEBUFFER_SIZE.y));
-			glDisable(GL_FRAMEBUFFER_SRGB);
-
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
-			renderScene(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), MVP, TextureName);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
+			renderScene(MVP, TextureName);
 		}
 
 		{
@@ -302,20 +291,24 @@ private:
 			glm::mat4 MVP = Projection * View * Model;
 
 			glViewportIndexedfv(0, &glm::vec4(0, 0, WindowSize.x, WindowSize.y)[0]);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glEnable(GL_SCISSOR_TEST);
 
 			// Correct display
 			glScissorIndexed(0, 0, WindowSize.y / 2 - 1, WindowSize.x, WindowSize.y / 2);
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			glSamplerParameteri(SamplerName, GL_TEXTURE_SRGB_DECODE_EXT, GL_SKIP_DECODE_EXT); // GL_DECODE_EXT 
-			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, ColorbufferName);
+			renderScene(MVP, ColorbufferName);
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			// Incorrected display
 			glScissorIndexed(0, 0, 0, WindowSize.x, WindowSize.y / 2);
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			glSamplerParameteri(SamplerName, GL_TEXTURE_SRGB_DECODE_EXT, GL_DECODE_EXT); // GL_DECODE_EXT 
-			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, ColorbufferName);
+			renderScene(MVP, ColorbufferName);
 			glDisable(GL_FRAMEBUFFER_SRGB);
+
+			glDisable(GL_SCISSOR_TEST);
 		}
 
 		return true;
