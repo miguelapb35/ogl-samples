@@ -135,7 +135,7 @@ private:
 		GLint ActiveUniform(0);
 		glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniform);
 
-		for (GLuint i = 0; i < static_cast<GLuint>(ActiveUniform); ++i)
+		for(GLuint i = 0; i < static_cast<GLuint>(ActiveUniform); ++i)
 		{
 			char Name[128];
 			memset(Name, '\0', sizeof(Name));
@@ -148,7 +148,31 @@ private:
 			if(StringName == std::string("transform.MVP[0]"))
 				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStride);
 		}
-	
+
+		GLint ActiveShaderStorageBuffer(0);
+		glGetProgramInterfaceiv(ProgramName, GL_BUFFER_VARIABLE, GL_ACTIVE_RESOURCES, &ActiveShaderStorageBuffer);
+
+		for(GLuint i = 0; i < static_cast<GLuint>(ActiveShaderStorageBuffer); ++i)
+		{
+			char Name[128];
+			memset(Name, '\0', sizeof(Name));
+			GLsizei Length(0);
+
+			glGetProgramResourceName(ProgramName, GL_BUFFER_VARIABLE, i, GLsizei(sizeof(Name)), &Length, Name);
+
+			std::string StringName(Name);
+
+			GLenum PropsTopLevel = GL_TOP_LEVEL_ARRAY_STRIDE;
+			GLint ParamsTopLevel = 0;
+			glGetProgramResourceiv(ProgramName, GL_BUFFER_VARIABLE, i, 1, &PropsTopLevel, 4, 0, &ParamsTopLevel);
+
+			GLenum PropsArrayStride = GL_ARRAY_STRIDE;
+			GLint ParamsArrayStride = 0;
+			glGetProgramResourceiv(ProgramName, GL_BUFFER_VARIABLE, i, 1, &PropsArrayStride, 4, 0, &ParamsArrayStride);
+
+			printf("%d", ParamsArrayStride);
+		}
+
 		if(Validated)
 		{
 			glGenProgramPipelines(1, &PipelineName);
