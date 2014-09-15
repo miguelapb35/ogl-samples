@@ -61,9 +61,19 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.5.0.0: 2014-XX-XX
+OpenGL Samples Pack 4.5.0.0: 2014-09-15
 --------------------------------------------------------------------------------
+- Added 450-buffer-sparse-arb
+- Added 450-caps
+- Added 450-clip-control
+- Added 450-culling
 - Added 450-direct-state-access
+- Added 450-fbo-multisample-explicit
+- Added 450-query-conditional
+- Added 450-query-statistics-arb
+- Added 450-texture-barrier
+- Added 450-texture-derivative
+- Added 450-transform-feedback-arb
 
 ================================================================================
 OpenGL Samples Pack 4.4.3.0: 2014-08-03
