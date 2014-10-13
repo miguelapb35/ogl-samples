@@ -14,7 +14,8 @@ set(GL_SHADER_GTC
 	draw-indexing-id.vert draw-indexing-id.frag
 	draw-indexing-attrib.vert draw-indexing-attrib.frag
 	draw-indexing-uniform.vert draw-indexing-uniform.frag
-	screenspace_coherence.vert screenspace_coherence.frag)
+	screenspace_coherence.vert screenspace_coherence.frag
+	test_uniform_caching.vert test_uniform_caching.frag)
 
 foreach(FILE ${GL_SHADER_GTC})
 	set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})

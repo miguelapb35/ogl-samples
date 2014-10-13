@@ -51,30 +51,23 @@ namespace
 		enum type
 		{
 			VERTEX,
-			TRANSFORM,
 			MAX
 		};
 	}//namespace buffer
 
-	enum drawMode
+	enum uniformMode
 	{
-		DRAW_SINGLE,
-		DRAW_PER_TILE
-	};
-
-	enum layout
-	{
-		LAYOUT_LINEAR,
-		LAYOUT_MORTON,
-		LAYOUT_RANDOM
+		UNIFORM_SINGLE,
+		UNIFORM_REDUNDANT,
+		UNIFORM_UNIQUE
 	};
 }//namespace
 
-class test_draw_call : public test
+class test_uniform_caching : public test
 {
 public:
-	test_draw_call(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, std::size_t DrawPerTile, layout Layout, drawMode DrawMode) :
-		test(argc, argv, "test_draw_call", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
+	test_uniform_caching(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, uniformMode UniformMode) :
+		test(argc, argv, "test_uniform_caching", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),
@@ -82,12 +75,10 @@ public:
 		VertexCount(0),
 		TileSize(TileSize),
 		TrianglePairPerTile(TrianglePairPerTile),
-		DrawPerTile(DrawPerTile),
-		Layout(Layout),
-		DrawMode(DrawMode)
-	{
-		assert((Layout == LAYOUT_MORTON && TileSize.x == TileSize.y && glm::bitCount(glm::uint(TileSize.x)) == 1u) || Layout != LAYOUT_MORTON);
-	}
+		UniformDiffuse(-1),
+		UniformMVP(-1),
+		UniformMode(UniformMode)
+	{}
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
@@ -99,9 +90,9 @@ private:
 	GLsizei VertexCount;
 	glm::vec2 const TileSize;
 	std::size_t const TrianglePairPerTile;
-	std::size_t const DrawPerTile;
-	layout const Layout;
-	drawMode const DrawMode;
+	GLint UniformDiffuse;
+	GLint UniformMVP;
+	uniformMode UniformMode;
 
 	bool initProgram()
 	{
@@ -127,6 +118,12 @@ private:
 		{
 			glGenProgramPipelines(1, &this->PipelineName);
 			glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, this->ProgramName);
+		}
+
+		if(Validated)
+		{
+			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
+			UniformMVP = glGetUniformLocation(ProgramName, "MVP");
 		}
 
 		return Validated;
@@ -164,16 +161,10 @@ private:
 
 		GLsizei VertexSize = static_cast<GLsizei>(Vertices.size() * sizeof(vertex));
 
-		glm::mat4 Perspective = glm::ortho(0.0f, static_cast<float>(WindowSize.x), 0.0f, static_cast<float>(WindowSize.y));
-
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, &Vertices[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(Perspective), &Perspective[0][0], GL_STATIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
 	}
@@ -213,12 +204,12 @@ private:
 		if(Validated)
 		{
 			glm::vec2 WindowSize(this->getWindowSize());
+			glm::mat4 Perspective = glm::ortho(0.0f, WindowSize.x, 0.0f, WindowSize.y);
 
 			glUseProgram(ProgramName);
+			glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &Perspective[0][0]);
 
 			glBindVertexArray(VertexArrayName);
-			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-
 			glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
 			glEnable(GL_DEPTH_TEST);
@@ -245,29 +236,20 @@ private:
 
 		this->beginTimer();
 
-		switch(this->DrawMode)
+		if(this->UniformMode == UNIFORM_SINGLE)
+			glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+
+		for(std::size_t i = 0; i < VertexCount; i += 6)
 		{
-			case DRAW_SINGLE:
+			if(this->UniformMode == UNIFORM_REDUNDANT)
+				glUniform4f(UniformDiffuse, 1.0f, 0.5f, 0.0f, 1.0f);
+			if(this->UniformMode == UNIFORM_UNIQUE)
 			{
-				glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
+				glm::vec4 Color = glm::linearRand(glm::vec4(0), glm::vec4(1));
+				glUniform4f(UniformDiffuse, Color.r, Color.g, Color.b, Color.a);
 			}
-			break;
-			case DRAW_PER_TILE:
-			{
-				for(std::size_t i = 0; i < VertexCount; i += 6 * this->TrianglePairPerTile / this->DrawPerTile)
-				{
-					glDrawArraysInstanced(GL_TRIANGLES,
-						static_cast<GLint>(i),
-						static_cast<GLsizei>(6 * this->TrianglePairPerTile / this->DrawPerTile),
-						1);
-				}
-			}
-			break;
-			default:
-			{
-				assert(0);
-			}
-			break;
+
+			glDrawArraysInstanced(GL_TRIANGLES, static_cast<GLint>(i), static_cast<GLsizei>(6), 1);
 		}
 
 		this->endTimer();
@@ -283,60 +265,54 @@ struct entry
 		glm::uvec2 const & WindowSize,
 		glm::vec2 const & TileSize,
 		std::size_t const & TrianglePairPerTile,
-		std::size_t const & DrawPerTile,
-		layout Layout,
-		drawMode DrawMode
+		uniformMode const & UniformMode
 	) :
 		String(String),
 		WindowSize(WindowSize),
 		TileSize(TileSize),
 		TrianglePairPerTile(TrianglePairPerTile),
-		DrawPerTile(DrawPerTile),
-		Layout(Layout),
-		DrawMode(DrawMode)
+		UniformMode(UniformMode)
 	{}
 
 	std::string const String;
 	glm::uvec2 const WindowSize;
 	glm::vec2 const TileSize;
 	std::size_t const TrianglePairPerTile;
-	std::size_t const DrawPerTile;
-	layout Layout;
-	drawMode DrawMode;
+	uniformMode UniformMode;
 };
 
-int main_draw_call(int argc, char* argv[])
+int main_uniform_caching(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	for(glm::uint TileSizeIndex = 3; TileSizeIndex < 4; ++TileSizeIndex)
-	{	
-		for(std::size_t DrawPerTile = 1; DrawPerTile <= 512; DrawPerTile <<= 1)
-			Entries.push_back(entry(
-			message_format("window(%d), tile(%d), triangle-per-draw(%d)", 64 * (TileSizeIndex + 1), 8 * (TileSizeIndex + 1), 1024 / DrawPerTile),
-			glm::uvec2(64) * (TileSizeIndex + 1), glm::uvec2(8, 8) * (TileSizeIndex + 1), 512, DrawPerTile, LAYOUT_LINEAR, DRAW_PER_TILE));
-	}
+	Entries.push_back(entry(
+		message_format("UNIFORM_SINGLE mode"),
+		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_SINGLE));
+	Entries.push_back(entry(
+		message_format("UNIFORM_REDUNDANT mode"),
+		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_REDUNDANT));
+	Entries.push_back(entry(
+		message_format("UNIFORM_UNIQUE mode"),
+		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_UNIQUE));
 
 	csv CSV;
 	int Error(0);
 
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	{
-		test_draw_call Test(
+		test_uniform_caching Test(
 			argc, argv,
 			1000,
 			Entries[EntryIndex].WindowSize,
 			Entries[EntryIndex].TileSize,
 			Entries[EntryIndex].TrianglePairPerTile,
-			Entries[EntryIndex].DrawPerTile,
-			Entries[EntryIndex].Layout,
-			Entries[EntryIndex].DrawMode);
+			Entries[EntryIndex].UniformMode);
 
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
 	}
 
-	CSV.save("../main_draw_call.csv");
+	CSV.save("../main_uniform_caching.csv");
 
 	return Error;
 }

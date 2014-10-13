@@ -8,6 +8,8 @@
 
 #include "test_draw_call.hpp"
 #include "test_small_primitive.hpp"
+#include "test_uniform_caching.hpp"
+
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
 std::size_t const TEST_FRAME_PER_RUN(100);
@@ -473,7 +475,8 @@ int main(int argc, char* argv[])
 	//Error += main_small_primitive5(argc, argv);
 	//Error += main_small_primitive6(argc, argv);
 
-	Error += main_draw_call(argc, argv);
+	//Error += main_draw_call(argc, argv);
+	Error += main_uniform_caching(argc, argv);
 
 	return Error;
 }
