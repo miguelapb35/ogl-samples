@@ -23,8 +23,6 @@ endforeach(FILE)
 source_group("Inline Files" FILES ${MICRO_INLINE})
 source_group("Shader Files" FILES ${MICRO_SHADER})
 
-if(NOT APPLE)
-
 foreach(FILE ${GL_SHADER_GTC})
 	set(SHADER_PATH ${SHADER_PATH} ${SHADER_DIR}/${FILE})
 endforeach(FILE)
@@ -38,4 +36,3 @@ add_custom_command(
 target_link_libraries(${MICRO} ${FRAMEWORK_NAME} ${BINARY_FILES})
 add_dependencies(${MICRO} ${FRAMEWORK_NAME} glfw)
 
-endif(NOT APPLE)
