@@ -5,11 +5,10 @@
 #include "test_draw_indexing.hpp"
 #include "test_screenspace_coherence.hpp"
 
-
+#include "test_buffer.hpp"
 #include "test_draw_call.hpp"
 #include "test_small_primitive.hpp"
 #include "test_uniform_caching.hpp"
-
 
 std::size_t const TEST_DUPLICATE_COUNT(1);
 std::size_t const TEST_FRAME_PER_RUN(100);
@@ -466,17 +465,21 @@ int drawIndexing(int argc, char* argv[], csv & CSV)
 int main(int argc, char* argv[])
 {
 	int Error(0);
+/*
+	Error += main_small_primitive_debug(argc, argv);
+	Error += main_small_primitive1(argc, argv);
+	Error += main_small_primitive2(argc, argv);
+	Error += main_small_primitive3(argc, argv);
+	Error += main_small_primitive4_memory_layout(argc, argv);
+	Error += main_small_primitive5(argc, argv);
+	Error += main_small_primitive6(argc, argv);
+*/
 
-	//Error += main_small_primitive_debug(argc, argv);
-	//Error += main_small_primitive1(argc, argv);
-	//Error += main_small_primitive2(argc, argv);
-	//Error += main_small_primitive3(argc, argv);
-	//Error += main_small_primitive4_memory_layout(argc, argv);
-	//Error += main_small_primitive5(argc, argv);
-	//Error += main_small_primitive6(argc, argv);
+//	Error += main_draw_call(argc, argv);
 
-	//Error += main_draw_call(argc, argv);
-	Error += main_uniform_caching(argc, argv);
+//	Error += main_uniform_caching(argc, argv);
+
+	Error += main_buffer(argc, argv);
 
 	return Error;
 }
