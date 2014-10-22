@@ -36,14 +36,23 @@ namespace
 		vertex
 		(
 			glm::vec3 const & Position,
-			glm::u8vec4 const & Color
+			glm::u8vec4 const & ColorA,
+			glm::vec4 const & ColorB,
+			glm::vec4 const & ColorC,
+			glm::vec4 const & ColorD
 		) :
 			Position(Position),
-			Color(Color)
+			ColorA(ColorA),
+			ColorB(ColorB),
+			ColorC(ColorC),
+			ColorD(ColorD)
 		{}
 
 		glm::vec3 Position;
-		glm::u8vec4 Color;
+		glm::u8vec4 ColorA;
+		glm::vec4 ColorB;
+		glm::vec4 ColorC;
+		glm::vec4 ColorD;
 	};
 
 	namespace buffer
@@ -51,57 +60,41 @@ namespace
 		enum type
 		{
 			VERTEX,
+			ELEMENT,
 			TRANSFORM,
 			MAX
 		};
 	}//namespace buffer
-
-	enum drawMode
-	{
-		DRAW_SINGLE,
-		DRAW_PER_TILE
-	};
-
-	enum layout
-	{
-		LAYOUT_LINEAR,
-		LAYOUT_MORTON,
-		LAYOUT_RANDOM
-	};
 }//namespace
 
 class test_buffer : public test
 {
 public:
-	test_buffer(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, std::size_t DrawPerTile, layout Layout, drawMode DrawMode) :
-		test(argc, argv, "test_buffer", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
-		VertexArrayName(0),
-		ProgramName(0),
-		SamplerName(0),
-		TextureName(0),
-		VertexCount(0),
-		TileSize(TileSize),
-		TrianglePairPerTile(TrianglePairPerTile),
-		DrawPerTile(DrawPerTile),
-		Layout(Layout),
-		DrawMode(DrawMode)
-	{
-		assert((Layout == LAYOUT_MORTON && TileSize.x == TileSize.y && glm::bitCount(glm::uint(TileSize.x)) == 1u) || Layout != LAYOUT_MORTON);
-	}
+	test_buffer(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize)
+		: test(argc, argv, "test_buffer", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize)
+		, VertexArrayName(0)
+		, ProgramName(0)
+		, ElementCount(0)
+	{}
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
-	GLuint SamplerName;
-	GLuint TextureName;
-	GLsizei VertexCount;
-	glm::vec2 const TileSize;
-	std::size_t const TrianglePairPerTile;
-	std::size_t const DrawPerTile;
-	layout const Layout;
-	drawMode const DrawMode;
+	GLsizei ElementCount;
+	std::vector<vertex> VertexData;
+	std::vector<glm::uint32> ElementData;
+
+	glm::u8vec4 generateColorU8() const
+	{
+		return glm::u8vec4(glm::clamp(glm::linearRand(glm::vec4(0.0), glm::vec4(255.0)), glm::vec4(0.0), glm::vec4(255.0)));
+	}
+
+	glm::vec4 generateColor() const
+	{
+		return glm::clamp(glm::linearRand(glm::vec4(0.0), glm::vec4(255.0)), glm::vec4(0.0), glm::vec4(255.0));
+	}
 
 	bool initProgram()
 	{
@@ -134,41 +127,38 @@ private:
 
 	bool initBuffer()
 	{
-		std::size_t tileAddress();
-		
-		glm::vec2 const WindowSize(this->getWindowSize());
+		glm::uvec2 const WindowSize(this->getWindowSize());
 
-		glm::uvec2 const TileCount((WindowSize / this->TileSize) + glm::mix(glm::vec2(0), glm::vec2(1), glm::greaterThan(glm::mod(glm::vec2(WindowSize), this->TileSize), glm::vec2(0))));
-		std::vector<vertex> Vertices;
-		Vertices.resize(TileCount.x * TileCount.y * 6 * this->TrianglePairPerTile);
-		VertexCount = static_cast<GLsizei>(Vertices.size());
+		VertexData.resize(WindowSize.x * WindowSize.y * 4);
+		ElementData.resize(WindowSize.x * WindowSize.y * 6);
+		this->ElementCount = static_cast<GLsizei>(ElementData.size());
 
-		for(glm::uint TileIndexY = 0; TileIndexY < TileCount.y; ++TileIndexY)
-		for(glm::uint TileIndexX = 0; TileIndexX < TileCount.x; ++TileIndexX)
+		for(std::size_t j = 0; j < WindowSize.y >> 1; ++j)
+		for(std::size_t i = 0; i < WindowSize.x >> 1; ++i)
 		{
-			glm::uint TileIndex = (TileIndexX + TileIndexY * TileCount.x);
-
-			glm::vec4 const RandColor = glm::linearRand(glm::vec4(0.0), glm::vec4(255.0));
-			glm::u8vec4 Color(glm::clamp(RandColor, glm::vec4(0.0), glm::vec4(255.0)));
-
-			for(std::size_t DrawIndex = 0; DrawIndex < this->TrianglePairPerTile; ++DrawIndex)
-			{
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 0] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 1] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 2] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 3] = vertex(glm::vec3((TileIndexX + 1) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 4] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 1) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-				Vertices[TileIndex * (6 * this->TrianglePairPerTile) + DrawIndex * 6 + 5] = vertex(glm::vec3((TileIndexX + 0) * this->TileSize.x, (TileIndexY + 0) * this->TileSize.y, static_cast<float>(2 + DrawIndex)), Color);
-			}
+			std::size_t Index(i + j * (static_cast<std::size_t>(WindowSize.x) >> 1));
+			VertexData[Index * 4 + 0] = vertex(glm::vec3(i * 2 + 0, j * 2 + 0, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 1] = vertex(glm::vec3(i * 2 + 2, j * 2 + 0, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 2] = vertex(glm::vec3(i * 2 + 2, j * 2 + 2, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 3] = vertex(glm::vec3(i * 2 + 0, j * 2 + 2, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			ElementData[Index * 6 + 0] = Index * 4 + 0;
+			ElementData[Index * 6 + 1] = Index * 4 + 1;
+			ElementData[Index * 6 + 2] = Index * 4 + 2;
+			ElementData[Index * 6 + 3] = Index * 4 + 2;
+			ElementData[Index * 6 + 4] = Index * 4 + 3;
+			ElementData[Index * 6 + 5] = Index * 4 + 0;
 		}
-
-		GLsizei VertexSize = static_cast<GLsizei>(Vertices.size() * sizeof(vertex));
 
 		glm::mat4 Perspective = glm::ortho(0.0f, static_cast<float>(WindowSize.x), 0.0f, static_cast<float>(WindowSize.y));
 
 		glGenBuffers(buffer::MAX, &BufferName[0]);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementData.size() * sizeof(glm::uint32), &ElementData[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, &Vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(vertex), &VertexData[0], GL_DYNAMIC_DRAW); //GL_STATIC_DRAW GL_STREAM_DRAW GL_DYNAMIC_DRAW
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -183,12 +173,20 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3)));
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
+			glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3)));
+			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3) + sizeof(glm::u8vec4)));
+			glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3) + sizeof(glm::u8vec4) + sizeof(glm::vec4)));
+			glVertexAttribPointer(4, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec3) + sizeof(glm::u8vec4) + sizeof(glm::vec4) + sizeof(glm::vec4)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::COLOR);
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
+			glEnableVertexAttribArray(3);
+			glEnableVertexAttribArray(4);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
 		return true;
@@ -213,13 +211,12 @@ private:
 		if(Validated)
 		{
 			glm::vec2 WindowSize(this->getWindowSize());
-
-			glUseProgram(ProgramName);
-
-			glBindVertexArray(VertexArrayName);
-			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-
 			glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
+
+			glBindProgramPipeline(this->PipelineName);
+			glBindVertexArray(this->VertexArrayName);
+			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, this->BufferName[buffer::TRANSFORM]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 			//glEnable(GL_DEPTH_TEST);
 			//glDepthFunc(GL_LESS);
@@ -240,36 +237,30 @@ private:
 
 	bool render()
 	{
-		//float Depth(1.0f);
-		//glClearBufferfv(GL_DEPTH, 0, &Depth);
+		glm::uvec2 const WindowSize(this->getWindowSize());
+/*
+		for(std::size_t j = 0; j < WindowSize.y >> 1; ++j)
+		for(std::size_t i = 0; i < WindowSize.x >> 1; ++i)
+		{
+			std::size_t Index(i + j * (static_cast<std::size_t>(WindowSize.x) >> 1));
+			VertexData[Index * 4 + 0] = vertex(glm::vec3(i * 2 + 0, j * 2 + 0, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 1] = vertex(glm::vec3(i * 2 + 2, j * 2 + 0, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 2] = vertex(glm::vec3(i * 2 + 2, j * 2 + 2, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			VertexData[Index * 4 + 3] = vertex(glm::vec3(i * 2 + 0, j * 2 + 2, 0), this->generateColorU8(), this->generateColor(), this->generateColor(), this->generateColor());
+			ElementData[Index * 6 + 0] = Index * 4 + 0;
+			ElementData[Index * 6 + 1] = Index * 4 + 1;
+			ElementData[Index * 6 + 2] = Index * 4 + 2;
+			ElementData[Index * 6 + 3] = Index * 4 + 2;
+			ElementData[Index * 6 + 4] = Index * 4 + 3;
+			ElementData[Index * 6 + 5] = Index * 4 + 0;
+		}
+*/
 
 		this->beginTimer();
+			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+			glBufferSubData(GL_ARRAY_BUFFER, 0, VertexData.size() * sizeof(vertex), &this->VertexData[0]);
 
-		switch(this->DrawMode)
-		{
-			case DRAW_SINGLE:
-			{
-				glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
-			}
-			break;
-			case DRAW_PER_TILE:
-			{
-				for(std::size_t i = 0; i < VertexCount; i += 6 * this->TrianglePairPerTile / this->DrawPerTile)
-				{
-					glDrawArraysInstanced(GL_TRIANGLES,
-						static_cast<GLint>(i),
-						static_cast<GLsizei>(6 * this->TrianglePairPerTile / this->DrawPerTile),
-						1);
-				}
-			}
-			break;
-			default:
-			{
-				assert(0);
-			}
-			break;
-		}
-
+			glDrawElementsInstanced(GL_TRIANGLES, this->ElementCount, GL_UNSIGNED_INT, 0, 1);
 		this->endTimer();
 
 		return true;
@@ -283,17 +274,13 @@ struct entry
 		glm::uvec2 const & WindowSize,
 		glm::vec2 const & TileSize,
 		std::size_t const & TrianglePairPerTile,
-		std::size_t const & DrawPerTile,
-		layout Layout,
-		drawMode DrawMode
+		std::size_t const & DrawPerTile
 	) :
 		String(String),
 		WindowSize(WindowSize),
 		TileSize(TileSize),
 		TrianglePairPerTile(TrianglePairPerTile),
-		DrawPerTile(DrawPerTile),
-		Layout(Layout),
-		DrawMode(DrawMode)
+		DrawPerTile(DrawPerTile)
 	{}
 
 	std::string const String;
@@ -301,8 +288,6 @@ struct entry
 	glm::vec2 const TileSize;
 	std::size_t const TrianglePairPerTile;
 	std::size_t const DrawPerTile;
-	layout Layout;
-	drawMode DrawMode;
 };
 
 int main_buffer(int argc, char* argv[])
@@ -314,38 +299,13 @@ int main_buffer(int argc, char* argv[])
 		for(std::size_t DrawPerTile = 1; DrawPerTile <= 512; DrawPerTile <<= 1)
 			Entries.push_back(entry(
 			message_format("window(%d), tile(%d), triangle-per-draw(%d)", 64 * (TileSizeIndex + 1), 8 * (TileSizeIndex + 1), 1024 / DrawPerTile),
-			glm::uvec2(64) * (TileSizeIndex + 1), glm::uvec2(8, 8) * (TileSizeIndex + 1), 512, DrawPerTile, LAYOUT_LINEAR, DRAW_PER_TILE));
+			glm::uvec2(64) * (TileSizeIndex + 1), glm::uvec2(8, 8) * (TileSizeIndex + 1), 512, DrawPerTile));
 	}
 
 	csv CSV;
 	int Error(0);
-/*
-	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
-	{
-		test_buffer Test(
-			argc, argv,
-			1000,
-			Entries[EntryIndex].WindowSize,
-			Entries[EntryIndex].TileSize,
-			Entries[EntryIndex].TrianglePairPerTile,
-			Entries[EntryIndex].DrawPerTile,
-			Entries[EntryIndex].Layout,
-			Entries[EntryIndex].DrawMode);
 
-		Error += Test();
-		Test.log(CSV, Entries[EntryIndex].String.c_str());
-	}
-*/
-
-	test_buffer Test(
-		argc, argv,
-		10000,
-		glm::uvec2(320, 240),
-		glm::vec2(64),
-		2,
-		1,
-		::LAYOUT_LINEAR,
-		DRAW_PER_TILE);
+	test_buffer Test(argc, argv, 10000, glm::uvec2(512));
 
 	Error += Test();
 	Test.log(CSV, "GNI");
