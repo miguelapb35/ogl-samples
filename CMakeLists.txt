@@ -216,6 +216,7 @@ endif()
 # Add subdirectory
 
 add_subdirectory(tests)
+add_subdirectory(perfs)
 add_subdirectory(micro)
 
 ################################
