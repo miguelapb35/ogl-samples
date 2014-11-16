@@ -97,7 +97,7 @@ class gl_450_multi_draw_indirect : public test
 {
 public:
 	gl_450_multi_draw_indirect(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-multi-draw-indirect-arb", test::CORE, 4, 3, glm::ivec2(640, 480),
+		test(argc, argv, "gl-450-multi-draw-indirect-arb", test::CORE, 4, 3, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),

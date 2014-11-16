@@ -53,7 +53,7 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::uvec2 WindowSize = this->getWindowSize();
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);

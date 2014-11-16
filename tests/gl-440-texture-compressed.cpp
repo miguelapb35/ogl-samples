@@ -316,7 +316,7 @@ private:
 
 	bool begin()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::ivec2 WindowSize(this->getWindowSize());
 
 		Viewport[texture::RGB8] = glm::ivec4(0, 0, WindowSize >> 1);
 		Viewport[texture::DXT5] = glm::ivec4(WindowSize.x >> 1, 0, WindowSize >> 1);
@@ -353,7 +353,7 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::uvec2 WindowSize = this->getWindowSize();
 
 		// Asynchrone update of the uniform buffer
 		{

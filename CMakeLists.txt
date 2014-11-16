@@ -91,7 +91,7 @@ set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTOR
 ################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.6.x)
+set(GLM_DIRECTORY glm-0.9.6.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################
@@ -225,8 +225,8 @@ install (DIRECTORY data DESTINATION .)
 
 # See http://www.vtk.org/Wiki/CMake:CPackPackageGenerators
 set (CPACK_PACKAGE_VERSION_MAJOR "4")
-set (CPACK_PACKAGE_VERSION_MINOR "4")
-set (CPACK_PACKAGE_VERSION_PATCH "3")
+set (CPACK_PACKAGE_VERSION_MINOR "5")
+set (CPACK_PACKAGE_VERSION_PATCH "1")
 # Use current date in YYYYMMDD format as patch number
 
 # cpack mistakenly detects Mingw-w64 as win32

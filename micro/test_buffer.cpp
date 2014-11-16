@@ -298,8 +298,8 @@ int main_buffer(int argc, char* argv[])
 	{	
 		for(std::size_t DrawPerTile = 1; DrawPerTile <= 512; DrawPerTile <<= 1)
 			Entries.push_back(entry(
-			message_format("window(%d), tile(%d), triangle-per-draw(%d)", 64 * (TileSizeIndex + 1), 8 * (TileSizeIndex + 1), 1024 / DrawPerTile),
-			glm::uvec2(64) * (TileSizeIndex + 1), glm::uvec2(8, 8) * (TileSizeIndex + 1), 512, DrawPerTile));
+				message_format("window(%d), tile(%d), triangle-per-draw(%d)", 64 * (TileSizeIndex + 1), 8 * (TileSizeIndex + 1), 1024 / DrawPerTile),
+				glm::uvec2(64) * (TileSizeIndex + 1), glm::vec2(glm::uvec2(8, 8) * (TileSizeIndex + 1)), 512, DrawPerTile));
 	}
 
 	csv CSV;
