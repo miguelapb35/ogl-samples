@@ -24,9 +24,7 @@
 #pragma once
 
 #include <GL/glew.h>
-
-#define GLM_FORCE_RADIANS
-#include <glm/gtx/raw_data.hpp>
+#include <glm/gtc/type_precision.hpp>
 
 #include <map>
 #include <string>
@@ -95,5 +93,5 @@ private:
 };
 
 std::string loadFile(std::string const & Filename);
-bool loadBinary(std::string const & Filename, GLenum & Format, std::vector<glm::byte> & Data, GLint & Size);
-bool saveBinary(std::string const & Filename, GLenum const & Format, std::vector<glm::byte> const & Data, GLint const & Size);
+bool loadBinary(std::string const & Filename, GLenum & Format, std::vector<glm::uint8> & Data, GLint & Size);
+bool saveBinary(std::string const & Filename, GLenum const & Format, std::vector<glm::uint8> const & Data, GLint const & Size);

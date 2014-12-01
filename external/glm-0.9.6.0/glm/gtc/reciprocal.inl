@@ -12,6 +12,10 @@
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
 /// 
+/// Restrictions:
+///		By making use of the Software for military purposes, you choose to make
+///		a Bunny unhappy.
+/// 
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,7 +70,9 @@ namespace glm
 	GLM_FUNC_QUALIFIER genType cot(genType angle)
 	{
 		GLM_STATIC_ASSERT(std::numeric_limits<genType>::is_iec559, "'cot' only accept floating-point values");
-		return genType(1) / glm::tan(angle);
+	
+		genType const pi_over_2 = genType(3.1415926535897932384626433832795 / 2.0);
+		return glm::tan(pi_over_2 - angle);
 	}
 
 	template <typename T, precision P, template <typename, precision> class vecType>

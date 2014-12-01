@@ -12,6 +12,10 @@
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
 /// 
+/// Restrictions:
+///		By making use of the Software for military purposes, you choose to make
+///		a Bunny unhappy.
+/// 
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -58,25 +62,30 @@ namespace glm
 	template <typename T, precision P>
 	struct tquat
 	{
+		typedef tquat<T, P> type;
 		typedef T value_type;
-		typedef tvec4<bool, P> bool_type;
 
 	public:
 		T x, y, z, w;
 
-#if GLM_FORCE_SIZE_FUNC
-		/// Return the count of components of a quaternion
-		GLM_FUNC_DECL GLM_CONSTEXPR size_t size() const;
-#else
-		/// Return the count of components of a quaternion
-		GLM_FUNC_DECL GLM_CONSTEXPR length_t length() const;
-#endif//GLM_FORCE_SIZE_FUNC
-
 		//////////////////////////////////////
-		// Accesses
+		// Component accesses
 
-		GLM_FUNC_DECL T & operator[](length_t i);
-		GLM_FUNC_DECL T const & operator[](length_t i) const;
+#		ifdef GLM_FORCE_SIZE_FUNC
+			typedef size_t size_type;
+			/// Return the count of components of a quaternion
+			GLM_FUNC_DECL GLM_CONSTEXPR size_type size() const;
+
+			GLM_FUNC_DECL T & operator[](size_type i);
+			GLM_FUNC_DECL T const & operator[](size_type i) const;
+#		else
+			typedef length_t length_type;
+			/// Return the count of components of a quaternion
+			GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+
+			GLM_FUNC_DECL T & operator[](length_type i);
+			GLM_FUNC_DECL T const & operator[](length_type i) const;
+#		endif//GLM_FORCE_SIZE_FUNC
 
 		//////////////////////////////////////
 		// Implicit basic constructors
@@ -95,6 +104,18 @@ namespace glm
 		//////////////////////////////////////
 		// Convertions
 
+#		ifdef GLM_FORCE_EXPLICIT_CTOR
+			template <typename U, precision Q>
+			GLM_FUNC_DECL explicit tquat(tquat<U, Q> const & q);
+#		else
+			template <typename U, precision Q>
+			GLM_FUNC_DECL tquat(tquat<U, Q> const & q);
+#		endif
+		
+		// explicit conversion operators
+		GLM_FUNC_DECL explicit operator tmat3x3<T, P>();
+		GLM_FUNC_DECL explicit operator tmat4x4<T, P>();
+		
 		/// Create a quaternion from two normalized axis
 		/// 
 		/// @param u A first normalized axis
@@ -102,6 +123,7 @@ namespace glm
 		/// @see gtc_quaternion
 		/// @see http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors
 		GLM_FUNC_DECL explicit tquat(tvec3<T, P> const & u,	tvec3<T, P> const & v);
+
 		/// Build a quaternion from euler angles (pitch, yaw, roll), in radians.
 		GLM_FUNC_DECL explicit tquat(tvec3<T, P> const & eulerAngles);
 		GLM_FUNC_DECL explicit tquat(tmat3x3<T, P> const & m);

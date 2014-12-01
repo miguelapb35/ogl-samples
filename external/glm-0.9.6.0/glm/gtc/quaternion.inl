@@ -12,6 +12,10 @@
 /// The above copyright notice and this permission notice shall be included in
 /// all copies or substantial portions of the Software.
 /// 
+/// Restrictions:
+///		By making use of the Software for military purposes, you choose to make
+///		a Bunny unhappy.
+/// 
 /// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 /// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 /// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -45,43 +49,57 @@ namespace detail
 	};
 }//namespace detail
 
-#if GLM_FORCE_SIZE_FUNC
-	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR size_t tquat<T, P>::size() const
-	{
-		return 4;
-	}
-#else
-	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR length_t tquat<T, P>::length() const
-	{
-		return 4;
-	}
-#endif
-
 	//////////////////////////////////////
-	// Accesses
+	// Component accesses
 
-	template <typename T, precision P> 
-	GLM_FUNC_QUALIFIER T & tquat<T, P>::operator[] (length_t i)
-	{
-		assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
-		return (&x)[i];
-	}
+#	ifdef GLM_FORCE_SIZE_FUNC
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename tquat<T, P>::size_type tquat<T, P>::size() const
+		{
+			return 4;
+		}
 
-	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER T const & tquat<T, P>::operator[] (length_t i) const
-	{
-		assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
-		return (&x)[i];
-	}
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER T & tquat<T, P>::operator[](typename tquat<T, P>::size_type i)
+		{
+			assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
+			return (&x)[i];
+		}
+
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER T const & tquat<T, P>::operator[](typename tquat<T, P>::size_type i) const
+		{
+			assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
+			return (&x)[i];
+		}
+#	else
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename tquat<T, P>::length_type tquat<T, P>::length() const
+		{
+			return 4;
+		}
+
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER T & tquat<T, P>::operator[](typename tquat<T, P>::length_type i)
+		{
+			assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
+			return (&x)[i];
+		}
+
+		template <typename T, precision P>
+		GLM_FUNC_QUALIFIER T const & tquat<T, P>::operator[](typename tquat<T, P>::length_type i) const
+		{
+			assert(i >= 0 && static_cast<detail::component_count_t>(i) < detail::component_count(*this));
+			return (&x)[i];
+		}
+#	endif//GLM_FORCE_SIZE_FUNC
 
 	//////////////////////////////////////
 	// Implicit basic constructors
 
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER tquat<T, P>::tquat()
-#		ifndef GLM_FORCE_NO_CTOR_INIT 
+#		ifndef GLM_FORCE_NO_CTOR_INIT
 			: x(0), y(0), z(0), w(1)
 #		endif
 	{}
@@ -106,11 +124,20 @@ namespace detail
 
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER tquat<T, P>::tquat(T const & w, T const & x, T const & y, T const & z)
-		: x(x), y(y), z(z),	w(w)
+		: x(x), y(y), z(z), w(w)
 	{}
 
 	//////////////////////////////////////////////////////////////
 	// Conversions
+
+	template <typename T, precision P>
+	template <typename U, precision Q>
+	GLM_FUNC_QUALIFIER tquat<T, P>::tquat(tquat<U, Q> const & q)
+		: x(static_cast<T>(q.x))
+		, y(static_cast<T>(q.y))
+		, z(static_cast<T>(q.z))
+		, w(static_cast<T>(q.w))
+	{}
 
 	//template <typename valType> 
 	//GLM_FUNC_QUALIFIER tquat<valType>::tquat
@@ -162,6 +189,18 @@ namespace detail
 	GLM_FUNC_QUALIFIER tquat<T, P>::tquat(tmat4x4<T, P> const & m)
 	{
 		*this = quat_cast(m);
+	}
+	
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tquat<T, P>::operator tmat3x3<T, P>()
+	{
+		return mat3_cast(*this);
+	}
+	
+	template <typename T, precision P>	
+	GLM_FUNC_QUALIFIER tquat<T, P>::operator tmat4x4<T, P>()
+	{
+		return mat4_cast(*this);
 	}
 
 	template <typename T, precision P>

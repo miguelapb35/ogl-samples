@@ -343,7 +343,7 @@ bool loadBinary
 (
 	std::string const & Filename,
 	GLenum & Format,
-	std::vector<glm::byte> & Data,
+	std::vector<glm::uint8> & Data,
 	GLint & Size
 )
 {
@@ -365,7 +365,7 @@ bool saveBinary
 (
 	std::string const & Filename, 
 	GLenum const & Format,
-	std::vector<glm::byte> const & Data,
+	std::vector<glm::uint8> const & Data,
 	GLint const & Size
 )
 {
