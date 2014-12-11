@@ -236,7 +236,7 @@ private:
 
 	bool begin()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::uvec2 WindowSize = this->getWindowSize();
 
 		glm::vec2 ViewportSize(WindowSize.x * 0.33f, WindowSize.y * 0.50f);
 

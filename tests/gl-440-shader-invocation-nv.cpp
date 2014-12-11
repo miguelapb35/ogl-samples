@@ -56,7 +56,7 @@ class gl_440_shader_invocation_nv : public test
 {
 public:
 	gl_440_shader_invocation_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4, glm::ivec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

@@ -148,7 +148,7 @@ private:
 				break;
 			case LAYOUT_RANDOM:
 			{
-				glm::uvec2 RandTileIndex = glm::clamp(glm::linearRand(glm::vec2(0.0f), glm::vec2(TileCount - 1u)), glm::vec2(0.0f), glm::vec2(TileCount - 1u));
+				glm::uvec2 RandTileIndex(glm::clamp(glm::linearRand(glm::vec2(0.0f), glm::vec2(TileCount - 1u)), glm::vec2(0.0f), glm::vec2(TileCount - 1u)));
 				TileIndex = (RandTileIndex.x + RandTileIndex.y * TileCount.x);
 				break;
 			}
@@ -282,9 +282,9 @@ int main_small_primitive_debug(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(640, 480), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(32, 2)", glm::uvec2(640, 480), glm::uvec2(32, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(640, 480), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::vec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 2)", glm::uvec2(640, 480), glm::vec2(32, 2), 1, LAYOUT_LINEAR));
 
 	csv CSV;
 	int Error(0);
@@ -312,15 +312,15 @@ int main_small_primitive1(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1920, 1080), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1920, 1080), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(32, 32)", glm::uvec2(1920, 1080), glm::uvec2(32, 32), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(64, 64)", glm::uvec2(1920, 1080), glm::uvec2(64, 64), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(128, 128)", glm::uvec2(1920, 1080), glm::uvec2(128, 128), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(1920, 1080)", glm::uvec2(1920, 1080), glm::uvec2(1920, 1080), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1920, 1080), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1920, 1080), glm::vec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::vec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::vec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::vec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 32)", glm::uvec2(1920, 1080), glm::vec2(32, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 64)", glm::uvec2(1920, 1080), glm::vec2(64, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(128, 128)", glm::uvec2(1920, 1080), glm::vec2(128, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1920, 1080)", glm::uvec2(1920, 1080), glm::vec2(1920, 1080), 1, LAYOUT_LINEAR));
 
 	csv CSV;
 	int Error(0);
@@ -348,29 +348,29 @@ int main_small_primitive2(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 8)", glm::uvec2(1920, 1080), glm::uvec2(2, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 2)", glm::uvec2(1920, 1080), glm::uvec2(8, 2), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(1, 16)", glm::uvec2(1920, 1080), glm::uvec2(1, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(16, 1)", glm::uvec2(1920, 1080), glm::uvec2(16, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1920, 1080), glm::vec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 8)", glm::uvec2(1920, 1080), glm::vec2(2, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 2)", glm::uvec2(1920, 1080), glm::vec2(8, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 16)", glm::uvec2(1920, 1080), glm::vec2(1, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 1)", glm::uvec2(1920, 1080), glm::vec2(16, 1), 1, LAYOUT_LINEAR));
 
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(4, 16)", glm::uvec2(1920, 1080), glm::uvec2(4, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(16, 4)", glm::uvec2(1920, 1080), glm::uvec2(16, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 32)", glm::uvec2(1920, 1080), glm::uvec2(2, 32), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(32, 2)", glm::uvec2(1920, 1080), glm::uvec2(32, 2), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(1, 64)", glm::uvec2(1920, 1080), glm::uvec2(1, 64), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(64, 1)", glm::uvec2(1920, 1080), glm::uvec2(64, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1920, 1080), glm::vec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 16)", glm::uvec2(1920, 1080), glm::vec2(4, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 4)", glm::uvec2(1920, 1080), glm::vec2(16, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 32)", glm::uvec2(1920, 1080), glm::vec2(2, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 2)", glm::uvec2(1920, 1080), glm::vec2(32, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 64)", glm::uvec2(1920, 1080), glm::vec2(1, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 1)", glm::uvec2(1920, 1080), glm::vec2(64, 1), 1, LAYOUT_LINEAR));
 
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 32)", glm::uvec2(1920, 1080), glm::uvec2(8, 32), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(32, 8)", glm::uvec2(1920, 1080), glm::uvec2(32, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(4, 64)", glm::uvec2(1920, 1080), glm::uvec2(4, 64), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(64, 4)", glm::uvec2(1920, 1080), glm::uvec2(64, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 128)", glm::uvec2(1920, 1080), glm::uvec2(2, 128), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(128, 2)", glm::uvec2(1920, 1080), glm::uvec2(128, 2), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(1, 256)", glm::uvec2(1920, 1080), glm::uvec2(1, 256), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(256, 1)", glm::uvec2(1920, 1080), glm::uvec2(256, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1920, 1080), glm::vec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 32)", glm::uvec2(1920, 1080), glm::vec2(8, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 8)", glm::uvec2(1920, 1080), glm::vec2(32, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 64)", glm::uvec2(1920, 1080), glm::vec2(4, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 4)", glm::uvec2(1920, 1080), glm::vec2(64, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 128)", glm::uvec2(1920, 1080), glm::vec2(2, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(128, 2)", glm::uvec2(1920, 1080), glm::vec2(128, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 256)", glm::uvec2(1920, 1080), glm::vec2(1, 256), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(256, 1)", glm::uvec2(1920, 1080), glm::vec2(256, 1), 1, LAYOUT_LINEAR));
 
 	csv CSV;
 	int Error(0);
@@ -429,21 +429,21 @@ int main_small_primitive4_memory_layout(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_MORTON));
-	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::uvec2(1, 1), 1, LAYOUT_RANDOM));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_MORTON));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::uvec2(2, 2), 1, LAYOUT_RANDOM));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_MORTON));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::uvec2(4, 4), 1, LAYOUT_RANDOM));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_MORTON));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::uvec2(8, 8), 1, LAYOUT_RANDOM));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_MORTON));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::uvec2(16, 16), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::vec2(1, 1), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(1, 1)", glm::uvec2(1024, 1024), glm::vec2(1, 1), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::vec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::vec2(2, 2), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(1024, 1024), glm::vec2(2, 2), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::vec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::vec2(4, 4), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(1024, 1024), glm::vec2(4, 4), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::vec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::vec2(8, 8), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(1024, 1024), glm::vec2(8, 8), 1, LAYOUT_RANDOM));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::vec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::vec2(16, 16), 1, LAYOUT_MORTON));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(1024, 1024), glm::vec2(16, 16), 1, LAYOUT_RANDOM));
 
 	csv CSV;
 	int Error(0);
@@ -471,13 +471,13 @@ int main_small_primitive5(int argc, char* argv[])
 {
 	std::vector<entry> Entries;
 
-	Entries.push_back(entry("tile(128, 128)", glm::uvec2(640, 480), glm::uvec2(128, 128), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(64, 64)", glm::uvec2(640, 480), glm::uvec2(64, 64), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(32, 32)", glm::uvec2(640, 480), glm::uvec2(32, 32), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(16, 16)", glm::uvec2(640, 480), glm::uvec2(16, 16), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::uvec2(8, 8), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(4, 4)", glm::uvec2(640, 480), glm::uvec2(4, 4), 1, LAYOUT_LINEAR));
-	Entries.push_back(entry("tile(2, 2)", glm::uvec2(640, 480), glm::uvec2(2, 2), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(128, 128)", glm::uvec2(640, 480), glm::vec2(128, 128), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(64, 64)", glm::uvec2(640, 480), glm::vec2(64, 64), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(32, 32)", glm::uvec2(640, 480), glm::vec2(32, 32), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(16, 16)", glm::uvec2(640, 480), glm::vec2(16, 16), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(8, 8)", glm::uvec2(640, 480), glm::vec2(8, 8), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(4, 4)", glm::uvec2(640, 480), glm::vec2(4, 4), 1, LAYOUT_LINEAR));
+	Entries.push_back(entry("tile(2, 2)", glm::uvec2(640, 480), glm::vec2(2, 2), 1, LAYOUT_LINEAR));
 	Entries.push_back(entry("tile(1, 1)", glm::uvec2(640, 480), glm::vec2(1, 1), 1, LAYOUT_LINEAR));
 	Entries.push_back(entry("tile(0.5, 0.5)", glm::uvec2(640, 480), glm::vec2(0.5, 0.5), 1, LAYOUT_LINEAR));
 	Entries.push_back(entry("tile(0.25, 0.25)", glm::uvec2(640, 480), glm::vec2(0.25, 0.25), 1, LAYOUT_LINEAR));
@@ -511,13 +511,13 @@ int main_small_primitive6(int argc, char* argv[])
 
 	for(std::size_t i = 8; i <= 1024; i *= 2)
 	{
-		//Entries.push_back(entry("(2048, 1024) tile(32, 32)", glm::uvec2(2048, 1024), glm::uvec2(32, 32), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(1536, 768) tile(24, 24)", glm::uvec2(1536, 768), glm::uvec2(24, 24), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(1024, 512) tile(16, 16)", glm::uvec2(1024, 512), glm::uvec2(16, 16), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(768, 384) tile(12, 12)", glm::uvec2(768, 384), glm::uvec2(12, 12), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(512, 256) tile(8, 8)", glm::uvec2(512, 256), glm::uvec2(8, 8), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(384, 192) tile(6, 6)", glm::uvec2(384, 192), glm::uvec2(6, 6), i, LAYOUT_LINEAR));
-		Entries.push_back(entry("(256, 128) tile(4, 4)", glm::uvec2(256, 128), glm::uvec2(4, 4), i, LAYOUT_LINEAR));
+		//Entries.push_back(entry("(2048, 1024) tile(32, 32)", glm::uvec2(2048, 1024), glm::vec2(32, 32), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1536, 768) tile(24, 24)", glm::uvec2(1536, 768), glm::vec2(24, 24), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(1024, 512) tile(16, 16)", glm::uvec2(1024, 512), glm::vec2(16, 16), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(768, 384) tile(12, 12)", glm::uvec2(768, 384), glm::vec2(12, 12), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(512, 256) tile(8, 8)", glm::uvec2(512, 256), glm::vec2(8, 8), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(384, 192) tile(6, 6)", glm::uvec2(384, 192), glm::vec2(6, 6), i, LAYOUT_LINEAR));
+		Entries.push_back(entry("(256, 128) tile(4, 4)", glm::uvec2(256, 128), glm::vec2(4, 4), i, LAYOUT_LINEAR));
 	}
 
 /*

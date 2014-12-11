@@ -175,7 +175,7 @@ private:
 		glm::mat4 MVP = Projection * this->view() * Model;
 
 		// Set the display viewport
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::uvec2 WindowSize = this->getWindowSize();
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 
 		// Clear color buffer with black
