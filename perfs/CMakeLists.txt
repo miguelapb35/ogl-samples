@@ -23,4 +23,7 @@ set(GL_SHADER_GTC test-buffer.vert test-buffer.frag)
 glCreateMicroGTC(test-buffer)
 set(GL_SHADER_GTC test-buffer-multi-attrib.vert test-buffer-multi-attrib.frag)
 glCreateMicroGTC(test-buffer-multi-attrib)
+set(GL_SHADER_GTC test-draw.vert test-draw.frag)
+glCreateMicroGTC(test-draw)
+
 
