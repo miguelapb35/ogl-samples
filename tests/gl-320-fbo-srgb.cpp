@@ -240,7 +240,7 @@ private:
 			glm::mat4 MVP = Projection * View * Model;
 
 			glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
-			glDisable(GL_FRAMEBUFFER_SRGB);
+			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
@@ -254,13 +254,13 @@ private:
 
 			glViewport(0, 0, WindowSize.x, WindowSize.y);
 
-			// Correct display
+			// Incorrected display, the default framebuffer is not sRGB
 			glScissor(0, WindowSize.y / 2 - 1, WindowSize.x, WindowSize.y / 2);
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, TextureName[texture::COLORBUFFER]);
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
-			// Incorrected display
+			// Correct display
 			glScissor(0, 0, WindowSize.x, WindowSize.y / 2);
 			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, TextureName[texture::COLORBUFFER]);
 		}
