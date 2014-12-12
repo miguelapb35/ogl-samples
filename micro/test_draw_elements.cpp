@@ -37,7 +37,7 @@ testDrawElements::testDrawElements(
 	int argc, char* argv[], profile Profile, std::size_t FrameCount,
 	drawType const DrawType, vertexDataType const VertexDataType, std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawElements", Profile, 4, 2, FrameCount, glm::vec2(0, 0), glm::vec2(0, 512)),
+	test(argc, argv, "testDrawElements", Profile, 4, 2, FrameCount, glm::uvec2(0, 0), glm::vec2(0, 512)),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
 	DrawCount(DrawCount),
@@ -199,7 +199,7 @@ bool testDrawElements::initVertexArray()
 
 bool testDrawElements::render()
 {
-	glm::vec2 const & WindowSize(this->getWindowSize());
+	glm::vec2 const WindowSize(this->getWindowSize());
 
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);

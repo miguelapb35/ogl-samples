@@ -320,7 +320,7 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize = this->getWindowSize();
+		glm::uvec2 WindowSize = this->getWindowSize();
 
 		{
 			// Compute the MVP (Model View Projection matrix)

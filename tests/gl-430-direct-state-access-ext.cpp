@@ -95,7 +95,7 @@ class gl_430_direct_state_access_ext : public test
 {
 public:
 	gl_430_direct_state_access_ext(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-direct-state-access-ext", test::CORE, 4, 3, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
+		test(argc, argv, "gl-430-direct-state-access-ext", test::CORE, 4, 3, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

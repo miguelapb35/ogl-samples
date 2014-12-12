@@ -96,7 +96,7 @@ class gl_450_direct_state_access : public test
 {
 public:
 	gl_450_direct_state_access(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::ivec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
+		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

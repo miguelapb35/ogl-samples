@@ -99,7 +99,7 @@ class gl_440_multi_draw_indirect_count : public test
 {
 public:
 	gl_440_multi_draw_indirect_count(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-multi-draw-indirect-count", test::CORE, 4, 2, glm::ivec2(640, 480),
+		test(argc, argv, "gl-440-multi-draw-indirect-count", test::CORE, 4, 2, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),

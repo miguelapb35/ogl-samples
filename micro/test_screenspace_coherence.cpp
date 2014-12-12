@@ -99,7 +99,7 @@ bool testScreenspaceCoherence::initProgram()
 	
 bool testScreenspaceCoherence::initBuffer()
 {
-	glm::ivec2 WindowSize = this->getWindowSize();
+	glm::uvec2 WindowSize = this->getWindowSize();
 	
 	glGenBuffers(BUFFER_MAX, &this->BufferName[0]);
 

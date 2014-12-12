@@ -36,7 +36,7 @@ testDrawArrays::testDrawArrays(
 	uniformUpdate const UniformUpdate,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::vec2(640, 480), glm::vec2(0), glm::vec2(0, 4)),
+	test(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4)),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
 	UniformUpdate(UniformUpdate),
@@ -276,7 +276,7 @@ void updateUniform(GLuint ProgramName, std::size_t DrawIndex, testDrawArrays::un
 
 bool testDrawArrays::render()
 {
-	glm::vec2 const & WindowSize(this->getWindowSize());
+	glm::vec2 const WindowSize(this->getWindowSize());
 
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);

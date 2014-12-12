@@ -42,7 +42,7 @@ class gl_440_atomic_counter : public test
 {
 public:
 	gl_440_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 2, glm::ivec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 2, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

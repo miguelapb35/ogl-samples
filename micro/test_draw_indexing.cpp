@@ -33,7 +33,7 @@ testDrawIndexing::testDrawIndexing(
 	indexing const Indexing,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawIndexing", Profile, 4, 2, FrameCount, glm::ivec2(640, 480), glm::vec2(0, 0), glm::vec2(0, 512)),
+	test(argc, argv, "testDrawIndexing", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0, 0), glm::vec2(0, 512)),
 	Indexing(Indexing),
 	DrawCount(DrawCount),
 	VertexArrayName(0),
@@ -174,7 +174,7 @@ bool testDrawIndexing::initVertexArray()
 
 bool testDrawIndexing::render()
 {
-	glm::vec2 const & WindowSize(this->getWindowSize());
+	glm::vec2 const WindowSize(this->getWindowSize());
 
 	float Depth(1.0f);
 	glClearBufferfv(GL_DEPTH, 0, &Depth);

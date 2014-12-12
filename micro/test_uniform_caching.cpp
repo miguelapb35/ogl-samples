@@ -287,13 +287,13 @@ int main_uniform_caching(int argc, char* argv[])
 
 	Entries.push_back(entry(
 		message_format("UNIFORM_SINGLE mode"),
-		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_SINGLE));
+		glm::uvec2(128), glm::vec2(8, 8), 16, UNIFORM_SINGLE));
 	Entries.push_back(entry(
 		message_format("UNIFORM_REDUNDANT mode"),
-		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_REDUNDANT));
+		glm::uvec2(128), glm::vec2(8, 8), 16, UNIFORM_REDUNDANT));
 	Entries.push_back(entry(
 		message_format("UNIFORM_UNIQUE mode"),
-		glm::uvec2(128), glm::uvec2(8, 8), 16, UNIFORM_UNIQUE));
+		glm::uvec2(128), glm::vec2(8, 8), 16, UNIFORM_UNIQUE));
 
 	csv CSV;
 	int Error(0);
