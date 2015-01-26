@@ -61,20 +61,22 @@ namespace
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
 	GLint CapableSRGB(0);
+
+	static const bool USE_SRGB = true;
 }//namespace
 
 class gl_320_fbo_srgb : public test
 {
 public:
 	gl_320_fbo_srgb(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2, USE_SRGB)
 	{}
 
 private:
 	bool initProgram()
 	{
 		bool Validated = true;
-	
+
 		if(Validated)
 		{
 			compiler Compiler;
@@ -128,7 +130,7 @@ private:
 			glTexImage2D(
 				GL_TEXTURE_2D,
 				GLint(Level),
-				GL_RGB8,
+				GL_SRGB8_ALPHA8,
 				GLsizei(Texture[Level].dimensions().x),
 				GLsizei(Texture[Level].dimensions().y),
 				0,
@@ -142,6 +144,7 @@ private:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SRGB_DECODE_EXT, GL_SKIP_DECODE_EXT);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		return this->checkError("initTexture");

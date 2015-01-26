@@ -78,7 +78,7 @@ class gl_420_texture_compressed : public test
 {
 public:
 	gl_420_texture_compressed(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-compressed", test::CORE, 4, 2),
+		test(argc, argv, "gl-420-texture-compressed", test::CORE, 4, 2, true),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

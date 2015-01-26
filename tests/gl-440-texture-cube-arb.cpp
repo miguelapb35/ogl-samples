@@ -176,7 +176,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dimensions_type(2));
+		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dim_type(2));
 		assert(!Texture.empty());
 
 		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));

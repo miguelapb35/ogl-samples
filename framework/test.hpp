@@ -233,7 +233,8 @@ protected:
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
 		std::size_t FrameCount = 2,
-		success Success = MATCH_TEMPLATE);
+		success Success = MATCH_TEMPLATE,
+		bool sRGB = false);
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
@@ -252,6 +253,10 @@ protected:
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
+		bool sRGB);
 	virtual ~test();
 
 	virtual bool begin() = 0;

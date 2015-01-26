@@ -57,7 +57,7 @@ namespace
 		GLint WindowSizeY(0);
 		glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
 
-		gli::texture2D Texture(1, gli::RGB8_UNORM, gli::texture2D::dimensions_type(WindowSizeX, WindowSizeY));
+		gli::texture2D Texture(1, gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
@@ -152,8 +152,17 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
+	bool sRGB
+) :
+	test(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4), 2, MATCH_TEMPLATE, true)
+{}
+
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
 	glm::uvec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
-	std::size_t FrameCount, success Success
+	std::size_t FrameCount, success Success, bool sRGB
 ) :
 	Window(nullptr),
 	Success(Success),
@@ -182,6 +191,7 @@ test::test
 	glfwInit();
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
+	glfwWindowHint(GLFW_SRGB_CAPABLE, GL_FALSE);
 	glfwWindowHint(GLFW_DECORATED, GL_TRUE);
 	glfwWindowHint(GLFW_CLIENT_API, Profile == ES ? GLFW_OPENGL_ES_API : GLFW_OPENGL_API);
 

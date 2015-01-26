@@ -15,7 +15,5 @@ out vec4 Color;
 
 void main()
 {
-	float A = dot(1.0, 2.0);
-
-	Color = texture(Diffuse, In.Texcoord) * A;
+	Color = texture(Diffuse, In.Texcoord);
 }

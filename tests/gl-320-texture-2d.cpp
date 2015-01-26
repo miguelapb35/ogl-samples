@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("rgba512.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgb8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -162,12 +162,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SRGB_DECODE_EXT, GL_SKIP_DECODE_EXT);
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
-				gli::internal_format(Texture.format()),
+				GL_SRGB8,//gli::internal_format(Texture.format()),
 				GLsizei(Texture[Level].dimensions().x),
 				GLsizei(Texture[Level].dimensions().y),
 				0,
@@ -214,7 +215,15 @@ private:
 			Validated = initProgram();
 		if(Validated)
 			Validated = initVertexArray();
-
+/*
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC1_COLOR, GL_ZERO);
+*/
+		GLint Encoding = 0;
+		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
+		//#define GL_LINEAR 0x2601;
+		//#define GL_SRGB 0x8C40;
 		return Validated;
 	}
 
@@ -247,10 +256,12 @@ private:
 		glm::uvec2 WindowSize = this->getWindowSize();
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
+		glDisable(GL_FRAMEBUFFER_SRGB);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
 
+		glDisable(GL_FRAMEBUFFER_SRGB);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);

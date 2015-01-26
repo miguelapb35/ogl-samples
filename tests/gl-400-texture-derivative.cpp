@@ -205,7 +205,7 @@ private:
 
 		std::size_t TextureSize(128);
 		std::size_t TextureLevel = glm::log2(TextureSize) + 1;
-		gli::texture2D Texture(TextureLevel, gli::RGBA8_UNORM, gli::texture2D::dimensions_type(TextureSize));
+		gli::texture2D Texture(TextureLevel, gli::RGBA8_UNORM, gli::texture2D::dim_type(TextureSize));
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
 		Texture[2].clear(glm::u8vec4(255, 255, 0, 255));

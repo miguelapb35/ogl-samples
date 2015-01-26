@@ -131,7 +131,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::RGBA8_UNORM, gli::texture2D::dimensions_type(64));
+		gli::texture2D Texture(gli::RGBA8_UNORM, gli::texture2D::dim_type(64));
 		gli::texture2D::size_type Level = Texture.levels();
 
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));

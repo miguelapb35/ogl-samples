@@ -329,11 +329,13 @@ inline storage load_dds
 		FileIn.read((char*)&HeaderDesc10, sizeof(HeaderDesc10));
 
 	gli::format Format(gli::FORMAT_NULL);
-	if(HeaderDesc.format.fourCC == detail::D3DFMT_DX10)
+	if(HeaderDesc.format.fourCC == detail::D3DFMT_DX10 && HeaderDesc10.Format != 0)
 		Format = detail::format_dds2gli_cast(HeaderDesc10.Format);
-	else if(HeaderDesc.format.flags & detail::DDPF_FOURCC)
+	
+	if(HeaderDesc.format.flags & detail::DDPF_FOURCC && Format == gli::FORMAT_NULL)
 		Format = detail::format_fourcc2gli_cast(HeaderDesc.format.flags, HeaderDesc.format.fourCC);
-	else if(HeaderDesc.format.flags & detail::DDPF_RGB)
+
+	if(HeaderDesc.format.flags & detail::DDPF_RGB && Format == gli::FORMAT_NULL)
 	{
 		switch(HeaderDesc.format.bpp)
 		{
