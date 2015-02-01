@@ -61,8 +61,6 @@ namespace
 	GLint UniformMVP(0);
 	GLint UniformDiffuse(0);
 	GLint CapableSRGB(0);
-
-	static const bool USE_SRGB = true;
 }//namespace
 
 class gl_320_fbo_srgb : public test

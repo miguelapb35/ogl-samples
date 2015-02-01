@@ -61,9 +61,10 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.5.0.1: 2015-XX-XX
+OpenGL Samples Pack 4.5.1.0: 2015-XX-XX
 --------------------------------------------------------------------------------
 - Updated gl-320-fbo-srgb sample to be more meaningful
+- Added gl-320-fbo-srgb-decode-ext sample
 
 ================================================================================
 OpenGL Samples Pack 4.5.0.0: 2014-09-15
