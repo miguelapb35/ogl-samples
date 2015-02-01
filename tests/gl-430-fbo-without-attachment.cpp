@@ -150,7 +150,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
@@ -162,7 +162,7 @@ private:
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D,
-				GLint(Level),
+				static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x),
 				static_cast<GLsizei>(Texture[Level].dimensions().y),
@@ -175,7 +175,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(1), GL_RGBA8, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
