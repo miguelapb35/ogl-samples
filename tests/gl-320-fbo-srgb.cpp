@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("gl-320/fbo-srgb.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-320/fbo-srgb.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(1024, 1024);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -69,7 +69,7 @@ class gl_320_fbo_srgb : public test
 {
 public:
 	gl_320_fbo_srgb(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2, USE_SRGB)
+		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2)
 	{}
 
 private:
@@ -127,15 +127,13 @@ private:
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
-				GL_SRGB8_ALPHA8,
-				GLsizei(Texture[Level].dimensions().x),
-				GLsizei(Texture[Level].dimensions().y),
+			glTexImage2D(GL_TEXTURE_2D,
+				static_cast<GLint>(Level),
+				gli::internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x),
+				static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				GL_BGR,
-				GL_UNSIGNED_BYTE,
+				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
 		glGenerateMipmap(GL_TEXTURE_2D);
@@ -144,7 +142,7 @@ private:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SRGB_DECODE_EXT, GL_SKIP_DECODE_EXT);
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		return this->checkError("initTexture");
@@ -243,6 +241,8 @@ private:
 			glm::mat4 MVP = Projection * View * Model;
 
 			glViewport(0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
+
+			// Convert linear fragment shader output color to sRGB color
 			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
@@ -257,13 +257,13 @@ private:
 
 			glViewport(0, 0, WindowSize.x, WindowSize.y);
 
-			// Incorrected display, the default framebuffer is not sRGB
+			// Top, incorrected display, the default framebuffer is sRGB but writes are automagically
 			glScissor(0, WindowSize.y / 2 - 1, WindowSize.x, WindowSize.y / 2);
 			glEnable(GL_FRAMEBUFFER_SRGB);
 			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, TextureName[texture::COLORBUFFER]);
 			glDisable(GL_FRAMEBUFFER_SRGB);
 
-			// Correct display
+			// Bottom, correct display
 			glScissor(0, 0, WindowSize.x, WindowSize.y / 2);
 			renderScene(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f), MVP, TextureName[texture::COLORBUFFER]);
 		}
