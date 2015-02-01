@@ -282,7 +282,13 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
+		GLint Encoding = 0;
+		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
+#		ifdef	WIN32
+			return Encoding == GL_SRGB; // Else GL_LINEAR
+#		else
+			return true;
+#		endif
 	}
 
 	bool begin()
