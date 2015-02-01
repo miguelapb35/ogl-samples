@@ -336,38 +336,42 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 
-		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
+			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		float Depth(1.0f);
-		glClearBufferfv(GL_DEPTH , 0, &Depth);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			float Depth(1.0f);
+			glClearBufferfv(GL_DEPTH , 0, &Depth);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-		glUseProgram(ProgramName[program::TEXTURE]);
+			glUseProgram(ProgramName[program::TEXTURE]);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-		glBindVertexArray(VertexArrayName[program::TEXTURE]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
+			glBindVertexArray(VertexArrayName[program::TEXTURE]);
+			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+		}
 
-		glDisable(GL_DEPTH_TEST);
+		{
+			glDisable(GL_DEPTH_TEST);
 
-		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
+			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		glUseProgram(ProgramName[program::SPLASH]);
+			glUseProgram(ProgramName[program::SPLASH]);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindVertexArray(VertexArrayName[program::SPLASH]);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindVertexArray(VertexArrayName[program::SPLASH]);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 
-		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
+		}
 
 		return true;
 	}
