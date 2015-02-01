@@ -214,15 +214,7 @@ private:
 			Validated = initProgram();
 		if(Validated)
 			Validated = initVertexArray();
-/*
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_SRC1_COLOR, GL_ZERO);
-*/
-		GLint Encoding = 0;
-		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		//#define GL_LINEAR 0x2601;
-		//#define GL_SRGB 0x8C40;
+
 		return Validated;
 	}
 
