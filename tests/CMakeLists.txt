@@ -88,7 +88,7 @@ set(GL_SHADER_GTC fbo-multisample-integer.vert fbo-multisample-integer.frag text
 glCreateSampleGTC(fbo-multisample-integer)
 set(GL_SHADER_GTC fbo-shadow-depth.vert fbo-shadow-render.vert fbo-shadow-render.frag)
 glCreateSampleGTC(fbo-shadow)
-set(GL_SHADER_GTC fbo-srgb.vert fbo-srgb.frag)
+set(GL_SHADER_GTC fbo-srgb.vert fbo-srgb.frag fbo-srgb-blit.vert fbo-srgb-blit.frag)
 glCreateSampleGTC(fbo-srgb)
 set(GL_SHADER_GTC fbo-srgb-decode.vert fbo-srgb-decode.frag fbo-srgb-decode-blit.vert fbo-srgb-decode-blit.frag)
 glCreateSampleGTC(fbo-srgb-decode-ext)

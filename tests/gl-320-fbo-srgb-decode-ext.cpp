@@ -98,7 +98,7 @@ class gl_320_fbo : public test
 {
 public:
 	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo", test::CORE, 3, 2),
+		test(argc, argv, "gl-320-fbo-srgb-decode-ext", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
