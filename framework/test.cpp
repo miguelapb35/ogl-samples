@@ -631,6 +631,9 @@ void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int m
 
 void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
 {
+	if (Key < 0)
+		return;
+
 	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 

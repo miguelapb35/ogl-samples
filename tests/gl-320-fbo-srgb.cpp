@@ -136,7 +136,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::TEXTURE]);
 		}
-		
+
 		if(Validated)
 		{
 			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
@@ -284,11 +284,14 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
+		return true;
+/*
 #		ifdef	WIN32
 			return Encoding == GL_SRGB; // Else GL_LINEAR
 #		else
 			return true;
 #		endif
+*/
 	}
 
 	bool begin()
@@ -351,7 +354,7 @@ private:
 
 			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 			// Shader execution is done with linear color to get correct linear algebra working.
-			glEnable(GL_FRAMEBUFFER_SRGB);
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);

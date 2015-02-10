@@ -147,6 +147,8 @@ set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-de
 glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC texture-integer.vert texture-integer.frag)
 glCreateSampleGTC(texture-integer)
+set(GL_SHADER_GTC texture-float.vert texture-float.frag)
+glCreateSampleGTC(texture-float)
 set(GL_SHADER_GTC texture-fetch.vert texture-fetch.frag)
 glCreateSampleGTC(texture-fetch)
 set(GL_SHADER_GTC texture-format.vert texture-format-normalized.frag texture-format-uint.frag)
