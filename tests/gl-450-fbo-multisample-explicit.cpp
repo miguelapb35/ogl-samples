@@ -363,6 +363,8 @@ private:
 
 		// Clear the framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		GLenum Buffer = GL_BACK;
+		glDrawBuffers(1, &Buffer);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		// Pass 1

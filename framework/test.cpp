@@ -205,14 +205,10 @@ test::test
 #		else
 			if(Profile != ES)
 			{
-#				if defined(__APPLE__)
-					glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#				else
-					glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == CORE ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
-					glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
-#				endif
+				glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == CORE ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+				glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
 			}	
-#			if defined(_DEBUG) || defined(__linux__)
+#			if defined(_DEBUG)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #			else
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_FALSE);
@@ -241,13 +237,13 @@ test::test
 		glewInit();
 		glGetError();
 
-#		ifdef GL_ARB_debug_output
-			if(this->Profile != ES && version(this->Major, this->Minor) >= version(3, 0))
-			if(this->isExtensionSupported("GL_ARB_debug_output"))
+#		if defined(GL_KHR_debug)
+			if(this->isExtensionSupported("GL_KHR_debug"))
 			{
-				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-				glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-				glDebugMessageCallbackARB(&test::debugOutput, this);
+				glEnable(GL_DEBUG_OUTPUT);
+				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+				glDebugMessageCallback(&test::debugOutput, this);
 			}
 #		endif
 

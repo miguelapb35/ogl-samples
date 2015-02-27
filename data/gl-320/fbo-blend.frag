@@ -4,8 +4,7 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2DArray Diffuse;
-uniform int Layer;
+uniform sampler2D Diffuse;
 
 in block
 {
@@ -16,5 +15,5 @@ out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, vec3(In.Texcoord, Layer));
+	Color = texture(Diffuse, In.Texcoord) * vec4(1.0, 1.0, 1.0, 0.05);
 }

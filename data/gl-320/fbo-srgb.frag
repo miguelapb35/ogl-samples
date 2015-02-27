@@ -14,8 +14,7 @@ in block
 out vec4 Color;
 
 /////////////
-// rgbToSrgb
-
+// convertRgbToSrgb
 
 vec3 detail_rgbToSrgb(in vec3 ColorRGB, in float GammaCorrection)
 {
@@ -27,30 +26,30 @@ vec3 detail_rgbToSrgb(in vec3 ColorRGB, in float GammaCorrection)
 		lessThan(ClampedColorRGB, vec3(0.0031308)));
 }
 
-vec3 rgbToSrgb(in vec3 ColorRGB, in float Gamma)
+vec3 convertRgbToSrgb(in vec3 ColorRGB, in float Gamma)
 {
 	return detail_rgbToSrgb(ColorRGB, 1.0 / Gamma);
 }
 
-vec3 rgbToSrgb(in vec3 ColorRGB)
+vec3 convertRgbToSrgb(in vec3 ColorRGB)
 {
 	return detail_rgbToSrgb(ColorRGB, 0.41666);
 }
 
-vec4 rgbToSrgb(in vec4 ColorRGB, in float Gamma)
+vec4 convertRgbToSrgb(in vec4 ColorRGB, in float Gamma)
 {
-	return rgbToSrgb(vec4(vec3(ColorRGB), ColorRGB.a), Gamma);
+	return convertRgbToSrgb(vec4(vec3(ColorRGB), ColorRGB.a), Gamma);
 }
 
-vec4 rgbToSrgb(in vec4 ColorRGB)
+vec4 convertRgbToSrgb(in vec4 ColorRGB)
 {
-	return rgbToSrgb(vec4(vec3(ColorRGB), ColorRGB.a), 0.41666);
+	return convertRgbToSrgb(vec4(vec3(ColorRGB), ColorRGB.a), 0.41666);
 }
 
 /////////////
-// srgbToRgb
+// convertSrgbToRgb
 
-vec3 srgbToRgb(in vec3 ColorSRGB, in float Gamma)
+vec3 convertSrgbToRgb(in vec3 ColorSRGB, in float Gamma)
 {
 	return mix(
 		pow((ColorSRGB + 0.055) * 0.94786729857819905213270142180095, vec3(Gamma)),
@@ -58,25 +57,43 @@ vec3 srgbToRgb(in vec3 ColorSRGB, in float Gamma)
 		lessThanEqual(ColorSRGB, vec3(0.04045)));
 }
 
-vec3 srgbToRgb(in vec3 ColorSRGB)
+vec3 convertSrgbToRgb(in vec3 ColorSRGB)
 {
-	return srgbToRgb(ColorSRGB, 2.4);
+	return convertSrgbToRgb(ColorSRGB, 2.4);
 }
 
-vec4 srgbToRgb(in vec4 ColorSRGB, in float Gamma)
+vec4 convertSrgbToRgb(in vec4 ColorSRGB, in float Gamma)
 {
-	return vec4(srgbToRgb(ColorSRGB.rgb, Gamma), ColorSRGB.a);
+	return vec4(convertSrgbToRgb(ColorSRGB.rgb, Gamma), ColorSRGB.a);
 }
 
-vec4 srgbToRgb(in vec4 ColorSRGB)
+vec4 convertSrgbToRgb(in vec4 ColorSRGB)
 {
-	return vec4(srgbToRgb(ColorSRGB.rgb, 2.4), ColorSRGB.a);
+	return vec4(convertSrgbToRgb(ColorSRGB.rgb, 2.4), ColorSRGB.a);
 }
+
+// For all settings: 1.0 = 100% 0.5=50% 1.5 = 150%
+vec3 ContrastSaturationBrightness(vec3 color, float brt, float sat, float con)
+{
+	const vec3 LumCoeff = vec3(0.2125, 0.7154, 0.0721);
+
+	vec3 brtColor = color * brt;
+	vec3 intensity = vec3(dot(brtColor, LumCoeff));
+	vec3 satColor = mix(intensity, brtColor, sat);
+	vec3 conColor = mix(vec3(0.5), satColor, con);
+	return conColor;
+}
+
+// Main
 
 void main()
 {
 	vec3 ColorRGB = texture(Diffuse, In.Texcoord).rgb;
 
-	Color = vec4(rgbToSrgb(srgbToRgb(rgbToSrgb(ColorRGB))), 1.0);
-	//Color = vec4(rgbToSrgb(ColorRGB), 1.0);
+	//ColorRGB = convertRgbToSrgb(convertSrgbToRgb(convertRgbToSrgb(ColorRGB)));
+
+	//ColorRGB = ContrastSaturationBrightness(ColorRGB, 1.0, 0.5, 1.0);
+
+	Color = vec4(ColorRGB, 1.0);
+	//Color = vec4(convertRgbToSrgb(ColorRGB), 1.0);
 }

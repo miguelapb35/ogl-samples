@@ -25,11 +25,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-decode.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-decode.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-decode-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-decode-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-blend.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-blend.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-blit.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-blit.frag");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -66,7 +66,6 @@ namespace
 		{
 			DIFFUSE,
 			COLORBUFFER,
-			RENDERBUFFER,
 			MAX
 		};
 	}//namespace texture
@@ -94,11 +93,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo_blend : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb-decode-ext", test::CORE, 3, 2),
+	gl_320_fbo_blend(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-fbo-blend", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -191,7 +190,7 @@ private:
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
@@ -216,7 +215,6 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SRGB_DECODE_EXT, GL_DECODE_EXT);
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -229,7 +227,9 @@ private:
 				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
-	
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
 		glm::ivec2 WindowSize(this->getWindowSize() * this->FramebufferScale);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -238,15 +238,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_SRGB8_ALPHA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8/*GL_RGB10_A2*/, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 		return Validated;
 	}
@@ -277,7 +269,6 @@ private:
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
@@ -323,34 +314,29 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
-			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
 		
-			*Pointer = Projection * this->view();
+			*Pointer = Projection * this->view() * Model;
 
 			// Make sure the uniform buffer is uploaded
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
 		{
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-			// Convert linear clear color to sRGB color space, FramebufferName is a sRGB FBO
-			glEnable(GL_FRAMEBUFFER_SRGB);
-				float Depth(1.0f);
-				glClearBufferfv(GL_DEPTH, 0, &Depth);
-				glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-			// TextureName[texture::DIFFUSE] is a sRGB texture which sRGB conversion on fetch has been disabled
-			// Hence in the shader, the value is stored as sRGB so we should not convert it to sRGB.
 			glUseProgram(ProgramName[program::TEXTURE]);
 
 			glActiveTexture(GL_TEXTURE0);
@@ -358,7 +344,9 @@ private:
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 20, 0);
+
+			glDisable(GL_BLEND);
 		}
 
 		{
@@ -367,7 +355,6 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
@@ -386,7 +373,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_320_fbo_blend Test(argc, argv);
 	Error += Test();
 
 	return Error;

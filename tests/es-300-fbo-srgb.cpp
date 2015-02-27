@@ -25,10 +25,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-decode.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-decode.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-decode-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-decode-blit.frag");
+	char const * VERT_SHADER_SOURCE_TEXTURE("es-300/fbo-srgb.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("es-300/fbo-srgb.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
@@ -94,11 +94,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class es_300_fbo_srgb : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb-decode-ext", test::CORE, 3, 2),
+	es_300_fbo_srgb(int argc, char* argv[]) :
+		test(argc, argv, "es-300-fbo-srgb", test::ES, 3, 0),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -124,29 +124,23 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 300 --profile es");
+			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 300 --profile es");
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::FRAG_TEXTURE]);
-
-			glBindAttribLocation(ProgramName[program::TEXTURE], semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::TEXTURE], semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::TEXTURE]);
 		}
-		
+
 		if(Validated)
 		{
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 300 --profile es");
+			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 300 --profile es");
 
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::FRAG_SPLASH]);
-
-			glBindFragDataLocation(ProgramName[program::SPLASH], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
 		}
 	
@@ -216,7 +210,6 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SRGB_DECODE_EXT, GL_DECODE_EXT);
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -238,13 +231,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_SRGB8_ALPHA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_SRGB8_ALPHA8, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -276,14 +271,25 @@ private:
 	{
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER], 0);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER], 0);
 
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return true;
+
+		GLint Encoding = 0;
+		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
+		return true;
+/*
+#		ifdef	WIN32
+			return Encoding == GL_SRGB; // Else GL_LINEAR
+#		else
+			return true;
+#		endif
+*/
 	}
 
 	bool begin()
@@ -335,22 +341,19 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
+		// Render a textured quad to a sRGB framebuffer object.
 		{
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
-			// Convert linear clear color to sRGB color space, FramebufferName is a sRGB FBO
-			glEnable(GL_FRAMEBUFFER_SRGB);
-				float Depth(1.0f);
-				glClearBufferfv(GL_DEPTH, 0, &Depth);
-				glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			float Depth(1.0f);
+			glClearBufferfv(GL_DEPTH, 0, &Depth);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
-			// TextureName[texture::DIFFUSE] is a sRGB texture which sRGB conversion on fetch has been disabled
-			// Hence in the shader, the value is stored as sRGB so we should not convert it to sRGB.
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 			glUseProgram(ProgramName[program::TEXTURE]);
 
 			glActiveTexture(GL_TEXTURE0);
@@ -358,16 +361,18 @@ private:
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 20, 0);
+
+			glDisable(GL_BLEND);
 		}
 
+		// Blit the sRGB framebuffer to the default framebuffer back buffer.
 		{
 			glDisable(GL_DEPTH_TEST);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
@@ -386,7 +391,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	es_300_fbo_srgb Test(argc, argv);
 	Error += Test();
 
 	return Error;

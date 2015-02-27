@@ -29,6 +29,8 @@ glCreateSampleGTC(draw-elements)
 set(GL_VERSION_GTC 300)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
+set(GL_SHADER_GTC fbo-srgb.vert fbo-srgb.frag fbo-srgb-blit.vert fbo-srgb-blit.frag)
+glCreateSampleGTC(fbo-srgb)
 
 # OpenGL 3.0 samples
 set(GL_PROFILE_GTC gl)
@@ -68,6 +70,8 @@ set(GL_SHADER_GTC draw-without-vertex-attrib.vert draw-without-vertex-attrib.fra
 glCreateSampleGTC(draw-without-vertex-attrib)
 set(GL_SHADER_GTC fbo.vert fbo.frag texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(fbo)
+set(GL_SHADER_GTC fbo-blend.vert fbo-blend.frag fbo-blend-blit.vert fbo-blend-blit.frag)
+glCreateSampleGTC(fbo-blend)
 set(GL_SHADER_GTC fbo-blit.vert fbo-blit.frag)
 glCreateSampleGTC(fbo-blit)
 set(GL_SHADER_GTC fbo-depth.vert fbo-depth.frag texture-2d.vert texture-2d.frag)
