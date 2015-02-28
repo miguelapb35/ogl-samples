@@ -280,16 +280,12 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return true;
 
+		/*
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		return true;
-/*
-#		ifdef	WIN32
-			return Encoding == GL_SRGB; // Else GL_LINEAR
-#		else
-			return true;
-#		endif
-*/
+		if (Encoding != GL_SRGB)
+		return false;
+		*/
 	}
 
 	bool begin()
@@ -306,6 +302,8 @@ private:
 			Validated = initTexture();
 		if(Validated)
 			Validated = initFramebuffer();
+
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		return Validated;
 	}
@@ -344,15 +342,11 @@ private:
 		// Render a textured quad to a sRGB framebuffer object.
 		{
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
-
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
-
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
 
@@ -361,9 +355,7 @@ private:
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 20, 0);
-
-			glDisable(GL_BLEND);
+			glDrawElementsInstanced(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1);
 		}
 
 		// Blit the sRGB framebuffer to the default framebuffer back buffer.
@@ -371,7 +363,6 @@ private:
 			glDisable(GL_DEPTH_TEST);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
-
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 			glUseProgram(ProgramName[program::SPLASH]);

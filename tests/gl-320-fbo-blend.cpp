@@ -35,17 +35,17 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-10.0f,-10.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 10.0f,-10.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 10.0f, 10.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-10.0f, 10.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
-		0, 1, 2, 
+		0, 1, 2,
 		2, 3, 0
 	};
 
@@ -238,7 +238,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8/*GL_RGB10_A2*/, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 		return Validated;
 	}
@@ -332,7 +332,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -344,7 +344,7 @@ private:
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 20, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 100, 0);
 
 			glDisable(GL_BLEND);
 		}

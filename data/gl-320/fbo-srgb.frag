@@ -12,7 +12,7 @@ in block
 } In;
 
 out vec4 Color;
-
+/*
 /////////////
 // convertRgbToSrgb
 
@@ -83,7 +83,7 @@ vec3 ContrastSaturationBrightness(vec3 color, float brt, float sat, float con)
 	vec3 conColor = mix(vec3(0.5), satColor, con);
 	return conColor;
 }
-
+*/
 // Main
 
 void main()

@@ -25,27 +25,27 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.frag");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-blend.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb-blend.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit-blend.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit-blend.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-10.0f,-10.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 10.0f,-10.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 10.0f, 10.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-10.0f, 10.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
-		0, 1, 2, 
+		0, 1, 2,
 		2, 3, 0
 	};
 
@@ -239,12 +239,6 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_SRGB8_ALPHA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		return Validated;
@@ -276,7 +270,6 @@ private:
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
@@ -334,9 +327,7 @@ private:
 			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
 				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
 			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-		
 			*Pointer = Projection * this->view();
 
 			// Make sure the uniform buffer is uploaded
@@ -345,20 +336,16 @@ private:
 
 		// Render a textured quad to a sRGB framebuffer object.
 		{
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
-			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 			// Shader execution is done with linear color to get correct linear algebra working.
 			glEnable(GL_FRAMEBUFFER_SRGB);
-
-			float Depth(1.0f);
-			glClearBufferfv(GL_DEPTH, 0, &Depth);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
 
@@ -367,13 +354,13 @@ private:
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 100, 0);
+
+			glDisable(GL_BLEND);
 		}
 
 		// Blit the sRGB framebuffer to the default framebuffer back buffer.
 		{
-			glDisable(GL_DEPTH_TEST);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);

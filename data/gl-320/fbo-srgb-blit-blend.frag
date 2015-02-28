@@ -6,14 +6,12 @@ layout(std140, column_major) uniform;
 
 uniform sampler2D Diffuse;
 
-in block
-{
-	vec2 Texcoord;
-} In;
-
+in vec4 gl_FragCoord;
 out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord) * vec4(1.0, 1.0, 1.0, 0.02);
+	vec2 TextureSize = vec2(textureSize(Diffuse, 0));
+
+	Color = texture(Diffuse, gl_FragCoord.xy * 2.0 / TextureSize);
 }

@@ -94,6 +94,8 @@ set(GL_SHADER_GTC fbo-shadow-depth.vert fbo-shadow-render.vert fbo-shadow-render
 glCreateSampleGTC(fbo-shadow)
 set(GL_SHADER_GTC fbo-srgb.vert fbo-srgb.frag fbo-srgb-blit.vert fbo-srgb-blit.frag)
 glCreateSampleGTC(fbo-srgb)
+set(GL_SHADER_GTC fbo-srgb-blend.vert fbo-srgb-blend.frag fbo-srgb-blit-blend.vert fbo-srgb-blit-blend.frag)
+glCreateSampleGTC(fbo-srgb-blend)
 set(GL_SHADER_GTC fbo-srgb-decode.vert fbo-srgb-decode.frag fbo-srgb-decode-blit.vert fbo-srgb-decode-blit.frag)
 glCreateSampleGTC(fbo-srgb-decode-ext)
 set(GL_SHADER_GTC fbo-rtt-multiple-output.vert fbo-rtt-multiple-output.frag fbo-rtt-single-output.vert fbo-rtt-single-output.frag)

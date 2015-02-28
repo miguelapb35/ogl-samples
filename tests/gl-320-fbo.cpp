@@ -343,6 +343,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH , 0, &Depth);
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
@@ -363,6 +364,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			//glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
