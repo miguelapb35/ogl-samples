@@ -89,8 +89,6 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-#define GL_CONSERVATIVE_RASTERIZATION_NV 0x9346
-
 class gl_450_conservative_raster : public test
 {
 public:
@@ -261,6 +259,13 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
+		GLint SubPixelBiasX = 0;
+		GLint SubPixelBiasY = 0;
+		GLint MaxSubPixelBias = 0;
+		glGetIntegerv(GL_SUBPIXEL_PRECISION_BIAS_X_BITS_NV, &SubPixelBiasX);
+		glGetIntegerv(GL_SUBPIXEL_PRECISION_BIAS_Y_BITS_NV, &SubPixelBiasY);
+		glGetIntegerv(GL_MAX_SUBPIXEL_PRECISION_BIAS_BITS_NV, &MaxSubPixelBias);
+
 		return Validated;
 	}
 
@@ -310,6 +315,7 @@ private:
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL0]);
 
+		//glSubpixelPrecisionBiasNV(-8, -8);
 		glEnable(GL_CONSERVATIVE_RASTERIZATION_NV);
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 
