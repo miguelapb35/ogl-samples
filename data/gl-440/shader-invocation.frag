@@ -78,6 +78,10 @@ void main()
 {
 	//vec3 hsv = vec3(float(gl_SMIDNV) / 8.0f * 60.f, 1.0f, 1.0f); // gl_SMIDNV Red - Orange - Yellow
 	//vec3 hsv = vec3(90.f, 1.0f, float(gl_SMIDNV) / float(Constant.SMCount)); // gl_SMIDNV - NVIDIA green
+
+	Color = vec4(float(gl_WarpIDNV) / (float(Constant.WrapsPerSM)), float(gl_SMIDNV) / float(Constant.SMCount - 1), 0.0, 1.0);
+
+/*
 	vec3 hsv = vec3(90.f, 1.0f, float(gl_WarpIDNV) / (float(Constant.WrapsPerSM))); // NVIDIA green
 	if (gl_WarpIDNV == 0 && gl_SMIDNV == 0)
 		Color = vec4(1.0, 0.0, 1.0, 1.0);
@@ -87,4 +91,5 @@ void main()
 		Color = vec4(0.0, 0.0, 1.0, 1.0);
 	else
 		Color = vec4(rgbColor(hsv), 1.0f);
+*/
 }
