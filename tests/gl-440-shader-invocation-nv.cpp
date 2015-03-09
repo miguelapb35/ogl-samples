@@ -48,10 +48,6 @@ namespace
 	}//namespace buffer
 }//namespace
 
-#define GL_WARP_SIZE_NV                                    0x9339
-#define GL_WARPS_PER_SM_NV                                 0x933A
-#define GL_SM_COUNT_NV                                     0x933B
-
 class gl_440_shader_invocation_nv : public test
 {
 public:
