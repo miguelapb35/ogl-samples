@@ -246,10 +246,42 @@ private:
 
 	bool initFramebuffer()
 	{
+		static const glm::vec2 SamplesPositions[2][4] =
+		{
+			{
+				glm::vec2(0.75f, 0.25f),
+				glm::vec2(1.00f, 0.75f),
+				glm::vec2(0.25f, 1.00f),
+				glm::vec2(0.00f, 0.25f)
+			},
+			{
+				glm::vec2(0.25f, 0.25f),
+				glm::vec2(1.00f, 0.25f),
+				glm::vec2(0.75f, 1.00f),
+				glm::vec2(0.00f, 0.75f)
+			}
+		};
+
+		GLint SubPixelBits(0);
+		glm::ivec2 PixelGrid(0);
+		GLint TableSize(0);
+
+		glGetIntegerv(GL_SAMPLE_LOCATION_SUBPIXEL_BITS_NV, &SubPixelBits);
+		glGetIntegerv(GL_SAMPLE_LOCATION_PIXEL_GRID_WIDTH_NV, &PixelGrid.x);
+		glGetIntegerv(GL_SAMPLE_LOCATION_PIXEL_GRID_HEIGHT_NV, &PixelGrid.y);
+		glGetIntegerv(GL_PROGRAMMABLE_SAMPLE_LOCATION_TABLE_SIZE_NV, &TableSize);
+
+		std::vector<glm::vec2> SamplesLocations;
+		SamplesLocations.resize(PixelGrid.x * PixelGrid.y);
+		for (std::size_t i = 0; i < SamplesLocations.size(); ++i)
+			SamplesLocations[i] = glm::vec2(0.0f);
+
 		glGenFramebuffers(texture::MAX, &FramebufferName[0]);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[texture::RENDERBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::RENDERBUFFER], 0);
+		glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_PROGRAMMABLE_SAMPLE_LOCATIONS_NV, GL_TRUE);
+		glFramebufferSampleLocationsfvNV(GL_FRAMEBUFFER, 0, static_cast<GLsizei>(SamplesLocations.size()), &SamplesLocations[0][0]);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[texture::COLORBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
