@@ -34,6 +34,6 @@ void main()
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
 	gl_Layer = gl_InstanceID;
 
-	//gl_ViewportMask[gl_InstanceID] = 1;
-	gl_ViewportIndex = gl_InstanceID;
+	gl_ViewportMask[gl_InstanceID] = 1;
+	//gl_ViewportIndex = gl_InstanceID;
 }
