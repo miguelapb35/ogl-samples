@@ -288,7 +288,7 @@ private:
 			glBindSampler(0, SamplerName);
 
 			glBindVertexArray(VertexArrayName[VIEWPORT]);
-			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 4, 0);
+			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 		}
 
 		return true;

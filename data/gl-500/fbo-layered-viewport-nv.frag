@@ -12,12 +12,12 @@ layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 in block
 {
 	vec2 Texcoord;
-	flat int Instance;
 } In;
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
+in int gl_ViewportIndex;
 
 void main()
 {
-	Color = texture(Diffuse, vec3(In.Texcoord, In.Instance));
+	Color = texture(Diffuse, vec3(In.Texcoord, gl_ViewportIndex));
 }

@@ -17,7 +17,6 @@ layout(location = TEXCOORD) in vec2 Texcoord;
 out block
 { 
 	vec2 Texcoord;
-	flat int Instance;
 } Out;
 
 out gl_PerVertex
@@ -29,11 +28,9 @@ out gl_PerVertex
 void main()
 {
 	Out.Texcoord = Texcoord;
-	Out.Instance = gl_InstanceID;
 
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
 	gl_Layer = gl_InstanceID;
 
-	gl_ViewportMask[gl_InstanceID] = 1;
-	//gl_ViewportIndex = gl_InstanceID;
+	gl_ViewportMask[0] = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 }
