@@ -25,10 +25,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-450/sample-location-render.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-450/sample-location-render.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-450/sample-location-splash.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-450/sample-location-splash.frag");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-500/sample-location-render.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-500/sample-location-render.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-500/sample-location-splash.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-500/sample-location-splash.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 
 	GLsizei const VertexCount(4);
@@ -105,11 +105,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_450_sample_location_grid_nv : public test
+class gl_450_sample_location_nv : public test
 {
 public:
-	gl_450_sample_location_grid_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-sample-location-grid-nv", test::CORE, 4, 5),
+	gl_450_sample_location_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-450-sample-location-nv", test::CORE, 4, 5),
 		FramebufferScale(3),
 		UniformTransform(-1),
 		VertexCount(0)
@@ -233,7 +233,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::RENDERBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
 
 		return Validated;
 	}
@@ -261,25 +261,88 @@ private:
 	{
 		typedef std::array<glm::vec2, 8> sampleLocations;
 
-		static glm::vec2 SamplesPositions16[] =
+		static glm::vec2 SamplesPositions8[][8] =
 		{
-			glm::vec2( 1.f,  0.f) / 16.f,
-			glm::vec2( 4.f,  1.f) / 16.f,
-			glm::vec2( 3.f,  6.f) / 16.f,
-			glm::vec2( 7.f,  5.f) / 16.f,
-			glm::vec2( 8.f,  1.f) / 16.f,
-			glm::vec2(11.f,  3.f) / 16.f,
-			glm::vec2(12.f,  7.f) / 16.f,
-			glm::vec2(15.f,  4.f) / 16.f,
-			glm::vec2( 0.f,  8.f) / 16.f,
-			glm::vec2( 5.f, 10.f) / 16.f,
-			glm::vec2( 2.f, 12.f) / 16.f,
-			glm::vec2( 6.f, 14.f) / 16.f,
-			glm::vec2( 9.f,  9.f) / 16.f,
-			glm::vec2(13.f, 11.f) / 16.f,
-			glm::vec2(10.f, 13.f) / 16.f,
-			glm::vec2(14.f, 15.f) / 16.f
+			{
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f)
+			},
+			{
+				glm::vec2(0.0f / 7.0f),
+				glm::vec2(1.0f / 7.0f),
+				glm::vec2(2.0f / 7.0f),
+				glm::vec2(3.0f / 7.0f),
+				glm::vec2(4.0f / 7.0f),
+				glm::vec2(5.0f / 7.0f),
+				glm::vec2(6.0f / 7.0f),
+				glm::vec2(7.0f / 7.0f),
+			},
+			{
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f),
+				glm::vec2(0.00f, 0.00f)
+			},
+			{
+				glm::vec2(0.75f, 0.25f),
+				glm::vec2(1.00f, 0.75f),
+				glm::vec2(0.25f, 1.00f),
+				glm::vec2(0.00f, 0.25f),
+				glm::vec2(0.25f, 0.25f),
+				glm::vec2(1.00f, 0.25f),
+				glm::vec2(0.75f, 1.00f),
+				glm::vec2(0.00f, 0.75f)
+			},
+			{
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f),
+				glm::vec2(0.50f, 0.50f)
+			},
 		};
+
+		sampleLocations SampleLocationsRead;
+
+		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
+
+		for(int FramebufferIndex = 0; FramebufferIndex < 4; ++FramebufferIndex)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDERBUFFER0 + FramebufferIndex]);
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::RENDERBUFFER], 0);
+
+			GLint Samples = 0;
+			glGetIntegerv(GL_SAMPLES, &Samples);
+
+			if(FramebufferIndex == 0)
+			{
+				for(GLint i = 0; i < Samples; ++i)
+				{
+					glGetMultisamplefv(GL_SAMPLE_POSITION, i, &SamplesPositions8[0][i][0]);
+					glGetMultisamplefv(GL_SAMPLE_POSITION, i, &SampleLocationsRead[i][0]);
+				}
+			}
+
+			glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_PROGRAMMABLE_SAMPLE_LOCATIONS_NV, GL_TRUE);
+			glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_SAMPLE_LOCATION_PIXEL_GRID_NV, GL_FALSE);
+			glFramebufferSampleLocationsfvNV(GL_FRAMEBUFFER, 0, Samples, &SamplesPositions8[FramebufferIndex][0][0]);
+		}
+
+		for(std::size_t i = 0; i < SampleLocationsRead.size(); ++i)
+			SampleLocationsRead[i] *= 16.0f;
 
 		GLint SubPixelBits(0);
 		glm::ivec2 PixelGrid(0);
@@ -289,17 +352,6 @@ private:
 		glGetIntegerv(GL_SAMPLE_LOCATION_PIXEL_GRID_WIDTH_NV, &PixelGrid.x);
 		glGetIntegerv(GL_SAMPLE_LOCATION_PIXEL_GRID_HEIGHT_NV, &PixelGrid.y);
 		glGetIntegerv(GL_PROGRAMMABLE_SAMPLE_LOCATION_TABLE_SIZE_NV, &TableSize);
-
-		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
-
-		for(int FramebufferIndex = 0; FramebufferIndex < 4; ++FramebufferIndex)
-		{
-			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDERBUFFER0 + FramebufferIndex]);
-			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::RENDERBUFFER], 0);
-			glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_PROGRAMMABLE_SAMPLE_LOCATIONS_NV, FramebufferIndex == 0 ? GL_FALSE : GL_TRUE);
-			glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_SAMPLE_LOCATION_PIXEL_GRID_NV, GL_TRUE);
-			glFramebufferSampleLocationsfvNV(GL_FRAMEBUFFER, 0, TableSize, &SamplesPositions16[0][0]);
-		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[texture::COLORBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
@@ -315,6 +367,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_NV_sample_locations");
 
 		if(Validated)
 			Validated = initProgram();
@@ -417,7 +470,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_sample_location_grid_nv Test(argc, argv);
+	gl_450_sample_location_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;
