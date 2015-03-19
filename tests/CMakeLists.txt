@@ -475,3 +475,9 @@ set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-de
 glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback-arb)
+
+# OpenGL 5 hardware samples
+set(GL_VERSION_GTC 500)
+
+set(GL_SHADER_GTC fbo-layered-viewport-nv.vert fbo-layered-viewport-nv.frag fbo-layered-layer-nv.vert fbo-layered-layer-nv.frag)
+glCreateSampleGTC(fbo-layered-nv)

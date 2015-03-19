@@ -71,6 +71,7 @@ OpenGL Samples Pack 4.5.1.0: 2015-XX-XX
 - Added gl-320-fbo-srgb sample
 - Added gl-320-fbo-srgb-blend sample
 - Added gl-320-fbo-srgb-decode-ext sample
+- Added gl-500-fbo-layered-nv sample
 
 ================================================================================
 OpenGL Samples Pack 4.5.0.0: 2014-09-15
