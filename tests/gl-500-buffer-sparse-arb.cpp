@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-450/buffer-sparse.vert");
-	char const * FRAG_SHADER_SOURCE("gl-450/buffer-sparse.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/buffer-sparse.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/buffer-sparse.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
@@ -60,11 +60,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_450_buffer_storage_arb : public test
+class gl_500_buffer_storage : public test
 {
 public:
-	gl_450_buffer_storage_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-buffer-storage-arb", test::CORE, 4, 3),
+	gl_500_buffer_storage(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-buffer-storage-arb", test::CORE, 4, 3),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -276,7 +276,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_buffer_storage_arb Test(argc, argv);
+	gl_500_buffer_storage Test(argc, argv);
 	Error += Test();
 
 	return Error;

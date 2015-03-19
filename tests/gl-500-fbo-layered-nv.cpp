@@ -64,10 +64,10 @@ namespace
 	GLuint TextureColorbufferName(0);
 }//namespace
 
-class gl_500_fbo_layered_nv : public test
+class gl_500_fbo_layered : public test
 {
 public:
-	gl_500_fbo_layered_nv(int argc, char* argv[]) :
+	gl_500_fbo_layered(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-fbo-layered-nv", test::CORE, 4, 2)
 	{}
 
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_fbo_layered_nv Test(argc, argv);
+	gl_500_fbo_layered Test(argc, argv);
 	Error += Test();
 
 	return Error;

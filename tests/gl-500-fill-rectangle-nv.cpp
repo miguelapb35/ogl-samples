@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-450/fill-rectangle.vert");
-	char const * FRAG_SHADER_SOURCE("gl-450/fill-rectangle.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/fill-rectangle.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/fill-rectangle.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_450_fill_rectangle : public test
+class gl_500_fill_rectangle : public test
 {
 public:
-	gl_450_fill_rectangle(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-fill-rectangle", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
+	gl_500_fill_rectangle(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-fill-rectangle-nv", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_fill_rectangle Test(argc, argv);
+	gl_500_fill_rectangle Test(argc, argv);
 	Error += Test();
 
 	return Error;

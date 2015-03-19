@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-440/texture-sparse.vert");
-	char const * FRAG_SHADER_SOURCE("gl-440/texture-sparse.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/texture-sparse.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/texture-sparse.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_texture_sparse_arb : public test
+class gl_500_texture_sparse_arb : public test
 {
 public:
-	gl_440_texture_sparse_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-texture-sparse-arb", test::CORE, 4, 2),
+	gl_500_texture_sparse_arb(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-texture-sparse-arb", test::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -275,7 +275,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_texture_sparse_arb Test(argc, argv);
+	gl_500_texture_sparse_arb Test(argc, argv);
 	Error += Test();
 
 	return Error;

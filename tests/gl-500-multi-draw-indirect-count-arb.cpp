@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-440/multi-draw-indirect-count.vert");
-	char const * FRAG_SHADER_SOURCE("gl-440/multi-draw-indirect-count.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/multi-draw-indirect-count.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/multi-draw-indirect-count.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const ElementCount(15);
@@ -95,11 +95,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_440_multi_draw_indirect_count : public test
+class gl_500_multi_draw_indirect_count : public test
 {
 public:
-	gl_440_multi_draw_indirect_count(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-multi-draw-indirect-count", test::CORE, 4, 2, glm::uvec2(640, 480),
+	gl_500_multi_draw_indirect_count(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-multi-draw-indirect-count", test::CORE, 4, 2, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -438,7 +438,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_multi_draw_indirect_count Test(argc, argv);
+	gl_500_multi_draw_indirect_count Test(argc, argv);
 	Error += Test();
 
 	return Error;

@@ -89,11 +89,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_450_conservative_raster : public test
+class gl_500_conservative_raster : public test
 {
 public:
-	gl_450_conservative_raster(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-conservative-raster", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.25f))
+	gl_500_conservative_raster(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-conservative-raster", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.25f))
 	{}
 
 private:
@@ -342,7 +342,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_conservative_raster Test(argc, argv);
+	gl_500_conservative_raster Test(argc, argv);
 	Error += Test();
 
 	return Error;

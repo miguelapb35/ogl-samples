@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-440/texture-cube.vert");
-	char const * FRAG_SHADER_SOURCE("gl-440/texture-cube.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/texture-cube.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/texture-cube.frag");
 	char const * TEXTURE_DIFFUSE("cube.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -70,11 +70,11 @@ namespace
 	};
 }//namespace
 
-class gl_440_texture_cube : public test
+class gl_500_texture_cube : public test
 {
 public:
-	gl_440_texture_cube(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-texture-cube-arb", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.1f)),
+	gl_500_texture_cube(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-texture-cube-arb", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.1f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -307,7 +307,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_texture_cube Test(argc, argv);
+	gl_500_texture_cube Test(argc, argv);
 	Error += Test();
 
 	return Error;

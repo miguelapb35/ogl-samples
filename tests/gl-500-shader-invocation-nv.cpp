@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-440/shader-invocation.vert");
-	char const * FRAG_SHADER_SOURCE("gl-440/shader-invocation.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/shader-invocation.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/shader-invocation.frag");
 
 	namespace program
 	{

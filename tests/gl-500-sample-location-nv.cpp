@@ -105,11 +105,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_450_sample_location_nv : public test
+class gl_500_sample_location : public test
 {
 public:
-	gl_450_sample_location_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-sample-location-nv", test::CORE, 4, 5),
+	gl_500_sample_location(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-sample-location-nv", test::CORE, 4, 5),
 		FramebufferScale(3),
 		UniformTransform(-1),
 		VertexCount(0)
@@ -470,7 +470,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_sample_location_nv Test(argc, argv);
+	gl_500_sample_location Test(argc, argv);
 	Error += Test();
 
 	return Error;
