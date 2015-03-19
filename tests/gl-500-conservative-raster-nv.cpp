@@ -25,10 +25,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-450/conservative-raster.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-450/conservative-raster.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-450/conservative-raster-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-450/conservative-raster-blit.frag");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-500/conservative-raster.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-500/conservative-raster.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-500/conservative-raster-blit.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-500/conservative-raster-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 
 	GLsizei const VertexCount(4);
