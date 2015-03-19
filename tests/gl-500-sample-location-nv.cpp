@@ -368,6 +368,35 @@ private:
 	{
 		bool Validated(true);
 		Validated = Validated && this->checkExtension("GL_NV_sample_locations");
+		Validated = Validated && this->checkExtension("GL_NV_internalformat_sample_query");
+
+		// Obtain supported sample count for a format:
+		GLint num_sample_counts = 0;
+		//GLenum ifmt = GL_RGBA8;
+		GLenum ifmt = GL_RGBA32F;
+		GLenum target = GL_TEXTURE_2D_MULTISAMPLE;
+		glGetInternalformativ(target, ifmt, GL_NUM_SAMPLE_COUNTS, 1, &num_sample_counts);
+
+		// get the list of supported samples for this format
+		std::vector<GLint> samples;
+		samples.resize(num_sample_counts);
+		glGetInternalformativ(target, ifmt, GL_SAMPLES, num_sample_counts, &samples[0]);
+
+		// loop over the supported formats and get per-sample properties
+		for (int i=0; i<num_sample_counts; i++)
+		{
+			GLint multisample;
+			GLint ss_scale_x, ss_scale_y;
+			GLint conformant;
+			glGetInternalformatSampleivNV(target, ifmt, samples[i], GL_MULTISAMPLES_NV, 1, &multisample);
+			glGetInternalformatSampleivNV(target, ifmt, samples[i], GL_SUPERSAMPLE_SCALE_X_NV, 1, &ss_scale_x);
+			glGetInternalformatSampleivNV(target, ifmt, samples[i], GL_SUPERSAMPLE_SCALE_Y_NV, 1, &ss_scale_y);
+			glGetInternalformatSampleivNV(target, ifmt, samples[i], GL_CONFORMANT_NV, 1, &conformant);
+			
+			// do something with this information :-)
+			continue;
+		}
+
 
 		if(Validated)
 			Validated = initProgram();
