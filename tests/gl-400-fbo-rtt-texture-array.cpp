@@ -100,7 +100,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glm::ivec2 const FramebufferSize(WindowSize / FRAMEBUFFER_SIZE);
-	
+
 		glTexImage3D(
 			GL_TEXTURE_2D_ARRAY,
 			0, 

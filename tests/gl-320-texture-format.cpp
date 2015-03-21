@@ -197,15 +197,11 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				static_cast<GLint>(0), 
-				TextureInternalFormat[i], 
-				static_cast<GLsizei>(Texture.dimensions().x), 
-				static_cast<GLsizei>(Texture.dimensions().y), 
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0),
+				TextureInternalFormat[i],
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
 				0,
-				TextureFormat[i], 
-				GL_UNSIGNED_BYTE, 
+				TextureFormat[i], GL_UNSIGNED_BYTE,
 				Texture.data());
 		}
 	
