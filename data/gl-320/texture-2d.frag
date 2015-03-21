@@ -15,5 +15,5 @@ out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord);
+	Color = textureLod(Diffuse, In.Texcoord, 0);
 }

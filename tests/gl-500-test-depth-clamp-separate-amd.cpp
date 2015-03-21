@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/test-depth-clamp-separate.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/test-depth-clamp-separate.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/test-depth-clamp-separate.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/test-depth-clamp-separate.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
@@ -58,11 +58,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_depth_clamp_separate_amd : public test
+class gl_500_test_depth_clamp_separate_amd : public test
 {
 public:
-	gl_420_depth_clamp_separate_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-depth-clamp-separate-amd", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+	gl_500_test_depth_clamp_separate_amd(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-test-depth-clamp-separate-amd", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_depth_clamp_separate_amd Test(argc, argv);
+	gl_500_test_depth_clamp_separate_amd Test(argc, argv);
 	Error += Test();
 
 	return Error;

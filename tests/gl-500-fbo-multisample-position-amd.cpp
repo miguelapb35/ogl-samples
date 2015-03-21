@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/multisample-amd.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/multisample-amd.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/fbo-multisample-position-amd.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/fbo-multisample-position-amd.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 
@@ -74,11 +74,11 @@ namespace
 	GLuint FramebufferResolveName(0);
 }//namespace
 
-class gl_420_fbo_multisample_position_amd : public test
+class gl_500_fbo_multisample_position_amd : public test
 {
 public:
-	gl_420_fbo_multisample_position_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-fbo-multisample-position-amd", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f))
+	gl_500_fbo_multisample_position_amd(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-fbo-multisample-position-amd", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:
@@ -398,7 +398,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_fbo_multisample_position_amd Test(argc, argv);
+	gl_500_fbo_multisample_position_amd Test(argc, argv);
 	Error += Test();
 
 	return Error;

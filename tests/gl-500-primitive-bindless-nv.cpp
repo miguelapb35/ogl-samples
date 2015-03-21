@@ -25,10 +25,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/texture-2d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
-	char const * TEXTURE_DIFFUSE_DXT1("kueken256-bc1-saved.dds");
+	char const * VERT_SHADER_SOURCE("gl-500/primitive-bindless-nv.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/primitive-bindless-nv.frag");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	struct vertex
 	{
@@ -144,21 +143,19 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), GL_RGBA8, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D,
-				GLint(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x),
-				GLsizei(Texture[Level].dimensions().y),
-				GL_BGR, GL_UNSIGNED_BYTE,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
+				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	

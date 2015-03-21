@@ -1,6 +1,13 @@
 #version 420 core
 
-#include "texture-2d.glsl"
+#include "primitive-bindless-nv.glsl"
+#line 5
+
+#define COUNT 24
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
 
 layout(binding = TRANSFORM0) uniform transform
 {
@@ -21,7 +28,7 @@ out block
 } Out;
 
 void main()
-{	
+{
 	Out.Texcoord = Texcoord;
 	gl_Position = Transform.MVP * vec4(Position, 1.0);
 }

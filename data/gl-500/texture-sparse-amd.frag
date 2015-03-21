@@ -1,7 +1,7 @@
 #version 420 core
 #extension GL_AMD_sparse_texture : require
 
-#include "texture-2d.glsl"
+#include "texture-sparse-amd.glsl"
 
 layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 

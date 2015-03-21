@@ -211,7 +211,7 @@ private:
 			}
 		}
 
-        this->checkError("initTexture 5");
+		this->checkError("initTexture 5");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC5).c_str()));

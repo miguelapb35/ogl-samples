@@ -25,10 +25,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-420/blend-op-amd.vert");
-	char const * FRAG_SHADER_SOURCE1("gl-420/blend-op-amd.frag");
-	char const * VERT_SHADER_SOURCE2("gl-420/blend-texture-2d.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-420/blend-texture-2d.frag");
+	char const * VERT_SHADER_SOURCE1("gl-500/blend-op-amd.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-500/blend-op-amd.frag");
+	char const * VERT_SHADER_SOURCE2("gl-500/blend-texture-2d-amd.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-500/blend-texture-2d-amd.frag");
 	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 
@@ -96,11 +96,11 @@ namespace
 	glm::ivec4 Viewport[texture::MAX];
 }//namespace
 
-class gl_420_blend_op_amd : public test
+class gl_500_blend_op_amd : public test
 {
 public:
-	gl_420_blend_op_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-blend-op-amd", test::CORE, 4, 2)
+	gl_500_blend_op_amd(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-blend-op-amd", test::CORE, 4, 2)
 	{}
 
 private:
@@ -449,7 +449,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_blend_op_amd Test(argc, argv);
+	gl_500_blend_op_amd Test(argc, argv);
 	Error += Test();
 
 	return Error;

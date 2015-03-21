@@ -25,9 +25,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-420/texture-bindless-nv.vert");
-	char const * FRAG_SHADER_SOURCE("gl-420/texture-bindless-nv.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * VERT_SHADER_SOURCE("gl-500/texture-bindless-nv.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/texture-bindless-nv.frag");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_texture_bindless_nv : public test
+class gl_500_texture_bindless_nv : public test
 {
 public:
-	gl_420_texture_bindless_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-bindless-nv", test::CORE, 4, 2),
+	gl_500_texture_bindless_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-texture-bindless-nv", test::CORE, 4, 5),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -163,21 +163,16 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexStorage2D(GL_TEXTURE_2D,
-			GLint(Texture.levels()),
-			gli::internal_format(Texture.format()),
-			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), gli::internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x),
-				GLsizei(Texture[Level].dimensions().y),
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x),
+				static_cast<GLsizei>(Texture[Level].dimensions().y),
+				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
@@ -246,9 +241,8 @@ private:
 		// Update of the uniform buffer
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER,
+				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, WindowSize.x, WindowSize.y, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
@@ -279,7 +273,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_texture_bindless_nv Test(argc, argv);
+	gl_500_texture_bindless_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;

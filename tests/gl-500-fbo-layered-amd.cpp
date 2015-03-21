@@ -25,10 +25,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-420/layer-amd.vert");
-	char const * FRAG_SHADER_SOURCE1("gl-420/layer-amd.frag");
-	char const * VERT_SHADER_SOURCE2("gl-420/viewport-amd.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-420/viewport-amd.frag");
+	char const * VERT_SHADER_SOURCE1("gl-500/fbo-layered-layer-amd.vert");
+	char const * FRAG_SHADER_SOURCE1("gl-500/fbo-layered-layer-amd.frag");
+	char const * VERT_SHADER_SOURCE2("gl-500/fbo-layered-viewport-amd.vert");
+	char const * FRAG_SHADER_SOURCE2("gl-500/fbo-layered-viewport-amd.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 
 	GLsizei const VertexCount(3);
@@ -64,11 +64,11 @@ namespace
 	GLuint TextureColorbufferName(0);
 }//namespace
 
-class gl_420_texture_storage : public test
+class gl_500_fbo_layered_amd : public test
 {
 public:
-	gl_420_texture_storage(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-fbo-layered-amd", test::CORE, 4, 2)
+	gl_500_fbo_layered_amd(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-fbo-layered-amd", test::CORE, 4, 2)
 	{}
 
 private:
@@ -82,10 +82,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, 
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE1, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[LAYERING] = glCreateProgram();
@@ -102,10 +100,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, 
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE2, "--version 420 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 420 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[VIEWPORT] = glCreateProgram();
@@ -304,7 +300,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_texture_storage Test(argc, argv);
+	gl_500_fbo_layered_amd Test(argc, argv);
 	Error += Test();
 
 	return Error;
