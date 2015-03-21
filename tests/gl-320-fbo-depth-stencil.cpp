@@ -25,11 +25,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/fbo-srgb.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * VERT_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.vert");
+	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.frag");
+	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo.vert");
+	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo.frag");
+	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -94,11 +94,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo_detph_stencil : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+	gl_320_fbo_detph_stencil(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-fbo-depth-stencil", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -136,7 +136,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::TEXTURE]);
 		}
-
+		
 		if(Validated)
 		{
 			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
@@ -186,12 +186,12 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		GLint UniformBufferOffset(0);
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
+		GLint UniformBufferOffsetAlignment(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffsetAlignment);
+		UniformBufferOffsetAlignment = glm::ceilMultiple<GLint>(sizeof(glm::mat4), UniformBufferOffsetAlignment);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformBufferOffsetAlignment * 2, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return true;
@@ -217,14 +217,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
-				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
-				0,
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+			glCompressedTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), 
+				static_cast<GLsizei>(Texture[Level].dimensions().y), 
+				0, 
+				static_cast<GLsizei>(Texture[Level].size()), 
 				Texture[Level].data());
 		}
 	
@@ -236,13 +236,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_SRGB8_ALPHA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0), GL_RGBA8, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0), GL_DEPTH24_STENCIL8, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
@@ -275,20 +275,13 @@ private:
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
 		if(this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		return true;
-
-		/*
-		GLint Encoding = 0;
-		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		if (Encoding != GL_SRGB)
-		return false;
-		*/
 	}
 
 	bool begin()
@@ -326,35 +319,33 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
+		GLint UniformBufferOffsetAlignment = 0;
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffsetAlignment);
+			UniformBufferOffsetAlignment = glm::ceilMultiple<GLint>(sizeof(glm::mat4), UniformBufferOffsetAlignment);
 
-			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, UniformBufferOffsetAlignment * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+
 			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
 		
-			*Pointer = Projection * this->view();
+			*reinterpret_cast<glm::mat4*>(Pointer + UniformBufferOffsetAlignment * 0) = Projection * this->view() * glm::scale(glm::mat4(1.0f), glm::vec3(1.00f));
+			*reinterpret_cast<glm::mat4*>(Pointer + UniformBufferOffsetAlignment * 1) = Projection * this->view() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f));
 
 			// Make sure the uniform buffer is uploaded
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
-		// Render a textured quad to a sRGB framebuffer object.
 		{
+			glEnable(GL_STENCIL_TEST);
 			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			glDepthFunc(GL_LEQUAL);
+			glStencilMask(0xFF);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
-			// Shader execution is done with linear color to get correct linear algebra working.
-			glEnable(GL_FRAMEBUFFER_SRGB);
-
-			float Depth(1.0f);
-			glClearBufferfv(GL_DEPTH, 0, &Depth);
+			glClearBufferfi(GL_DEPTH_STENCIL, 0, 1.0f, 0);
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
@@ -362,19 +353,31 @@ private:
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 			glBindVertexArray(VertexArrayName[program::TEXTURE]);
-			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0);
+			glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], UniformBufferOffsetAlignment * 0, UniformBufferOffsetAlignment);
+
+			glDisable(GL_DEPTH_TEST);
+			glStencilMask(0xFF);
+			glStencilFunc(GL_ALWAYS, 1, 0xFF);
+			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], UniformBufferOffsetAlignment * 1, UniformBufferOffsetAlignment);
+
+			glStencilMask(0x00);
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 		}
 
-		// Blit the sRGB framebuffer to the default framebuffer back buffer.
 		{
 			glDisable(GL_DEPTH_TEST);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
@@ -393,7 +396,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_320_fbo_detph_stencil Test(argc, argv);
 	Error += Test();
 
 	return Error;
