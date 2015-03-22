@@ -75,6 +75,7 @@ OpenGL Samples Pack 4.5.1.0: 2015-XX-XX
 - Added gl-320-texture-lod sample
 - Added gl-320-fbo-depth-stencil sample
 - Added gl-440-fbo-depth-stencil sample
+- Added gl-500-primitive-shading-nv sample
 - Reorganized vendor and ARB samples into GL5 hardware samples
 
 ================================================================================

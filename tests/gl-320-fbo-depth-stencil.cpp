@@ -363,7 +363,7 @@ private:
 
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
-			glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_2D, 0); // 
 			glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], UniformBufferOffsetAlignment * 1, UniformBufferOffsetAlignment);
 
 			glStencilMask(0x00);
