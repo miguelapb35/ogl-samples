@@ -99,21 +99,10 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, GeomShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-
-			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName, semantic::attr::COLOR, "Color");
-			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
 
 			Validated = Validated && Compiler.check();
 			Validated = Validated && Compiler.checkProgram(ProgramName);
-		}
-
-		if(Validated)
-		{
-			glUseProgram(ProgramName);
-			glUniformBlockBinding(ProgramName, glGetUniformBlockIndex(ProgramName, "transform"), semantic::uniform::TRANSFORM0);
-			glUseProgram(0);
 		}
 
 		return Validated && this->checkError("initProgram");

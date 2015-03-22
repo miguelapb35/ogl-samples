@@ -395,19 +395,17 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		{
-			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
-
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, Padding * 3, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::vec2 WindowSize(this->getWindowSize());
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / 3.0f / WindowSize.y, 0.1f, 100.0f);
 			glm::mat4 View = this->view();
 			glm::mat4 Model = glm::mat4(1.0f);
 
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f));
+			*reinterpret_cast<glm::mat4*>(Pointer + sizeof(glm::mat4) * 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
+			*reinterpret_cast<glm::mat4*>(Pointer + sizeof(glm::mat4) * 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+			*reinterpret_cast<glm::mat4*>(Pointer + sizeof(glm::mat4) * 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f));
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 

@@ -46,6 +46,7 @@ namespace
 		{
 			VERTEX,
 			TRANSFORM,
+			MATERIAL,
 			MAX
 		};
 	}//namespace buffer
@@ -66,6 +67,7 @@ private:
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLint UniformTransform;
+	GLint UniformMaterial;
 
 	bool initTest()
 	{
@@ -102,6 +104,7 @@ private:
 		if(Validated)
 		{
 			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
 		}
 
 		return Validated && this->checkError("initProgram");
@@ -117,10 +120,21 @@ private:
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4) * 2), UniformBufferOffset);
 
+		GLint UniformTransformBlockSize = glm::max(GLint(sizeof(glm::mat4) * 2), UniformBufferOffset);
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, UniformTransformBlockSize, NULL, GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		GLint UniformMaterialBlockSize = glm::max(GLint(sizeof(glm::vec4) * 2), UniformBufferOffset);
+		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
+		glBufferData(GL_UNIFORM_BUFFER, UniformMaterialBlockSize, nullptr, GL_STATIC_DRAW);
+
+		glm::vec4* Pointer = reinterpret_cast<glm::vec4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		*(Pointer + 0) = glm::vec4(1.0, 0.5, 0.0, 1.0);
+		*(Pointer + 1) = glm::vec4(0.0, 0.5, 1.0, 1.0);
+
+		glUnmapBuffer(GL_UNIFORM_BUFFER);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		return this->checkError("initBuffer");
@@ -193,8 +207,10 @@ private:
 
 		glUseProgram(ProgramName);
 		glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName, UniformMaterial, semantic::uniform::MATERIAL);
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 5);

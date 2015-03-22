@@ -1,4 +1,4 @@
-#version 150 core
+#version 450 core
 #extension GL_NV_geometry_shader_passthrough : require
 
 #ifndef GEN_ERROR // If this is not declared, the compiler should generate an error
