@@ -235,6 +235,21 @@ namespace glf
 		glm::vec4 Color;
 	};
 
+	struct vertex_v4fv4f
+	{
+		vertex_v4fv4f
+		(
+			glm::vec4 const & Position,
+			glm::vec4 const & Texcoord
+		) :
+			Position(Position),
+			Texcoord(Texcoord)
+		{}
+
+		glm::vec4 Position;
+		glm::vec4 Texcoord;
+	};
+
 	struct vertex_v4fv4fv4f
 	{
 		vertex_v4fv4fv4f
