@@ -135,7 +135,7 @@ private:
 
 		GLsizei const Size(16384);
 		std::size_t const Levels = gli::levels(Size);
-		std::size_t const MaxLevels = Levels - gli::levels(256);
+		std::size_t const MaxLevels = 4;
 
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
@@ -145,8 +145,8 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 2);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);//GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLsizei>(gli::levels(Size)), GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
@@ -166,7 +166,7 @@ private:
 		glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Y_ARB, 1, &Page3DSizeY);
 		glGetInternalformativ(GL_TEXTURE_3D, GL_RGBA32F, GL_VIRTUAL_PAGE_SIZE_Z_ARB, 1, &Page3DSizeZ);
 
-		for(std::size_t Level = 0; Level < 3; ++Level)
+		for(std::size_t Level = 0; Level < MaxLevels; ++Level)
 		{
 			GLsizei LevelSize = (Size >> Level);
 			GLsizei TileCountY = LevelSize / PageSize.y;
