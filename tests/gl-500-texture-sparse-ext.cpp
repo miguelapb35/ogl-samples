@@ -25,8 +25,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-500/texture-sparse.vert");
-	char const * FRAG_SHADER_SOURCE("gl-500/texture-sparse.frag");
+	char const * VERT_SHADER_SOURCE("gl-500/texture-sparse-ext.vert");
+	char const * FRAG_SHADER_SOURCE("gl-500/texture-sparse-ext.frag");
 	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_sparse_arb : public test
+class gl_500_texture_sparse_ext : public test
 {
 public:
-	gl_500_texture_sparse_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-texture-sparse-arb", test::CORE, 4, 4, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
+	gl_500_texture_sparse_ext(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-texture-sparse-ext", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -81,13 +81,11 @@ private:
 	{
 		bool Validated(true);
 	
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 450 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 450 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -100,31 +98,24 @@ private:
 		}
 
 		if(Validated)
+		{
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated;
 	}
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
 		return true;
 	}
@@ -137,19 +128,17 @@ private:
 		std::size_t const Levels = gli::levels(Size);
 		std::size_t const MaxLevels = 4;
 
-		glGenTextures(1, &TextureName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLsizei>(gli::levels(Size)), GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &TextureName);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTextureParameteri(TextureName, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName, GL_TEXTURE_MAX_LEVEL, MaxLevels - 1);
+		glTextureParameteri(TextureName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+		glTextureParameteri(TextureName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(TextureName, GL_TEXTURE_SPARSE_ARB, GL_TRUE);
+		glTextureStorage3D(TextureName, static_cast<GLsizei>(gli::levels(Size)), GL_RGBA8, GLsizei(Size), GLsizei(Size), 1);
 
 		glm::ivec3 PageSize;
 		glGetInternalformativ(GL_TEXTURE_2D_ARRAY, GL_RGBA8, GL_VIRTUAL_PAGE_SIZE_X_ARB, 1, &PageSize.x);
@@ -183,12 +172,12 @@ private:
 					static_cast<unsigned char>(float(j) / float(LevelSize / PageSize.y) * 255),
 					static_cast<unsigned char>(float(Level) / float(MaxLevels) * 255), 255));
 
-				glTexPageCommitmentARB(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+				glTexturePageCommitmentEXT(TextureName, static_cast<GLint>(Level),
 					static_cast<GLsizei>(PageSize.x) * i, static_cast<GLsizei>(PageSize.y) * j, 0,
 					static_cast<GLsizei>(PageSize.x), static_cast<GLsizei>(PageSize.y), 1,
 					GL_TRUE);
 
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+				glTextureSubImage3D(TextureName, static_cast<GLint>(Level),
 					static_cast<GLsizei>(PageSize.x) * i, static_cast<GLsizei>(PageSize.y) * j, 0,
 					static_cast<GLsizei>(PageSize.x), static_cast<GLsizei>(PageSize.y), 1,
 					GL_RGBA, GL_UNSIGNED_BYTE,
@@ -203,10 +192,8 @@ private:
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(1, &VertexArrayName);
-		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindVertexArray(0);
+		glCreateVertexArrays(1, &VertexArrayName);
+		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
 
 		return true;
 	}
@@ -214,7 +201,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_sparse_texture");
+		Validated = Validated && this->checkExtension("GL_EXT_sparse_texture2");
 
 		if(Validated)
 			Validated = initProgram();
@@ -244,17 +231,15 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM],
+				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.001f, 100.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.001f, 100.0f);
+			glm::mat4 const Model = glm::mat4(1.0f);
 		
 			*Pointer = Projection * this->view() * Model;
 
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
@@ -276,7 +261,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_texture_sparse_arb Test(argc, argv);
+	gl_500_texture_sparse_ext Test(argc, argv);
 	Error += Test();
 
 	return Error;

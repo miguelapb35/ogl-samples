@@ -485,4 +485,6 @@ set(GL_SHADER_GTC texture-sparse.vert texture-sparse.frag texture-sparse.glsl)
 glCreateSampleGTC(texture-sparse-arb)
 set(GL_SHADER_GTC texture-sparse-amd.vert texture-sparse-amd.frag texture-sparse-amd.glsl)
 glCreateSampleGTC(texture-sparse-amd)
+set(GL_SHADER_GTC texture-sparse-ext.vert texture-sparse-ext.frag)
+glCreateSampleGTC(texture-sparse-ext)
 
