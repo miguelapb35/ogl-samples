@@ -529,7 +529,7 @@ bool test::checkFramebuffer(GLuint FramebufferName) const
 		break;
 	}
 
-	return Status != GL_FRAMEBUFFER_COMPLETE;
+	return Status == GL_FRAMEBUFFER_COMPLETE;
 }
 
 bool test::checkExtension(char const * ExtensionName) const
