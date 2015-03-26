@@ -95,6 +95,7 @@ std::string compiler::commandline::getDefines() const
 std::string compiler::parser::operator()(commandline const & CommandLine, std::string const & Filename) const
 {
 	std::string Source = loadFile(Filename);
+	assert(!Source.empty());
 
 	std::stringstream Stream;
 	Stream << Source;
@@ -183,7 +184,6 @@ GLuint compiler::create(GLenum Type, std::string const & Filename, std::string c
 	commandline CommandLine(Filename, Arguments);
 
 	std::string PreprocessedSource = parser()(CommandLine, Filename);
-	PreprocessedSource += format("\n/*\n%f*/\n", glm::linearRand(0.0f, 1.0f));
 	assert(!PreprocessedSource.empty());
 	char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
 
