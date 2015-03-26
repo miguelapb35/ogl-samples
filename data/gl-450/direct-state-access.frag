@@ -14,5 +14,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, interpolateAtSample(Vert.Texcoord, gl_SampleID)) + s.v[0];
+	Color = texture(Diffuse, interpolateAtSample(Vert.Texcoord, gl_SampleID));
 }

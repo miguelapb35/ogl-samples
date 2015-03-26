@@ -267,7 +267,7 @@ private:
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::MULTISAMPLE], 0);
 		glDrawBuffer(GL_NONE);
 
-		if(this->checkFramebuffer(FramebufferName[framebuffer::DEPTH_MULTISAMPLE]))
+		if(!this->checkFramebuffer(FramebufferName[framebuffer::DEPTH_MULTISAMPLE]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);	

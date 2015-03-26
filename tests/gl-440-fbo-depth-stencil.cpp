@@ -286,7 +286,7 @@ private:
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::DEPTHBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, TextureName[texture::STENCILBUFFER], 0);
 
-		if(this->checkFramebuffer(FramebufferName))
+		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

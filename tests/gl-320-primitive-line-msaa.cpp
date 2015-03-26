@@ -254,9 +254,9 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[texture::COLORBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 
-		if(this->checkFramebuffer(FramebufferName[texture::RENDERBUFFER]))
+		if(!this->checkFramebuffer(FramebufferName[texture::RENDERBUFFER]))
 			return false;
-		if(this->checkFramebuffer(FramebufferName[texture::COLORBUFFER]))
+		if(!this->checkFramebuffer(FramebufferName[texture::COLORBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

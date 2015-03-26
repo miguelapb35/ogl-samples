@@ -357,7 +357,7 @@ private:
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 
 		for(int FramebufferIndex = 0; FramebufferIndex < framebuffer::MAX; ++FramebufferIndex)
-			if(this->checkFramebuffer(FramebufferName[FramebufferIndex]))
+			if(!this->checkFramebuffer(FramebufferName[FramebufferIndex]))
 				return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
