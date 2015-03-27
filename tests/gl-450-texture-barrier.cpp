@@ -330,7 +330,7 @@ private:
 
 		for (std::size_t i = 0; i < this->Viewports.size(); ++i)
 		{
-			//glViewportIndexedfv(0, &this->Viewports[i][0]);
+			glViewportIndexedfv(0, &this->Viewports[i][0]);
 			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 			glTextureBarrier();
 		}
