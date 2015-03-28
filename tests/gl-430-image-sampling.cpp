@@ -78,7 +78,7 @@ class gl_430_image_sampling : public test
 {
 public:
 	gl_430_image_sampling(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-image-sampling", test::CORE, 4, 2),
+		test(argc, argv, "gl-430-image-sampling", test::CORE, 4, 3),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -103,10 +103,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, 
-				"--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE,
-				"--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();

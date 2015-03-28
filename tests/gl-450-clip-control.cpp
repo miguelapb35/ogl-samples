@@ -77,7 +77,10 @@ public:
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
-	{}
+	{
+		std::fill(this->ProgramName.begin(), this->ProgramName.end(), 0);
+		std::fill(this->BufferName.begin(), this->BufferName.end(), 0);
+	}
 
 private:
 	GLuint PipelineName;

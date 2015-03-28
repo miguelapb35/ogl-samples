@@ -199,7 +199,7 @@ private:
 			glm::byte* Pointer = reinterpret_cast<glm::byte*>(glMapBufferRange(GL_UNIFORM_BUFFER,
 				0, this->UniformTransformOffset * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, static_cast<float>(WindowSize.x) / static_cast<float>(WindowSize.y), 0.1f, 100.0f);
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, static_cast<float>(WindowSize.x) / static_cast<float>(WindowSize.y), 0.1f, 10.0f);
 			glm::mat4 Model0 = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 8.0f));
 			glm::mat4 Model1 = glm::mat4(1.0f);
 		

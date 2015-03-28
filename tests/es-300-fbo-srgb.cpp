@@ -278,14 +278,15 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
 
-		/*
+		
+		GLint const SRGB = GL_SRGB;
+		GLint const Linear = GL_LINEAR;
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		if (Encoding != GL_SRGB)
-		return false;
-		*/
+		//if (Encoding != GL_SRGB)
+
+		return true;
 	}
 
 	bool begin()

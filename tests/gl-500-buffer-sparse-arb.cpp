@@ -60,11 +60,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_buffer_storage_arb : public test
+class gl_500_buffer_sparse_arb : public test
 {
 public:
-	gl_500_buffer_storage_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-buffer-storage-arb", test::CORE, 4, 5),
+	gl_500_buffer_sparse_arb(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-buffer-sparse-arb", test::CORE, 4, 5),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -195,7 +195,6 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
 		Validated = Validated && this->checkExtension("GL_ARB_sparse_buffer");
 
 		if(Validated)
@@ -263,7 +262,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_buffer_storage_arb Test(argc, argv);
+	gl_500_buffer_sparse_arb Test(argc, argv);
 	Error += Test();
 
 	return Error;

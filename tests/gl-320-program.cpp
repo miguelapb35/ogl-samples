@@ -57,22 +57,34 @@ namespace
 			MAX
 		};
 	}//namespace buffer
-	
-	GLuint ProgramName(0);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	GLuint VertexArrayName(0);
-	GLint UniformTransform(0);
-	GLint UniformMaterial(0);
+
+	namespace program
+	{
+		enum type
+		{
+			USED,
+			MAX
+		};
+	}//namespace buffer
 }//namespace
 
 class gl_320_program : public test
 {
 public:
 	gl_320_program(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-program", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-program", test::CORE, 3, 2),
+		VertexArrayName(0),
+		UniformTransform(0),
+		UniformMaterial(0)
 	{}
 
 private:
+	std::array<GLuint, program::MAX> ProgramName;
+	std::array<GLuint, buffer::MAX> BufferName;
+	GLuint VertexArrayName;
+	GLint UniformTransform;
+	GLint UniformMaterial;
+
 	bool initProgram()
 	{
 		bool Validated = true;
@@ -84,26 +96,26 @@ private:
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 
-			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertShaderName);
-			glAttachShader(ProgramName, FragShaderName);
+			ProgramName[program::USED] = glCreateProgram();
+			glAttachShader(ProgramName[program::USED], VertShaderName);
+			glAttachShader(ProgramName[program::USED], FragShaderName);
 
-			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
-			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
-			glLinkProgram(ProgramName);
+			glBindAttribLocation(ProgramName[program::USED], semantic::attr::POSITION, "Position");
+			glBindFragDataLocation(ProgramName[program::USED], semantic::frag::COLOR, "Color");
+			glLinkProgram(ProgramName[program::USED]);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.checkProgram(ProgramName[program::USED]);
 		}
 
 		if(Validated)
 		{
-			UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
-			UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			UniformMaterial = glGetUniformBlockIndex(ProgramName[program::USED], "material");
+			UniformTransform = glGetUniformBlockIndex(ProgramName[program::USED], "transform");
 		}
 
 		GLint ActiveUniformBlocks(0);
-		glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORM_BLOCKS, &ActiveUniformBlocks);
+		glGetProgramiv(ProgramName[program::USED], GL_ACTIVE_UNIFORM_BLOCKS, &ActiveUniformBlocks);
 
 		for(GLint i = 0; i < ActiveUniformBlocks; ++i)
 		{
@@ -111,7 +123,7 @@ private:
 			memset(Name, '\0', sizeof(Name));
 			GLsizei Length(0);
 
-			glGetActiveUniformBlockName(ProgramName, i, GLsizei(sizeof(Name)), &Length, Name);
+			glGetActiveUniformBlockName(ProgramName[program::USED], i, GLsizei(sizeof(Name)), &Length, Name);
 
 			std::string StringName(Name);
 
@@ -119,7 +131,7 @@ private:
 		}
 
 		GLint ActiveUniform(0);
-		glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniform);
+		glGetProgramiv(ProgramName[program::USED], GL_ACTIVE_UNIFORMS, &ActiveUniform);
 
 		for(GLint i = 0; i < ActiveUniformBlocks; ++i)
 		{
@@ -127,7 +139,7 @@ private:
 			memset(Name, '\0', sizeof(Name));
 			GLsizei Length(0);
 
-			glGetActiveUniformName(ProgramName, i, GLsizei(sizeof(Name)), &Length, Name);
+			glGetActiveUniformName(ProgramName[program::USED], i, GLsizei(sizeof(Name)), &Length, Name);
 
 			std::string StringName(Name);
 
@@ -169,7 +181,7 @@ private:
 		GLint UniformBlockSize = 0;
 
 		{
-			glGetActiveUniformBlockiv(ProgramName, UniformTransform, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
+			glGetActiveUniformBlockiv(ProgramName[program::USED], UniformTransform, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, 0, GL_DYNAMIC_DRAW);
@@ -179,7 +191,7 @@ private:
 		{
 			glm::vec4 Diffuse(1.0f, 0.5f, 0.0f, 1.0f);
 
-			glGetActiveUniformBlockiv(ProgramName, UniformMaterial, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
+			glGetActiveUniformBlockiv(ProgramName[program::USED], UniformMaterial, GL_UNIFORM_BLOCK_DATA_SIZE, &UniformBlockSize);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
 			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, &Diffuse[0], GL_DYNAMIC_DRAW);
@@ -207,7 +219,7 @@ private:
 	{
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
-		glDeleteProgram(ProgramName);
+		glDeleteProgram(ProgramName[program::USED]);
 
 		return this->checkError("end");
 	}
@@ -236,9 +248,9 @@ private:
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
-		glUseProgram(ProgramName);
-		glUniformBlockBinding(ProgramName, UniformTransform, semantic::uniform::TRANSFORM0);
-		glUniformBlockBinding(ProgramName, UniformMaterial, semantic::uniform::MATERIAL);
+		glUseProgram(ProgramName[program::USED]);
+		glUniformBlockBinding(ProgramName[program::USED], UniformTransform, semantic::uniform::TRANSFORM0);
+		glUniformBlockBinding(ProgramName[program::USED], UniformMaterial, semantic::uniform::MATERIAL);
 
 		// Attach the buffer to UBO binding point semantic::uniform::TRANSFORM0
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);

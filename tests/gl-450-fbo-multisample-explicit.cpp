@@ -257,8 +257,8 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
-
+		bool Validated = this->checkExtension("GL_ARB_shader_texture_image_samples");
+		
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)

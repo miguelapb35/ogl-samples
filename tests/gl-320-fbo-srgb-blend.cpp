@@ -291,6 +291,10 @@ private:
 	{
 		bool Validated(true);
 
+		// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
+		// Shader execution is done with linear color to get correct linear algebra working.
+		glEnable(GL_FRAMEBUFFER_SRGB);
+
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -342,9 +346,7 @@ private:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
-			// Shader execution is done with linear color to get correct linear algebra working.
-			glEnable(GL_FRAMEBUFFER_SRGB);
+
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
@@ -364,7 +366,6 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 

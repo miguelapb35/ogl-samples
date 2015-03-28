@@ -281,14 +281,11 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
 
-		/*
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		if (Encoding != GL_SRGB)
-		return false;
-		*/
+
+		return true;
 	}
 
 	bool begin()
@@ -348,7 +345,6 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
 			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 			// Shader execution is done with linear color to get correct linear algebra working.
 			glEnable(GL_FRAMEBUFFER_SRGB);

@@ -42,7 +42,7 @@ class gl_440_atomic_counter : public test
 {
 public:
 	gl_440_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 2, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 3, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -61,8 +61,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -122,7 +122,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
+		bool Validated = this->checkExtension("GL_ARB_clear_buffer_object");
 
 		if(Validated)
 			Validated = initBuffer();
@@ -149,22 +149,8 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-
-		if(this->checkExtension("GL_ARB_clear_buffer_object"))
-		{
-			glm::uint Data(0);
-			glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
-		}
-		else
-		{
-			glm::uint32* Pointer = (glm::uint32*)glMapBufferRange(
-				GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(glm::uint32),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
-
-			*Pointer = 0;
-
-			glUnmapBuffer(GL_ATOMIC_COUNTER_BUFFER);
-		}
+		glm::uint Data(0);
+		glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
