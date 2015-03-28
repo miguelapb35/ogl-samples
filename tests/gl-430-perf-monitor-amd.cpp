@@ -355,12 +355,9 @@ private:
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexSubImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
+			glCompressedTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());

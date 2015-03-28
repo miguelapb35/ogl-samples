@@ -46,7 +46,6 @@
 #include <glm/gtc/round.hpp>
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/integer.hpp>
-#include <glm/gtx/multiple.hpp>
 #include <glm/gtx/fast_trigonometry.hpp>
 
 #include <gli/gli.hpp>
@@ -274,6 +273,7 @@ protected:
 	glm::mat4 view() const;
 	float cameraDistance() const {return this->TranlationCurrent.y;}
 	glm::vec3 cameraPosition() const;
+	bool checkTemplate(GLFWwindow* pWindow, char const * Title);
 
 protected:
 	void beginTimer();

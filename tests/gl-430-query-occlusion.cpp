@@ -51,11 +51,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_query_occlusion : public test
+class gl_430_query_occlusion : public test
 {
 public:
-	gl_320_query_occlusion(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-occlusion", test::CORE, 4, 2),
+	gl_430_query_occlusion(int argc, char* argv[]) :
+		test(argc, argv, "gl-430-query-occlusion", test::CORE, 4, 3),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -76,9 +76,9 @@ private:
 		int QueryBits(0);
 		glGetQueryiv(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, GL_QUERY_COUNTER_BITS, &QueryBits);
 
-		bool Validated = QueryBits >= 32;
+		bool Validated = QueryBits >= 1;
 
-		return Validated && this->checkError("initQuery");
+		return Validated;
 	}
 
 	bool initProgram()
@@ -88,8 +88,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -106,7 +106,7 @@ private:
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -125,7 +125,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -139,7 +139,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -158,7 +158,7 @@ private:
 		if(Validated)
 			Validated = initQuery();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -168,7 +168,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_query_occlusion Test(argc, argv);
+	gl_430_query_occlusion Test(argc, argv);
 	Error += Test();
 
 	return Error;

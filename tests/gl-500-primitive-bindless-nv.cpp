@@ -68,11 +68,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_primitive_bindless_nv : public test
+class gl_500_primitive_bindless_nv : public test
 {
 public:
-	gl_420_primitive_bindless_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-primitive-bindless-nv", test::CORE, 4, 2),
+	gl_500_primitive_bindless_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-primitive-bindless-nv", test::CORE, 4, 5),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_primitive_bindless_nv Test(argc, argv);
+	gl_500_primitive_bindless_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;

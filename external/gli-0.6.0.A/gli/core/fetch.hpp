@@ -35,13 +35,13 @@ namespace gli
 	template <typename genType>
 	genType texelFetch(
 		texture2D const & Texture, 
-		texture2D::dim_type const & Texcoord,
+		texture2D::dim_type const & TexelCoord,
 		texture2D::size_type const & Level);
 
 	template <typename genType>
 	void texelWrite(
 		texture2D & Texture,
-		texture2D::dim_type const & Texcoord,
+		texture2D::dim_type const & TexelCoord,
 		texture2D::size_type const & Level,
 		genType const & Color);
 

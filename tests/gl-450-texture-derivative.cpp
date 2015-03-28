@@ -157,12 +157,12 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), gli::internal_format(Texture.format()), GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
+			gli::internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D,
-				static_cast<GLint>(Level),
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				static_cast<GLenum>(gli::external_format(Texture.format())), static_cast<GLenum>(gli::type_format(Texture.format())),
@@ -179,20 +179,24 @@ private:
 
 	bool initVertexArray()
 	{
+		bool Validated(true);
+
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, 0);
+			glVertexAttribFormat(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+
+			glVertexAttribBinding(semantic::attr::TEXCOORD, 0);
+			glVertexAttribFormat(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+			glBindVertexBuffer(0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 		glBindVertexArray(0);
 
-		return true;
+		return Validated;
 	}
 
 	bool begin()

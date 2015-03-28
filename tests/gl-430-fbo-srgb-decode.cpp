@@ -95,11 +95,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_430_fbo_srgb_decode : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+	gl_430_fbo_srgb_decode(int argc, char* argv[]) :
+		test(argc, argv, "gl-430-fbo-srgb-decode", test::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -388,7 +388,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_430_fbo_srgb_decode Test(argc, argv);
 	Error += Test();
 
 	return Error;

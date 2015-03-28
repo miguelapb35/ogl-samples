@@ -12,8 +12,8 @@ uniform int Instance;
 
 layout(binding = TRANSFORM0) uniform transform
 {
-	mat4 MVP;
-} Transform[2];
+	mat4 MVP[2];
+} Transform;
 
 out gl_PerVertex
 {
@@ -24,7 +24,7 @@ layout(location = POSITION) in vec2 Position;
 
 void main()
 {	
-	gl_Position = Transform[Instance].MVP * vec4(Position, 0.0, 1.0);
+	gl_Position = Transform.MVP[Instance] * vec4(Position, 0.0, 1.0);
 }
 
 

@@ -274,7 +274,7 @@ private:
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER], 0);
 
-		if(this->checkFramebuffer(FramebufferName))
+		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -302,8 +302,6 @@ private:
 			Validated = initTexture();
 		if(Validated)
 			Validated = initFramebuffer();
-
-		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		return Validated;
 	}

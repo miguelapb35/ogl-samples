@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-440/fbo-depth-stencil-render.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-440/fbo-depth-stencil-blit.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-440/fbo-depth-stencil-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_bc1_rgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -283,7 +283,6 @@ private:
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::DEPTHBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, TextureName[texture::STENCILBUFFER], 0);
 
 		if(!this->checkFramebuffer(FramebufferName))
@@ -330,9 +329,8 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER,
+				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
@@ -345,14 +343,9 @@ private:
 		}
 
 		{
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-			float Depth(1.0f);
-			glClearBufferfv(GL_DEPTH , 0, &Depth);
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
@@ -366,8 +359,6 @@ private:
 		}
 
 		{
-			glDisable(GL_DEPTH_TEST);
-
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);

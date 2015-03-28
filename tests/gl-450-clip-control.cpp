@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-450/clip-control.vert");
 	char const * FRAG_SHADER_SOURCE("gl-450/clip-control.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -161,25 +161,19 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-			GLint(Texture.levels()),
-			gli::internal_format(Texture.format()),
-			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), GLsizei(1));
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()), gli::internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-				GLint(Level),
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 				0, 0, 0,
-				GLsizei(Texture[Level].dimensions().x),
-				GLsizei(Texture[Level].dimensions().y),
-				GLsizei(1),
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
@@ -194,15 +188,17 @@ private:
 
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, 0);
+			glVertexAttribFormat(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+
+			glVertexAttribBinding(semantic::attr::TEXCOORD, 0);
+			glVertexAttribFormat(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+			glBindVertexBuffer(0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 		glBindVertexArray(0);
 
 		return Validated;

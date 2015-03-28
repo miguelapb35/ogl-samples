@@ -25,7 +25,7 @@
 #include "png.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace 
+namespace
 {
 	inline std::string vendor()
 	{
@@ -47,38 +47,6 @@ namespace
 			return os + "intel/";
 		else
 			return os + "unknown/";
-	}
-
-	inline bool checkTemplate(GLFWwindow* pWindow, char const * Title)
-	{
-		//glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &Params); // For ES 2 this is actually necessary
-
-		GLint WindowSizeX(0);
-		GLint WindowSizeY(0);
-		glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
-
-		gli::texture2D Texture(1, gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glReadPixels(0, 0, WindowSizeX, WindowSizeY, GL_RGB, GL_UNSIGNED_BYTE, Texture.data());
-
-		bool Success = true;
-
-		if(Success)
-		{
-			gli::texture2D Template(load_png((getDataDirectory() + "templates/" + vendor() + Title + ".png").c_str()));
-
-			if(Success)
-				Success = Success && (!Template.empty());
-
-			if(Success)
-				Success = Success && (Template == Texture);
-		}
-
-		if(!Success)
-			save_png(Texture, (getBinaryDirectory() + Title + ".png").c_str());
-
-		return Success;
 	}
 
 	inline GLFWmonitor* GetMonitor(test::vendor const & Vendor)
@@ -294,7 +262,7 @@ int test::operator()()
 		glfwPollEvents();
 		if(glfwWindowShouldClose(this->Window) || (Automated && FrameNum == 0))
 		{
-			if(this->Success == MATCH_TEMPLATE && this->Profile == CORE)
+			if(this->Success == MATCH_TEMPLATE)
 			{
 				if(!checkTemplate(this->Window, this->Title.c_str()))
 					Result = EXIT_FAILURE;
@@ -384,6 +352,63 @@ glm::mat4 test::view() const
 glm::vec3 test::cameraPosition() const
 {
 	return glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y);
+}
+
+bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
+{
+	GLint ColorType = GL_UNSIGNED_BYTE;
+	GLint ColorFormat = GL_RGBA;
+		
+	if (Profile == ES)
+	{
+		glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_TYPE, &ColorType);
+		glGetIntegerv(GL_IMPLEMENTATION_COLOR_READ_FORMAT, &ColorFormat);
+	}
+
+	GLint WindowSizeX(0);
+	GLint WindowSizeY(0);
+	glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
+
+	gli::texture2D TextureRead(1, ColorFormat == GL_RGBA ? gli::RGBA8_UNORM : gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.data());
+
+	gli::texture2D TextureRGB(1, gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+
+	if(TextureRead.format() == gli::RGBA8_UNORM)
+	{
+		for(gli::size_t y = 0; y < TextureRGB.dimensions().y; ++y)
+		for(gli::size_t x = 0; x < TextureRGB.dimensions().x; ++x)
+		{
+			gli::texture2D::dim_type TexelCoord(x, y);
+
+			glm::u8vec3 Color(gli::texelFetch<glm::u8vec4>(TextureRead, TexelCoord, 0));
+			gli::texelWrite(TextureRGB, TexelCoord, 0, Color);
+		}
+	}
+	else
+	{
+		TextureRGB = TextureRead;
+	}
+
+	bool Success = true;
+
+	if(Success)
+	{
+		gli::texture2D Template(load_png((getDataDirectory() + "templates/" + ::vendor() + Title + ".png").c_str()));
+
+		if(Success)
+			Success = Success && (!Template.empty());
+
+		if(Success)
+			Success = Success && (Template == TextureRGB);
+	}
+
+	if(!Success)
+		save_png(TextureRGB, (getBinaryDirectory() + Title + ".png").c_str());
+
+	return Success;
 }
 
 void test::beginTimer()

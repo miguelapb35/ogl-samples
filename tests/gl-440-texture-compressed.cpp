@@ -27,10 +27,10 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-440/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE_DXT5("kueken2-dxt5.dds");
-	char const * TEXTURE_DIFFUSE_RGTC("kueken2-bc4.dds");
-	char const * TEXTURE_DIFFUSE_BPTC("kueken2-bc7.dds");
-	char const * TEXTURE_DIFFUSE_RGB8("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE_RGB8("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE_RGB10("kueken7_rgb10_a2_unorm.dds");
+	char const * TEXTURE_DIFFUSE_BC1("kueken7_bc1_rgb.dds");
+	char const * TEXTURE_DIFFUSE_BC3("kueken7_bc3_rgba.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -66,9 +66,9 @@ namespace
 		enum type
 		{
 			RGB8,
-			DXT5,
-			RGTC,
-			BPTC,
+			RGB10,
+			BC1,
+			BC3,
 			MAX
 		};
 	}//namespace texture
@@ -143,21 +143,14 @@ private:
 	bool initTexture()
 	{
 		bool Validated(true);
-	/*
-		Texture2DName[texture::BPTC] = glu::create_texture_2d_array((getDataDirectory() + TEXTURE_DIFFUSE_BPTC).c_str());
-		Texture2DName[texture::DXT5] = glu::create_texture_2d_array((getDataDirectory() + TEXTURE_DIFFUSE_DXT5).c_str());
-		Texture2DName[texture::RGTC] = glu::create_texture_2d_array((getDataDirectory() + TEXTURE_DIFFUSE_RGTC).c_str());
-		Texture2DName[texture::RGB8] = glu::create_texture_2d_array((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str());
 
-		return Validated;
-	*/
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BPTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BPTC]);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BC1]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -166,77 +159,38 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				static_cast<GLenum>(gli::internal_format(Texture.format())),
-				static_cast<GLsizei>(Texture.dimensions().x),
-				static_cast<GLsizei>(Texture.dimensions().y),
-				static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x),
-					static_cast<GLsizei>(Texture[Level].dimensions().y),
-					static_cast<GLsizei>(1),
-					static_cast<GLenum>(gli::internal_format(Texture.format())), static_cast<GLsizei>(Texture[Level].size()), 
-					Texture[Level].data());
-			}
-		}
-
-		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5).c_str()));
-			assert(!Texture.empty());
-
-			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::DXT5]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()), 
-				static_cast<GLenum>(gli::internal_format(Texture.format())), 
-				static_cast<GLsizei>(Texture.dimensions().x),
-				static_cast<GLsizei>(Texture.dimensions().y),
-				static_cast<GLsizei>(1));
-
-			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-			{
-				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x),
-					static_cast<GLsizei>(Texture[Level].dimensions().y),
-					static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					static_cast<GLenum>(gli::internal_format(Texture.format())), static_cast<GLsizei>(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC3).c_str()));
 			assert(!Texture.empty());
 
-			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGTC]);
+			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BC3]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ONE);
-			glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-				static_cast<GLint>(Texture.levels()),
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				static_cast<GLenum>(gli::internal_format(Texture.format())),
-				static_cast<GLsizei>(Texture.dimensions().x),
-				static_cast<GLsizei>(Texture.dimensions().y),
-				static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-					static_cast<GLint>(Level),
+				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x),
-					static_cast<GLsizei>(Texture[Level].dimensions().y),
-					static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					static_cast<GLenum>(gli::internal_format(Texture.format())), static_cast<GLsizei>(Texture[Level].size()),
 					Texture[Level].data());
 			}
@@ -253,21 +207,40 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-			glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-				static_cast<GLint>(Texture.levels()),
+			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				static_cast<GLenum>(gli::internal_format(Texture.format())),
-				static_cast<GLsizei>(Texture.dimensions().x),
-				static_cast<GLsizei>(Texture.dimensions().y),
-				static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-					static_cast<GLint>(Level),
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x),
-					static_cast<GLsizei>(Texture[Level].dimensions().y),
-					static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLenum>(gli::external_format(Texture.format())), static_cast<GLenum>(gli::type_format(Texture.format())),
+					Texture[Level].data());
+			}
+		}
+
+		{
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB10).c_str()));
+			assert(!Texture.empty());
+
+			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGB10]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
+				static_cast<GLenum>(gli::internal_format(Texture.format())),
+				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
+
+			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+			{
+				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+					0, 0, 0,
+					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					static_cast<GLenum>(gli::external_format(Texture.format())), static_cast<GLenum>(gli::type_format(Texture.format())),
 					Texture[Level].data());
 			}
@@ -280,20 +253,24 @@ private:
 
 	bool initVertexArray()
 	{
+		bool Validated(true);
+
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glVertexAttribBinding(semantic::attr::POSITION, 0);
+			glVertexAttribFormat(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+
+			glVertexAttribBinding(semantic::attr::TEXCOORD, 0);
+			glVertexAttribFormat(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+			glBindVertexBuffer(0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 		glBindVertexArray(0);
 
-		return true;
+		return Validated;
 	}
 
 	bool initSampler()
@@ -319,9 +296,9 @@ private:
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		Viewport[texture::RGB8] = glm::ivec4(0, 0, WindowSize >> 1);
-		Viewport[texture::DXT5] = glm::ivec4(WindowSize.x >> 1, 0, WindowSize >> 1);
-		Viewport[texture::RGTC] = glm::ivec4(WindowSize.x >> 1, WindowSize.y >> 1, WindowSize >> 1);
-		Viewport[texture::BPTC] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
+		Viewport[texture::RGB10] = glm::ivec4(WindowSize.x >> 1, 0, WindowSize >> 1);
+		Viewport[texture::BC1] = glm::ivec4(WindowSize.x >> 1, WindowSize.y >> 1, WindowSize >> 1);
+		Viewport[texture::BC3] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
 
 		bool Validated(true);
 
@@ -363,7 +340,7 @@ private:
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 1000.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f));
 
 			*Pointer = Projection * this->view() * Model;
 

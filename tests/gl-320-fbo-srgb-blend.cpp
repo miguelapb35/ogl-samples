@@ -94,11 +94,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo_srgb_blend : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+	gl_320_fbo_srgb_blend(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -383,7 +383,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_320_fbo_srgb_blend Test(argc, argv);
 	Error += Test();
 
 	return Error;

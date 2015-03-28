@@ -26,8 +26,9 @@ out block
 } Out;
 
 void main()
-{	
+{
+	vec2 Offset = vec2(gl_InstanceID % 5, gl_InstanceID / 5) - vec2(2, 1);
 	Out.Instance = gl_InstanceID;
 	Out.Texcoord = Texcoord;
-	gl_Position = Transform.MVP * vec4(Position.x + Out.Instance * 2.4 - 1.2, Position.y, 0.0, 1.0);
+	gl_Position = Transform.MVP * vec4(Position + Offset, 0.0, 1.0);
 }
