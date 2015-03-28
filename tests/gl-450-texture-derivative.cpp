@@ -201,7 +201,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
+		bool Validated = this->checkExtension("GL_ARB_pipeline_statistics_query");
 
 		if (Validated)
 			Validated = initBuffer();
