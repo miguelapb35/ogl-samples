@@ -221,9 +221,7 @@ private:
 		{
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
-				0,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 0,
 				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
@@ -282,6 +280,9 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		GLint const EncodingLinear = GL_LINEAR;
+		GLint const EncodingSRGB = GL_SRGB;
+
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
 
@@ -291,6 +292,10 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+
+		// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
+		// Shader execution is done with linear color to get correct linear algebra working.
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		if(Validated)
 			Validated = initProgram();
@@ -347,7 +352,7 @@ private:
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 			// Shader execution is done with linear color to get correct linear algebra working.
-			glEnable(GL_FRAMEBUFFER_SRGB);
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);
@@ -370,7 +375,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
+			//glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 

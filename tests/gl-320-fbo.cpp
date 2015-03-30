@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/texture-2d.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -217,15 +217,12 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(GL_TEXTURE_2D,
-				GLint(Level),
-				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				gli::internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 0,
+				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	

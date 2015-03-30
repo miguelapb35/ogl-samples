@@ -274,17 +274,13 @@ private:
 		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
+		GLint const EncodingLinear = GL_LINEAR;
+		GLint const EncodingSRGB = GL_SRGB;
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
 		return true;
-/*
-#		ifdef	WIN32
-			return Encoding == GL_SRGB; // Else GL_LINEAR
-#		else
-			return true;
-#		endif
-*/
 	}
 
 	bool begin()
@@ -346,6 +342,7 @@ private:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
@@ -366,6 +363,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
