@@ -186,18 +186,20 @@ private:
 		if(Texture.empty())
 			return false;
 
+		gli::gl GL;
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), gli::internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), GL.internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage2D(TextureName[texture::TEXTURE], GLint(Level),
 				0, 0, 
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y), 
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()),GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 

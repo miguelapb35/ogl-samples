@@ -25,7 +25,7 @@
 
 namespace
 {
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -33,12 +33,12 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-4.0f,-3.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f,-3.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f, 3.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f, 3.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-4.0f, 3.0f), glm::vec2(0.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-4.0f,-3.0f), glm::vec2(0.0f, 1.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace program
@@ -162,18 +162,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				GL_RGB8, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				GL.internal_format(Texture.format()),
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL_BGR, 
-				GL_UNSIGNED_BYTE, 
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
@@ -292,9 +289,9 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Perspective = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, 0.0f, 100.0f);
+		glm::mat4 Perspective = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 100.0f);
 		glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, -1.0f, 1.0f));
-		glm::mat4 View = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -this->cameraDistance() * 2.0));
+		glm::mat4 View = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -this->cameraDistance() * 1.0));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Perspective * View * Model;
 

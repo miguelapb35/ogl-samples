@@ -119,6 +119,8 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
+		gli::gl GL;
+
 		gli::texture2DArray Texture(15, 1, gli::RGBA8_UNORM, gli::texture2DArray::dim_type(4));
 		for(gli::layer_t LayerIndex = 0; LayerIndex < Texture.layers(); ++LayerIndex)
 		{
@@ -127,7 +129,7 @@ private:
 		}
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(Texture.levels()),
-			gli::internal_format(Texture.format()),
+			GL.internal_format(Texture.format()),
 			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.layers()));
 
 		for(gli::texture2DArray::size_type Array = 0; Array < Texture.layers(); ++Array)
@@ -136,7 +138,7 @@ private:
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 				0, 0, GLint(Array),
 				GLsizei(Texture[Array][Level].dimensions().x), GLsizei(Texture[Array][Level].dimensions().y), GLsizei(1),
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Array][Level].data());
 		}
 

@@ -172,6 +172,7 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -188,14 +189,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), gli::internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for (std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				gli::external_format(Texture.format()),
+				GL.external_format(Texture.format()),
 				static_cast<GLsizei>(Texture[Level].size()),
 				Texture[Level].data());
 		}

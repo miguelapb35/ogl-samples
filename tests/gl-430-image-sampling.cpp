@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-430/image-sampling.vert");
 	char const * FRAG_SHADER_SOURCE("gl-430/image-sampling.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	struct vertex
 	{
@@ -143,6 +143,7 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -152,16 +153,13 @@ private:
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8UI, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
+			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				GL_BGR_INTEGER, GL_UNSIGNED_BYTE, 
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 

@@ -137,6 +137,7 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
 		gli::texture2D Texture(gli::RGBA8_UNORM, gli::texture2D::dim_type(64));
 		gli::texture2D::size_type Level = Texture.levels();
 
@@ -163,14 +164,11 @@ private:
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D,
-				GLint(Level),
-				gli::internal_format(Texture.format()),
-				GLsizei(Texture[Level].dimensions().x),
-				GLsizei(Texture[Level].dimensions().y),
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				GL.internal_format(Texture.format()),
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 

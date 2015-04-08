@@ -201,6 +201,8 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
+
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -220,13 +222,11 @@ private:
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D,
-				static_cast<GLint>(Level),
-				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	

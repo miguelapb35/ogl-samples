@@ -4,7 +4,8 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-in vec2 gl_PointCoord;
+in vec2 gl_PointCoord;
+
 in block
 {
 	vec4 Color;
@@ -29,7 +30,7 @@ vec4 convertRgbToSrgb(in vec4 ColorRGB)
 
 void main()
 {
-	vec4 ColorRGB = vec4(In.Color.rgb, 1.0 - smoothstep(0.0, 1.0, length((gl_PointCoord - 0.5) * 2.0)));
+	vec4 ColorRGB = vec4(In.Color.rgb, (1.0 - smoothstep(0.0, 1.0, length((gl_PointCoord - 0.5) * 2.0))) * 1.0);
 
 	Color = ColorRGB;//convertRgbToSrgb(ColorRGB);
 }

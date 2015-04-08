@@ -150,6 +150,7 @@ private:
 	bool initTexture()
 	{
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
@@ -161,12 +162,11 @@ private:
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D,
-				GLint(Level),
-				GL_RGB8,
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				GL.internal_format(Texture.format()),
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL_BGR, GL_UNSIGNED_BYTE,
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 		glGenerateMipmap(GL_TEXTURE_2D); // Allocate all mipmaps memory

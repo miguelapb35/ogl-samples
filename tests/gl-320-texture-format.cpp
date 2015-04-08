@@ -26,12 +26,12 @@
 namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-format.vert");
-	char const * FRAG_SHADER_SOURCE[3] = 
+	char const * FRAG_SHADER_SOURCE[3] =
 	{
-		"gl-320/texture-format-normalized.frag", 
+		"gl-320/texture-format-normalized.frag",
 		"gl-320/texture-format-uint.frag"
 	};
-	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -81,22 +81,22 @@ namespace
 		};
 	}//namespace program
 
-	GLenum TextureInternalFormat[texture::MAX] = 
+	GLenum TextureInternalFormat[texture::MAX] =
 	{
-		GL_RGBA8, 
-		GL_RGBA8UI, 
+		GL_RGBA8,
+		GL_RGBA8UI,
 		GL_RGBA16F,
 		GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
 		GL_RGBA8_SNORM
 	};
 
-	GLenum TextureFormat[texture::MAX] = 
+	GLenum TextureFormat[texture::MAX] =
 	{
-		GL_BGRA, 
-		GL_BGRA_INTEGER, 
-		GL_BGRA,
-		GL_BGRA,
-		GL_BGRA
+		GL_RGB,
+		GL_RGB_INTEGER,
+		GL_RGB,
+		GL_RGB,
+		GL_RGB
 	};
 
 	GLuint VertexArrayName(0);
@@ -204,9 +204,6 @@ private:
 				TextureFormat[i], GL_UNSIGNED_BYTE,
 				Texture.data());
 		}
-	
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		return this->checkError("initTexture");
 	}
@@ -259,7 +256,7 @@ private:
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
 		glm::mat4 MVP = Projection * this->view() * Model;
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);

@@ -27,8 +27,8 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("gl-400/subroutine.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/subroutine.frag");
-	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
-	char const * TEXTURE_DIFFUSE_DXT1("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE_RGB8("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE_DXT1("kueken7_bc1_rgb.dds");
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -85,7 +85,7 @@ class gl_400_program_subroutine : public test
 {
 public:
 	gl_400_program_subroutine(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-program-subroutine", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.3f))
+		test(argc, argv, "gl-400-program-subroutine", test::CORE, 4, 0, glm::vec2(0.0f))
 	{}
 
 private:
@@ -173,6 +173,8 @@ private:
 	{
 		glGenTextures(texture::MAX, TextureName);
 
+		gli::gl GL;
+
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 
@@ -180,21 +182,19 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_GREEN);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
-					GL_RGB8, 
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+				glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
-					GL_BGR, 
-					GL_UNSIGNED_BYTE, 
+					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 					Texture[Level].data());
 			}
 		}
@@ -206,18 +206,14 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, GL.swizzle(Texture.format()));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
-					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0, 
 					GLsizei(Texture[Level].size()), 
 					Texture[Level].data());
@@ -285,11 +281,11 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 
-		glUniform1f(UniformDisplacement,  0.2f);
+		glUniform1f(UniformDisplacement,  1.1f);
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &IndexDXT1);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, nullptr, 1, 0);
 
-		glUniform1f(UniformDisplacement, -0.2f);
+		glUniform1f(UniformDisplacement, -1.1f);
 		glUniformSubroutinesuiv(GL_FRAGMENT_SHADER, 1, &IndexRGB8);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, nullptr, 1, 0);
 

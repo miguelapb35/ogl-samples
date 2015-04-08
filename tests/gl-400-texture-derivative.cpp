@@ -217,6 +217,8 @@ private:
 
 		assert(!Texture.empty());
 
+		gli::gl GL;
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		glGenTextures(texture::MAX, &TextureName[0]);
@@ -236,15 +238,11 @@ private:
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
-				gli::internal_format(Texture.format()),
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				GL.internal_format(Texture.format()),
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()), 
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 

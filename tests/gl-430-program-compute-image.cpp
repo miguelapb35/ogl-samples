@@ -28,7 +28,7 @@ namespace
 	char const * VS_SOURCE("gl-430/program-compute-image.vert");
 	char const * FS_SOURCE("gl-430/program-compute-image.frag");
 	char const * CS_SOURCE("gl-430/program-compute-image.comp");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v4fv4fv4f);
@@ -262,13 +262,13 @@ private:
 
 	bool initTexture()
 	{
-		glGenTextures(texture::MAX, &TextureName[0]);
-
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
@@ -279,25 +279,20 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL.internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				GL_BGR, GL_UNSIGNED_BYTE, 
+			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+				0, 0,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		GLint TextureBufferOffset(0);
-		glGetIntegerv(
-			GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT,
-			&TextureBufferOffset);
+		glGetIntegerv(GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &TextureBufferOffset);
 		GLint TextureBufferRange = glm::max(GLint(PositionSize), TextureBufferOffset);
 
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[texture::POSITION_INPUT]);

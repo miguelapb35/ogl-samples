@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	struct vertex
 	{
@@ -149,6 +149,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture
@@ -156,15 +157,11 @@ private:
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture.dimensions().x) / 4);
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture.dimensions().y) / 4);
 
-		glTexImage2D(
-			GL_TEXTURE_2D,
-			static_cast<GLint>(0),
-			GL_RGBA8,
-			static_cast<GLsizei>(Texture.dimensions().x) / 2,
-			static_cast<GLsizei>(Texture.dimensions().y) / 2,
+		glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0),
+			GL.internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x) / 2, static_cast<GLsizei>(Texture.dimensions().y) / 2,
 			0,
-			GL_BGRA, 
-			GL_UNSIGNED_BYTE, 
+			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 			Texture.data());
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);

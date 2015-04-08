@@ -31,14 +31,19 @@ namespace
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-points-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
-	GLsizei const VertexCount(4);
+	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v4fc4f);
+	float Scale = 0.2f;
 	glf::vertex_v4fc4f const VertexData[VertexCount] =
 	{
-		glf::vertex_v4fc4f(glm::vec4(-0.2f,-0.2f, 0.0f, 1.0f), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)),
-		glf::vertex_v4fc4f(glm::vec4( 0.2f,-0.2f, 0.0f, 1.0f), glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)),
-		glf::vertex_v4fc4f(glm::vec4( 0.2f, 0.2f, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.5f, 1.0f)),
-		glf::vertex_v4fc4f(glm::vec4(-0.2f, 0.2f, 0.0f, 1.0f), glm::vec4(0.5f, 0.0f, 1.0f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2(-1.0f,-1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2( 1.0f,-1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.5f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2( 1.0f, 1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.5f, 0.0f, 1.0f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2(-1.0f, 1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.5f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2( 1.0f, 0.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.5f, 1.0f, 0.0f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2( 0.0f, 1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2(-1.0f, 0.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.4f, 0.6f, 0.5f, 1.0f)),
+		glf::vertex_v4fc4f(glm::vec4(glm::normalize(glm::vec2( 0.0f,-1.0f)) * Scale, 0.0f, 1.0f), glm::vec4(0.5f, 0.4f, 0.6f, 1.0f)),
 	};
 
 	namespace buffer
@@ -300,7 +305,7 @@ private:
 			glBindVertexArray(VertexArrayName[program::RENDER]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawArraysInstanced(GL_POINTS, 0, 4, 1);
+			glDrawArraysInstanced(GL_POINTS, 0, 8, 1);
 
 			glDisable(GL_BLEND);
 		}

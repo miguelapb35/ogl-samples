@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-420/image-load.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/image-load.frag");
-	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba16f.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -147,7 +147,7 @@ private:
 			GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
@@ -155,7 +155,7 @@ private:
 			GLint UniformBlockSize = glm::max(GLint(sizeof(glm::uvec2)), UniformBufferOffset);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
-			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
+			glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
@@ -166,6 +166,7 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -182,17 +183,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
+			GL.internal_format(Texture.format()), GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
+			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				GL_BGRA, GL_UNSIGNED_BYTE, 
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 		ImageSize = glm::uvec2(Texture.dimensions());
@@ -278,7 +277,7 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
 		glBindProgramPipeline(PipelineName);
-		glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+		glBindImageTexture(semantic::image::DIFFUSE, TextureName, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16F);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_INT, nullptr, 1, 0, 0);

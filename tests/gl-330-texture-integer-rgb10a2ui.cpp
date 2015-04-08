@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-330/texture-integer.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/texture-integer-10bit.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-rgb10a2.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb10_a2_ui.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -99,6 +99,10 @@ private:
 	bool initTexture()
 	{
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		if(Texture.empty())
+			return false;
+
+		gli::gl GL;
 
 		glGenTextures(1, &TextureName);
 
@@ -110,18 +114,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			0, 
-			GL_RGB10_A2UI, 
-			GLsizei(Texture[0].dimensions().x), 
-			GLsizei(Texture[0].dimensions().y), 
+		glTexImage2D(GL_TEXTURE_2D, 0,
+			GL.internal_format(Texture.format()),
+			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
 			0,
-			GL_BGRA_INTEGER, 
-			GL_UNSIGNED_INT_2_10_10_10_REV, 
+			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 			Texture[0].data());
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -137,7 +137,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -153,7 +153,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -163,7 +163,7 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
