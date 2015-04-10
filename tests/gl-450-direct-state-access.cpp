@@ -28,17 +28,17 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-450/direct-state-access.vert");
 	char const * FRAG_SHADER_SOURCE("gl-450/direct-state-access.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
-	glm::ivec2 const FRAMEBUFFER_SIZE(80, 60);
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	glm::ivec2 const FRAMEBUFFER_SIZE(160, 160);
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-2.0f,-1.5f), glm::vec2(0.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 2.0f,-1.5f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 2.0f, 1.5f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-2.0f, 1.5f), glm::vec2(0.0f, 1.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	GLsizei const ElementCount(6);
@@ -96,7 +96,7 @@ class gl_450_direct_state_access : public test
 {
 public:
 	gl_450_direct_state_access(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.0f)),
+		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -186,18 +186,20 @@ private:
 		if(Texture.empty())
 			return false;
 
+		gli::gl GL;
+
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), gli::internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), GL.internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage2D(TextureName[texture::TEXTURE], GLint(Level),
 				0, 0, 
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y), 
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()),GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
@@ -292,14 +294,13 @@ private:
 		glEnable(GL_SAMPLE_SHADING);
 		glMinSampleShading(4.0f);
 
-		glClipControl(GL_UPPER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
+		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, static_cast<float>(FRAMEBUFFER_SIZE.x), static_cast<float>(FRAMEBUFFER_SIZE.y));
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		GLintptr Offset(0);
-		//glBindBuffersRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, 1, &BufferName[buffer::TRANSFORM], &Offset, reinterpret_cast<GLsizeiptr*>(&this->UniformBlockSize));
-		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
 		glBindSamplers(0, 1, &SamplerName);
 		glBindTextures(0, 1, &TextureName[texture::TEXTURE]);
 		glBindVertexArray(VertexArrayName);
@@ -334,17 +335,16 @@ private:
 			*reinterpret_cast<glm::mat4*>(this->UniformPointer + 0) = ProjectionA * this->view() * glm::mat4(1);
 
 			glm::mat4 ProjectionB = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::mat4(1);
+			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::scale(glm::mat4(1), glm::vec3(2));
 		}
 
+		// Step 1, render the scene in a multisampled framebuffer
 		glBindProgramPipeline(PipelineName);
 
-		// Pass 1, render the scene in a multisampled framebuffer
 		renderFBO();
 
-		glBlitNamedFramebuffer(
-			FramebufferName[framebuffer::RENDER],
-			FramebufferName[framebuffer::RESOLVE],
+		// Step 2: blit
+		glBlitNamedFramebuffer(FramebufferName[framebuffer::RENDER], FramebufferName[framebuffer::RESOLVE],
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 			0, 0, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y,
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
@@ -352,7 +352,7 @@ private:
 		GLenum MaxColorAttachment = GL_COLOR_ATTACHMENT0;
 		glInvalidateNamedFramebufferData(FramebufferName[framebuffer::RENDER], 1, &MaxColorAttachment);
 
-		// Pass 2, render the colorbuffer from the multisampled framebuffer
+		// Step 3, render the colorbuffer from the multisampled framebuffer
 		renderFB();
 
 		return true;

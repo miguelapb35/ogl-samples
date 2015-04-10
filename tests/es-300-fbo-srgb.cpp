@@ -195,6 +195,8 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
+
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -213,13 +215,11 @@ private:
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D,
-				static_cast<GLint>(Level),
-				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
@@ -274,18 +274,19 @@ private:
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER], 0);
 
-		if(this->checkFramebuffer(FramebufferName))
+		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
 
-		/*
+		
+		GLint const SRGB = GL_SRGB;
+		GLint const Linear = GL_LINEAR;
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		if (Encoding != GL_SRGB)
-		return false;
-		*/
+		//if (Encoding != GL_SRGB)
+
+		return true;
 	}
 
 	bool begin()
@@ -302,8 +303,6 @@ private:
 			Validated = initTexture();
 		if(Validated)
 			Validated = initFramebuffer();
-
-		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		return Validated;
 	}

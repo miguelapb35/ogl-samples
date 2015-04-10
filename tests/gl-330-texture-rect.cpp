@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-330/texture-rect.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/texture-rect.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	struct vertex
 	{
@@ -48,12 +48,12 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
 	vertex const VertexData[VertexCount] =
 	{
-		vertex(glm::vec2(-2.0f,-1.5f), glm::vec2(0.0f, 240.0f)),
-		vertex(glm::vec2( 2.0f,-1.5f), glm::vec2(320.0f, 240.0f)),
-		vertex(glm::vec2( 2.0f, 1.5f), glm::vec2(320.0f, 0.0f)),
-		vertex(glm::vec2( 2.0f, 1.5f), glm::vec2(320.0f, 0.0f)),
-		vertex(glm::vec2(-2.0f, 1.5f), glm::vec2(0.0f, 0.0f)),
-		vertex(glm::vec2(-2.0f,-1.5f), glm::vec2(0.0f, 240.0f))
+		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(-128.0f, 384.0f)),
+		vertex(glm::vec2( 1.0f,-1.0f), glm::vec2( 384.0f, 384.0f)),
+		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2( 384.0f,-128.0f)),
+		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2( 384.0f,-128.0f)),
+		vertex(glm::vec2(-1.0f, 1.0f), glm::vec2(-128.0f,-128.0f)),
+		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(-128.0f, 384.0f))
 	};
 
 	GLuint VertexArrayName = 0;
@@ -126,20 +126,18 @@ private:
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		assert(
 			Texture.dimensions().x <= std::size_t(TextureSize) && 
 			Texture.dimensions().y <= std::size_t(TextureSize));
 
-		glTexImage2D(
-			GL_TEXTURE_RECTANGLE,
-			static_cast<GLint>(0),
-			GL_RGB8,
-			static_cast<GLsizei>(Texture.dimensions().x),
-			static_cast<GLsizei>(Texture.dimensions().y),
+		glTexImage2D(GL_TEXTURE_RECTANGLE, static_cast<GLint>(0),
+			GL.internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
 			0,
-			GL_BGR, GL_UNSIGNED_BYTE,
+			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 			Texture.data());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -193,9 +191,10 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		//glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * this->view() * Model;
+		glm::mat4 MVP = Projection * glm::mat4(1.0f) * Model;
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);

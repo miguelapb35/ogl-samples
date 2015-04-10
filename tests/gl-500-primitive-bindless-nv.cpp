@@ -68,11 +68,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_primitive_bindless_nv : public test
+class gl_500_primitive_bindless_nv : public test
 {
 public:
-	gl_420_primitive_bindless_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-primitive-bindless-nv", test::CORE, 4, 2),
+	gl_500_primitive_bindless_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-primitive-bindless-nv", test::CORE, 4, 5),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -134,6 +134,7 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -149,13 +150,16 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), GL_RGBA8, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()),
+			GL.internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
@@ -247,7 +251,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_420_primitive_bindless_nv Test(argc, argv);
+	gl_500_primitive_bindless_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;

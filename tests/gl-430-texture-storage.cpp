@@ -149,6 +149,7 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -166,7 +167,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
-			gli::internal_format(Texture.format()),
+			GL.internal_format(Texture.format()),
 			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -174,7 +175,7 @@ private:
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 				0, 0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), GLsizei(1),
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	

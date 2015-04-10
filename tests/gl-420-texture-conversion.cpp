@@ -31,7 +31,7 @@ namespace
 		"gl-420/texture-conversion-normalized.frag", 
 		"gl-420/texture-conversion-uint.frag"
 	};
-	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -87,17 +87,17 @@ namespace
 	GLenum const TextureInternalFormat[texture::MAX] = 
 	{
 		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 
-		GL_RGBA8UI, 
+		GL_RGBA8UI,
 		GL_COMPRESSED_RGBA_BPTC_UNORM_ARB,
 		GL_RGBA8_SNORM
 	};
 
 	GLenum const TextureFormat[texture::MAX] = 
 	{
-		GL_BGRA, 
-		GL_BGRA_INTEGER, 
-		GL_BGRA,
-		GL_BGRA
+		GL_RGB,
+		GL_RGB_INTEGER,
+		GL_RGB,
+		GL_RGB
 	};
 
 	glm::ivec4 const Viewport[texture::MAX] = 
@@ -211,14 +211,10 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexSubImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
-					0, 0, 
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					TextureFormat[i], 
-					GL_UNSIGNED_BYTE, 
+				glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+					0, 0,
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					TextureFormat[i], GL_UNSIGNED_BYTE,
 					Texture[Level].data());
 			}
 		}

@@ -25,9 +25,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-330/image-2d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/image-2d.frag");
-	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
+	char const * VERT_SHADER_SOURCE("gl-330/sampler-object.vert");
+	char const * FRAG_SHADER_SOURCE("gl-330/sampler-object.frag");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	struct vertex
 	{
@@ -144,7 +144,7 @@ private:
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerAName);
-		glSamplerParameteri(SamplerAName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerAName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -152,7 +152,7 @@ private:
 		glSamplerParameterfv(SamplerAName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MIN_LOD, -1000.f);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 3.0f);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
@@ -165,7 +165,7 @@ private:
 		glSamplerParameterfv(SamplerBName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
 		glSamplerParameterf(SamplerBName, GL_TEXTURE_MIN_LOD, -1000.f);
 		glSamplerParameterf(SamplerBName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerBName, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glSamplerParameterf(SamplerBName, GL_TEXTURE_LOD_BIAS, 3.0f);
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
@@ -174,10 +174,10 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -187,16 +187,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
+				0,
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
@@ -257,11 +254,11 @@ private:
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 1000.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(3.0f));
 		glm::mat4 MVP = Projection * this->view() * Model;
 
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		// Bind the program for use
 		glUseProgram(ProgramName);

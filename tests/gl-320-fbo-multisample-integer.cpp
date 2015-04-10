@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-multisample-integer.frag");
 	char const * VERT_SHADER_SOURCE2("gl-320/texture-integer.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-320/texture-integer.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 	int const FRAMEBUFFER_SIZE(4);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -37,12 +37,12 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-4.0f,-3.0f) * 0.5f, glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f,-3.0f) * 0.5f, glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f, 3.0f) * 0.5f, glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 4.0f, 3.0f) * 0.5f, glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-4.0f, 3.0f) * 0.5f, glm::vec2(0.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-4.0f,-3.0f) * 0.5f, glm::vec2(0.0f, 1.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace texture
@@ -194,14 +194,11 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				GL_RGBA8UI, 
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				GL_RGBA8UI,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL_BGR_INTEGER, GL_UNSIGNED_BYTE,
+				GL_RGB_INTEGER, GL_UNSIGNED_BYTE,
 				Texture[Level].data());
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -210,20 +207,17 @@ private:
 
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE]);
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, MaxIntegerSamples, GL_RGBA8UI,
-			WindowSize.x / FRAMEBUFFER_SIZE,
-			WindowSize.y / FRAMEBUFFER_SIZE,
+			WindowSize.x / FRAMEBUFFER_SIZE, WindowSize.y / FRAMEBUFFER_SIZE,
 			GL_TRUE);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI,
-			WindowSize.x / FRAMEBUFFER_SIZE,
-			WindowSize.y / FRAMEBUFFER_SIZE,
-			0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8UI,
+			WindowSize.x / FRAMEBUFFER_SIZE, WindowSize.y / FRAMEBUFFER_SIZE,
+			0, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -301,21 +295,24 @@ private:
 	void renderFBO(GLuint Framebuffer)
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
-
+/*
 		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(WindowSize.x) / WindowSize.y, 0.1f, 100.0f);
 		glm::mat4 ViewFlip = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 		glm::mat4 ViewTranslate = glm::translate(ViewFlip, glm::vec3(0.0f, 0.0f, -this->cameraDistance() * 2.0f));
-		glm::mat4 View = glm::rotate(ViewTranslate,-15.f, glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 View = glm::rotate(ViewTranslate, -0.3f, glm::vec3(0.f, 0.f, 1.f));
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Perspective * View * Model;
+*/
+		glm::mat4 Projection = glm::ortho(-1.1f, 1.1f, 1.1f,-1.1f, 1.1f, -1.1f);
+		glm::mat4 View = glm::mat4(1.0f);
+		glm::mat4 Model = glm::rotate(glm::mat4(1.0f), -0.3f, glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 MVP = Projection * View * Model;
 
 		glUseProgram(ProgramName[program::RENDER]);
 		glUniform1i(UniformDiffuse[program::RENDER], 0);
 		glUniformMatrix4fv(UniformMVP[program::RENDER], 1, GL_FALSE, &MVP[0][0]);
 
-		glViewport(0, 0,
-			WindowSize.x / FRAMEBUFFER_SIZE,
-			WindowSize.y / FRAMEBUFFER_SIZE);
+		glViewport(0, 0, WindowSize.x / FRAMEBUFFER_SIZE, WindowSize.y / FRAMEBUFFER_SIZE);
 		glBindFramebuffer(GL_FRAMEBUFFER, Framebuffer);
 		glClearBufferuiv(GL_COLOR, 0, &glm::uvec4(0, 128, 255, 255)[0]);
 
@@ -370,12 +367,8 @@ private:
 		glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::RESOLVE]);
 		glBlitFramebuffer(
-			0, 0,
-			WindowSize.x / FRAMEBUFFER_SIZE,
-			WindowSize.y / FRAMEBUFFER_SIZE,
-			0, 0,
-			WindowSize.x / FRAMEBUFFER_SIZE,
-			WindowSize.y / FRAMEBUFFER_SIZE,
+			0, 0, WindowSize.x / FRAMEBUFFER_SIZE, WindowSize.y / FRAMEBUFFER_SIZE,
+			0, 0, WindowSize.x / FRAMEBUFFER_SIZE, WindowSize.y / FRAMEBUFFER_SIZE,
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

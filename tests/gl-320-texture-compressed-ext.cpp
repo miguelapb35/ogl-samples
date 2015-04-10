@@ -140,10 +140,10 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
+
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
-
-        this->checkError("initTexture 1");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
@@ -154,18 +154,14 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
-					GLenum(gli::internal_format(Texture.format())),
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0, 
-					GLsizei(Texture[Level].size()), 
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					0,
+					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
-        this->checkError("initTexture 3");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC3).c_str()));
@@ -176,19 +172,14 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
-					static_cast<GLenum>(gli::internal_format(Texture.format())),
-					static_cast<GLsizei>(Texture[Level].dimensions().x), 
-					static_cast<GLsizei>(Texture[Level].dimensions().y), 
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 
 					0, 
-					static_cast<GLsizei>(Texture[Level].size()), 
+					static_cast<GLsizei>(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
-
-        this->checkError("initTexture 4");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC4).c_str()));
@@ -199,19 +190,14 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
-					GLenum(gli::internal_format(Texture.format())),
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
-					0, 
-					GLsizei(Texture[Level].size()), 
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					0,
+					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
-
-		this->checkError("initTexture 5");
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC5).c_str()));
@@ -222,14 +208,11 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
-					GLenum(gli::internal_format(Texture.format())),
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					GL.internal_format(Texture.format()),
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
-					GLsizei(Texture[Level].size()), 
+					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
 			}
 		}
@@ -265,7 +248,7 @@ private:
 		Viewport[TEXTURE_BC5] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
 
 		bool Validated = true;
-        //Validated = Validated && this->checkExtension("GL_EXT_texture_compression_s3tc");
+		Validated = Validated && this->checkExtension("GL_EXT_texture_compression_s3tc");
 
 		if(Validated)
 			Validated = initProgram();

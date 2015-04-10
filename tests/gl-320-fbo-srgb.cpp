@@ -94,10 +94,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo_srgb : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
+	gl_320_fbo_srgb(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
@@ -201,7 +201,25 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+
+		{
+			//gli::texture2D Texture(gli::SRGB8, gli::dim2_t(16));
+			//Texture.clear(glm::u8vec3(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
+			gli::texture2D Texture(gli::SRGB8_ALPHA8, gli::dim2_t(16));
+			Texture.clear(glm::u8vec4(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
+			//gli::texture2D Texture(gli::RGBA8_UNORM, gli::dim2_t(16));
+			//Texture.clear(glm::u8vec4(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f) * 255.0f));
+			gli::save_dds(Texture, "orange.dds");
+		}
+
+		gli::texture2D Texture(gli::load_dds("orange.dds"));
+		GLenum InternalFormat = GL.internal_format(Texture.format());
+		GLenum ExternalFormat = GL.external_format(Texture.format());
+		GLenum TypeFormat = GL.type_format(Texture.format());
+		std::size_t Levels = Texture.levels();
+
+		//gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -212,6 +230,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, GL.swizzle(Texture.format()));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -220,14 +239,12 @@ private:
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
-				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
-				0,
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 0,
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
-	
+
 		glm::ivec2 WindowSize(this->getWindowSize() * this->FramebufferScale);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -281,19 +298,23 @@ private:
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
 
-		/*
+		GLint const EncodingLinear = GL_LINEAR;
+		GLint const EncodingSRGB = GL_SRGB;
+
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
-		if (Encoding != GL_SRGB)
-		return false;
-		*/
+
+		return true;
 	}
 
 	bool begin()
 	{
 		bool Validated(true);
+
+		// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
+		// Shader execution is done with linear color to get correct linear algebra working.
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		if(Validated)
 			Validated = initProgram();
@@ -348,14 +369,13 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
 			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 			// Shader execution is done with linear color to get correct linear algebra working.
 			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
 
@@ -393,7 +413,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_320_fbo_srgb Test(argc, argv);
 	Error += Test();
 
 	return Error;

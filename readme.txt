@@ -63,6 +63,11 @@ The OpenGL Samples Pack requires at least Clang 3.0.
 ================================================================================
 OpenGL Samples Pack 4.5.1.0: 2015-XX-XX
 --------------------------------------------------------------------------------
+- Added gl-320-fbo-blend-points sample
+
+================================================================================
+OpenGL Samples Pack 4.5.1.0: 2015-03-28
+--------------------------------------------------------------------------------
 - Updated gl-320-fbo-srgb sample to be more meaningful
 - Added gl-320-fbo-srgb-decode-ext sample
 - Added gl-430-fbo-srgb-decode sample

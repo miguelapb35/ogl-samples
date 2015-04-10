@@ -11,7 +11,7 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-layout(binding = DIFFUSE, rgba8) coherent uniform image2D Diffuse;
+layout(binding = DIFFUSE, rgba16f) coherent uniform image2D Diffuse;
 
 layout(binding = MATERIAL) uniform material
 {

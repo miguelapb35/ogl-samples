@@ -95,11 +95,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_430_fbo_srgb_decode : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+	gl_430_fbo_srgb_decode(int argc, char* argv[]) :
+		test(argc, argv, "gl-430-fbo-srgb-decode", test::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -196,6 +196,7 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -215,18 +216,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-			static_cast<GLint>(Texture.levels()), gli::internal_format(Texture.format()),
+			static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()),
 			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 				0, 0, 0,
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
-				static_cast<GLsizei>(1),
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
@@ -388,7 +386,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_430_fbo_srgb_decode Test(argc, argv);
 	Error += Test();
 
 	return Error;

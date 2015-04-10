@@ -137,6 +137,8 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
+
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -157,10 +159,10 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-					gli::internal_format(Texture.format()),
+					GL.internal_format(Texture.format()),
 					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					0,
-					gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 					Texture[Level].data());
 			}
 		}
@@ -178,10 +180,10 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-					gli::internal_format(Texture.format()),
+					GL.internal_format(Texture.format()),
 					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					0,
-					gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 					Texture[Level].data());
 			}
 		}
@@ -199,10 +201,10 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-					gli::internal_format(Texture.format()),
+					GL.internal_format(Texture.format()),
 					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					0,
-					gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 					Texture[Level].data());
 			}
 		}
@@ -220,10 +222,10 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
-					gli::internal_format(Texture.format()),
+					GL.internal_format(Texture.format()),
 					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
 					0,
-					gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 					Texture[Level].data());
 			}
 		}

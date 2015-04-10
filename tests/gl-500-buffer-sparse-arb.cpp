@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-500/buffer-sparse.vert");
 	char const * FRAG_SHADER_SOURCE("gl-500/buffer-sparse.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -60,11 +60,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_buffer_storage_arb : public test
+class gl_500_buffer_sparse_arb : public test
 {
 public:
-	gl_500_buffer_storage_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-buffer-storage-arb", test::CORE, 4, 5),
+	gl_500_buffer_sparse_arb(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-buffer-sparse-arb", test::CORE, 4, 5),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -116,27 +116,27 @@ private:
 
 		bool Validated(true);
 
-		GLintptr CopyBufferSize = glm::higherMultiple<GLint>(VertexSize, Alignement) + glm::higherMultiple<GLint>(ElementSize, Alignement);
+		GLintptr CopyBufferSize = glm::ceilMultiple<GLint>(VertexSize, Alignement) + glm::ceilMultiple<GLint>(ElementSize, Alignement);
 
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
 
 		glNamedBufferStorage(BufferName[buffer::COPY], CopyBufferSize, nullptr, GL_MAP_WRITE_BIT);
 		glm::byte* CopyBufferPointer = reinterpret_cast<glm::byte*>(glMapNamedBufferRange(BufferName[buffer::COPY], 0, CopyBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 		memcpy(CopyBufferPointer + 0, VertexData, VertexSize);
-		memcpy(CopyBufferPointer + glm::higherMultiple<GLint>(VertexSize, Alignement), ElementData, ElementSize);
+		memcpy(CopyBufferPointer + glm::ceilMultiple<GLint>(VertexSize, Alignement), ElementData, ElementSize);
 		glUnmapNamedBuffer(BufferName[buffer::COPY]);
 
 		glBindBuffer(GL_COPY_READ_BUFFER, BufferName[buffer::COPY]);
 
 		glBindBuffer(GL_COPY_WRITE_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferStorage(GL_COPY_WRITE_BUFFER, glm::higherMultiple<GLint>(ElementSize, BufferPageSize), nullptr, GL_SPARSE_STORAGE_BIT_ARB);
+		glBufferStorage(GL_COPY_WRITE_BUFFER, glm::ceilMultiple<GLint>(ElementSize, BufferPageSize), nullptr, GL_SPARSE_STORAGE_BIT_ARB);
 		glBufferPageCommitmentARB(GL_COPY_WRITE_BUFFER, 0, BufferPageSize, GL_TRUE);
-		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, glm::higherMultiple<GLint>(VertexSize, Alignement), 0, glm::higherMultiple<GLint>(ElementSize, Alignement));
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, glm::ceilMultiple<GLint>(VertexSize, Alignement), 0, glm::ceilMultiple<GLint>(ElementSize, Alignement));
 
 		glBindBuffer(GL_COPY_WRITE_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferStorage(GL_COPY_WRITE_BUFFER, glm::higherMultiple<GLint>(VertexSize, BufferPageSize), nullptr, GL_SPARSE_STORAGE_BIT_ARB);
+		glBufferStorage(GL_COPY_WRITE_BUFFER, glm::ceilMultiple<GLint>(VertexSize, BufferPageSize), nullptr, GL_SPARSE_STORAGE_BIT_ARB);
 		glBufferPageCommitmentARB(GL_COPY_WRITE_BUFFER, 0, BufferPageSize, GL_TRUE);
-		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, glm::higherMultiple<GLint>(VertexSize, Alignement));
+		glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, glm::ceilMultiple<GLint>(VertexSize, Alignement));
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
@@ -151,6 +151,7 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -166,7 +167,7 @@ private:
 		glTextureParameteri(TextureName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureStorage3D(TextureName, static_cast<GLint>(Texture.levels()),
-			gli::internal_format(Texture.format()),
+			GL.internal_format(Texture.format()),
 			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -174,8 +175,8 @@ private:
 			glTextureSubImage3D(TextureName, static_cast<GLint>(Level),
 				0, 0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
-				gli::external_format(Texture.format()),
-				gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()),
+				GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
@@ -195,7 +196,6 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_buffer_storage");
 		Validated = Validated && this->checkExtension("GL_ARB_sparse_buffer");
 
 		if(Validated)
@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_buffer_storage_arb Test(argc, argv);
+	gl_500_buffer_sparse_arb Test(argc, argv);
 	Error += Test();
 
 	return Error;

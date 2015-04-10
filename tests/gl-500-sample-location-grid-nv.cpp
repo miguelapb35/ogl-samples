@@ -29,7 +29,6 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-500/sample-location-render.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-500/sample-location-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-500/sample-location-splash.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -105,11 +104,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_500_sample_location_grid : public test
+class gl_500_sample_location_grid_nv : public test
 {
 public:
-	gl_500_sample_location_grid(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-sample-location-grid", test::CORE, 4, 5),
+	gl_500_sample_location_grid_nv(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-sample-location-grid-nv", test::CORE, 4, 5),
 		FramebufferScale(3),
 		UniformTransform(-1),
 		VertexCount(0)
@@ -418,7 +417,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_sample_location_grid Test(argc, argv);
+	gl_500_sample_location_grid_nv Test(argc, argv);
 	Error += Test();
 
 	return Error;

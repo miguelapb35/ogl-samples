@@ -142,8 +142,8 @@ private:
 
 		int DisplacementSize = sizeof(Displacement);
 		int DiffuseSize = sizeof(Diffuse);
-		int DisplacementMultiple = glm::higherMultiple(int(sizeof(Displacement)), int(TextureBufferOffsetAlignment));
-		int DiffuseMultiple = glm::higherMultiple(int(sizeof(Diffuse)), int(TextureBufferOffsetAlignment));
+		int DisplacementMultiple = glm::ceilMultiple(int(sizeof(Displacement)), int(TextureBufferOffsetAlignment));
+		int DiffuseMultiple = glm::ceilMultiple(int(sizeof(Diffuse)), int(TextureBufferOffsetAlignment));
 
 		glGenBuffers(BUFFER_MAX, &BufferName[0]);
 

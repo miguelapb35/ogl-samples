@@ -94,11 +94,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo_srgb_blend : public test
 {
 public:
-	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+	gl_320_fbo_srgb_blend(int argc, char* argv[]) :
+		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -201,6 +201,8 @@ private:
 	{
 		bool Validated(true);
 
+		gli::gl GL;
+
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -219,13 +221,11 @@ private:
 
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(GL_TEXTURE_2D,
-				static_cast<GLint>(Level),
-				gli::internal_format(Texture.format()),
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				gli::external_format(Texture.format()), gli::type_format(Texture.format()),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 	
@@ -274,22 +274,22 @@ private:
 		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
+		GLint const EncodingLinear = GL_LINEAR;
+		GLint const EncodingSRGB = GL_SRGB;
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
 		return true;
-/*
-#		ifdef	WIN32
-			return Encoding == GL_SRGB; // Else GL_LINEAR
-#		else
-			return true;
-#		endif
-*/
 	}
 
 	bool begin()
 	{
 		bool Validated(true);
+
+		// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
+		// Shader execution is done with linear color to get correct linear algebra working.
+		glEnable(GL_FRAMEBUFFER_SRGB);
 
 		if(Validated)
 			Validated = initProgram();
@@ -342,9 +342,8 @@ private:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-			// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
-			// Shader execution is done with linear color to get correct linear algebra working.
 			glEnable(GL_FRAMEBUFFER_SRGB);
+
 			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
@@ -383,7 +382,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo Test(argc, argv);
+	gl_320_fbo_srgb_blend Test(argc, argv);
 	Error += Test();
 
 	return Error;

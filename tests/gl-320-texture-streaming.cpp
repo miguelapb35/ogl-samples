@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	struct vertex
 	{
@@ -152,35 +152,33 @@ private:
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		glGenTextures(1, &TextureName);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		glTexImage2D(
-			GL_TEXTURE_2D, 
-			GLint(0), 
-			GL_RGB8, 
-			GLsizei(Texture.dimensions().x), 
-			GLsizei(Texture.dimensions().y), 
+		glTexImage2D(GL_TEXTURE_2D, GLint(0),
+			GL.internal_format(Texture.format()),
+			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
 			0,
-			GL_BGR, 
-			GL_UNSIGNED_BYTE, 
-			NULL);
+			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+			nullptr);
 
-		GLsizei TextureSize = GLsizei(Texture.dimensions().x) * GLsizei(Texture.dimensions().y) * 3;
+		GLsizei TextureSize = Texture[0].size();
 
 		GLuint PixelBuffer(0);
 		glGenBuffers(1, &PixelBuffer);
 		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, PixelBuffer);
-		glBufferData(GL_PIXEL_UNPACK_BUFFER, TextureSize, NULL, GL_STREAM_DRAW);
+		glBufferData(GL_PIXEL_UNPACK_BUFFER, TextureSize, nullptr, GL_STREAM_DRAW);
 		void* Pointer = glMapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, TextureSize, GL_MAP_WRITE_BIT);
 		memcpy(Pointer, Texture[0].data(), TextureSize);
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GL_BGR, GL_UNSIGNED_BYTE, NULL);
+		glTexSubImage2D(GL_TEXTURE_2D, 0,
+			0, 0, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
+			GL.external_format(Texture.format()), GL.type_format(Texture.format()), nullptr);
 		glDeleteBuffers(1, &PixelBuffer);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);

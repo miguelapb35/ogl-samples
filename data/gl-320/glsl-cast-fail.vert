@@ -22,7 +22,7 @@ out block
 
 void main()
 {
-	lowp int Count = lowp int(COUNT);
+	lowp int Count = lowp int(COUNT); // This shader is invalid, lowp is not part of the type hence of the cast
 
 	for(lowp int i = 0; i < Count; ++i)
 		Out.Lumimance[i] = vec4(1.0) / vec4(COUNT);

@@ -15,8 +15,8 @@ out vec4 Color;
 
 void main()
 {
-	vec4 Temp = texture(Diffuse, In.Texcoord);
-	if(Temp.a < 0.2)
+	if(length(In.Texcoord - 0.5) > 0.5)
 		discard;
-	Color = Temp;
+
+	Color = texture(Diffuse, In.Texcoord);
 }

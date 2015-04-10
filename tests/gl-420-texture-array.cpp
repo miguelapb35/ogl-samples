@@ -29,31 +29,16 @@ namespace
 	char const * FRAG_SHADER_SOURCE("gl-420/texture-array.frag");
 	char const * TEXTURE_DIFFUSE("array.dds");
 
-	struct vertex
-	{
-		vertex
-		(
-			glm::vec2 const & Position,
-			glm::vec2 const & Texcoord
-		) :
-			Position(Position),
-			Texcoord(Texcoord)
-		{}
-
-		glm::vec2 Position;
-		glm::vec2 Texcoord;
-	};
-
 	GLsizei const VertexCount = 6;
-	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
-	vertex const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
+	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		vertex(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		vertex(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
-		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
+		glf::vertex_v2fv2f(glm::vec2(-0.4f,-0.4f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 0.4f,-0.4f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 0.4f, 0.4f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 0.4f, 0.4f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-0.4f, 0.4f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-0.4f,-0.4f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace buffer
@@ -134,28 +119,26 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
-		gli::texture2DArray Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
 
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY,
-			GLsizei(Texture.levels()),
-			gli::internal_format(Texture.format()), 
-			GLsizei(Texture.dimensions().x), 
-			GLsizei(Texture.dimensions().y), 
-			GLsizei(Texture.layers())); //depth
+		gli::texture2DArray Texture(15, 1, gli::RGBA8_UNORM, gli::texture2DArray::dim_type(4));
+		for(gli::layer_t LayerIndex = 0; LayerIndex < Texture.layers(); ++LayerIndex)
+		{
+			glm::u8vec4 const Color(glm::linearRand(glm::vec4(0), glm::vec4(1)) * 255.f);
+			Texture[LayerIndex].clear<glm::u8vec4>(Color);
+		}
+
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(Texture.levels()),
+			GL.internal_format(Texture.format()),
+			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.layers()));
 
 		for(gli::texture2DArray::size_type Array = 0; Array < Texture.layers(); ++Array)
 		for(gli::texture2DArray::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-				GLint(Level), 
-				0, // offset x 
-				0, // offset y 
-				GLint(Array), // offset z
-				GLsizei(Texture[Array][Level].dimensions().x), 
-				GLsizei(Texture[Array][Level].dimensions().y), 
-				GLsizei(1), //depth
-				gli::external_format(Texture.format()), 
-				gli::type_format(Texture.format()), 
+			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
+				0, 0, GLint(Array),
+				GLsizei(Texture[Array][Level].dimensions().x), GLsizei(Texture[Array][Level].dimensions().y), GLsizei(1),
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Array][Level].data());
 		}
 
@@ -169,8 +152,8 @@ private:
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), BUFFER_OFFSET(sizeof(glm::vec2)));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
@@ -248,7 +231,7 @@ private:
 		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glUseProgram(ProgramName);
 
@@ -258,7 +241,7 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glBindVertexArray(VertexArrayName);
-		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 2, 0);
+		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 15, 0);
 
 		return true;
 	}
