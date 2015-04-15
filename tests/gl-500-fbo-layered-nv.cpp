@@ -40,45 +40,59 @@ namespace
 		glf::vertex_v2fv2f(glm::vec2(-1.0f, 3.0f), glm::vec2(0.0f, 1.0f))
 	};
 
-	enum buffer_type
+	namespace buffer
 	{
-		BUFFER_VERTEX,
-		BUFFER_ELEMENT,
-		BUFFER_MAX
-	};
+		enum type
+		{
+			VERTEX,
+			TRANSFORM,
+			MAX
+		};
+	}//namespace buffer
 
-	enum pipeline 
+	namespace pipeline
 	{
-		LAYERING,
-		VIEWPORT,
-		PIPELINE_MAX
-	};
-
-	GLuint FramebufferName(0);
-	GLuint VertexArrayName[PIPELINE_MAX] = {0, 0};
-	GLuint ProgramName[PIPELINE_MAX] = {0, 0};
-	GLuint PipelineName[PIPELINE_MAX] = {0, 0};
-	GLint UniformMVP[PIPELINE_MAX] = {0, 0};
-	GLuint SamplerName(0);
-	GLuint BufferName[BUFFER_MAX] = {0, 0};
-	GLuint TextureColorbufferName(0);
+		enum type
+		{
+			LAYERING,
+			VIEWPORT,
+			MAX
+		};
+	}//namespace pipeline
 }//namespace
 
 class gl_500_fbo_layered : public test
 {
 public:
-	gl_500_fbo_layered(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-fbo-layered-nv", test::CORE, 4, 2)
-	{}
+	gl_500_fbo_layered(int argc, char* argv[])
+		: test(argc, argv, "gl-500-fbo-layered-nv", test::CORE, 4, 5)
+		, FramebufferName(0)
+		, SamplerName(0)
+		, TextureColorbufferName(0)
+	{
+		this->VertexArrayName.fill(0);
+		this->ProgramName.fill(0);
+		this->PipelineName.fill(0);
+		this->UniformMVP.fill(0);
+		this->BufferName.fill(0);
+	}
 
 private:
+	GLuint FramebufferName;
+	GLuint SamplerName;
+	GLuint TextureColorbufferName;
+	std::array<GLuint, pipeline::MAX> VertexArrayName;
+	std::array<GLuint, pipeline::MAX> ProgramName;
+	std::array<GLuint, pipeline::MAX> PipelineName;
+	std::array<GLint, pipeline::MAX> UniformMVP;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<glm::vec4, 4> Viewport;
+
 	bool initProgram()
 	{
 		bool Validated = true;
 
 		compiler Compiler;
-
-		glGenProgramPipelines(GLsizei(PIPELINE_MAX), PipelineName);
 
 		if(Validated)
 		{
@@ -86,17 +100,14 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE1, "--version 450 --profile core");
 			Validated = Validated && Compiler.check();
 
-			ProgramName[LAYERING] = glCreateProgram();
-			glProgramParameteri(ProgramName[LAYERING], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[LAYERING], VertShaderName);
-			glAttachShader(ProgramName[LAYERING], FragShaderName);
-			glLinkProgram(ProgramName[LAYERING]);
+			ProgramName[pipeline::LAYERING] = glCreateProgram();
+			glProgramParameteri(ProgramName[pipeline::LAYERING], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName[pipeline::LAYERING], VertShaderName);
+			glAttachShader(ProgramName[pipeline::LAYERING], FragShaderName);
+			glLinkProgram(ProgramName[pipeline::LAYERING]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::LAYERING]);
 		}
-
-		if(Validated)
-			glUseProgramStages(PipelineName[LAYERING], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[LAYERING]);
 
 		if(Validated)
 		{
@@ -104,21 +115,25 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE2, "--version 450 --profile core");
 			Validated = Validated && Compiler.check();
 
-			ProgramName[VIEWPORT] = glCreateProgram();
-			glProgramParameteri(ProgramName[VIEWPORT], GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[VIEWPORT], VertShaderName);
-			glAttachShader(ProgramName[VIEWPORT], FragShaderName);
-			glLinkProgram(ProgramName[VIEWPORT]);
+			ProgramName[pipeline::VIEWPORT] = glCreateProgram();
+			glProgramParameteri(ProgramName[pipeline::VIEWPORT], GL_PROGRAM_SEPARABLE, GL_TRUE);
+			glAttachShader(ProgramName[pipeline::VIEWPORT], VertShaderName);
+			glAttachShader(ProgramName[pipeline::VIEWPORT], FragShaderName);
+			glLinkProgram(ProgramName[pipeline::VIEWPORT]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[VIEWPORT]);
+			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::VIEWPORT]);
 		}
 
 		if(Validated)
-			glUseProgramStages(PipelineName[VIEWPORT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[VIEWPORT]);
+		{
+			glGenProgramPipelines(GLsizei(pipeline::MAX), &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::VIEWPORT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::VIEWPORT]);
+			glUseProgramStages(PipelineName[pipeline::LAYERING], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::LAYERING]);
+		}
 
 		if(Validated)
 		{
-			for(std::size_t i = 0; i < PIPELINE_MAX; ++i)
+			for(std::size_t i = 0; i < pipeline::MAX; ++i)
 				UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 		}
 
@@ -127,45 +142,30 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(BUFFER_MAX, BufferName);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
 		return true;
 	}
 
 	bool initTexture()
 	{
-		glGenTextures(1, &TextureColorbufferName);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureColorbufferName);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 1000);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-
-		glTexImage3D(GL_TEXTURE_2D_ARRAY,
-			0, 
-			GL_RGB, 
-			GLsizei(FRAMEBUFFER_SIZE.x), 
-			GLsizei(FRAMEBUFFER_SIZE.y), 
-			GLsizei(4), //depth
-			0,  
-			GL_RGB, 
-			GL_UNSIGNED_BYTE, 
-			NULL);
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &TextureColorbufferName);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteri(TextureColorbufferName, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTextureStorage3D(TextureColorbufferName, static_cast<GLsizei>(1), GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y), 4);
 
 		return true;
 	}
 
 	bool initSampler()
 	{
-		glGenSamplers(1, &SamplerName);
+		glCreateSamplers(1, &SamplerName);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -183,33 +183,25 @@ private:
 
 	bool initFramebuffer()
 	{
-		glGenFramebuffers(1, &FramebufferName);
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureColorbufferName, 0);
+		glCreateFramebuffers(1, &FramebufferName);
+		glNamedFramebufferTexture(FramebufferName, GL_COLOR_ATTACHMENT0, TextureColorbufferName, 0);
 
-		if(!this->checkFramebuffer(FramebufferName))
-			return false;
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
+		return glCheckNamedFramebufferStatus(FramebufferName, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(PIPELINE_MAX, VertexArrayName);
+		glCreateVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
-		glBindVertexArray(VertexArrayName[VIEWPORT]);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[BUFFER_VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glVertexArrayAttribBinding(VertexArrayName[pipeline::VIEWPORT], semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName[pipeline::VIEWPORT], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName[pipeline::VIEWPORT], semantic::attr::POSITION);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName[pipeline::VIEWPORT], semantic::attr::TEXCOORD, 0);
+		glVertexArrayAttribFormat(VertexArrayName[pipeline::VIEWPORT], semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName[pipeline::VIEWPORT], semantic::attr::TEXCOORD);
 
-		glBindVertexArray(VertexArrayName[LAYERING]);
-		glBindVertexArray(0);
+		glVertexArrayVertexBuffer(VertexArrayName[pipeline::VIEWPORT], 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 		return true;
 	}
@@ -231,18 +223,25 @@ private:
 			Validated = initFramebuffer();
 		if(Validated)
 			Validated = initSampler();
-	
+
+		GLint const Border = 2;
+		glm::vec2 const WindowSize(this->getWindowSize());
+		this->Viewport[0] = glm::vec4(Border, Border, WindowSize * 0.5f - 2.0f * Border);
+		this->Viewport[1] = glm::vec4((WindowSize.x * 0.5f) + Border, Border, WindowSize * 0.5f - 2.0f * Border);
+		this->Viewport[2] = glm::vec4((WindowSize.x * 0.5f) + Border, (WindowSize.y * 0.5f) + 1, WindowSize * 0.5f - 2.0f * Border);
+		this->Viewport[3] = glm::vec4(Border, (WindowSize.y * 0.5f) + Border, WindowSize * 0.5f - 2.0f * Border);
+
 		return Validated;
 	}
 
 	bool end()
 	{
-		glDeleteVertexArrays(PIPELINE_MAX, VertexArrayName);
-		glDeleteBuffers(BUFFER_MAX, BufferName);
+		glDeleteVertexArrays(pipeline::MAX, &VertexArrayName[0]);
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteTextures(1, &TextureColorbufferName);
 		glDeleteFramebuffers(1, &FramebufferName);
-		glDeleteProgram(ProgramName[VIEWPORT]);
-		glDeleteProgram(ProgramName[LAYERING]);
+		glDeleteProgram(ProgramName[pipeline::VIEWPORT]);
+		glDeleteProgram(ProgramName[pipeline::LAYERING]);
 		glDeleteSamplers(1, &SamplerName);
 
 		return true;
@@ -250,44 +249,42 @@ private:
 
 	bool render()
 	{
-		glm::vec2 WindowSize(this->getWindowSize());
+		{
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-		glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, 1.0f,-1.0f, 1.0f, -1.0f);
-		glm::mat4 View = glm::mat4(1.0f);
-		glm::mat4 Model = glm::mat4(1.0f);
-		glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, 1.0f,-1.0f, 1.0f, -1.0f);
+			glm::mat4 View = glm::mat4(1.0f);
+			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 MVP = Projection * View * Model;
+		
+			*Pointer = MVP;
 
-		glProgramUniformMatrix4fv(ProgramName[LAYERING], UniformMVP[LAYERING], 1, GL_FALSE, &MVP[0][0]);
-		glProgramUniformMatrix4fv(ProgramName[VIEWPORT], UniformMVP[VIEWPORT], 1, GL_FALSE, &MVP[0][0]);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
+		}
+
+		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4));
 
 		// Pass 1
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-	//		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glBindProgramPipeline(PipelineName[pipeline::LAYERING]);
+			glBindVertexArray(VertexArrayName[pipeline::LAYERING]);
+
 			glViewportIndexedfv(0, &glm::vec4(0, 0, FRAMEBUFFER_SIZE)[0]);
 
-			glBindProgramPipeline(PipelineName[LAYERING]);
-			glBindVertexArray(VertexArrayName[LAYERING]);
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 4, 0);
 		}
 
 		// Pass 2
 		{
-			GLint Border = 2;
-
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glViewportIndexedfv(0, &glm::vec4(Border, Border, WindowSize * 0.5f - 2.0f * Border)[0]);
-			glViewportIndexedfv(1, &glm::vec4((WindowSize.x * 0.5f) + Border, Border, WindowSize * 0.5f - 2.0f * Border)[0]);
-			glViewportIndexedfv(2, &glm::vec4((WindowSize.x * 0.5f) + Border, (WindowSize.y * 0.5f) + 1, WindowSize * 0.5f - 2.0f * Border)[0]);
-			glViewportIndexedfv(3, &glm::vec4(Border, (WindowSize.y * 0.5f) + Border, WindowSize * 0.5f - 2.0f * Border)[0]);
-
-			glBindProgramPipeline(PipelineName[VIEWPORT]);
-
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureColorbufferName);
+			glBindProgramPipeline(PipelineName[pipeline::VIEWPORT]);
+			glBindTextureUnit(0, TextureColorbufferName);
 			glBindSampler(0, SamplerName);
+			glBindVertexArray(VertexArrayName[pipeline::VIEWPORT]);
 
-			glBindVertexArray(VertexArrayName[VIEWPORT]);
+			glViewportArrayv(0, 4, &this->Viewport[0][0]);
+
 			glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, VertexCount, 1, 0);
 		}
 

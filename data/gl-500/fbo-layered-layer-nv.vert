@@ -6,7 +6,7 @@ precision highp int;
 layout(std140, column_major) uniform;
 
 out block
-{ 
+{
 	flat int Instance;
 } Out;
 
