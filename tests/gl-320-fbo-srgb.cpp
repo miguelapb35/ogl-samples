@@ -394,7 +394,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//glDisable(GL_FRAMEBUFFER_SRGB);
+			// glDisable(GL_FRAMEBUFFER_SRGB); // Uncomment to avoid the extra linear to sRGB conversion and hence get correct display
 
 			glUseProgram(ProgramName[program::SPLASH]);
 

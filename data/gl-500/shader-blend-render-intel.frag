@@ -19,12 +19,9 @@ layout(binding = 0, rgba8) uniform coherent image2D Attachment;
 
 void main()
 {
-	//beginInvocationInterlockNV();
 	beginFragmentShaderOrderingINTEL();
 
 	vec4 FramebufferColor = imageLoad(Attachment, ivec2(gl_FragCoord.xy));
 	vec4 TextureColor = texture(Diffuse, In.Texcoord.st);
 	imageStore(Attachment, ivec2(gl_FragCoord.xy), TextureColor * 0.75 + FramebufferColor * 0.25);
-
-	//endInvocationInterlockNV();
 }
