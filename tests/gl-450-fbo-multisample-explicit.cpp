@@ -176,7 +176,7 @@ private:
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glBufferStorage(GL_UNIFORM_BUFFER, this->UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
-		this->UniformPointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_UNIFORM_BUFFER,
+		this->UniformPointer = static_cast<glm::uint8*>(glMapBufferRange(GL_UNIFORM_BUFFER,
 			0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);

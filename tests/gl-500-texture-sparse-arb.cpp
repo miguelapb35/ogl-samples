@@ -245,7 +245,7 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapBufferRange(
 				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 

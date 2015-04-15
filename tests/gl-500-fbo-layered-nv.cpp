@@ -144,7 +144,7 @@ private:
 	{
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
 		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
-		glNamedBufferStorage(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), nullptr, GL_MAP_WRITE_BIT);
 
 		return true;
 	}
@@ -250,7 +250,7 @@ private:
 	bool render()
 	{
 		{
-			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, 1.0f,-1.0f, 1.0f, -1.0f);
 			glm::mat4 View = glm::mat4(1.0f);

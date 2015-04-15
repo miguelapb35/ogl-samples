@@ -78,8 +78,6 @@ private:
 	bool initProgram()
 	{
 		bool Validated(true);
-	
-		glGenProgramPipelines(1, &PipelineName);
 
 		if(Validated)
 		{
@@ -97,7 +95,10 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated;
 	}
@@ -120,23 +121,11 @@ private:
 		glGetIntegerv(GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS, &MaxFragmentAtomicCounterBuffers);
 		glGetIntegerv(GL_MAX_COMBINED_ATOMIC_COUNTER_BUFFERS, &MaxCombinedAtomicCounterBuffers);
 
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), 0, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_COPY);
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::ATOMIC_COUNTER], sizeof(GLuint), nullptr, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], sizeof(glm::mat4), nullptr, GL_MAP_WRITE_BIT);
 
 		return Validated;
 	}
@@ -145,18 +134,18 @@ private:
 	{
 		bool Validated(true);
 
-		glGenVertexArrays(1, &VertexArrayName);
-		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCreateVertexArrays(1, &VertexArrayName);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::TEXCOORD, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::TEXCOORD);
+
+		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
+		glVertexArrayVertexBuffer(VertexArrayName, 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 		return Validated;
 	}
@@ -193,8 +182,7 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
@@ -202,12 +190,11 @@ private:
 
 			*Pointer = MVP;
 
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 		}
 
 		glm::uint Data(0);
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
+		glClearNamedBufferSubData(BufferName[buffer::ATOMIC_COUNTER], GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_BYTE, &Data);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);

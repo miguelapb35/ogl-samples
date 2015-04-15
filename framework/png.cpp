@@ -71,15 +71,15 @@ gli::texture2D load_png(char const * Filename)
 	case 3:
 		for(std::size_t Offset = 0; Offset < Texture.size() / 3; ++Offset)
 		{
-			glm::u8vec3 Src = *(reinterpret_cast<glm::u8vec3 const *>(Texture.data()) + Offset);
-			*(reinterpret_cast<glm::u8vec3*>(Texture.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
+			glm::u8vec3 Src = *(static_cast<glm::u8vec3 const *>(Texture.data()) + Offset);
+			*(static_cast<glm::u8vec3*>(Texture.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
 		}
 		break;
 	case 4:
 		for(std::size_t Offset = 0; Offset < Texture.size() / 4; ++Offset)
 		{
-			glm::u8vec4 Src = *(reinterpret_cast<glm::u8vec4 const *>(Texture.data()) + Offset);
-			*(reinterpret_cast<glm::u8vec4*>(Texture.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
+			glm::u8vec4 Src = *(static_cast<glm::u8vec4 const *>(Texture.data()) + Offset);
+			*(static_cast<glm::u8vec4*>(Texture.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
 		}
 		break;
 	}
@@ -99,15 +99,15 @@ void save_png(gli::texture2D const & Texture, char const * Filename)
 	case 3:
 		for(std::size_t Offset = 0; Offset < Copy.size() / 3; ++Offset)
 		{
-			glm::u8vec3 Src = *(reinterpret_cast<glm::u8vec3 const *>(Copy.data()) + Offset);
-			*(reinterpret_cast<glm::u8vec3*>(Copy.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
+			glm::u8vec3 Src = *(static_cast<glm::u8vec3 const *>(Copy.data()) + Offset);
+			*(static_cast<glm::u8vec3*>(Copy.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
 		}
 		break;
 	case 4:
 		for(std::size_t Offset = 0; Offset < Copy.size() / 4; ++Offset)
 		{
-			glm::u8vec4 Src = *(reinterpret_cast<glm::u8vec4 const *>(Copy.data()) + Offset);
-			*(reinterpret_cast<glm::u8vec4*>(Copy.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
+			glm::u8vec4 Src = *(static_cast<glm::u8vec4 const *>(Copy.data()) + Offset);
+			*(static_cast<glm::u8vec4*>(Copy.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
 		}
 		break;
 	}

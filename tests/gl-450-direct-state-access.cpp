@@ -156,7 +156,7 @@ private:
 		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
 		glNamedBufferStorage(BufferName[buffer::TRANSFORM], this->UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
-		this->UniformPointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRange(
+		this->UniformPointer = static_cast<glm::uint8*>(glMapNamedBufferRange(
 			BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize * 2, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 		return true;

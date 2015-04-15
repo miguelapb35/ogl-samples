@@ -583,7 +583,7 @@ bool test::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) 
 
 void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)
 {
-	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
+	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	Test->MouseCurrent = glm::ivec2(x, y);
@@ -593,7 +593,7 @@ void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)
 
 void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int mods)
 {
-	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
+	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	switch(Action)
@@ -655,7 +655,7 @@ void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, in
 	if (Key < 0)
 		return;
 
-	test * Test = reinterpret_cast<test*>(glfwGetWindowUserPointer(Window));
+	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	Test->KeyPressed[Key] = Action == KEY_PRESS;
