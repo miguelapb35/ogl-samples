@@ -51,16 +51,16 @@ namespace
 	};
 
 	GLsizeiptr const ColorSize = VertexCount * sizeof(glm::u8vec4);
-	glm::u8vec4 const ColorData[VertexCount] =
+	glm::u8vec4 const ColorData[] =
 	{
 		glm::u8vec4(255,   0,   0, 255),
 		glm::u8vec4(255, 255,   0, 255),
 		glm::u8vec4(  0, 255,   0, 255),
 		glm::u8vec4(  0,   0, 255, 255),
-		glm::u8vec4(255, 128, 128, 255),
-		glm::u8vec4(255, 255, 128, 255),
-		glm::u8vec4(128, 255, 128, 255),
-		glm::u8vec4(128, 128, 255, 255)
+		glm::u8vec4(255, 128,   0, 255),
+		glm::u8vec4(255, 128,   0, 255),
+		glm::u8vec4(255, 128,   0, 255),
+		glm::u8vec4(255, 128,   0, 255)
 	};
 
 	namespace buffer
@@ -230,7 +230,7 @@ private:
 
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH, 0, &Depth);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName);
 		glBindVertexArray(VertexArrayName);

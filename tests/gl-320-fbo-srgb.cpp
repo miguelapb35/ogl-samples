@@ -213,7 +213,7 @@ private:
 			gli::save_dds(Texture, "orange.dds");
 		}
 
-		gli::texture2D Texture(gli::load_dds("orange.dds"));
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		GLenum InternalFormat = GL.internal_format(Texture.format());
 		GLenum ExternalFormat = GL.external_format(Texture.format());
 		GLenum TypeFormat = GL.type_format(Texture.format());
@@ -375,7 +375,7 @@ private:
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::TEXTURE]);
 
@@ -394,7 +394,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glDisable(GL_FRAMEBUFFER_SRGB);
+			//glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 

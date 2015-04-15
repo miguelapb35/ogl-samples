@@ -88,10 +88,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo_blend_points : public test
+class instance : public test
 {
 public:
-	gl_320_fbo_blend_points(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-fbo-blend-points", test::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
@@ -333,7 +333,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo_blend_points Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

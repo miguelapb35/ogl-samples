@@ -216,7 +216,7 @@ glCreateSampleGTC(texture-rect)
 # OpenGL 4.0 samples
 set(GL_VERSION_GTC 400)
 
-set(GL_SHADER_GTC mrt.vert mrt.frag image-2d.vert image-2d.frag)
+set(GL_SHADER_GTC blend-rtt.vert blend-rtt.frag blend-rtt-blit.vert blend-rtt-blit.frag)
 glCreateSampleGTC(blend-rtt)
 set(GL_SHADER_GTC )
 glCreateSampleGTC(caps)
