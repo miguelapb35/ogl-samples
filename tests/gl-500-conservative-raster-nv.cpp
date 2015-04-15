@@ -153,11 +153,11 @@ private:
 		glm::vec4 Material1(0.0f, 0.5f, 1.0f, 1.0f);
 
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
-		glNamedBufferData(BufferName[buffer::ELEMENT], ElementSize, ElementData, GL_STATIC_DRAW);
-		glNamedBufferData(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
-		glNamedBufferData(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
-		glNamedBufferData(BufferName[buffer::MATERIAL0], sizeof(glm::vec4), &Material0[0], GL_STATIC_DRAW);
-		glNamedBufferData(BufferName[buffer::MATERIAL1], sizeof(glm::vec4), &Material1[0], GL_STATIC_DRAW);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT);
+		glNamedBufferStorage(BufferName[buffer::MATERIAL0], sizeof(glm::vec4), &Material0[0], 0);
+		glNamedBufferStorage(BufferName[buffer::MATERIAL1], sizeof(glm::vec4), &Material1[0], 0);
 
 		return true;
 	}
@@ -171,14 +171,12 @@ private:
 
 		glm::uvec2 FramebufferSize(this->getWindowSize() / 16u);
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glCreateTextures(GL_TEXTURE_2D, texture::MAX, &TextureName[0]);
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, texture::MAX, &TextureName[0]);
 		glTextureParameteri(TextureName[0], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[0], GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureParameteri(TextureName[0], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[0], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[0], GLint(1), GL_RGBA8, GLsizei(FramebufferSize.x), GLsizei(FramebufferSize.y));
+		glTextureStorage3D(TextureName[0], GLint(1), GL_RGBA8, GLsizei(FramebufferSize.x), GLsizei(FramebufferSize.y), 1);
 
 		return Validated;
 	}
@@ -297,9 +295,8 @@ private:
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
 		glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
-		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+		glBindTextureUnit(0, TextureName[texture::COLORBUFFER]);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 

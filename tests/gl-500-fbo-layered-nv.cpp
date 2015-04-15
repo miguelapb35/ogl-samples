@@ -126,7 +126,7 @@ private:
 
 		if(Validated)
 		{
-			glGenProgramPipelines(GLsizei(pipeline::MAX), &PipelineName[0]);
+			glCreateProgramPipelines(GLsizei(pipeline::MAX), &PipelineName[0]);
 			glUseProgramStages(PipelineName[pipeline::VIEWPORT], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::VIEWPORT]);
 			glUseProgramStages(PipelineName[pipeline::LAYERING], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::LAYERING]);
 		}

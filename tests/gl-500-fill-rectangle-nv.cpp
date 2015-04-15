@@ -96,7 +96,7 @@ private:
 
 		if(Validated)
 		{
-			glGenProgramPipelines(1, &PipelineName);
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
