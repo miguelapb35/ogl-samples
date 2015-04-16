@@ -28,7 +28,7 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-420/sampler-fetch.vert");
 	char const * FRAG_SHADER_LIBRARY("gl-420/sampler-library.frag");
 	char const * FRAG_SHADER_SOURCE("gl-420/sampler-fetch.frag");
-	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
 
 	struct vertex
 	{
@@ -156,33 +156,37 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		assert(!Texture.empty());
+
+		glGenTextures(1, &TextureName);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_NEAREST : GL_NEAREST_MIPMAP_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
 
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
+			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				GL.internal_format(Texture.format()),
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
+				0,
+				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		if(Texture.levels() == 1)
+			glGenerateMipmap(GL_TEXTURE_2D);
 
 		return true;
 	}

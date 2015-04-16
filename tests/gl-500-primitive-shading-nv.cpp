@@ -67,13 +67,15 @@ namespace
 class gl_500_primitive_shading_nv : public test
 {
 public:
-	gl_500_primitive_shading_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-primitive-shading-nv", test::CORE, 4, 5),
-		QueryName(0)
+	gl_500_primitive_shading_nv(int argc, char* argv[])
+		: test(argc, argv, "gl-500-primitive-shading-nv", test::CORE, 4, 5)
+		, QueryName(0)
+		, PipelineName(0)
 	{}
 
 private:
 	GLuint QueryName;
+	GLuint PipelineName;
 
 	bool testError()
 	{
@@ -96,6 +98,7 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + SAMPLE_FRAG_SHADER, "--version 450 --profile core");
 
 			ProgramName = glCreateProgram();
+			glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, GeomShaderName);
 			glAttachShader(ProgramName, FragShaderName);
@@ -105,47 +108,45 @@ private:
 			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
-		return Validated && this->checkError("initProgram");
+		if(Validated)
+		{
+			glCreateProgramPipelines(1, &PipelineName);
+			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_GEOMETRY_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
+
+		return Validated;
 	}
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(1, &VertexArrayName);
-		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v2fc4ub), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::COLOR);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCreateVertexArrays(1, &VertexArrayName);
+		
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::COLOR, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::COLOR);
 
-		return this->checkError("initVertexArray");
+		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
+		glVertexArrayVertexBuffer(VertexArrayName, 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fc4ub));
+
+		return true;
 	}
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initQuery()
@@ -155,9 +156,7 @@ private:
 		int QueryBits(0);
 		glGetQueryiv(GL_PRIMITIVES_GENERATED, GL_QUERY_COUNTER_BITS, &QueryBits);
 
-		bool Validated = QueryBits >= 32;
-
-		return Validated && this->checkError("initQuery");
+		return QueryBits >= 32;
 	}
 
 	bool begin()
@@ -173,7 +172,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -181,8 +180,9 @@ private:
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteProgram(ProgramName);
+		glDeleteProgramPipelines(1, &PipelineName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -190,10 +190,8 @@ private:
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 1,
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM],
+				0, sizeof(glm::mat4) * 1, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -202,14 +200,13 @@ private:
 			*Pointer = Projection * this->view() * Model;
 
 			// Make sure the uniform buffer is uploaded
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 		}
 	
 		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-		glUseProgram(ProgramName);
-
+		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 

@@ -68,10 +68,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_primitive_bindless_nv : public test
+class instance : public test
 {
 public:
-	gl_500_primitive_bindless_nv(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-primitive-bindless-nv", test::CORE, 4, 5),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -92,8 +92,6 @@ private:
 	{
 		bool Validated = true;
 
-		glGenProgramPipelines(1, &PipelineName);
-
 		if(Validated)
 		{
 			compiler Compiler;
@@ -110,7 +108,10 @@ private:
 		}
 
 		if(Validated)
+		{
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
+		}
 
 		return Validated;
 	}
@@ -140,38 +141,32 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		glGenTextures(1, &TextureName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName);
+		glTextureParameteri(TextureName, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()),
-			GL.internal_format(Texture.format()),
+		glTextureStorage2D(TextureName, static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()),
 			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+			glTextureSubImage2D(TextureName, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
-	
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
 		return true;
 	}
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(1, &VertexArrayName);
+		glCreateVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glVertexAttribFormatNV(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
 			glVertexAttribFormatNV(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
@@ -223,7 +218,7 @@ private:
 			glm::mat4 MVP = Projection * this->view() * Model;
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(MVP), GL_MAP_WRITE_BIT);
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(MVP), GL_MAP_WRITE_BIT));
 			*Pointer = MVP;
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
@@ -232,9 +227,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glBindTextureUnit(0, TextureName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
@@ -251,7 +244,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_primitive_bindless_nv Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

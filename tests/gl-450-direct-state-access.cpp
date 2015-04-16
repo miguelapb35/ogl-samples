@@ -232,8 +232,6 @@ private:
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glCreateVertexArrays(1, &VertexArrayName);
 		
 		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
@@ -247,7 +245,7 @@ private:
 		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
 		glVertexArrayVertexBuffer(VertexArrayName, 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
-		return Validated;
+		return true;
 	}
 
 	bool begin()

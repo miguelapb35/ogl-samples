@@ -1,13 +1,16 @@
 #version 150 core
 
+#define FRAG_COLOR	0
+#define DIFFUSE		0
+
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2D Diffuse;
+layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
 in vec4 gl_FragCoord;
-out vec4 Color;
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {

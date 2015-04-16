@@ -1,4 +1,11 @@
-#version 150 core
+#version 450 core
+
+#define POSITION	0
+#define COLOR		3
+#define TEXCOORD	4
+#define FRAG_COLOR	0
+#define TRANSFORM0	1
+#define DIFFUSE		0
 
 precision highp float;
 precision highp int;
@@ -9,7 +16,7 @@ in block
 	vec2 Texcoord;
 } In;
 
-out vec4 Color;
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
