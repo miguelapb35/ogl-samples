@@ -56,4 +56,6 @@ namespace gli
 	typedef std::size_t layer_t;
 	typedef std::size_t level_t;
 	typedef std::size_t face_t;
+
+	typedef glm::tvec4<int> swizzle_t;
 }//namespace gli

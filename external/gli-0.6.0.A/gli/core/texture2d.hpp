@@ -100,10 +100,8 @@ namespace gli
 		/// Create a texture view, reference a subset of an existing textureCubeArray instance
 		explicit texture2D(
 			textureCubeArray const & Texture,
-			size_type const & BaseLayer,
-			size_type const & BaseFace,
-			size_type const & BaseLevel,
-			size_type const & MaxLevel);
+			size_type const & BaseLayer, size_type const & BaseFace,
+			size_type const & BaseLevel, size_type const & MaxLevel);
 
 		operator storage() const;
 		image operator[] (size_type const & Level) const;
@@ -114,6 +112,7 @@ namespace gli
 		size_type layers() const;
 		size_type faces() const;
 		size_type levels() const;
+		glm::ivec4 swizzle() const;
 
 		size_type size() const;
 		void * data();

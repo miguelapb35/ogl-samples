@@ -435,7 +435,7 @@ inline storage load_dds(std::istream& FileIn)
 	FileIn.read((char*)Storage.data(), std::size_t(End - Curr));
 
 	detail::format_desc const & Desc = detail::getFormatInfo(Storage.format());
-/*
+
 	if(HeaderDesc.format.fourCC != detail::D3DFMT_DX10 && !Desc.Compressed && Desc.Component >= 3)
 	{
 		switch(Desc.Component)
@@ -459,7 +459,7 @@ inline storage load_dds(std::istream& FileIn)
 			break;
 		}
 	}
-*/
+
 	return Storage;
 }
 

@@ -68,6 +68,7 @@ namespace gli
 		typedef size_t face_type;
 		typedef gli::format format_type;
 		typedef glm::byte data_type;
+		typedef glm::ivec4 swizzle_type;
 
 	public:
 		storage();
@@ -94,6 +95,7 @@ namespace gli
 		layer_type layers() const;
 		level_type levels() const;
 		face_type faces() const;
+		swizzle_type swizzle() const;
 
 		size_type block_size() const; // Express is bytes
 		dim_type block_dimensions() const; // Express is bytes
