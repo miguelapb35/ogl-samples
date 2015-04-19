@@ -233,7 +233,7 @@ private:
 	bool initVertexArray()
 	{
 		glCreateVertexArrays(1, &VertexArrayName);
-		
+
 		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
 		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
 		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);

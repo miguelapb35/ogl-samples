@@ -88,8 +88,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 450 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 450 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -108,7 +108,7 @@ private:
 
 		if(Validated)
 		{
-			glGenProgramPipelines(1, &PipelineName);
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
@@ -117,27 +117,15 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT);
 
 		return true;
 	}
@@ -152,27 +140,23 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		glGenTextures(1, &TextureName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()),
-			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+		glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &TextureName);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTextureParameteri(TextureName, GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTextureParameteri(TextureName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTextureParameteri(TextureName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureStorage3D(TextureName, static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()),
+			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), 1);
 
 		for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
-				0, 0,
-				static_cast<GLsizei>(Texture[Level].dimensions().x),
-				static_cast<GLsizei>(Texture[Level].dimensions().y),
+			glTextureSubImage3D(TextureName, static_cast<GLint>(Level),
+				0, 0, 0,
+				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 1,
 				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
@@ -182,9 +166,6 @@ private:
 		// Query the texture handle and make the texture resident
 		TextureHandle = glGetTextureHandleNV(TextureName);
 		glMakeTextureHandleResidentNV(TextureHandle);
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-
 
 		return Validated;
 	}

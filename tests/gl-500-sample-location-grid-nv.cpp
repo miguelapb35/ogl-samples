@@ -53,6 +53,7 @@ namespace
 		enum type
 		{
 			VERTEX,
+			ELEMENT,
 			TRANSFORM,
 			MAX
 		};
@@ -135,8 +136,8 @@ private:
 
 		if(Validated)
 		{
-			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
-			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 150 --profile core");
+			ShaderName[shader::VERT_TEXTURE] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 450 --profile core");
+			ShaderName[shader::FRAG_TEXTURE] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 450 --profile core");
 
 			ProgramName[program::TEXTURE] = glCreateProgram();
 			glAttachShader(ProgramName[program::TEXTURE], ShaderName[shader::VERT_TEXTURE]);
@@ -150,8 +151,8 @@ private:
 		
 		if(Validated)
 		{
-			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
-			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 150 --profile core");
+			ShaderName[shader::VERT_SPLASH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 450 --profile core");
+			ShaderName[shader::FRAG_SPLASH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 450 --profile core");
 
 			ProgramName[program::SPLASH] = glCreateProgram();
 			glAttachShader(ProgramName[program::SPLASH], ShaderName[shader::VERT_SPLASH]);
@@ -187,7 +188,9 @@ private:
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
+		GLint UniformBufferOffset(0);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
+		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		std::array<glm::vec2, 36> Data;
 		for(std::size_t i = 0; i < Data.size(); ++i)
@@ -197,17 +200,10 @@ private:
 		}
 		this->VertexCount = 18;//static_cast<GLsizei>(Data.size() - 8);
 
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, Data.size() * sizeof(glm::vec2), &Data[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		GLint UniformBufferOffset(0);
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], Data.size() * sizeof(glm::vec2), &Data[0], 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT);
 
 		return true;
 	}
@@ -218,40 +214,35 @@ private:
 
 		glm::ivec2 WindowSize(this->getWindowSize() >> this->FramebufferScale);
 
-		glGenTextures(texture::MAX, &TextureName[0]);
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::COLORBUFFER]);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::RENDERBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
+		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &TextureName[texture::RENDERBUFFER]);
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureStorage2DMultisample(TextureName[texture::RENDERBUFFER], 4, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
 
 		return Validated;
 	}
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(program::MAX, &VertexArrayName[0]);
-		glBindVertexArray(VertexArrayName[program::TEXTURE]);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCreateVertexArrays(program::MAX, &VertexArrayName[0]);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName[program::TEXTURE], semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName[program::TEXTURE], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName[program::TEXTURE], semantic::attr::POSITION);
 
-		glBindVertexArray(VertexArrayName[program::SPLASH]);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName[program::TEXTURE], semantic::attr::TEXCOORD, 0);
+		glVertexArrayAttribFormat(VertexArrayName[program::TEXTURE], semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName[program::TEXTURE], semantic::attr::TEXCOORD);
+
+		glVertexArrayElementBuffer(VertexArrayName[program::TEXTURE], BufferName[buffer::ELEMENT]);
+		glVertexArrayVertexBuffer(VertexArrayName[program::TEXTURE], 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 		return true;
 	}
@@ -348,10 +339,7 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
@@ -360,7 +348,7 @@ private:
 			*Pointer = Projection * this->view() * Model;
 
 			// Make sure the uniform buffer is uploaded
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDERBUFFER0]);
@@ -389,11 +377,8 @@ private:
 		glViewportIndexedf(0, 0, ViewportSize.y, ViewportSize.x, ViewportSize.y);
 		glDrawArraysInstanced(GL_LINE_LOOP, 0, this->VertexCount, 1);
 
-
 		// Blit
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, FramebufferName[framebuffer::RENDERBUFFER0]);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, FramebufferName[framebuffer::COLORBUFFER]);
-		glBlitFramebuffer(
+		glBlitNamedFramebuffer(FramebufferName[framebuffer::RENDERBUFFER0], FramebufferName[framebuffer::COLORBUFFER],
 			0, 0, static_cast<GLsizei>(WindowSize.x) >> this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) >> this->FramebufferScale, 
 			0, 0, static_cast<GLsizei>(WindowSize.x) >> this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) >> this->FramebufferScale, 
 			GL_COLOR_BUFFER_BIT, GL_NEAREST);

@@ -10,7 +10,7 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2D Diffuse;
+uniform sampler2DArray Diffuse;
 
 in block
 {
@@ -21,5 +21,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord.st);
+	Color = texture(Diffuse, vec3(In.Texcoord.st, 0));
 }
