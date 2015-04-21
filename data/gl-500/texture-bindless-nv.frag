@@ -5,12 +5,13 @@
 #define COLOR		3
 #define TEXCOORD	4
 #define FRAG_COLOR	0
+#define DIFFUSE		0
 
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2DArray Diffuse;
+layout(binding = DIFFUSE) uniform sampler2DArray Diffuse;
 
 in block
 {

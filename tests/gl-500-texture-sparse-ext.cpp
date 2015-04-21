@@ -59,10 +59,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_sparse_ext : public test
+class instance : public test
 {
 public:
-	gl_500_texture_sparse_ext(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-texture-sparse-ext", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
 		PipelineName(0),
 		ProgramName(0),
@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_texture_sparse_ext Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

@@ -218,6 +218,8 @@ set(GL_VERSION_GTC 400)
 
 set(GL_SHADER_GTC blend-rtt.vert blend-rtt.frag blend-rtt-blit.vert blend-rtt-blit.frag)
 glCreateSampleGTC(blend-rtt)
+set(GL_SHADER_GTC buffer-uniform-array.vert buffer-uniform-array.frag)
+glCreateSampleGTC(buffer-uniform-array)
 set(GL_SHADER_GTC )
 glCreateSampleGTC(caps)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)

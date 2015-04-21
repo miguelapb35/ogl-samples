@@ -29,32 +29,17 @@ namespace
 	char const * FRAG_SHADER_SOURCE("gl-500/primitive-bindless-nv.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
-	struct vertex
-	{
-		vertex
-		(
-			glm::vec2 const & Position,
-			glm::vec2 const & Texcoord
-		) :
-			Position(Position),
-			Texcoord(Texcoord)
-		{}
-
-		glm::vec2 Position;
-		glm::vec2 Texcoord;
-	};
-
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex);
-	vertex const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
+	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		vertex(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		vertex(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		vertex(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
-		vertex(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f))
 	};
 
 	namespace buffer
@@ -168,8 +153,8 @@ private:
 	{
 		glCreateVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glVertexAttribFormatNV(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
-			glVertexAttribFormatNV(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(vertex));
+			glVertexAttribFormatNV(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f));
+			glVertexAttribFormatNV(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f));
 
 			glEnableClientState(GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV);
 			glEnableVertexAttribArray(semantic::attr::POSITION);

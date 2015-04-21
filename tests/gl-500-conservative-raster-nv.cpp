@@ -89,10 +89,10 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_500_conservative_raster_nv : public test
+class instance : public test
 {
 public:
-	gl_500_conservative_raster_nv(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-conservative-raster-nv", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.25f))
 	{}
 
@@ -164,8 +164,6 @@ private:
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
@@ -178,13 +176,11 @@ private:
 		glTextureParameteri(TextureName[0], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTextureStorage3D(TextureName[0], GLint(1), GL_RGBA8, GLsizei(FramebufferSize.x), GLsizei(FramebufferSize.y), 1);
 
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glCreateVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 		
 		glVertexArrayAttribBinding(VertexArrayName[0], semantic::attr::POSITION, 0);
@@ -198,13 +194,11 @@ private:
 		glVertexArrayElementBuffer(VertexArrayName[0], BufferName[buffer::ELEMENT]);
 		glVertexArrayVertexBuffer(VertexArrayName[0], 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
-		return Validated;
+		return true;
 	}
 
 	bool initFramebuffer()
 	{
-		bool Validated(true);
-
 		glCreateFramebuffers(1, &FramebufferName);
 		glNamedFramebufferTexture(FramebufferName, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 
@@ -308,7 +302,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_conservative_raster_nv Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

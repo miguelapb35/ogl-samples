@@ -66,7 +66,7 @@ namespace
 		0, 1, 2
 	};
 
-	GLsizei const IndirectBufferCount(3);
+	std::size_t const IndirectBufferCount(3);
 
 	namespace buffer
 	{
@@ -93,16 +93,15 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_500_multi_draw_indirect : public test
+class instance : public test
 {
 public:
-	gl_500_multi_draw_indirect(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-multi-draw-indirect-arb", test::CORE, 4, 4, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
-		UniformArrayStrideMat(256),
 		UniformArrayStrideInt(256)
 	{}
 
@@ -115,7 +114,6 @@ private:
 	GLuint VertexArrayName;
 	GLuint PipelineName;
 	GLuint ProgramName;
-	GLint UniformArrayStrideMat;
 	GLint UniformArrayStrideInt;
 
 	bool initProgram()
@@ -146,9 +144,6 @@ private:
 			glGetActiveUniformName(ProgramName, i, GLsizei(sizeof(Name)), &Length, Name);
 
 			std::string StringName(Name);
-
-			if(StringName == std::string("transform.MVP[0]"))
-				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideMat);
 
 			if(StringName == std::string("indirection.Transform[0]"))
 				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideInt);
@@ -184,9 +179,8 @@ private:
 		glBufferSubData(GL_UNIFORM_BUFFER, PaddingInt * 2, PaddingInt, &VertexIndirection[2]);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		std::size_t PaddingMat = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
 		glBindBuffer(GL_UNIFORM_BUFFER, this->BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, PaddingMat * 3, nullptr, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4) * IndirectBufferCount, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		DrawElementsIndirectCommand Commands[6];
@@ -261,8 +255,6 @@ private:
 				Texture[Level].data());
 		}
 	
-		///////////////////////////////////////////
-
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_B]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
@@ -282,8 +274,6 @@ private:
 				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
-	
-		///////////////////////////////////////////
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_C]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_NONE);
@@ -330,8 +320,7 @@ private:
 				GL_DEBUG_SOURCE_APPLICATION_ARB, 
 				GL_DEBUG_TYPE_OTHER_ARB, 76,
 				GL_DEBUG_SEVERITY_LOW_ARB,
-				LengthQuery, 
-				&InfoLog[0]);
+				LengthQuery, &InfoLog[0]);
 		}
 	}
 
@@ -381,19 +370,17 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		{
-			std::size_t Padding = glm::max(sizeof(glm::mat4), std::size_t(UniformArrayStrideMat));
-
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, Padding * 3, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * IndirectBufferCount, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::vec2 WindowSize(this->getWindowSize());
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / 3.0f / WindowSize.y, 0.1f, 100.0f);
 			glm::mat4 View = this->view();
 			glm::mat4 Model = glm::mat4(1.0f);
 
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-			*reinterpret_cast<glm::mat4*>(Pointer + Padding * 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f));
+			*(Pointer + 0) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.5f));
+			*(Pointer + 1) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+			*(Pointer + 2) = Projection * View * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -0.5f));
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
@@ -428,7 +415,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_multi_draw_indirect Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

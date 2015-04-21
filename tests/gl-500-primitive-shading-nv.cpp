@@ -64,10 +64,10 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 }//namespace
 
-class gl_500_primitive_shading_nv : public test
+class instance : public test
 {
 public:
-	gl_500_primitive_shading_nv(int argc, char* argv[])
+	instance(int argc, char* argv[])
 		: test(argc, argv, "gl-500-primitive-shading-nv", test::CORE, 4, 5)
 		, QueryName(0)
 		, PipelineName(0)
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_primitive_shading_nv Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;
