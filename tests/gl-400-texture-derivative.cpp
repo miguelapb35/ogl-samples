@@ -29,7 +29,6 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-400/texture-derivative2.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-400/texture-derivative1.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-400/texture-derivative1.frag");
-	char const * TEXTURE_DIFFUSE("kueken2-bgra8.dds");
 	int const FRAMEBUFFER_SIZE(8);
 	int const SAMPLE_SIZE_WIDTH(640);
 	int const SAMPLE_SIZE_HEIGHT(480);
