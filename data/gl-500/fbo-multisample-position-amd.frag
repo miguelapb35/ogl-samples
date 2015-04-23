@@ -9,16 +9,16 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-layout(binding = 0) uniform sampler2D Diffuse;
+layout(binding = 0) uniform sampler2DArray Diffuse;
 
 in block
 {
 	vec2 Texcoord;
 } In;
 
-layout(location = FRAG_COLOR, index = 0) out vec4 FragColor;
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	FragColor = texture(Diffuse, interpolateAtSample(In.Texcoord, gl_SampleID));
+	Color = texture(Diffuse, vec3(interpolateAtSample(In.Texcoord, gl_SampleID), 0.0));
 }
