@@ -481,6 +481,8 @@ set(GL_SHADER_GTC shader-blend-render-nv.vert shader-blend-render-nv.frag shader
 glCreateSampleGTC(shader-blend-nv)
 set(GL_SHADER_GTC shader-invocation.vert shader-invocation.frag)
 glCreateSampleGTC(shader-invocation-nv)
+set(GL_SHADER_GTC shader-group-nv.vert shader-group-nv.frag)
+glCreateSampleGTC(shader-group-nv)
 set(GL_SHADER_GTC test-depth-clamp-separate.vert test-depth-clamp-separate.frag)
 glCreateSampleGTC(test-depth-clamp-separate-amd)
 set(GL_SHADER_GTC texture-bindless.vert texture-bindless.frag)

@@ -81,6 +81,8 @@ namespace
 	GLuint Texture2DName(0);
 }//namespace
 
+static const GLenum GL_PROGRAM_BINARY_SPIR_V = 0xFFFF;
+
 class gl_410_program_binary : public test
 {
 public:
@@ -101,7 +103,66 @@ private:
 
 		return this->checkError("saveProgram");
 	}
+/*
+	char const * retrieveBinaryCache(char const* Path)
+	{
+		return 0;
+	}
 
+	enum
+	{
+		PROGRAM_SEPARATE_BIT = (1 << 0),
+		PROGRAM_CACHE_BIT = (1 << 1),
+		PROGRAM_BYPASS_CACHE_BIT = (1 << 2)
+	};
+
+	bool hasProgramBinarySPIRVSupport()
+	{
+		GLint NumProgramBinaryFormats(0);
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
+
+		std::vector<GLint> ProgramBinaryFormats(static_cast<std::size_t>(NumProgramBinaryFormats));
+		glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, &ProgramBinaryFormats[0]);
+
+		for(std::size_t FormatIndex = 0; FormatIndex < ProgramBinaryFormats.size(); ++FormatIndex)
+		{
+			if(ProgramBinaryFormats[FormatIndex] == GL_PROGRAM_BINARY_SPIR_V)
+				return true;
+		}
+
+		return false;
+	}
+
+	bool isProgramBinarySPIRV(GLubyte * binary)
+	{
+		return *reinterpret_cast<GLuint*>(binary) == 0x07230203;
+	}
+
+	GLuint createProgram(char const* Path, GLbitfield Flags)
+	{
+		assert(HasProgramBinarySPIRVSupport());
+		assert(Path);
+
+		if(!(Flags & PROGRAM_BYPASS_CACHE_BIT))
+			Path = retrieveBinaryCache(Path);
+
+		GLenum Format = 0;
+		GLint Size = 0;
+		std::vector<glm::byte> Data;
+		if(!loadBinary(Path, Format, Data, Size))
+			return 0;
+
+		assert((isProgramBinarySPIRV(&Data[0]) && Format == GL_PROGRAM_BINARY_SPIR_V) || Format != GL_PROGRAM_BINARY_SPIR_V);
+
+		GLuint ProgramName = glCreateProgram();
+		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, Flags & PROGRAM_SEPARATE_BIT ? GL_TRUE : GL_FALSE);
+		glProgramParameteri(ProgramName, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, Flags & PROGRAM_CACHE_BIT ? GL_TRUE : GL_FALSE);
+		glProgramBinary(ProgramName, Format, &Data[0], Size);
+		glLinkProgram(ProgramName);
+
+		return ProgramName;
+	}
+*/
 	bool initProgram()
 	{
 		bool Validated = true;
