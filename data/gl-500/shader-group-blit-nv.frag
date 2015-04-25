@@ -22,6 +22,5 @@ void main()
 {
 	vec2 TextureSize = vec2(textureSize(Diffuse, 0));
 
-	Color = texture(Diffuse, gl_FragCoord.xy / (TextureSize * 8));
-	//Color = texelFetch(Diffuse, ivec2(gl_FragCoord.xy), 0);
+	Color = texelFetch(Diffuse, ivec2(gl_FragCoord.xy) >> 3, 0);
 }

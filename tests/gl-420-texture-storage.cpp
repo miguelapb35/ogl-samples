@@ -175,8 +175,7 @@ private:
 		{
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 				0, 0, 0,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GLsizei(1),
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y), GLsizei(1),
 				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
