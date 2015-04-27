@@ -32,5 +32,6 @@ out block
 void main()
 {
 	Out.Texcoord = Texcoord;
-	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
+	gl_Position = Transform.MVP * vec4(Position, (float(gl_InstanceID) * 1.0 - 2.0) * 0.5, 1.0);
+	//gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

@@ -389,7 +389,10 @@ set(GL_SHADER_GTC texture-copy.vert texture-copy.frag)
 glCreateSampleGTC(texture-copy)
 set(GL_SHADER_GTC texture-storage.vert texture-storage.frag texture-storage.glsl)
 glCreateSampleGTC(texture-storage)
-set(GL_SHADER_GTC texture-view.vert texture-view.geom texture-view.frag)
+set(GL_SHADER_GTC texture-fetch-dependent.vert texture-fetch-dependent.frag)
+glCreateSampleGTC(texture-fetch-dependent)
+
+set(GL_SHADER_GTC draw-without-vertex-attrib.vert draw-without-vertex-attrib.frag)
 glCreateSampleGTC(texture-view)
 
 # OpenGL 4.4 samples

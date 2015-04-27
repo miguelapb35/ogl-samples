@@ -67,6 +67,7 @@ namespace
 		{
 			COLORBUFFER,
 			RENDERBUFFER,
+			INVOCATION_COUNT,
 			MAX
 		};
 	}//namespace texture
@@ -100,8 +101,6 @@ private:
 	bool initProgram()
 	{
 		bool Validated(true);
-	
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
 
 		if(Validated)
 		{
@@ -120,9 +119,6 @@ private:
 		}
 
 		if(Validated)
-			glUseProgramStages(PipelineName[pipeline::TEXTURE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::TEXTURE]);
-
-		if(Validated)
 		{
 			compiler Compiler;
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_BLIT, "--version 450 --profile core");
@@ -139,101 +135,84 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::TEXTURE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::TEXTURE]);
 			glUseProgramStages(PipelineName[pipeline::SPLASH], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::SPLASH]);
+		}
 
 		return Validated;
 	}
 
 	bool initBuffer()
 	{
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
+		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT);
 
 		return true;
 	}
 
 	bool initTexture()
 	{
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glGenTextures(texture::MAX, &TextureName[0]);
+		glCreateTextures(GL_TEXTURE_2D, texture::MAX, &TextureName[0]);
 
 		glm::vec2 const FramwbufferSize = glm::vec2(this->getWindowSize()) * FRAMEBUFFER_SCALE;
 
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(FramwbufferSize.x), GLsizei(FramwbufferSize.y));
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTextureStorage2D(TextureName[texture::COLORBUFFER], GLint(1), GL_RGBA8, GLsizei(FramwbufferSize.x), GLsizei(FramwbufferSize.y));
 
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH_COMPONENT24, GLsizei(FramwbufferSize.x), GLsizei(FramwbufferSize.y));
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureStorage2D(TextureName[texture::RENDERBUFFER], GLint(1), GL_DEPTH_COMPONENT24, GLsizei(FramwbufferSize.x), GLsizei(FramwbufferSize.y));
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glTextureParameteri(TextureName[texture::INVOCATION_COUNT], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::INVOCATION_COUNT], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureStorage2D(TextureName[texture::INVOCATION_COUNT], GLint(1), GL_R32UI, GLsizei(FramwbufferSize.x), GLsizei(FramwbufferSize.y));
 
 		return true;
 	}
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(pipeline::MAX, &VertexArrayName[0]);
-		glBindVertexArray(VertexArrayName[pipeline::TEXTURE]);
-			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(sizeof(glm::vec2)));
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glCreateVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
-			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
+		glVertexArrayAttribBinding(VertexArrayName[pipeline::TEXTURE], semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName[pipeline::TEXTURE], semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName[pipeline::TEXTURE], semantic::attr::POSITION);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBindVertexArray(0);
+		glVertexArrayAttribBinding(VertexArrayName[pipeline::TEXTURE], semantic::attr::TEXCOORD, 0);
+		glVertexArrayAttribFormat(VertexArrayName[pipeline::TEXTURE], semantic::attr::TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2));
+		glEnableVertexArrayAttrib(VertexArrayName[pipeline::TEXTURE], semantic::attr::TEXCOORD);
 
-		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
-		glBindVertexArray(0);
+		glVertexArrayElementBuffer(VertexArrayName[pipeline::TEXTURE], BufferName[buffer::ELEMENT]);
+		glVertexArrayVertexBuffer(VertexArrayName[pipeline::TEXTURE], 0, BufferName[buffer::VERTEX], 0, sizeof(glf::vertex_v2fv2f));
 
 		return true;
 	}
 
 	bool initFramebuffer()
 	{
-		bool Validated(true);
+		glCreateFramebuffers(1, &FramebufferName);
+		glNamedFramebufferTexture(FramebufferName, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
+		glNamedFramebufferTexture(FramebufferName, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
 
-		glGenFramebuffers(1, &FramebufferName);
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
-
-		if(!this->checkFramebuffer(FramebufferName))
-			return false;
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		return true;
+		return glCheckNamedFramebufferStatus(FramebufferName, GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 	}
 
 	bool begin()
 	{
-		bool Validated(true);
+		bool Validated = this->checkExtension("GL_NV_shader_thread_group");
 
 		caps Caps(caps::CORE);
 
@@ -269,8 +248,7 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = (glm::mat4*)(glMapBufferRange(GL_UNIFORM_BUFFER,
+			glm::mat4* Pointer = reinterpret_cast<glm::mat4*>(glMapNamedBufferRange(BufferName[buffer::TRANSFORM],
 				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
@@ -280,34 +258,34 @@ private:
 			*Pointer = Projection * this->view() * Model;
 
 			// Make sure the uniform buffer is uploaded
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			glUnmapNamedBuffer(BufferName[buffer::TRANSFORM]);
 		}
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+		glClearTexImage(TextureName[texture::COLORBUFFER], 0, GL_RGBA, GL_UNSIGNED_BYTE, &glm::u8vec4(255, 255, 255, 255)[0]);
+		glClearTexImage(TextureName[texture::RENDERBUFFER], 0, GL_DEPTH_COMPONENT, GL_FLOAT, &glm::vec1(1.0)[0]);
+		glClearTexImage(TextureName[texture::INVOCATION_COUNT], 0, GL_RED_INTEGER, GL_UNSIGNED_INT, &glm::u32vec1(0)[0]);
+
 		glViewportIndexedf(0, 0, 0, WindowSize.x * FRAMEBUFFER_SCALE, WindowSize.y * FRAMEBUFFER_SCALE);
 
-		float Depth(1.0f);
-		glClearBufferfv(GL_DEPTH , 0, &Depth);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
-
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glBindProgramPipeline(PipelineName[pipeline::TEXTURE]);
 		glBindVertexArray(VertexArrayName[pipeline::TEXTURE]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glBindImageTexture(0, TextureName[texture::INVOCATION_COUNT], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI);
 
-		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 2, 0, 0);
+		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 5, 0, 0);
 
 		glDisable(GL_DEPTH_TEST);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
-		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
+		glBindImageTexture(0, TextureName[texture::INVOCATION_COUNT], 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32UI);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 

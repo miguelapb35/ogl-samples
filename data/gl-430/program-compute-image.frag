@@ -5,7 +5,7 @@
 #define TEXCOORD	4
 #define FRAG_COLOR	0
 
-#define SAMPLER_DIFFUSE		0 
+#define SAMPLER_DIFFUSE		0
 
 precision highp float;
 precision highp int;

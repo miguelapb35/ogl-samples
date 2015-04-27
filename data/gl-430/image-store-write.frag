@@ -8,8 +8,6 @@ void main()
 {
 	ivec2 Size = imageSize(Diffuse);
 
-	imageStore(
-		Diffuse, 
-		ivec2(gl_FragCoord.xy), 
+	imageStore(Diffuse, ivec2(gl_FragCoord.xy),
 		vec4(vec2(gl_FragCoord.xy) / vec2(Size), 0.0, 1.0) * vec4(1.0, 0.5, 0.0, 1.0));
 }

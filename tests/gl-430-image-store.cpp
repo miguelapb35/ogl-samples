@@ -64,8 +64,6 @@ private:
 
 		compiler Compiler;
 
-		glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
-
 		if(Validated)
 		{
 			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_READ, "--version 420 --profile core");
@@ -79,9 +77,6 @@ private:
 			glLinkProgram(ProgramName[pipeline::READ]);
 			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::READ]);
 		}
-
-		if(Validated)
-			glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::READ]);
 
 		if(Validated)
 		{
@@ -98,7 +93,11 @@ private:
 		}
 
 		if(Validated)
+		{
+			glGenProgramPipelines(pipeline::MAX, &PipelineName[0]);
+			glUseProgramStages(PipelineName[pipeline::READ], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::READ]);
 			glUseProgramStages(PipelineName[pipeline::SAVE], GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName[pipeline::SAVE]);
+		}
 
 		return Validated;
 	}

@@ -294,13 +294,12 @@ private:
 
 		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, static_cast<float>(FRAMEBUFFER_SIZE.x), static_cast<float>(FRAMEBUFFER_SIZE.y));
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
+		glClearNamedFramebufferfv(FramebufferName[framebuffer::RENDER], GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
-		GLintptr Offset(0);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
 		glBindSamplers(0, 1, &SamplerName);
-		glBindTextures(0, 1, &TextureName[texture::TEXTURE]);
+		glBindTextureUnit(0, TextureName[texture::TEXTURE]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
@@ -314,11 +313,11 @@ private:
 
 		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearNamedFramebufferfv(0, GL_COLOR, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
-		glBindTextures(0, 1, &TextureName[texture::COLORBUFFER]);
+		glBindTextureUnit(0, TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);

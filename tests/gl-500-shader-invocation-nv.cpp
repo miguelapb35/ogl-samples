@@ -48,11 +48,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_shader_invocation_nv : public test
+class instance : public test
 {
 public:
-	gl_440_shader_invocation_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-shader-invocation-nv", test::CORE, 4, 4, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+	instance(int argc, char* argv[]) :
+		test(argc, argv, "gl-500-shader-invocation-nv", test::CORE, 4, 4, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -85,7 +85,7 @@ private:
 
 		if(Validated)
 		{
-			glGenProgramPipelines(1, &PipelineName);
+			glCreateProgramPipelines(1, &PipelineName);
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
@@ -94,9 +94,7 @@ private:
 
 	bool initVertexArray()
 	{
-		glGenVertexArrays(1, &VertexArrayName);
-		glBindVertexArray(VertexArrayName);
-		glBindVertexArray(0);
+		glCreateVertexArrays(1, &VertexArrayName);
 
 		return true;
 	}
@@ -108,19 +106,15 @@ private:
 		glGetIntegerv(GL_WARPS_PER_SM_NV, &Constants[1]);
 		glGetIntegerv(GL_SM_COUNT_NV, &Constants[2]);
 
-		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::CONSTANT]);
-		glBufferStorage(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], 0);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+		glNamedBufferStorage(BufferName[buffer::CONSTANT], static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], 0);
 
 		return true;
 	}
 
 	bool begin()
 	{
-		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_NV_shader_thread_group");
+		bool Validated = this->checkExtension("GL_NV_shader_thread_group");
 
 		if(Validated)
 			Validated = initBuffer();
@@ -134,6 +128,7 @@ private:
 
 	bool end()
 	{
+		glDeleteBuffers(buffer::MAX, &BufferName[0]);
 		glDeleteProgramPipelines(1, &PipelineName);
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
@@ -162,7 +157,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_shader_invocation_nv Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;
