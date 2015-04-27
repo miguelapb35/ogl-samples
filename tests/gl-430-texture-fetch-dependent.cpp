@@ -87,6 +87,8 @@ private:
 
 	bool initTexture()
 	{
+		glm::uvec2 WindowSize(this->getWindowSize());
+
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
@@ -124,14 +126,14 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 			std::vector<glm::u32vec1> Data;
-			Data.resize(2048);
+			Data.resize(WindowSize.x * WindowSize.y);
 			for(std::size_t Index = 0; Index < Data.size(); ++Index)
 				Data[Index] = glm::u32vec1(glm::linearRand(glm::vec1(0), glm::vec1(1)) * glm::vec1(Data.size() - 1));
 
-			glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_R32UI, 1, 1, static_cast<GLsizei>(Data.size()));
+			glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_R32UI, WindowSize.x, WindowSize.y, 1);
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 					0, 0, 0,
-					1, 1, static_cast<GLsizei>(Data.size()),
+					WindowSize.x, WindowSize.y, 1,
 					GL_RED_INTEGER, GL_UNSIGNED_INT, &Data[0][0]);
 		}
 
@@ -177,6 +179,7 @@ private:
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
+		//glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);

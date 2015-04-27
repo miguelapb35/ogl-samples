@@ -1,6 +1,7 @@
 uniform highp vec4 Diffuse;
 
-void main()
+void main ()
 {
-	gl_FragColor = Diffuse;
+  gl_FragColor = Diffuse;
 }
+
