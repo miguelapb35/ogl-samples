@@ -327,7 +327,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_shader_draw_parameters");
+		Validated = Validated && this->checkExtension("GL_ARB_indirect_parameters");
 
 		if(Validated)
 			Validated = initProgram();
