@@ -369,14 +369,14 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	GLint WindowSizeY(0);
 	glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
 
-	gli::texture2D TextureRead(1, ColorFormat == GL_RGBA ? gli::RGBA8_UNORM : gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+	gli::texture2D TextureRead(1, ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM : gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.data());
 
-	gli::texture2D TextureRGB(1, gli::RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+	gli::texture2D TextureRGB(1, gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
 
-	if(TextureRead.format() == gli::RGBA8_UNORM)
+	if(TextureRead.format() == gli::FORMAT_RGBA8_UNORM)
 	{
 		for(gli::size_t y = 0; y < TextureRGB.dimensions().y; ++y)
 		for(gli::size_t x = 0; x < TextureRGB.dimensions().x; ++x)

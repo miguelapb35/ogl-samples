@@ -59,7 +59,7 @@ gli::texture2D load_png(char const * Filename)
 	glm::uint Width = FreeImage_GetWidth(Bitmap);
 	glm::uint Height = FreeImage_GetHeight(Bitmap);
 
-	gli::texture2D Texture(1, BPP == 24 ? gli::RGB8_UNORM : gli::RGBA8_UNORM, gli::texture2D::dim_type(Width, Height));
+	gli::texture2D Texture(1, BPP == 24 ? gli::FORMAT_RGB8_UNORM : gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(Width, Height));
 	memcpy(Texture.data(), FreeImage_GetBits(Bitmap), Texture.size());
 	FreeImage_Unload(Bitmap);
 
