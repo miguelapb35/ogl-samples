@@ -93,10 +93,10 @@ namespace
 	std::vector<glm::vec4> Viewport(program::MAX);
 }//namespace
 
-class gl_320_texture_offset : public test
+class instance : public test
 {
 public:
-	gl_320_texture_offset(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-texture-offset", test::CORE, 3, 2)
 	{}
 
@@ -131,7 +131,7 @@ private:
 				UniformOffset = glGetUniformLocation(ProgramName[program::OFFSET], "Offset");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -146,13 +146,14 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
 	{
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
@@ -166,14 +167,14 @@ private:
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -191,7 +192,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -214,7 +215,7 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -225,7 +226,7 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -266,7 +267,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_texture_offset Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

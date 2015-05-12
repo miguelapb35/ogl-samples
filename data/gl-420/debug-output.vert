@@ -7,18 +7,16 @@
 
 #define MATERIAL	0
 #define TRANSFORM0	1
-#define TRANSFORM1	2	
+#define TRANSFORM1	2
 
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform int Instance;
-
 layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
-} Transform[2];
+} Transform;
 
 out gl_PerVertex
 {
@@ -28,6 +26,6 @@ out gl_PerVertex
 layout(location = POSITION) in vec2 Position;
 
 void main()
-{	
-	gl_Position = Transform[Instance].MVP * vec4(Position, 0.0, 1.0);
+{
+	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }

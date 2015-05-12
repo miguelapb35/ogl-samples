@@ -135,16 +135,15 @@ private:
 			glUseProgramStages(PipelineName, GL_FRAGMENT_SHADER_BIT, ProgramName[program::FRAG]);
 		}
 
-		return Validated && this->checkError("initProgram");;
+		return Validated;
 	}
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -160,27 +159,25 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_RGBA8, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 		ImageSize = glm::uvec2(Texture[0].dimensions());
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
@@ -192,13 +189,11 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return Validated;
+		return true;
 	}
 
 	bool initBuffer()
 	{
-		bool Validated(true);
-
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 
@@ -228,7 +223,7 @@ private:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return Validated;
+		return true;
 	}
 
 	bool begin()

@@ -174,13 +174,11 @@ private:
 		glSamplerParameteri(SamplerName[pipeline::SPLASH], GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName[pipeline::SPLASH], GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initBuffer()
 	{
-		bool Validated(true);
-
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -199,16 +197,15 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return Validated;
+		return true;
 	}
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -223,7 +220,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), GL.internal_format(Texture.format()),
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), Format.Internal,
 			static_cast<GLsizei>(Texture.dimensions().x),
 			static_cast<GLsizei>(Texture.dimensions().y));
 
@@ -232,7 +229,7 @@ private:
 			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
@@ -247,13 +244,11 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glGenVertexArrays(pipeline::MAX, &VertexArrayName[0]);
 
 		glBindVertexArray(VertexArrayName[pipeline::RENDER]);
@@ -263,13 +258,11 @@ private:
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
 		glBindVertexArray(0);
 
-		return Validated;
+		return true;
 	}
 
 	bool initFramebuffer()
 	{
-		bool Validated(true);
-
 		glm::ivec2 WindowSize(this->getWindowSize());
 
 		glGenFramebuffers(1, &FramebufferName);

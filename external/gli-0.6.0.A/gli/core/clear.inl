@@ -29,11 +29,7 @@
 namespace gli
 {
 	template <typename genType>
-	inline image clear
-	(
-		image const & Image, 
-		genType const & Texel
-	)
+	inline image clear(image const & Image, genType const & Texel)
 	{
 		image Result = Image;
 		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)

@@ -71,10 +71,10 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_430_texture_view : public test
+class instance : public test
 {
 public:
-	gl_430_texture_view(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-430-texture-view", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
@@ -143,40 +143,46 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::format const Format = gli::RGB8U;
 		assert(!Texture.empty());
+		gli::gl GL;
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glGenTextures(texture::MAX, &TextureName[0]);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
-			GL.internal_format(Format),
-			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
-
-		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
-				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GL.external_format(Format), GL.type_format(Format),
-				Texture[Level].data());
+			gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UNORM);
+
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+			glGenTextures(texture::MAX, &TextureName[0]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+
+			glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
+				Format.Internal,
+				GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+
+			for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+			{
+				glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+					0, 0, 
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					Format.External, Format.Type,
+					Texture[Level].data());
+			}
+
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		}
 
-		glTextureView(TextureName[texture::VIEW_A], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], GL.internal_format(Texture.format()), 0, GLuint(Texture.levels()), 0, 1);
-		glTextureView(TextureName[texture::VIEW_B], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], GL.internal_format(Texture.format()), 0, 1, 0, 1);
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		{
+			gli::gl::format const Format = GL.translate(Texture.format());
+			glTextureView(TextureName[texture::VIEW_A], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], Format.Internal, 0, GLuint(Texture.levels()), 0, 1);
+			glTextureView(TextureName[texture::VIEW_B], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], Format.Internal, 0, 1, 0, 1);
+		}
 
 		return true;
 	}
@@ -272,7 +278,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_texture_view Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

@@ -107,7 +107,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -126,7 +126,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
@@ -142,19 +142,22 @@ private:
 
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		assert(!Texture.empty());
+
+		gli::gl::format const Format = GL.translate(Texture.format());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -170,7 +173,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -186,7 +189,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -197,7 +200,7 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -207,7 +210,7 @@ private:
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);

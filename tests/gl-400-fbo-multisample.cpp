@@ -68,10 +68,10 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_400_fbo_multisample : public test
+class instance : public test
 {
 public:
-	gl_400_fbo_multisample(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-400-fbo-multisample", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.1f))
 	{}
 
@@ -101,7 +101,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -116,7 +116,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initSampler()
@@ -137,7 +137,7 @@ private:
 
 		glBindSampler(0, SamplerName);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initTexture()
@@ -148,20 +148,21 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initFramebuffer()
@@ -191,7 +192,7 @@ private:
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return this->checkError("initFramebuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -209,7 +210,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[BUFFER_ELEMENT]);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -232,7 +233,7 @@ private:
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -247,7 +248,7 @@ private:
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteSamplers(1, &SamplerName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	void renderFBO(GLuint Framebuffer)
@@ -266,8 +267,6 @@ private:
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
-
-		this->checkError("renderFBO");
 	}
 
 	void renderFB(GLuint Texture2DName)
@@ -284,8 +283,6 @@ private:
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
-
-		this->checkError("renderFB");
 	}
 
 	bool render()
@@ -330,7 +327,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_400_fbo_multisample Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

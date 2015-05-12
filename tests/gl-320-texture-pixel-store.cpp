@@ -149,8 +149,9 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture.dimensions().x);
@@ -158,10 +159,10 @@ private:
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture.dimensions().y) / 4);
 
 		glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0),
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			static_cast<GLsizei>(Texture.dimensions().x) / 2, static_cast<GLsizei>(Texture.dimensions().y) / 2,
 			0,
-			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+			Format.External, Format.Type,
 			Texture.data());
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
@@ -169,7 +170,7 @@ private:
 		glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
 		glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -185,7 +186,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()

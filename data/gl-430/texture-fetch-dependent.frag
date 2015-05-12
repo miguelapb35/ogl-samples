@@ -14,7 +14,7 @@ const ivec2 WINDOW_SIZE = ivec2(1280, 720);
 const uint TextureFetchOffset = 104729;
 const uint TextureFetchCount = 0;
 
-//#define GARANTEE_TEXTURE_CACHE_MISS
+#define GARANTEE_TEXTURE_CACHE_MISS
 #ifdef GARANTEE_TEXTURE_CACHE_MISS
 	const int TextureTexelWrap = 2048;
 	const int TextureIndirectionWrap = WINDOW_SIZE.x * WINDOW_SIZE.y;

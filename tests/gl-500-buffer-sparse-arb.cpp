@@ -153,6 +153,7 @@ private:
 
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -167,7 +168,7 @@ private:
 		glTextureParameteri(TextureName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTextureStorage3D(TextureName, static_cast<GLint>(Texture.levels()),
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -175,8 +176,7 @@ private:
 			glTextureSubImage3D(TextureName, static_cast<GLint>(Level),
 				0, 0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
-				GL.external_format(Texture.format()),
-				GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
@@ -195,8 +195,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_sparse_buffer");
+		bool Validated = this->checkExtension("GL_ARB_sparse_buffer");
 
 		if(Validated)
 			Validated = initProgram();

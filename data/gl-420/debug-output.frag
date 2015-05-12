@@ -7,20 +7,15 @@
 
 #define MATERIAL	0
 #define TRANSFORM0	1
-#define TRANSFORM1	2	
+#define TRANSFORM1	2
 
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-layout(binding = MATERIAL) uniform material
-{
-	vec4 Diffuse;
-} Material;
-
-layout(location = FRAG_COLOR, index = 0) out vec4 FragColor;
+layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	FragColor = Material.Diffuse;
+	Color = vec4(1.0, 0.5, 0.0, 1.0);
 }

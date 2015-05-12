@@ -103,7 +103,7 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
@@ -118,17 +118,18 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
-		gli::gl GL;
-
-		gli::texture2DArray Texture(15, 1, gli::RGBA8_UNORM, gli::texture2DArray::dim_type(4));
+		gli::texture2DArray Texture(15, 1, gli::FORMAT_RGBA8_UNORM, gli::texture2DArray::dim_type(4));
 		for(gli::layer_t LayerIndex = 0; LayerIndex < Texture.layers(); ++LayerIndex)
 		{
 			glm::u8vec4 const Color(glm::linearRand(glm::vec4(0), glm::vec4(1)) * 255.f);
 			Texture[LayerIndex].clear<glm::u8vec4>(Color);
 		}
 
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
+
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(Texture.levels()),
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.layers()));
 
 		for(gli::texture2DArray::size_type Array = 0; Array < Texture.layers(); ++Array)
@@ -137,13 +138,13 @@ private:
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 				0, 0, GLint(Array),
 				GLsizei(Texture[Array][Level].dimensions().x), GLsizei(Texture[Array][Level].dimensions().y), GLsizei(1),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Array][Level].data());
 		}
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()

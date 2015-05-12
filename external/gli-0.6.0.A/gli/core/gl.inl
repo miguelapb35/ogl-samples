@@ -32,7 +32,7 @@ namespace gli
 {
 	inline gl::gl()
 	{
-		static desc const Translate[] =
+		static format const Table[] =
 		{
 			// unorm formats
 			{INTERNAL_R8_UNORM, EXTERNAL_RED, TYPE_U8, {SWIZZLE_RED, SWIZZLE_ZERO, SWIZZLE_ZERO, SWIZZLE_ONE}},						//R8_UNORM,
@@ -123,6 +123,7 @@ namespace gli
 			{INTERNAL_D24S8, EXTERNAL_DEPTH_STENCIL, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA}},			//D24S8,
 			{INTERNAL_D32F, EXTERNAL_DEPTH, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA}},					//D32F,
 			{INTERNAL_D32FS8X24, EXTERNAL_DEPTH_STENCIL, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA}},		//D32FS8X24,
+			{INTERNAL_S8, EXTERNAL_STENCIL, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA}},					//S8,
 
 			/// Compressed formats
 			{INTERNAL_RGB_DXT1, EXTERNAL_RGB_DXT1, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ONE}},												//RGB_DXT1,
@@ -184,38 +185,13 @@ namespace gli
 			{INTERNAL_SRGB8_ALPHA8_ASTC_12x12, EXTERNAL_SRGB8_ALPHA8_ASTC_12x12, TYPE_NONE, {SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA}},				//SRGB8_ALPHA8_ASTC_12x12,
 		};
 
-		static_assert(sizeof(Translate) / sizeof(Translate[0]) == FORMAT_COUNT, "GLI error: format descriptor list doesn't match number of supported formats");
+		static_assert(sizeof(Table) / sizeof(Table[0]) == FORMAT_COUNT, "GLI error: format descriptor list doesn't match number of supported formats");
 
-		std::copy(&Translate[0], &Translate[0] + FORMAT_COUNT, this->Desc.begin());
+		std::copy(&Table[0], &Table[0] + FORMAT_COUNT, this->Translation.begin());
 	}
 
-	inline gl::GLenum gl::internal_format(format const & Format) const
+	inline gl::format const & gl::translate(gli::format const & Format) const
 	{
-		assert(is_valid(Format));
-
-		return this->Desc[Format].Internal;
-	}
-
-	inline gl::GLenum gl::external_format(format const & Format) const
-	{
-		assert(is_valid(Format));
-
-		return this->Desc[Format].External;
-	}
-
-	inline gl::GLenum gl::type_format(format const & Format) const
-	{
-		assert(is_valid(Format));
-		desc const & Desc = this->Desc[Format];
-
-		assert(Desc.Type != TYPE_NONE);
-		return Desc.Type;
-	}
-
-	inline gl::GLint const * const gl::swizzle(format const & Format) const
-	{
-		assert(is_valid(Format));
-
-		return this->Desc[Format].Swizzle;
+		return this->Translation[Format];
 	}
 }//namespace gli

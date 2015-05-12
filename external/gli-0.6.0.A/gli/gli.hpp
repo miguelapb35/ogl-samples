@@ -40,7 +40,6 @@
 
 #include "./core/storage.hpp"
 #include "./core/texture.hpp"
-#include "./core/clear.hpp"
 #include "./core/comparison.hpp"
 #include "./core/copy.hpp"
 #include "./core/flip.hpp"

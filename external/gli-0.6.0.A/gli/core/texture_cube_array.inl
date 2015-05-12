@@ -243,7 +243,7 @@ namespace gli
 	template <typename genType>
 	inline textureCubeArray::size_type textureCubeArray::size() const
 	{
-		assert(sizeof(genType) <= this->Storage.block_size());
+		assert(block_size(this->format()) >= sizeof(genType));
 		return this->size() / sizeof(genType);
 	}
 
@@ -251,7 +251,7 @@ namespace gli
 	inline genType * textureCubeArray::data()
 	{
 		assert(!this->empty());
-		assert(this->Storage.block_size() >= sizeof(genType));
+		assert(block_size(this->format()) == sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -260,7 +260,7 @@ namespace gli
 	inline genType const * textureCubeArray::data() const
 	{
 		assert(!this->empty());
-		assert(this->Storage.block_size() >= sizeof(genType));
+		assert(block_size(this->format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}
@@ -275,7 +275,7 @@ namespace gli
 	template <typename genType>
 	inline void textureCubeArray::clear(genType const & Texel)
 	{
-		assert(this->Storage.block_size() == sizeof(genType));
+		assert(block_size(this->format()) == sizeof(genType));
 
 		for(size_type Layer = 0; Layer < this->layers(); ++Layer)
 		for(size_type Face = 0; Face < this->faces(); ++Face)

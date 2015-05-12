@@ -67,10 +67,10 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_texture_derivative : public test
+class instance : public test
 {
 public:
-	gl_320_texture_derivative(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-texture-derivative", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.49f))
 	{}
 
@@ -103,7 +103,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 	
-		Validated = Validated && this->checkError("initProgram");
+		Validated = Validated;
 	
 		return Validated;
 	}
@@ -121,24 +121,20 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
 	{
 		gli::gl GL;
-		gli::texture2D Texture(gli::RGBA8_UNORM, gli::texture2D::dim_type(64));
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(64));
 		gli::texture2D::size_type Level = Texture.levels();
 
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
@@ -162,13 +158,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+		gli::gl::format const Format = GL.translate(Texture.format());
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
@@ -177,7 +174,7 @@ private:
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -195,7 +192,7 @@ private:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -214,7 +211,7 @@ private:
 		glEnable(GL_SAMPLE_SHADING);
 		glMinSampleShading(4.0f);
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -224,7 +221,7 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -268,7 +265,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_texture_derivative Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

@@ -185,7 +185,6 @@ private:
 
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
-		gli::format const Format = gli::RGB8U;
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
@@ -194,13 +193,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UINT);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Format),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Format), GL.type_format(Format),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 		glBindTexture(GL_TEXTURE_2D, 0);

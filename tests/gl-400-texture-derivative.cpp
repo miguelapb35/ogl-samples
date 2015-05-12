@@ -204,7 +204,7 @@ private:
 
 		std::size_t TextureSize(128);
 		std::size_t TextureLevel = glm::log2(TextureSize) + 1;
-		gli::texture2D Texture(TextureLevel, gli::RGBA8_UNORM, gli::texture2D::dim_type(TextureSize));
+		gli::texture2D Texture(TextureLevel, gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(TextureSize));
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
 		Texture[2].clear(glm::u8vec4(255, 255, 0, 255));
@@ -217,6 +217,7 @@ private:
 		assert(!Texture.empty());
 
 		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -238,10 +239,10 @@ private:
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 

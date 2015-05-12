@@ -100,7 +100,7 @@ private:
 			UniformCamera = glGetUniformLocation(ProgramName, "Camera");
 		}
 
-		return Validated &&this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -110,12 +110,12 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");;
+		return true;
 	}
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(6, 1, gli::RGBA8_UNORM, gli::textureCube::dim_type(2));
+		gli::textureCube Texture(6, 1, gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(2));
 		assert(!Texture.empty());
 
 		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
@@ -142,19 +142,21 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 		for(gli::textureCube::size_type Face = 0; Face < Texture.faces(); ++Face)
 		{
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
 				0,
-				GL_RGBA8,
+				Format.Internal,
 				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
 				0,
-				GL_RGBA, GL_UNSIGNED_BYTE,
+				Format.External, Format.Type,
 				Texture[Face].data());
 		}
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -168,7 +170,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::POSITION);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -184,7 +186,7 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -194,7 +196,7 @@ private:
 		glDeleteTextures(1, &TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()

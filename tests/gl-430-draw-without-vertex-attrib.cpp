@@ -52,10 +52,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_draw_without_vertex_attrib : public test
+class instance : public test
 {
 public:
-	gl_430_draw_without_vertex_attrib(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-430-draw-without-vertex-attrib", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
@@ -120,9 +120,10 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -138,13 +139,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL.internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
@@ -164,8 +165,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_shader_storage_buffer_object");
+		bool Validated = this->checkExtension("GL_ARB_shader_storage_buffer_object");
 
 		if(Validated)
 			Validated = initBuffer();
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_draw_without_vertex_attrib Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

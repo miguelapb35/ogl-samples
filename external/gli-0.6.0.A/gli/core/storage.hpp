@@ -37,8 +37,9 @@
 #include <cstring>
 #include <memory>
 
-#include "header.hpp"
 #include "type.hpp"
+#include "format.hpp"
+#include "format_info.hpp"
 
 // GLM
 #include <glm/gtc/round.hpp>
@@ -66,7 +67,7 @@ namespace gli
 		typedef size_t layer_type;
 		typedef size_t level_type;
 		typedef size_t face_type;
-		typedef gli::format format_type;
+		typedef format format_type;
 		typedef glm::byte data_type;
 		typedef glm::ivec4 swizzle_type;
 
@@ -79,7 +80,7 @@ namespace gli
 			level_type const & Levels,
 			format_type const & Format,
 			dim_type const & Dimensions);
-
+/*
 		storage(
 			layer_type const & Layers,
 			face_type const & Faces,
@@ -88,7 +89,7 @@ namespace gli
 			format_type const & Format,
 			size_type const & BlockSize,
 			dim_type const & BlockDimensions);
-
+*/
 		bool empty() const;
 		size_type size() const; // Express is bytes
 		format_type format() const;
@@ -97,8 +98,8 @@ namespace gli
 		face_type faces() const;
 		swizzle_type swizzle() const;
 
-		size_type block_size() const; // Express is bytes
-		dim_type block_dimensions() const; // Express is bytes
+		//size_type block_size() const; // Express is bytes
+		//dim_type block_dimensions() const; // Express is bytes
 		dim_type dimensions(size_type const & Level) const;
 
 		data_type * data();
@@ -121,21 +122,17 @@ namespace gli
 			impl();
 
 			explicit impl(
-				layer_type const & Layers, 
+				layer_type const & Layers,
 				face_type const & Faces,
 				level_type const & Levels,
 				format_type const & Format,
-				dim_type const & Dimensions,
-				size_type const & BlockSize,
-				dim_type const & BlockDimensions);
+				size3_t const & Dimensions);
 
 			size_type const Layers; 
 			size_type const Faces;
 			size_type const Levels;
 			format_type const Format;
-			dim_type const Dimensions;
-			size_type const BlockSize;
-			dim_type const BlockDimensions;
+			size3_t const Dimensions;
 			std::vector<data_type> Data;
 		};
 
@@ -187,12 +184,6 @@ namespace gli
 		storage::size_type const & DestinationFaceOffset,
 		storage::size_type const & DestinationlevelOffset);
 */
-
-	storage::size_type block_size(format const & Format);
-	storage::dim3_type block_dimensions(format const & Format);
-	storage::size_type component_count(format const & Format);
-	bool is_compressed(format const & Format);
-
 }//namespace gli
 
 #include "storage.inl"

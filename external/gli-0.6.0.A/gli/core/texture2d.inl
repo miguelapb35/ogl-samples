@@ -268,7 +268,7 @@ namespace gli
 	template <typename genType>
 	inline texture2D::size_type texture2D::size() const
 	{
-		assert(sizeof(genType) <= this->Storage.block_size());
+		assert(block_size(this->format()) >= sizeof(genType));
 
 		return this->size() / sizeof(genType);
 	}
@@ -277,7 +277,7 @@ namespace gli
 	inline genType * texture2D::data()
 	{
 		assert(!this->empty());
-		assert(this->Storage.block_size() >= sizeof(genType));
+		assert(block_size(this->format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -286,7 +286,7 @@ namespace gli
 	inline genType const * texture2D::data() const
 	{
 		assert(!this->empty());
-		assert(this->Storage.block_size() >= sizeof(genType));
+		assert(block_size(this->format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}
@@ -300,22 +300,18 @@ namespace gli
 	inline void texture2D::clear(genType const & Texel)
 	{
 		assert(!this->empty());
-		assert(this->Storage.block_size() == sizeof(genType));
+		assert(block_size(this->format()) == sizeof(genType));
 
 		for(size_type TexelIndex = 0; TexelIndex < this->size<genType>(); ++TexelIndex)
 			*(this->data<genType>() + TexelIndex) = Texel;
 	}
 
 	template <typename genType>
-	inline genType texture2D::fetch
-	(
-		dim_type const & TexelCoord,
-		size_type const & Level
-	)
+	inline genType texture2D::fetch(dim_type const & TexelCoord, size_type const & Level)
 	{
 		assert(!this->empty());
-		assert(!is_compressed(this->format()));
-		assert(this->Storage.block_size() == sizeof(genType));
+		assert(!is(this->format(), FORMAT_COMPRESSED_BIT));
+		assert(block_size(this->format()) == sizeof(genType));
 
 		dim_type const Dimensions(this->dimensions());
 		size_type const Address = TexelCoord.x + TexelCoord.y * Dimensions.x;

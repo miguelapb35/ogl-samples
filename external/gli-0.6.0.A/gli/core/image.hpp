@@ -33,7 +33,6 @@
 
 #include "storage.hpp"
 #include "addressing.hpp"
-#include "header.hpp"
 
 namespace gli
 {
@@ -51,13 +50,13 @@ namespace gli
 		typedef storage::size_type face_type;
 
 		image();
-
+/*
 		/// Allocate a new storage constructor
 		explicit image(
 			dim_type const & Dimensions,
 			size_type const & BlockSize,
 			dim_type const & BlockDimensions);
-
+*/
 		/// Allocate a new storage constructor
 		explicit image(
 			format const & Format,

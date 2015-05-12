@@ -54,10 +54,10 @@ namespace
 	}//namespace pipeline
 }//namespace
 
-class gl_430_fbo_without_attachment : public test
+class instance : public test
 {
 public:
-	gl_430_fbo_without_attachment(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-430-fbo-without-attachment", test::CORE, 4, 2),
 		VertexArrayName(0),
 		FramebufferName(0),
@@ -133,16 +133,15 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -158,14 +157,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), 
-			GL.internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+			Format.Internal, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
@@ -178,7 +177,7 @@ private:
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
@@ -278,7 +277,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_fbo_without_attachment Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

@@ -161,6 +161,7 @@ private:
 			return false;
 
 		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(1, &TextureName);
 
@@ -174,7 +175,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -182,7 +183,7 @@ private:
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 				0, 0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), GLsizei(1),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
@@ -250,8 +251,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_AMD_sample_positions");
+		bool Validated = this->checkExtension("GL_AMD_sample_positions");
 
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
@@ -284,7 +284,7 @@ private:
 		glDeleteVertexArrays(1, &VertexArrayName);
 		glDeleteSamplers(1, &SamplerName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	void renderFBO()

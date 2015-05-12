@@ -164,13 +164,15 @@ private:
 
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+
+		gli::gl::format const Format = GL.translate(Texture.format());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
@@ -184,7 +186,7 @@ private:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initFramebuffer()
@@ -206,7 +208,7 @@ private:
 			return false;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		return this->checkError("initFramebuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -222,7 +224,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -240,7 +242,7 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()

@@ -48,10 +48,10 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_primitive_sprite : public test
+class instance : public test
 {
 public:
-	gl_320_primitive_sprite(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-primitive-sprite", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
@@ -90,7 +90,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	// Buffer update using glBufferSubData
@@ -111,7 +111,7 @@ private:
 		// Unbind the buffer
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -144,15 +144,16 @@ private:
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		assert(!gli::is_compressed(Texture.format()));
+		assert(!gli::is(Texture.format(), gli::FORMAT_COMPRESSED_BIT));
 
+		gli::gl::format const Format = GL.translate(Texture.format());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 	
@@ -182,7 +183,7 @@ private:
 		//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -192,7 +193,7 @@ private:
 		glDeleteProgram(ProgramName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -238,7 +239,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_primitive_sprite Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

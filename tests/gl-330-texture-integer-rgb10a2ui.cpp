@@ -93,7 +93,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");;
+		return true;
 	}
 
 	bool initTexture()
@@ -103,6 +103,7 @@ private:
 			return false;
 
 		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(1, &TextureName);
 
@@ -115,10 +116,10 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glTexImage2D(GL_TEXTURE_2D, 0,
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
 			0,
-			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+			Format.External, Format.Type,
 			Texture[0].data());
 
 		return true;

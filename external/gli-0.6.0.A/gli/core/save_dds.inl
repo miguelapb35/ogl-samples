@@ -35,10 +35,10 @@ namespace detail
 		{
 		default:
 			return 0x0000000;
-		case R8_UNORM: 
-		case RG8_UNORM: 
-		case RGB8_UNORM: 
-		case RGBA8_UNORM: 
+		case FORMAT_R8_UNORM: 
+		case FORMAT_RG8_UNORM: 
+		case FORMAT_RGB8_UNORM: 
+		case FORMAT_RGBA8_UNORM: 
 			return 0xFF000000;
 		}
 	}
@@ -49,9 +49,9 @@ namespace detail
 		{
 		default:
 			return 0x0000000;
-		case RG8_UNORM: 
-		case RGB8_UNORM: 
-		case RGBA8_UNORM: 
+		case FORMAT_RG8_UNORM: 
+		case FORMAT_RGB8_UNORM: 
+		case FORMAT_RGBA8_UNORM: 
 			return 0x00FF0000;
 		}
 	}
@@ -62,8 +62,8 @@ namespace detail
 		{
 		default:
 			return 0x0000000;
-		case RGB8_UNORM: 
-		case RGBA8_UNORM: 
+		case FORMAT_RGB8_UNORM: 
+		case FORMAT_RGBA8_UNORM: 
 			return 0x0000FF00;
 		}
 	}
@@ -74,18 +74,14 @@ namespace detail
 		{
 		default:
 			return 0x0000000;
-		case RGBA8_UNORM: 
+		case FORMAT_RGBA8_UNORM: 
 			return 0x000000FF;
 		}
 	}
 
 }//namespace detail
 
-	inline void save_dds
-	(
-		storage const & Storage, 
-		char const * Filename
-	)
+	inline void save_dds(storage const & Storage, char const * Filename)
 	{
 		if(Storage.empty())
 			return;
@@ -94,7 +90,10 @@ namespace detail
 		if (!File)
 			return;
 
-		detail::format_desc const & Desc = detail::getFormatInfo(Storage.format());
+		dx DX;
+		dx::format const & Format = DX.translate(Storage.format());
+		detail::formatInfo const & Info = detail::getInfo(Storage.format());
+		std::uint32_t BPP = detail::computeBitPerPixel(Storage.format());
 
 		char const * Magic = "DDS ";
 		File.write((char*)Magic, sizeof(char) * 4);
@@ -103,7 +102,7 @@ namespace detail
 		Caps |= Storage.dimensions(0).y > 1 ? detail::DDSD_HEIGHT : 0;
 		Caps |= Storage.dimensions(0).z > 1 ? detail::DDSD_DEPTH : 0;
 		//Caps |= Storage.levels() > 1 ? detail::DDSD_MIPMAPCOUNT : 0;
-		Caps |= Desc.Compressed ? detail::DDSD_LINEARSIZE : detail::DDSD_PITCH;
+		Caps |= Info.Flags & FORMAT_COMPRESSED_BIT ? detail::DDSD_LINEARSIZE : detail::DDSD_PITCH;
 
 		detail::ddsHeader HeaderDesc;
 		memset(HeaderDesc.reserved1, 0, sizeof(HeaderDesc.reserved1));
@@ -114,14 +113,14 @@ namespace detail
 		HeaderDesc.width = static_cast<glm::uint32>(Storage.dimensions(0).x);
 		assert(Storage.dimensions(0).y < std::numeric_limits<glm::uint32>::max());
 		HeaderDesc.height = static_cast<glm::uint32>(Storage.dimensions(0).y);
-		HeaderDesc.pitch = glm::uint32(Desc.Compressed ? Storage.size() / Storage.faces() : 32);
+		HeaderDesc.pitch = glm::uint32(Info.Flags & FORMAT_COMPRESSED_BIT ? Storage.size() / Storage.faces() : 32);
 		assert(Storage.dimensions(0).z < std::numeric_limits<glm::uint32>::max());
 		HeaderDesc.depth = static_cast<glm::uint32>(Storage.dimensions(0).z > 1 ? Storage.dimensions(0).z : 0);
 		HeaderDesc.mipMapLevels = glm::uint32(Storage.levels());
 		HeaderDesc.format.size = sizeof(detail::ddsPixelFormat);
-		HeaderDesc.format.flags = Storage.layers() > 1 ? detail::DDPF_FOURCC : Desc.Flags;
-		HeaderDesc.format.fourCC = Storage.layers() > 1 ? detail::D3DFMT_DX10 : Desc.FourCC;
-		HeaderDesc.format.bpp = glm::uint32(Desc.BBP);
+		HeaderDesc.format.flags = Storage.layers() > 1 ? dx::DDPF_FOURCC : Format.DDPixelFormat;
+		HeaderDesc.format.fourCC = Storage.layers() > 1 ? dx::D3DFMT_DX10 : Format.D3DFormat;
+		HeaderDesc.format.bpp = BPP;
 		HeaderDesc.format.redMask = detail::getMaskRed(Storage.format());
 		HeaderDesc.format.greenMask = detail::getMaskGreen(Storage.format());
 		HeaderDesc.format.blueMask = detail::getMaskBlue(Storage.format());
@@ -148,35 +147,35 @@ namespace detail
 
 		File.write((char*)&HeaderDesc, sizeof(HeaderDesc));
 
-		if(HeaderDesc.format.fourCC == detail::D3DFMT_DX10)
+		if(HeaderDesc.format.fourCC == dx::D3DFMT_DX10)
 		{
 			detail::ddsHeader10 HeaderDesc10;
 			HeaderDesc10.arraySize = glm::uint32(Storage.layers());
 			HeaderDesc10.resourceDimension = detail::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
 			HeaderDesc10.miscFlag = 0;//Storage.levels() > 0 ? detail::D3D10_RESOURCE_MISC_GENERATE_MIPS : 0;
-			HeaderDesc10.Format = static_cast<dxgiFormat>(Desc.Format);
+			HeaderDesc10.Format = static_cast<dx::dxgiFormat>(Format.DXGIFormat);
 			HeaderDesc10.reserved = 0;
 			File.write((char*)&HeaderDesc10, sizeof(HeaderDesc10));
 		}
 
-		if(HeaderDesc.format.fourCC != detail::D3DFMT_DX10 && !Desc.Compressed && Desc.Component >= 3)
+		if(HeaderDesc.format.fourCC != dx::D3DFMT_DX10 && !(Info.Flags & FORMAT_COMPRESSED_BIT) && Info.Component >= 3)
 		{
 			storage Copy = gli::copy(Storage);
 
-			switch(Desc.Component)
+			switch(Info.Component)
 			{
 			default:
 				assert(0);
 				break;
 			case 3:
-				for(std::size_t Offset = 0; Offset < Copy.size() / 3; ++Offset)
+				for(std::size_t Offset = 0; Offset < Copy.size() / Info.Component; ++Offset)
 				{
 					glm::u8vec3 Src = *(reinterpret_cast<glm::u8vec3 const *>(Storage.data()) + Offset);
 					*(reinterpret_cast<glm::u8vec3*>(Copy.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
 				}
 				break;
 			case 4:
-				for(std::size_t Offset = 0; Offset < Copy.size() / 4; ++Offset)
+				for(std::size_t Offset = 0; Offset < Copy.size() / Info.Component; ++Offset)
 				{
 					glm::u8vec4 Src = *(reinterpret_cast<glm::u8vec4 const *>(Storage.data()) + Offset);
 					*(reinterpret_cast<glm::u8vec4*>(Copy.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);

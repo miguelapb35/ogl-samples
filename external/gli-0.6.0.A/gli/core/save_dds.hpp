@@ -33,9 +33,7 @@
 namespace gli
 {
 	/// Saving a texture storage to file
-	void save_dds(
-		storage const & Storage, 
-		char const * Filename);
+	void save_dds(storage const & Storage, char const * Filename);
 
 }//namespace gli
 

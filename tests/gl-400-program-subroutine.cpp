@@ -135,7 +135,7 @@ private:
 			IndexRGB8 = glGetSubroutineIndex(ProgramName, GL_FRAGMENT_SHADER, "diffuseHQ");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -150,7 +150,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -166,7 +166,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool initTexture()
@@ -177,6 +177,7 @@ private:
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::gl::format const Format = GL.translate(Texture.format());
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
@@ -191,28 +192,29 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
-					GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+					Format.External, Format.Type,
 					Texture[Level].data());
 			}
 		}
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
+			gli::gl::format const Format = GL.translate(Texture.format());
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-			glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, GL.swizzle(Texture.format()));
+			glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0, 
 					GLsizei(Texture[Level].size()), 
@@ -220,7 +222,7 @@ private:
 			}
 		}
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool begin()
@@ -240,7 +242,7 @@ private:
 
 		this->logImplementationDependentLimit(GL_MAX_SUBROUTINES, "GL_MAX_SUBROUTINES");
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()

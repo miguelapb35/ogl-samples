@@ -93,11 +93,11 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_330_sampler_object : public test
+class instance : public test
 {
 public:
-	gl_330_sampler_object(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-sampler-object", test::CORE, 3, 3)
+	instance(int argc, char* argv[])
+		: test(argc, argv, "gl-330-sampler-object", test::CORE, 3, 3)
 	{}
 
 private:
@@ -127,7 +127,7 @@ private:
 			UniformColor = glGetUniformLocation(ProgramName, "Material.Color");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -138,7 +138,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");;
+		return true;
 	}
 
 	bool initSampler()
@@ -169,13 +169,14 @@ private:
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initTexture()
 	{
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
@@ -190,17 +191,17 @@ private:
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -216,7 +217,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -234,7 +235,7 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -246,7 +247,7 @@ private:
 		glDeleteSamplers(1, &SamplerBName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -302,7 +303,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_330_sampler_object Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

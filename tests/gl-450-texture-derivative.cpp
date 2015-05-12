@@ -131,9 +131,10 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
-		gli::texture2D Texture(gli::RGBA8_UNORM, gli::texture2D::dim_type(64));
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(64));
 		gli::texture2D::size_type Level = Texture.levels();
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
@@ -159,14 +160,14 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
-			GL.internal_format(Texture.format()), static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
+			Format.Internal, static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 

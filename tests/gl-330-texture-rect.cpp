@@ -64,10 +64,10 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_330_texture_rect : public test
+class instance : public test
 {
 public:
-	gl_330_texture_rect(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-330-texture-rect", test::CORE, 3, 3)
 	{}
 
@@ -96,7 +96,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -107,7 +107,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
@@ -126,23 +126,24 @@ private:
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		assert(
 			Texture.dimensions().x <= std::size_t(TextureSize) && 
 			Texture.dimensions().y <= std::size_t(TextureSize));
 
 		glTexImage2D(GL_TEXTURE_RECTANGLE, static_cast<GLint>(0),
-			GL.internal_format(Texture.format()),
+			Format.Internal,
 			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
 			0,
-			GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+			Format.External, Format.Type,
 			Texture.data());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -158,7 +159,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -174,7 +175,7 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
-		return Validated && this->checkError("begin");;
+		return Validated;
 	}
 
 	bool end()
@@ -184,7 +185,7 @@ private:
 		glDeleteTextures(1, &TextureRectName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -218,7 +219,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_330_texture_rect Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

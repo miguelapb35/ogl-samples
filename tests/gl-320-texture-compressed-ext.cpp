@@ -89,10 +89,10 @@ namespace
 	glm::ivec4 Viewport[TEXTURE_MAX] = {glm::ivec4(0), glm::ivec4(0), glm::ivec4(0), glm::ivec4(0)};
 }//namespace
 
-class gl_320_texture_compressed_ext : public test
+class instance : public test
 {
 public:
-	gl_320_texture_compressed_ext(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-texture-compressed-ext", test::CORE, 3, 2)
 	{}
 
@@ -125,7 +125,7 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -135,7 +135,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initTexture()
@@ -152,10 +152,11 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 
+			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
 					GLsizei(Texture[Level].size()),
@@ -170,10 +171,11 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 
+			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 
 					0, 
 					static_cast<GLsizei>(Texture[Level].size()),
@@ -188,10 +190,11 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 
+			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
 					GLsizei(Texture[Level].size()),
@@ -206,10 +209,11 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
 
+			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					GL.internal_format(Texture.format()),
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
 					GLsizei(Texture[Level].size()),
@@ -220,7 +224,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -236,7 +240,7 @@ private:
 			glEnableVertexAttribArray(semantic::attr::TEXCOORD);
 		glBindVertexArray(0);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
@@ -259,7 +263,7 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -269,7 +273,7 @@ private:
 		glDeleteTextures(TEXTURE_MAX, TextureName);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
-		return this->checkError("end");
+		return true;
 	}
 
 	bool render()
@@ -305,7 +309,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_texture_compressed_ext Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

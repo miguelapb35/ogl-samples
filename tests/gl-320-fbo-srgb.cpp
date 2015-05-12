@@ -206,7 +206,7 @@ private:
 		{
 			//gli::texture2D Texture(gli::SRGB8, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec3(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
-			gli::texture2D Texture(gli::SRGB8_ALPHA8, gli::dim2_t(16));
+			gli::texture2D Texture(gli::FORMAT_RGBA8_SRGB, gli::dim2_t(16));
 			Texture.clear(glm::u8vec4(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
 			//gli::texture2D Texture(gli::RGBA8_UNORM, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec4(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f) * 255.0f));
@@ -214,9 +214,8 @@ private:
 		}
 
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		GLenum InternalFormat = GL.internal_format(Texture.format());
-		GLenum ExternalFormat = GL.external_format(Texture.format());
-		GLenum TypeFormat = GL.type_format(Texture.format());
+		gli::gl::format const Format = GL.translate(Texture.format());
+
 		std::size_t Levels = Texture.levels();
 
 		//gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
@@ -230,12 +229,20 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, GL.swizzle(Texture.format()));
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+		glm::vec4 Data2(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.f);
+		glm::vec4 Data(glm::convertRgbToSrgb(glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)));
+		glTexImage2D(GL_TEXTURE_2D, 0,
+			GL_SRGB8_ALPHA8,
+			1, 1, 0,
+			GL_RGBA, GL_FLOAT,
+			&Data[0]);
+/*
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
@@ -244,7 +251,7 @@ private:
 				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
 				Texture[Level].data());
 		}
-
+*/
 		glm::ivec2 WindowSize(this->getWindowSize() * this->FramebufferScale);
 
 		glActiveTexture(GL_TEXTURE0);

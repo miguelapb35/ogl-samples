@@ -91,10 +91,10 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_430_direct_state_access_ext : public test
+class instance : public test
 {
 public:
-	gl_430_direct_state_access_ext(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-430-direct-state-access-ext", test::CORE, 4, 3, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.1f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -139,7 +139,7 @@ private:
 			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
 	bool initBuffer()
@@ -153,7 +153,7 @@ private:
 		glNamedBufferDataEXT(BufferName[buffer::VERTEX], VertexSize, VertexData, GL_STATIC_DRAW);
 		glNamedBufferDataEXT(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_DYNAMIC_DRAW);
 
-		return this->checkError("initBuffer");
+		return true;
 	}
 
 	bool initSampler()
@@ -171,14 +171,14 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		return this->checkError("initSampler");
+		return true;
 	}
 
 	bool initTexture()
 	{
-		gli::gl GL;
-
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 
@@ -186,16 +186,16 @@ private:
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureParameterivEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, GL.swizzle(Texture.format()));
+		glTextureParameterivEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 
-		glTextureStorage2DEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GLint(Texture.levels()), GL.internal_format(Texture.format()), GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTextureStorage2DEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage2DEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D,
 				GLint(Level),
 				0, 0, 
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
@@ -207,7 +207,7 @@ private:
 		glTextureParameteriEXT(TextureName[texture::COLORBUFFER], GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureStorage2DEXT(TextureName[texture::COLORBUFFER], GL_TEXTURE_2D, 1, GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y));
 
-		return this->checkError("initTexture");
+		return true;
 	}
 
 	bool initFramebuffer()
@@ -221,7 +221,7 @@ private:
 		if(glCheckNamedFramebufferStatusEXT(FramebufferName[framebuffer::RESOLVE], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
-		return this->checkError("initFramebuffer");
+		return true;
 	}
 
 	bool initVertexArray()
@@ -232,13 +232,12 @@ private:
 		glEnableVertexArrayAttribEXT(VertexArrayName, semantic::attr::POSITION);
 		glEnableVertexArrayAttribEXT(VertexArrayName, semantic::attr::TEXCOORD);
 
-		return this->checkError("initVertexArray");
+		return true;
 	}
 
 	bool begin()
 	{
-		bool Validated = true;
-		Validated = Validated && this->checkExtension("GL_EXT_direct_state_access");
+		bool Validated = this->checkExtension("GL_EXT_direct_state_access");
 
 		if(Validated)
 			Validated = initProgram();
@@ -256,7 +255,7 @@ private:
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
 
-		return Validated && this->checkError("begin");
+		return Validated;
 	}
 
 	bool end()
@@ -293,8 +292,6 @@ private:
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0, 0);
 
 		glDisable(GL_MULTISAMPLE);
-
-		this->checkError("renderFBO");
 	}
 
 	bool render()
@@ -339,7 +336,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_direct_state_access_ext Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

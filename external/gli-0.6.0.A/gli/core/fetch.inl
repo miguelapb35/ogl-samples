@@ -37,7 +37,7 @@ namespace gli
 	)
 	{
 		assert(!Texture.empty());
-		assert(!is_compressed(Texture.format()));
+		assert(!is(Texture.format(), FORMAT_COMPRESSED_BIT));
 
 		image::dim_type Dimensions = Texture[Level].dimensions();
 		genType const * const Data = reinterpret_cast<genType const * const >(Texture[Level].data());
@@ -55,7 +55,7 @@ namespace gli
 	)
 	{
 		assert(!Texture.empty());
-		assert(!is_compressed(Texture.format()));
+		assert(!is(Texture.format(), FORMAT_COMPRESSED_BIT));
 
 		genType * Data = Texture[Level].data<genType>();
 		std::size_t Index = Texcoord.x + Texcoord.y * Texture[Level].dimensions().x;

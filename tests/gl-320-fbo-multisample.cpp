@@ -143,6 +143,7 @@ private:
 
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
@@ -153,17 +154,18 @@ private:
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
-				GL.internal_format(Texture.format()),
+				Format.Internal,
 				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0,
-				GL.external_format(Texture.format()), GL.type_format(Texture.format()),
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexImage2D(GL_TEXTURE_2D, 0,
-			GL.internal_format(Texture.format()), FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0,
-			GL.external_format(Texture.format()), GL.type_format(Texture.format()), nullptr);
+			Format.Internal,
+			FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0,
+			Format.External, Format.Type, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -171,7 +173,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE]);
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, GL.internal_format(Texture.format()), FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE); // The second parameter is the number of samples.
+		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 8, Format.Internal, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, GL_TRUE); // The second parameter is the number of samples.
 		glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 		return this->checkError("initTexture");
