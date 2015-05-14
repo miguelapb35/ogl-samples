@@ -24,7 +24,7 @@ void main()
 {
 	vec4 P = Transform.MV * vec4(Position, 1.0);
 
-	Out.Normal = mat3(Transform.MV) * normalize(Position);
+	Out.Normal = mat3(Transform.MV) * Normal;
 	Out.View = -P.xyz;
 	Out.Color = Color.rgb;
 

@@ -48,15 +48,25 @@ namespace
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex_v3fn3fc4f);
-/*
-	glf::vertex_v3fn3f const VertexData[VertexCount] =
+	vertex_v3fn3fc4f const VertexData[VertexCount] =
 	{
-		glf::vertex_v3fn3f(glm::vec3(-1.0f,-1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f)),
-		glf::vertex_v3fn3f(glm::vec3( 1.0f,-1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f)),
-		glf::vertex_v3fn3f(glm::vec3( 1.0f, 1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f)),
-		glf::vertex_v3fn3f(glm::vec3(-1.0f, 1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f))
+		vertex_v3fn3fc4f(glm::vec3(-1.0f,-1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
+		vertex_v3fn3fc4f(glm::vec3( 1.0f,-1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
+		vertex_v3fn3fc4f(glm::vec3( 1.0f, 1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
+		vertex_v3fn3fc4f(glm::vec3(-1.0f, 1.0f, 0.0), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
 	};
-*/
+
+	GLsizei const ElementCount(6);
+	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
+	GLushort const ElementData[ElementCount] =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
+
+/*
+	GLsizei const VertexCount(4);
+	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex_v3fn3fc4f);
 	vertex_v3fn3fc4f const VertexData[VertexCount] =
 	{
 		vertex_v3fn3fc4f(glm::vec3(-1.000f, -0.732f, -0.732f), glm::normalize(glm::vec3(-1.000f, -0.732f, -0.732f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
@@ -74,6 +84,7 @@ namespace
 		1, 2, 3,
 		2, 0, 3
 	};
+*/
 
 	namespace buffer
 	{
@@ -147,7 +158,6 @@ private:
 
 		compiler Compiler;
 	
-		// Create program
 		if(Validated)
 		{
 			compiler Compiler;
@@ -168,7 +178,6 @@ private:
 			Validated = Validated && Compiler.checkProgram(ProgramName);
 		}
 
-		// Get variables locations
 		if(Validated)
 		{
 			this->UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
@@ -205,7 +214,6 @@ private:
 
 	bool initBuffer()
 	{
-		// Generate buffer objects
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
@@ -231,7 +239,7 @@ private:
 		}
 
 		{
-			material Material = {glm::vec4(0.2f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.5f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 0.5f, 1.0f), 4.0f};
+			material Material = {glm::vec4(0.5f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.5f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 0.5f, 1.0f), 128.0f};
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(Material), &Material, GL_STATIC_DRAW);
@@ -281,7 +289,7 @@ private:
 
 			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 const View = this->view();
-			glm::mat4 const Model = glm::rotate(glm::mat4(1.0f), -glm::pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+			glm::mat4 const Model = glm::rotate(glm::mat4(1.0f), -glm::pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
 		
 			Transform->MV = View * Model;
 			Transform->P = Projection;
@@ -303,7 +311,6 @@ private:
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0);
-		//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, BUFFER_OFFSET(sizeof(GLushort) * 3), 1, 0);
 
 		return true;
 	}
