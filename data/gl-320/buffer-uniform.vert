@@ -2,12 +2,17 @@
 
 layout(std140) uniform;
 
-uniform transform
+struct transform
 {
 	mat4 P;
 	mat4 MV;
 	mat3 Normal;
-} Transform;
+};
+
+uniform per_draw
+{
+	transform Transform;
+} PerDraw;
 
 in vec3 Position;
 in vec3 Normal;
@@ -22,11 +27,11 @@ out block
 
 void main()
 {
-	vec4 P = Transform.MV * vec4(Position, 1.0);
+	vec4 P = PerDraw.Transform.MV * vec4(Position, 1.0);
 
-	Out.Normal = mat3(Transform.MV) * Normal;
+	Out.Normal = mat3(PerDraw.Transform.MV) * Normal;
 	Out.View = -P.xyz;
 	Out.Color = Color.rgb;
 
-	gl_Position = Transform.P * P;
+	gl_Position = PerDraw.Transform.P * P;
 }

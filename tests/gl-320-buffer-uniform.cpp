@@ -92,9 +92,9 @@ namespace
 		{
 			VERTEX,
 			ELEMENT,
-			TRANSFORM,
-			MATERIAL,
-			LIGHT,
+			PER_SCENE,
+			PER_PASS,
+			PER_DRAW,
 			MAX
 		};
 	}//namespace buffer
@@ -103,18 +103,20 @@ namespace
 	{
 		enum type
 		{
-			MATERIAL = 0,
-			TRANSFORM0 = 1,
-			PER_SCENE = 2,
+			PER_SCENE = 0,
+			PER_PASS = 1,
+			PER_DRAW = 2,
 			LIGHT = 3
 		};
 	};
 
 	struct material
 	{
-		glm::vec4 Ambient;
-		glm::vec4 Diffuse;
-		glm::vec4 Specular;
+		glm::vec3 Ambient;
+		float Padding1;
+		glm::vec3 Diffuse;
+		float Padding2;
+		glm::vec3 Specular;
 		float Shininess;
 	};
 
@@ -138,8 +140,8 @@ public:
 		test(argc, argv, "gl-320-buffer-uniform", test::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
-		UniformTransform(0),
-		UniformMaterial(0),
+		UniformPerDraw(0),
+		UniformPerPass(0),
 		UniformPerScene(0)
 	{}
 
@@ -147,10 +149,9 @@ private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint ProgramName;
 	GLuint VertexArrayName;
-	GLint UniformTransform;
-	GLint UniformMaterial;
+	GLint UniformPerDraw;
+	GLint UniformPerPass;
 	GLint UniformPerScene;
-	GLint UniformLight;
 
 	bool initProgram()
 	{
@@ -180,13 +181,13 @@ private:
 
 		if(Validated)
 		{
-			this->UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
-			this->UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
-			this->UniformLight = glGetUniformBlockIndex(ProgramName, "light");
+			this->UniformPerDraw = glGetUniformBlockIndex(ProgramName, "per_draw");
+			this->UniformPerPass = glGetUniformBlockIndex(ProgramName, "per_pass");
+			this->UniformPerScene = glGetUniformBlockIndex(ProgramName, "per_scene");
 
-			glUniformBlockBinding(ProgramName, UniformTransform, uniform::TRANSFORM0);
-			glUniformBlockBinding(ProgramName, UniformMaterial, uniform::MATERIAL);
-			glUniformBlockBinding(ProgramName, UniformLight, uniform::LIGHT);
+			glUniformBlockBinding(ProgramName, this->UniformPerDraw, uniform::PER_DRAW);
+			glUniformBlockBinding(ProgramName, this->UniformPerPass, uniform::PER_PASS);
+			glUniformBlockBinding(ProgramName, this->UniformPerPass, uniform::PER_SCENE);
 		}
 	
 		return Validated;
@@ -225,7 +226,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::PER_DRAW]);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(transform), nullptr, GL_DYNAMIC_DRAW);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
@@ -233,15 +234,15 @@ private:
 		{
 			light Light = {glm::vec3(0.0f, 0.0f, 100.f)};
 
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::LIGHT]);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::PER_PASS]);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(Light), &Light, GL_STATIC_DRAW);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
 		{
-			material Material = {glm::vec4(0.5f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.5f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 0.5f, 1.0f), 128.0f};
+			material Material = {glm::vec3(0.7f, 0.0f, 0.0f), 0.0f, glm::vec3(0.0f, 0.5f, 0.0f), 0.0f, glm::vec3(0.0f, 0.0f, 0.5f), 128.0f};
 
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::PER_SCENE]);
 			glBufferData(GL_UNIFORM_BUFFER, sizeof(Material), &Material, GL_STATIC_DRAW);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
@@ -283,7 +284,7 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::PER_DRAW]);
 			transform* Transform = static_cast<transform*>(glMapBufferRange(GL_UNIFORM_BUFFER,
 				0, sizeof(transform), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
@@ -304,12 +305,11 @@ private:
 		glClearBufferfv(GL_DEPTH, 0, &glm::vec1(1.0f)[0]);
 
 		glUseProgram(ProgramName);
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::MATERIAL, BufferName[buffer::MATERIAL]);
-		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::LIGHT, BufferName[buffer::LIGHT]);
-
+		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::PER_SCENE, BufferName[buffer::PER_SCENE]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::PER_PASS, BufferName[buffer::PER_PASS]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, uniform::PER_DRAW, BufferName[buffer::PER_DRAW]);
 		glBindVertexArray(VertexArrayName);
+
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0);
 
 		return true;
