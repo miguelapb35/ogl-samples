@@ -225,8 +225,6 @@ private:
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
@@ -299,7 +297,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 
-		return Validated;
+		return true;
 	}
 
 	void validate()

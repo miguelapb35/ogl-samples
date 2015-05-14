@@ -92,10 +92,10 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_450_direct_state_access : public test
+class instance : public test
 {
 public:
-	gl_450_direct_state_access(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -178,6 +178,36 @@ private:
 		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
 		return true;
+	}
+
+	GLuint glCreateTextureGTC(GLenum target, GLsizei layers, GLsizei levels, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLboolean fixedsamplelocations)
+	{
+		GLuint TextureName = 0;
+		glCreateTextures(target, 1, &TextureName);
+
+		switch(target)
+		{
+		case GL_TEXTURE_2D:
+			glTextureStorage2D(TextureName, levels, internalformat, width, height);
+			break;
+		case GL_TEXTURE_2D_ARRAY:
+			glTextureStorage3D(TextureName, levels, internalformat, width, height, layers);
+			break;
+		case GL_TEXTURE_2D_MULTISAMPLE:
+			glTextureStorage2DMultisample(TextureName, samples, internalformat, width, height, fixedsamplelocations);
+			break;
+		case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
+			glTextureStorage3DMultisample(TextureName, samples, internalformat, width, height, layers, fixedsamplelocations);
+			break;
+		case GL_TEXTURE_CUBE_MAP:
+			glTextureStorage2D(TextureName, levels, internalformat, width, height);
+			break;
+		case GL_TEXTURE_CUBE_MAP_ARRAY:
+			glTextureStorage3D(TextureName, levels, internalformat, width, height, layers * 6);
+			break;
+		}
+
+		return TextureName;
 	}
 
 	bool initTexture()
@@ -361,7 +391,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_450_direct_state_access Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

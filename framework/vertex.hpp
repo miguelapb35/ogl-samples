@@ -106,6 +106,21 @@ namespace glf
 		glm::vec3 Texcoord;
 	};
 
+	struct vertex_v3fn3f
+	{
+		vertex_v3fn3f
+		(
+			glm::vec3 const & Position,
+			glm::vec3 const & Texcoord
+		) :
+			Position(Position),
+			Texcoord(Texcoord)
+		{}
+
+		glm::vec3 Position;
+		glm::vec3 Texcoord;
+	};
+
 	struct vertex_v3fv3fv1i
 	{
 		vertex_v3fv3fv1i

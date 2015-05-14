@@ -69,10 +69,10 @@ namespace
 	};
 }//namespace
 
-class gl_500_texture_cube : public test
+class instance : public test
 {
 public:
-	gl_500_texture_cube(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-500-texture-cube-arb", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.1f)),
 		PipelineName(0),
 		ProgramName(0),
@@ -309,7 +309,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_500_texture_cube Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;

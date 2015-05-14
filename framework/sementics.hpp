@@ -44,7 +44,8 @@ namespace semantic
 			INDIRECTION = 3,
 			CONSTANT = 0,
 			PER_FRAME = 1,
-			PER_PASS = 2
+			PER_PASS = 2,
+			LIGHT = 3
 		};
 	};
 
@@ -73,6 +74,7 @@ namespace semantic
 		enum type
 		{
 			POSITION = 0,
+			NORMAL	 = 1,
 			COLOR	 = 3,
 			TEXCOORD = 4,
 			DRAW_ID  = 5
