@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-440/sampler-wrap.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/sampler-wrap.frag");
-	char const * TEXTURE_DIFFUSE_DXT5("kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE_DXT5("kueken7_rgba_dxt5_unorm.dds");
 
 	struct vertex
 	{

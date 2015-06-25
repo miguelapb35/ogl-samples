@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_LIBRARY("gl-420/sampler-library.frag");
 	char const * FRAG_SHADER_SOURCE_PROG("gl-420/sampler-fetch.frag");
 	char const * FRAG_SHADER_SOURCE_FUNC("gl-420/sampler-fetch-builtin.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	float const FRAMEBUFFER_SCALE = 0.125f;
 
 	GLsizei const VertexCount(4);

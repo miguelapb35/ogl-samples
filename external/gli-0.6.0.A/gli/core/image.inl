@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -68,27 +68,7 @@ namespace detail
 		BaseLevel(0),
 		MaxLevel(0)
 	{}
-/*
-	inline image::image
-	(
-		dim_type const & Dimensions,
-		size_type const & BlockSize,
-		dim_type const & BlockDimensions
-	) :
-		Storage(
-			1, 1, 1,
-			storage::dim_type(Dimensions),
-			FORMAT_INVALID,
-			BlockSize,
-			storage::dim_type(BlockDimensions)),
-		BaseLayer(0),
-		MaxLayer(0),
-		BaseFace(0),
-		MaxFace(0),
-		BaseLevel(0),
-		MaxLevel(0)
-	{}
-*/
+
 	inline image::image
 	(
 		format const & Format,
@@ -97,10 +77,7 @@ namespace detail
 		Storage(
 			1, 1, 1,
 			Format,
-			storage::dim_type(Dimensions)
-			//block_size(Format),
-			//block_dimensions(Format)
-			),
+			storage::dim_type(Dimensions)),
 		BaseLayer(0),
 		MaxLayer(0),
 		BaseFace(0),
@@ -148,6 +125,8 @@ namespace detail
 	template <typename genType>
 	inline image::size_type image::size() const
 	{
+		assert(sizeof(genType) <= block_size(this->Storage.format()));
+
 		return this->size() / sizeof(genType);
 	}
 
@@ -180,6 +159,7 @@ namespace detail
 	inline genType * image::data()
 	{
 		assert(!this->empty());
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -188,6 +168,7 @@ namespace detail
 	inline genType const * image::data() const
 	{
 		assert(!this->empty());
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}

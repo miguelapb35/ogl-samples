@@ -31,7 +31,7 @@ namespace
 	char const * VERT_PROGRAM_BINARY("gl-410/binary.vert.bin");
 	char const * GEOM_PROGRAM_BINARY("gl-410/binary.geom.bin");
 	char const * FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
-	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE( "kueken7_rgba_dxt5_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

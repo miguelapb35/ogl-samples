@@ -16,6 +16,7 @@ set(GL_SHADER_GTC
 	draw-indexing-uniform.vert draw-indexing-uniform.frag
 	screenspace_coherence.vert screenspace_coherence.frag
 	test_buffer.vert test_buffer.frag
+	test_buffer_double.vert
 	test_draw_call.vert test_draw_call.frag
 	test_uniform_caching.vert test_uniform_caching.frag)
 

@@ -27,10 +27,10 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-440/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE_RGB8("kueken7_srgba8_unorm.dds");
-	char const * TEXTURE_DIFFUSE_RGB10("kueken7_rgb10_a2_unorm.dds");
-	char const * TEXTURE_DIFFUSE_BC1("kueken7_bc1_rgb.dds");
-	char const * TEXTURE_DIFFUSE_BC3("kueken7_bc3_rgba.dds");
+	char const * TEXTURE_DIFFUSE_R5G6B5_UNORM("kueken7_r5g6b5_unorm.dds");
+	char const * TEXTURE_DIFFUSE_RGB9E5_UFLOAT("kueken7_rgb9e5_ufloat.dds");
+	char const * TEXTURE_DIFFUSE_RGBA_DXT5_UNORM("kueken7_rgba_dxt5_unorm.dds");
+	char const * TEXTURE_DIFFUSE_ETC1_UNORM("kueken7_rgb_etc1_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -78,7 +78,7 @@ class instance : public test
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-texture-compressed", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-texture-compressed", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -148,7 +148,7 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGBA_DXT5_UNORM).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -172,7 +172,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC3).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_ETC1_UNORM).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -196,7 +196,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB9E5_UFLOAT).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -219,7 +219,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB10).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_R5G6B5_UNORM).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 

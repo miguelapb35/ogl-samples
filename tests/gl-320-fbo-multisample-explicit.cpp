@@ -25,7 +25,7 @@
 
 namespace
 {
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -262,7 +262,7 @@ private:
 	void renderFBO(GLuint Framebuffer)
 	{
 		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
-		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
+		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 		glm::mat4 MVP = Perspective * this->view() * Model;
 
 		glEnable(GL_DEPTH_TEST);

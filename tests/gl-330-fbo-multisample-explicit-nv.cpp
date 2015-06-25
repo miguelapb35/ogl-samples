@@ -25,7 +25,7 @@
 
 namespace
 {
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom

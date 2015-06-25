@@ -33,12 +33,13 @@
 
 // GLM
 #define GLM_FORCE_EXPLICIT_CTOR
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
+#include <glm/glm.hpp>
 #include <glm/gtc/vec1.hpp>
+#include <glm/gtx/std_based_type.hpp>
 
 // GLI
+#include "format.hpp"
+
 namespace gli
 {
 	using std::size_t;
@@ -47,12 +48,6 @@ namespace gli
 	typedef glm::tvec2<size_t> dim2_t;
 	typedef glm::tvec3<size_t> dim3_t;
 	typedef glm::tvec4<size_t> dim4_t;
-
-	typedef glm::tvec1<size_t> size1_t;
-	typedef glm::tvec2<size_t> size2_t;
-	typedef glm::tvec3<size_t> size3_t;
-	typedef glm::tvec4<size_t> size4_t;
-
 	typedef glm::vec1 texcoord1_t;
 	typedef glm::vec2 texcoord2_t;
 	typedef glm::vec3 texcoord3_t;

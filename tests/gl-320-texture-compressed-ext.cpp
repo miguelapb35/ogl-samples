@@ -27,10 +27,10 @@ namespace
 {
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-compressed.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-compressed.frag");
-	char const * TEXTURE_DIFFUSE_BC1("kueken2-dxt1.dds");
-	char const * TEXTURE_DIFFUSE_BC3("kueken2-dxt5.dds");
-	char const * TEXTURE_DIFFUSE_BC4("kueken2-bc4.dds");
-	char const * TEXTURE_DIFFUSE_BC5("kueken2-bc5.dds");
+	char const * TEXTURE_DIFFUSE_BC1("kueken7_rgb_dxt1_srgb.dds");
+	char const * TEXTURE_DIFFUSE_BC3("kueken7_rgba_dxt5_srgb.dds");
+	char const * TEXTURE_DIFFUSE_BC4("kueken7_r_ati1n_unorm.dds");
+	char const * TEXTURE_DIFFUSE_BC5("kueken7_rg_ati2n_unorm.dds");
 
 	struct vertex
 	{
@@ -150,7 +150,7 @@ private:
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC1]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
 			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -169,7 +169,7 @@ private:
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC3]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
 			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -185,10 +185,11 @@ private:
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC4).c_str()));
+			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC4]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
 			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -204,10 +205,11 @@ private:
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC5).c_str()));
+			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC5]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
 			gli::gl::format const Format = GL.translate(Texture.format());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

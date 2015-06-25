@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -28,62 +28,45 @@
 
 namespace gli
 {
-	inline storage::impl::impl()
-		: Layers(0)
-		, Faces(0)
-		, Levels(0)
-		, Format(FORMAT_INVALID)
-		, Dimensions(0)
+	inline storage::impl::impl() :
+		Layers(0),
+		Faces(0),
+		Levels(0),
+		Format(static_cast<gli::format>(FORMAT_INVALID)),
+		Dimensions(0)
 	{}
-	
-	inline storage::impl::impl
-	(
-		size_type const & Layers,
-		size_type const & Faces,
-		size_type const & Levels,
+
+	inline storage::impl::impl(
+		layer_type const & Layers, 
+		face_type const & Faces,
+		level_type const & Levels,
 		format_type const & Format,
-		size3_t const & Dimensions
+		dim_type const & Dimensions
 	)
-		: Layers(Layers)
-		, Faces(Faces)
-		, Levels(Levels)
-		, Format(Format)
-		, Dimensions(Dimensions)
+	:	Layers(Layers),
+		Faces(Faces),
+		Levels(Levels),
+		Format(Format),
+		Dimensions(Dimensions)
 	{}
-	
+
 	inline storage::storage()
 	{}
 
-	inline storage::storage(size_type const & Layers, size_type const & Faces, size_type const & Levels, format_type const & Format, dim_type const & Dimensions)
-		: Impl(new impl(Layers, Faces, Levels, Format, Dimensions))
-	{
-		assert(Layers > 0);
-		assert(Faces > 0);
-		assert(Levels > 0);
-		assert(glm::all(glm::greaterThan(Dimensions, dim_type(0))));
-
-		std::size_t const Size = this->layer_size(0, Faces - 1, 0, Levels - 1) * Layers;
-		this->Impl->Data.resize(Size, 0);
-	}
-/*
 	inline storage::storage
 	(
 		size_type const & Layers,
 		size_type const & Faces,
 		size_type const & Levels,
-		dim_type const & Dimensions,
 		format_type const & Format,
-		size_type const & BlockSize,
-		dim_type const & BlockDimensions
+		dim_type const & Dimensions
 	) :
 		Impl(new impl(
 			Layers,
 			Faces,
 			Levels,
 			Format,
-			Dimensions,
-			BlockSize,
-			BlockDimensions))
+			Dimensions))
 	{
 		assert(Layers > 0);
 		assert(Faces > 0);
@@ -92,7 +75,7 @@ namespace gli
 
 		Impl->Data.resize(this->layer_size(0, Faces - 1, 0, Levels - 1) * Layers, 0);
 	}
-*/
+
 	inline bool storage::empty() const
 	{
 		if(this->Impl.get() == 0)
@@ -119,17 +102,7 @@ namespace gli
 	{
 		return this->Impl->Levels;
 	}
-/*
-	inline storage::size_type storage::block_size() const
-	{
-		return this->Impl->BlockSize;
-	}
 
-	inline storage::dim_type storage::block_dimensions() const
-	{
-		return this->Impl->BlockDimensions;
-	}
-*/
 	inline storage::dim_type storage::dimensions(size_type const & Level) const
 	{
 		assert(Level < this->Impl->Levels);
@@ -162,12 +135,12 @@ namespace gli
 	{
 		assert(Level < this->levels());
 
-		size_t const BlockSize = block_size(this->format());
-		size3_t const BlockDimensions = block_dimensions(this->format());
+		dim_type const BlockDimensions(gli::block_dimensions_x(this->format()), gli::block_dimensions_y(this->format()), gli::block_dimensions_z(this->format()));
+		dim_type const Dimensions = this->dimensions(Level);
+		dim_type const Multiple = glm::ceilMultiple(Dimensions, BlockDimensions);
+		std::size_t const BlockSize = gli::block_size(this->format());
 
-		return BlockSize * glm::compMul(glm::ceilMultiple(
-			this->dimensions(Level),
-			BlockDimensions) / BlockDimensions);
+		return BlockSize * glm::compMul(Multiple / BlockDimensions);
 	}
 
 	inline storage::size_type storage::face_size(

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -33,6 +33,7 @@
 
 #include "storage.hpp"
 #include "addressing.hpp"
+#include "header.hpp"
 
 namespace gli
 {
@@ -50,13 +51,7 @@ namespace gli
 		typedef storage::size_type face_type;
 
 		image();
-/*
-		/// Allocate a new storage constructor
-		explicit image(
-			dim_type const & Dimensions,
-			size_type const & BlockSize,
-			dim_type const & BlockDimensions);
-*/
+
 		/// Allocate a new storage constructor
 		explicit image(
 			format const & Format,

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -22,23 +22,16 @@
 ///
 /// @ref core
 /// @file gli/core/load_dds.inl
-/// @date 2010-09-26 / 2013-01-28
+/// @date 2010-09-26 / 2015-06-16
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "dx.hpp"
 #include <fstream>
 #include <cassert>
 
 namespace gli{
 namespace detail
 {
-	// DDS Documentation
-	/*
-		http://msdn.microsoft.com/en-us/library/bb943991(VS.85).aspx#File_Layout1
-		http://msdn.microsoft.com/en-us/library/bb943992.aspx
-	*/
-
 	enum ddsCubemapflag
 	{
 		DDSCAPS2_CUBEMAP				= 0x00000200,
@@ -51,10 +44,10 @@ namespace detail
 		DDSCAPS2_VOLUME					= 0x00200000
 	};
 
-	glm::uint32 const DDSCAPS2_CUBEMAP_ALLFACES = (
-		DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX |
-		DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY |
-		DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ);
+	enum
+	{
+		DDSCAPS2_CUBEMAP_ALLFACES = DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ
+	};
 
 	enum ddsFlag
 	{
@@ -78,13 +71,10 @@ namespace detail
 	struct ddsPixelFormat
 	{
 		glm::uint32 size; // 32
-		glm::uint32 flags;
-		glm::uint32 fourCC;
+		dx::DDPF flags;
+		dx::D3DFORMAT fourCC;
 		glm::uint32 bpp;
-		glm::uint32 redMask;
-		glm::uint32 greenMask;
-		glm::uint32 blueMask;
-		glm::uint32 alphaMask;
+		glm::u32vec4 Mask;
 	};
 
 	struct ddsHeader
@@ -112,13 +102,22 @@ namespace detail
 		D3D10_RESOURCE_DIMENSION_TEXTURE3D   = 4 
 	};
 
-	enum D3D10_RESOURCE_MISC_FLAG 
+	enum D3D10_RESOURCE_MISC_FLAG
 	{
-		D3D10_RESOURCE_MISC_GENERATE_MIPS       = 0x1L,
-		D3D10_RESOURCE_MISC_SHARED              = 0x2L,
-		D3D10_RESOURCE_MISC_TEXTURECUBE         = 0x4L,
-		D3D10_RESOURCE_MISC_SHARED_KEYEDMUTEX   = 0x10L,
-		D3D10_RESOURCE_MISC_GDI_COMPATIBLE      = 0x20L 
+		D3D10_RESOURCE_MISC_GENERATE_MIPS		= 0x01,
+		D3D10_RESOURCE_MISC_SHARED				= 0x02,
+		D3D10_RESOURCE_MISC_TEXTURECUBE			= 0x04,
+		D3D10_RESOURCE_MISC_SHARED_KEYEDMUTEX	= 0x10,
+		D3D10_RESOURCE_MISC_GDI_COMPATIBLE		= 0x20,
+	};
+
+	enum
+	{
+		DDS_ALPHA_MODE_UNKNOWN					= 0x0,
+		DDS_ALPHA_MODE_STRAIGHT					= 0x1,
+		DDS_ALPHA_MODE_PREMULTIPLIED			= 0x2,
+		DDS_ALPHA_MODE_OPAQUE					= 0x3,
+		DDS_ALPHA_MODE_CUSTOM					= 0x4
 	};
 
 	struct ddsHeader10
@@ -131,148 +130,113 @@ namespace detail
 			reserved(0)
 		{}
 
-		gli::dx::dxgiFormat			Format;
+		dx::dxgiFormat				Format;
 		D3D10_RESOURCE_DIMENSION	resourceDimension;
 		glm::uint32					miscFlag; // D3D10_RESOURCE_MISC_GENERATE_MIPS
 		glm::uint32					arraySize;
 		glm::uint32					reserved;
 	};
-
-	inline gli::format format_fourcc2gli_cast(glm::uint32 const & Flags, glm::uint32 const & FourCC)
-	{
-		gli::dx DX;
-
-		if(Flags & dx::DDPF_ALPHAPIXELS && FourCC == dx::D3DFMT_DXT1)
-			return Flags & dx::DDPF_ALPHAPIXELS ? FORMAT_RGBA_BC1_UNORM : FORMAT_RGB_BC1_UNORM;
-
-		for(int FormatIndex = 0; FormatIndex < FORMAT_COUNT; ++FormatIndex)
-		{
-			gli::dx::format const & FormatInfo = DX.translate(static_cast<format>(FormatIndex));
-
-			if(FormatInfo.D3DFormat == FourCC)
-				return static_cast<format>(FormatIndex);
-		}
-
-		return FORMAT_INVALID;
-	}
-
-	inline gli::format format_dds2gli_cast(dx::dxgiFormat const & Format)
-	{
-		gli::dx DX;
-
-		for(int FormatIndex = 0; FormatIndex < FORMAT_COUNT; ++FormatIndex)
-		{
-			gli::dx::format const & FormatInfo = DX.translate(static_cast<format>(FormatIndex));
-
-			if(FormatInfo.DXGIFormat == Format)
-				return static_cast<format>(FormatIndex);
-		}
-
-		return FORMAT_INVALID;
-	}
 }//namespace detail
-
-
-/* Taken from http://stackoverflow.com/a/13059195 */
-struct membuf : std::streambuf 
-{
-	membuf(char const* base, size_t size)
-	{
-		char* p(const_cast<char*>(base));
-		this->setg(p, p, p + size);
-	}
-};
-
-struct imemstream : virtual membuf, std::istream
-{
-	imemstream(char const* base, size_t size) : 
-		membuf(base, size),
-		std::istream(static_cast<std::streambuf*>(this))
-	{
-
-	}
-};
-
-
-inline storage load_dds(const char* pBuffer, size_t size)
-{
-	assert(pBuffer != nullptr && size > 0);
-
-	imemstream memstream(pBuffer, size);
-
-	return load_dds(memstream);
-}
-
 
 inline storage load_dds(char const * Filename)
 {
-	std::ifstream FileIn(Filename, std::ios::in | std::ios::binary);
-	assert(!FileIn.fail());
+	std::ifstream File(Filename, std::ios::in | std::ios::binary);
+	assert(!File.fail());
 
-	if(FileIn.fail())
-		return storage();
+	dx DX;
 
-	return load_dds(FileIn);
-}
-
-
-inline storage load_dds(std::istream& FileIn)
-{
 	detail::ddsHeader HeaderDesc;
 	detail::ddsHeader10 HeaderDesc10;
 	char Magic[4]; 
 
-	//* Read magic number and check if valid .dds file 
-	FileIn.read((char*)&Magic, sizeof(Magic));
+	// Read magic number and check if valid .dds file 
+	File.read((char*)&Magic, sizeof(Magic));
 
 	assert(strncmp(Magic, "DDS ", 4) == 0);
 
 	// Get the surface descriptor 
-	FileIn.read((char*)&HeaderDesc, sizeof(HeaderDesc));
+	File.read((char*)&HeaderDesc, sizeof(HeaderDesc));
 	if(HeaderDesc.format.flags & dx::DDPF_FOURCC && HeaderDesc.format.fourCC == dx::D3DFMT_DX10)
-		FileIn.read((char*)&HeaderDesc10, sizeof(HeaderDesc10));
+		File.read((char*)&HeaderDesc10, sizeof(HeaderDesc10));
 
-	gli::format Format(gli::FORMAT_INVALID);
-	if(HeaderDesc.format.fourCC == dx::D3DFMT_DX10 && HeaderDesc10.Format != dx::DXGI_FORMAT_UNKNOWN)
-		Format = detail::format_dds2gli_cast(HeaderDesc10.Format);
-	
-	if(HeaderDesc.format.flags & dx::DDPF_FOURCC && Format == FORMAT_INVALID)
-		Format = detail::format_fourcc2gli_cast(HeaderDesc.format.flags, HeaderDesc.format.fourCC);
-	
-	if(HeaderDesc.format.flags & dx::DDPF_RGB && Format == FORMAT_INVALID)
+	gli::format Format(static_cast<gli::format>(FORMAT_INVALID));
+
+	if((HeaderDesc.format.flags & (dx::DDPF_RGB | dx::DDPF_ALPHAPIXELS | dx::DDPF_ALPHA | dx::DDPF_YUV | dx::DDPF_LUMINANCE)) && Format == gli::FORMAT_INVALID && HeaderDesc.format.flags != dx::DDPF_FOURCC_ALPHAPIXELS)
 	{
 		switch(HeaderDesc.format.bpp)
 		{
-		case 8:
-			Format = FORMAT_R8_UNORM;
-			break;
-		case 16:
-			Format = FORMAT_RG8_UNORM;
-			break;
-		case 24:
-			Format = FORMAT_RGB8_UNORM;
-			break;
-		case 32:
-			Format = FORMAT_RGBA8_UNORM;
+			case 8:
+			{
+				if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_L8_UNORM).Mask)))
+					Format = FORMAT_L8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_A8_UNORM).Mask)))
+					Format = FORMAT_A8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_R8_UNORM).Mask)))
+					Format = FORMAT_R8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_RG3B2_UNORM).Mask)))
+					Format = FORMAT_RG3B2_UNORM;
+				break;
+			}
+			case 16:
+			{
+				if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_LA8_UNORM).Mask)))
+					Format = FORMAT_LA8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_RG8_UNORM).Mask)))
+					Format = FORMAT_RG8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_R5G6B5_UNORM).Mask)))
+					Format = FORMAT_R5G6B5_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_L16_UNORM).Mask)))
+					Format = FORMAT_L16_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_A16_UNORM).Mask)))
+					Format = FORMAT_A16_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_R16_UNORM).Mask)))
+					Format = FORMAT_R16_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_RGB5A1_UNORM).Mask)))
+					Format = FORMAT_RGB5A1_UNORM;
+				break;
+			}
+			case 24:
+			{
+				if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_BGR8_UNORM).Mask)))
+					Format = FORMAT_BGR8_UNORM;
+				break;
+			}
+			case 32:
+			{
+				if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_BGRA8_UNORM).Mask)))
+					Format = FORMAT_BGRA8_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_RGB10A2_UNORM).Mask)))
+					Format = FORMAT_RGB10A2_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_LA16_UNORM).Mask)))
+					Format = FORMAT_LA16_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_RG16_UNORM).Mask)))
+					Format = FORMAT_RG16_UNORM;
+				else if(glm::all(glm::equal(HeaderDesc.format.Mask, DX.translate(FORMAT_R32_SFLOAT).Mask)))
+					Format = FORMAT_R32_SFLOAT;
+			}
 			break;
 		}
 	}
+	else if((HeaderDesc.format.flags & dx::DDPF_FOURCC) && (HeaderDesc.format.fourCC != dx::D3DFMT_DX10) && (Format == gli::FORMAT_INVALID))
+		Format = DX.find(HeaderDesc.format.fourCC);
+	else if((HeaderDesc.format.fourCC == dx::D3DFMT_DX10) && (HeaderDesc10.Format != dx::DXGI_FORMAT_UNKNOWN))
+		Format = DX.find(HeaderDesc10.Format);
 
-	std::streamoff Curr = FileIn.tellg();
-	FileIn.seekg(0, std::ios_base::end);
-	std::streamoff End = FileIn.tellg();
-	FileIn.seekg(Curr, std::ios_base::beg);
+	assert(Format != gli::FORMAT_INVALID);
 
-	storage::size_type const MipMapCount = (HeaderDesc.flags & detail::DDSD_MIPMAPCOUNT) ? 
-		HeaderDesc.mipMapLevels : 1;
+	std::streamoff Curr = File.tellg();
+	File.seekg(0, std::ios_base::end);
+	std::streamoff End = File.tellg();
+	File.seekg(Curr, std::ios_base::beg);
 
+	storage::size_type const MipMapCount = (HeaderDesc.flags & detail::DDSD_MIPMAPCOUNT) ? HeaderDesc.mipMapLevels : 1;
 	storage::size_type FaceCount(1);
 	if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_CUBEMAP)
 		FaceCount = int(glm::bitCount(HeaderDesc.cubemapFlags & detail::DDSCAPS2_CUBEMAP_ALLFACES));
 
 	storage::size_type DepthCount = 1;
 	if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_VOLUME)
-			DepthCount = HeaderDesc.depth;
+		DepthCount = HeaderDesc.depth;
 
 	storage Storage(
 		HeaderDesc10.arraySize,
@@ -281,35 +245,16 @@ inline storage load_dds(std::istream& FileIn)
 		Format,
 		storage::dim_type(HeaderDesc.width, HeaderDesc.height, DepthCount));
 
-	FileIn.read((char*)Storage.data(), std::size_t(End - Curr));
+	std::size_t Size = Storage.size();
 
-	detail::formatInfo const & Info = detail::getInfo(Storage.format());
-
-	if(HeaderDesc.format.fourCC != dx::D3DFMT_DX10 && !(Info.Flags & FORMAT_COMPRESSED_BIT) && Info.Component >= 3)
-	{
-		switch(Info.Component)
-		{
-		default:
-			assert(0);
-			break;
-		case 3:
-			for(std::size_t Offset = 0; Offset < Storage.size() / Info.Component; ++Offset)
-			{
-				glm::u8vec3 Src = *(reinterpret_cast<glm::u8vec3 const *>(Storage.data()) + Offset);
-				*(reinterpret_cast<glm::u8vec3*>(Storage.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
-			}
-			break;
-		case 4:
-			for(std::size_t Offset = 0; Offset < Storage.size() / Info.Component; ++Offset)
-			{
-				glm::u8vec4 Src = *(reinterpret_cast<glm::u8vec4 const *>(Storage.data()) + Offset);
-				*(reinterpret_cast<glm::u8vec4*>(Storage.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
-			}
-			break;
-		}
-	}
+	File.read((char*)Storage.data(), std::size_t(End - Curr));
 
 	return Storage;
+}
+
+inline storage load_dds(std::string const & Filename)
+{
+	return load_dds(Filename.c_str());
 }
 
 }//namespace gli

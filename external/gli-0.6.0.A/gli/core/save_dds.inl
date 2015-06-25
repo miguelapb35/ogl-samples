@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -26,61 +26,8 @@
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-namespace gli{
-namespace detail
+namespace gli
 {
-	inline glm::uint32 getMaskRed(format const & Formatl)
-	{
-		switch(Formatl)
-		{
-		default:
-			return 0x0000000;
-		case FORMAT_R8_UNORM: 
-		case FORMAT_RG8_UNORM: 
-		case FORMAT_RGB8_UNORM: 
-		case FORMAT_RGBA8_UNORM: 
-			return 0xFF000000;
-		}
-	}
-
-	inline glm::uint32 getMaskGreen(format const & Formatl)
-	{
-		switch(Formatl)
-		{
-		default:
-			return 0x0000000;
-		case FORMAT_RG8_UNORM: 
-		case FORMAT_RGB8_UNORM: 
-		case FORMAT_RGBA8_UNORM: 
-			return 0x00FF0000;
-		}
-	}
-
-	inline glm::uint32 getMaskBlue(format const & Formatl)
-	{
-		switch(Formatl)
-		{
-		default:
-			return 0x0000000;
-		case FORMAT_RGB8_UNORM: 
-		case FORMAT_RGBA8_UNORM: 
-			return 0x0000FF00;
-		}
-	}
-
-	inline glm::uint32 getMaskAlpha(format const & Formatl)
-	{
-		switch(Formatl)
-		{
-		default:
-			return 0x0000000;
-		case FORMAT_RGBA8_UNORM: 
-			return 0x000000FF;
-		}
-	}
-
-}//namespace detail
-
 	inline void save_dds(storage const & Storage, char const * Filename)
 	{
 		if(Storage.empty())
@@ -90,10 +37,9 @@ namespace detail
 		if (!File)
 			return;
 
+		detail::format_info const & Desc = detail::getFormatInfo(Storage.format());
 		dx DX;
-		dx::format const & Format = DX.translate(Storage.format());
-		detail::formatInfo const & Info = detail::getInfo(Storage.format());
-		std::uint32_t BPP = detail::computeBitPerPixel(Storage.format());
+		dx::format const & DXFormat = DX.translate(Storage.format());
 
 		char const * Magic = "DDS ";
 		File.write((char*)Magic, sizeof(char) * 4);
@@ -102,7 +48,7 @@ namespace detail
 		Caps |= Storage.dimensions(0).y > 1 ? detail::DDSD_HEIGHT : 0;
 		Caps |= Storage.dimensions(0).z > 1 ? detail::DDSD_DEPTH : 0;
 		//Caps |= Storage.levels() > 1 ? detail::DDSD_MIPMAPCOUNT : 0;
-		Caps |= Info.Flags & FORMAT_COMPRESSED_BIT ? detail::DDSD_LINEARSIZE : detail::DDSD_PITCH;
+		Caps |= (Desc.Flags & detail::CAP_COMPRESSED_BIT) ? detail::DDSD_LINEARSIZE : detail::DDSD_PITCH;
 
 		detail::ddsHeader HeaderDesc;
 		memset(HeaderDesc.reserved1, 0, sizeof(HeaderDesc.reserved1));
@@ -113,18 +59,15 @@ namespace detail
 		HeaderDesc.width = static_cast<glm::uint32>(Storage.dimensions(0).x);
 		assert(Storage.dimensions(0).y < std::numeric_limits<glm::uint32>::max());
 		HeaderDesc.height = static_cast<glm::uint32>(Storage.dimensions(0).y);
-		HeaderDesc.pitch = glm::uint32(Info.Flags & FORMAT_COMPRESSED_BIT ? Storage.size() / Storage.faces() : 32);
+		HeaderDesc.pitch = glm::uint32((Desc.Flags & detail::CAP_COMPRESSED_BIT) ? Storage.size() / Storage.faces() : 32);
 		assert(Storage.dimensions(0).z < std::numeric_limits<glm::uint32>::max());
 		HeaderDesc.depth = static_cast<glm::uint32>(Storage.dimensions(0).z > 1 ? Storage.dimensions(0).z : 0);
 		HeaderDesc.mipMapLevels = glm::uint32(Storage.levels());
 		HeaderDesc.format.size = sizeof(detail::ddsPixelFormat);
-		HeaderDesc.format.flags = Storage.layers() > 1 ? dx::DDPF_FOURCC : Format.DDPixelFormat;
-		HeaderDesc.format.fourCC = Storage.layers() > 1 ? dx::D3DFMT_DX10 : Format.D3DFormat;
-		HeaderDesc.format.bpp = BPP;
-		HeaderDesc.format.redMask = detail::getMaskRed(Storage.format());
-		HeaderDesc.format.greenMask = detail::getMaskGreen(Storage.format());
-		HeaderDesc.format.blueMask = detail::getMaskBlue(Storage.format());
-		HeaderDesc.format.alphaMask = detail::getMaskAlpha(Storage.format());
+		HeaderDesc.format.flags = Storage.layers() > 1 ? dx::DDPF_FOURCC : DXFormat.DDPixelFormat;
+		HeaderDesc.format.fourCC = Storage.layers() > 1 ? dx::D3DFMT_DX10 : DXFormat.D3DFormat;
+		HeaderDesc.format.bpp = glm::uint32(detail::bits_per_pixel(Storage.format()));
+		HeaderDesc.format.Mask = DXFormat.Mask;
 		//HeaderDesc.surfaceFlags = detail::DDSCAPS_TEXTURE | (Storage.levels() > 1 ? detail::DDSCAPS_MIPMAP : 0);
 		HeaderDesc.surfaceFlags = detail::DDSCAPS_TEXTURE | detail::DDSCAPS_MIPMAP;
 		HeaderDesc.cubemapFlags = 0;
@@ -140,7 +83,6 @@ namespace detail
 		if(Storage.dimensions(0).z > 1)
 			HeaderDesc.cubemapFlags |= detail::DDSCAPS2_VOLUME;
 
-
 		storage::size_type DepthCount = 1;
 		if(HeaderDesc.cubemapFlags & detail::DDSCAPS2_VOLUME)
 				DepthCount = HeaderDesc.depth;
@@ -153,44 +95,13 @@ namespace detail
 			HeaderDesc10.arraySize = glm::uint32(Storage.layers());
 			HeaderDesc10.resourceDimension = detail::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
 			HeaderDesc10.miscFlag = 0;//Storage.levels() > 0 ? detail::D3D10_RESOURCE_MISC_GENERATE_MIPS : 0;
-			HeaderDesc10.Format = static_cast<dx::dxgiFormat>(Format.DXGIFormat);
+			HeaderDesc10.Format = static_cast<dx::dxgiFormat>(DXFormat.DXGIFormat);
 			HeaderDesc10.reserved = 0;
 			File.write((char*)&HeaderDesc10, sizeof(HeaderDesc10));
 		}
 
-		if(HeaderDesc.format.fourCC != dx::D3DFMT_DX10 && !(Info.Flags & FORMAT_COMPRESSED_BIT) && Info.Component >= 3)
-		{
-			storage Copy = gli::copy(Storage);
-
-			switch(Info.Component)
-			{
-			default:
-				assert(0);
-				break;
-			case 3:
-				for(std::size_t Offset = 0; Offset < Copy.size() / Info.Component; ++Offset)
-				{
-					glm::u8vec3 Src = *(reinterpret_cast<glm::u8vec3 const *>(Storage.data()) + Offset);
-					*(reinterpret_cast<glm::u8vec3*>(Copy.data()) + Offset) = glm::u8vec3(Src.z, Src.y, Src.x);
-				}
-				break;
-			case 4:
-				for(std::size_t Offset = 0; Offset < Copy.size() / Info.Component; ++Offset)
-				{
-					glm::u8vec4 Src = *(reinterpret_cast<glm::u8vec4 const *>(Storage.data()) + Offset);
-					*(reinterpret_cast<glm::u8vec4*>(Copy.data()) + Offset) = glm::u8vec4(Src.z, Src.y, Src.x, Src.w);
-				}
-				break;
-			}
-
-			std::size_t Size = Copy.size();
-			File.write((char*)(Copy.data()), Size);
-		}
-		else
-		{
-			std::size_t Size = Storage.size();
-			File.write((char*)(Storage.data()), Size);
-		}
+		std::size_t Size = Storage.size();
+		File.write((char*)(Storage.data()), Size);
 
 		assert(!File.fail() && !File.bad());
 	}

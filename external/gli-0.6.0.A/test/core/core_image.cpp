@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -32,8 +32,8 @@ int test_image_ctor()
 {
 	int Error(0);
 
-	gli::image ImageA(gli::RGBA8U, gli::image::dim_type(4, 4, 1));
-	gli::image ImageB(gli::image::dim_type(4, 4, 1), 4, gli::image::dim_type(1));
+	gli::image ImageA(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(4, 4, 1));
+	gli::image ImageB(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(4, 4, 1));
 	gli::image ImageC = ImageA;
 
 	Error += ImageA == ImageB ? 0 : 1;
@@ -50,7 +50,7 @@ int test_image_data()
 	Error += ImageA.empty() ? 0 : 1;
 	assert(!Error);
 
-	gli::image ImageB(gli::image::dim_type(1, 1, 1), sizeof(glm::u8vec4), gli::image::dim_type(1, 1, 1));
+	gli::image ImageB(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(1, 1, 1));
 	Error += ImageB.size() == sizeof(glm::u8vec4) ? 0 : 1;
 
 	*ImageB.data<glm::u8vec4>() = glm::u8vec4(255, 127, 0, 255);
@@ -58,10 +58,8 @@ int test_image_data()
 	assert(!Error);
 
 	gli::storage Storage(
-		2, 1, 1, 
-		gli::storage::dim3_type(1), 
-		gli::FORMAT_INVALID,
-		sizeof(glm::u8vec4),
+		2, 1, 1,
+		gli::FORMAT_RGBA8_UNORM,
 		gli::storage::dim3_type(1));
 
 	std::vector<glm::u8vec4> Data(2);
@@ -88,7 +86,7 @@ int test_image_query()
 {
 	int Error(0);
 
-	gli::image Image(gli::image::dim_type(1, 1, 1), sizeof(glm::u8vec4), gli::image::dim_type(1, 1, 1));
+	gli::image Image(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(1, 1, 1));
 
 	Error += Image.size() == sizeof(glm::u8vec4) ? 0 : 1;
 	Error += !Image.empty() ? 0 : 1;
@@ -105,7 +103,7 @@ namespace fetch
 	{
 		int Error(0);
 
-		gli::image Image(gli::RGBA8U, gli::image::dim_type(4, 2, 1));
+		gli::image Image(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(4, 2, 1));
 		*(Image.data<glm::u8vec4>() + 0) = glm::u8vec4(255,   0,   0, 255);
 		*(Image.data<glm::u8vec4>() + 1) = glm::u8vec4(255, 128,   0, 255);
 		*(Image.data<glm::u8vec4>() + 2) = glm::u8vec4(255, 255,   0, 255);

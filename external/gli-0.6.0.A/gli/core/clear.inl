@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -29,7 +29,11 @@
 namespace gli
 {
 	template <typename genType>
-	inline image clear(image const & Image, genType const & Texel)
+	inline image clear
+	(
+		image const & Image, 
+		genType const & Texel
+	)
 	{
 		image Result = Image;
 		for(std::size_t i = 0; i < Image.size() / sizeof(genType); ++i)

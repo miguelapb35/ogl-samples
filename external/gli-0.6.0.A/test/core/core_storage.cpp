@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -34,10 +34,8 @@ int test_storage_layer_size()
 
 	gli::storage Storage(
 		2, 1, 1,
-		gli::storage::dim3_type(2, 2, 1),
-		gli::FORMAT_INVALID,
-		sizeof(glm::u8vec4),
-		gli::storage::dim3_type(1));
+		gli::FORMAT_RGBA8_UNORM,
+		gli::storage::dim3_type(2, 2, 1));
 
 	std::vector<glm::u8vec4> Data(8, glm::u8vec4(0));
 	for(std::size_t i = 0; i < 4; ++i)
@@ -47,7 +45,7 @@ int test_storage_layer_size()
 
 	memcpy(Storage.data(), &Data[0][0], Data.size() * sizeof(glm::u8vec4));
 
-	Error += Storage.block_size() == sizeof(glm::u8vec4) ? 0 : 1;
+	Error += block_size(Storage.format()) == sizeof(glm::u8vec4) ? 0 : 1;
 	Error += Storage.level_size(0) == sizeof(glm::u8vec4) * 2 * 2 ? 0 : 1;
 	Error += Storage.face_size(0, Storage.levels() - 1) == sizeof(glm::u8vec4) * 2 * 2 ? 0 : 1;
 	Error += Storage.layer_size(0, Storage.faces() - 1, 0, Storage.levels() - 1) == sizeof(glm::u8vec4) * 2 * 2 ? 0 : 1;
@@ -60,14 +58,9 @@ int test_storage_face_size()
 {
 	int Error(0);
 
-	gli::storage Storage(
-		1, 6, 1,
-		gli::storage::dim3_type(2, 2, 1),
-		gli::FORMAT_INVALID,
-		sizeof(glm::u8vec4),
-		gli::storage::dim3_type(1));
+	gli::storage Storage(1, 6, 1, gli::FORMAT_RGBA8_UNORM, gli::storage::dim3_type(2, 2, 1));
 
-	gli::storage::size_type BlockSize = Storage.block_size();
+	gli::storage::size_type BlockSize = gli::block_size(Storage.format());
 	Error += BlockSize == sizeof(glm::u8vec4) ? 0 : 1;
 
 	gli::storage::size_type LevelSize = Storage.level_size(0);
@@ -90,7 +83,7 @@ int main()
 	int Error(0);
 
 	Error += test_storage_layer_size();
-    Error += test_storage_face_size();
+	Error += test_storage_face_size();
 
 	assert(!Error);
 

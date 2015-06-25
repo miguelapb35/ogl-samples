@@ -27,7 +27,7 @@ namespace
 {
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-lod.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-lod.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	struct vertex
 	{

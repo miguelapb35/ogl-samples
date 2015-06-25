@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -37,7 +37,7 @@ namespace gli
 	)
 	{
 		assert(!Texture.empty());
-		assert(!is(Texture.format(), FORMAT_COMPRESSED_BIT));
+		assert(!is_compressed(Texture.format()));
 
 		image::dim_type Dimensions = Texture[Level].dimensions();
 		genType const * const Data = reinterpret_cast<genType const * const >(Texture[Level].data());
@@ -55,7 +55,7 @@ namespace gli
 	)
 	{
 		assert(!Texture.empty());
-		assert(!is(Texture.format(), FORMAT_COMPRESSED_BIT));
+		assert(!is_compressed(Texture.format()));
 
 		genType * Data = Texture[Level].data<genType>();
 		std::size_t Index = Texcoord.x + Texcoord.y * Texture[Level].dimensions().x;

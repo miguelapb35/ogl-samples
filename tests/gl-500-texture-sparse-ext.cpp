@@ -27,7 +27,6 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-500/texture-sparse-ext.vert");
 	char const * FRAG_SHADER_SOURCE("gl-500/texture-sparse-ext.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

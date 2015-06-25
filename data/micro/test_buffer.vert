@@ -14,11 +14,8 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP;
 } Transform;
 
-layout(location = 0) in vec3 Position;
-layout(location = 1) in vec4 ColorA;
-layout(location = 2) in vec4 ColorB;
-layout(location = 3) in vec4 ColorC;
-layout(location = 4) in vec4 ColorD;
+layout(location = 0) in vec2 Position;
+layout(location = 1) in vec4 Color[12];
 
 out gl_PerVertex
 {
@@ -32,7 +29,15 @@ out block
 
 void main()
 {
-	Out.Color = (((ColorA + ColorB) * 0.5) + ((ColorC + ColorD) * 0.5)) * 0.5 * vec4(1.0, 0.5, 0.0, 1.0);
-	
-	gl_Position = Transform.MVP * vec4(Position, 1);
+/*
+	Out.Color = vec4(0.0);
+	for(int i = 0; i < 12; ++i)
+		Out.Color += Color[i];
+*/
+	vec4 Temp = vec4(0.0);
+	for(int i = 0; i < 12; ++i)
+		Temp += Color[i];
+	Out.Color = Temp;//vec4(Temp, 1.0);
+
+	gl_Position = Transform.MVP * vec4(Position, 0, 1);
 }

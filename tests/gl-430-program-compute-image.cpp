@@ -28,7 +28,7 @@ namespace
 	char const * VS_SOURCE("gl-430/program-compute-image.vert");
 	char const * FS_SOURCE("gl-430/program-compute-image.frag");
 	char const * CS_SOURCE("gl-430/program-compute-image.comp");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v4fv4fv4f);

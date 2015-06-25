@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -37,7 +37,7 @@ namespace gli
 		MaxFace(0),
 		BaseLevel(0),
 		MaxLevel(0),
-		Format(FORMAT_INVALID)
+		Format(static_cast<gli::format>(FORMAT_INVALID))
 	{}
 
 	inline texture3D::texture3D
@@ -47,12 +47,9 @@ namespace gli
 		dim_type const & Dimensions
 	) :
 		Storage(1, 1, Levels, Format, storage::dim_type(Dimensions)),
-		BaseLayer(0), 
-		MaxLayer(0), 
-		BaseFace(0), 
-		MaxFace(0), 
-		BaseLevel(0), 
-		MaxLevel(Levels - 1),
+		BaseLayer(0), MaxLayer(0),
+		BaseFace(0), MaxFace(0),
+		BaseLevel(0), MaxLevel(Levels - 1),
 		Format(Format)
 	{}
 
@@ -62,12 +59,9 @@ namespace gli
 		dim_type const & Dimensions
 	) :
 		Storage(1, 1, gli::levels(Dimensions), Format, storage::dim_type(Dimensions)),
-		BaseLayer(0),
-		MaxLayer(this->Storage.layers() - 1),
-		BaseFace(0),
-		MaxFace(this->Storage.faces() - 1),
-		BaseLevel(0),
-		MaxLevel(this->Storage.levels() - 1),
+		BaseLayer(0), MaxLayer(this->Storage.layers() - 1),
+		BaseFace(0), MaxFace(this->Storage.faces() - 1),
+		BaseLevel(0), MaxLevel(this->Storage.levels() - 1),
 		Format(Format)
 	{}
 
@@ -76,12 +70,9 @@ namespace gli
 		storage const & Storage
 	) :
 		Storage(Storage),
-		BaseLayer(0), 
-		MaxLayer(0), 
-		BaseFace(0), 
-		MaxFace(0), 
-		BaseLevel(0), 
-		MaxLevel(Storage.levels() - 1),
+		BaseLayer(0), MaxLayer(0),
+		BaseFace(0), MaxFace(0),
+		BaseLevel(0), MaxLevel(Storage.levels() - 1),
 		Format(Storage.format())
 	{}
 
@@ -89,36 +80,26 @@ namespace gli
 	(
 		storage const & Storage,
 		format_type const & Format,
-		size_type BaseLayer,
-		size_type MaxLayer,
-		size_type BaseFace,
-		size_type MaxFace,
-		size_type BaseLevel,
-		size_type MaxLevel
+		size_type BaseLayer, size_type MaxLayer,
+		size_type BaseFace, size_type MaxFace,
+		size_type BaseLevel, size_type MaxLevel
 	) :
 		Storage(Storage),
-		BaseLayer(BaseLayer),
-		MaxLayer(MaxLayer),
-		BaseFace(BaseFace),
-		MaxFace(MaxFace),
-		BaseLevel(BaseLevel),
-		MaxLevel(MaxLevel),
+		BaseLayer(BaseLayer), MaxLayer(MaxLayer),
+		BaseFace(BaseFace), MaxFace(MaxFace),
+		BaseLevel(BaseLevel), MaxLevel(MaxLevel),
 		Format(Format)
 	{}
  
 	inline texture3D::texture3D
 	(
 		texture3D const & Texture,
-		size_type const & BaseLevel,
-		size_type const & MaxLevel
+		size_type const & BaseLevel, size_type const & MaxLevel
 	) :
 		Storage(Texture.Storage),
-		BaseLayer(Texture.baseLayer()),
-		MaxLayer(Texture.maxLayer()),
-		BaseFace(Texture.baseFace()),
-		MaxFace(Texture.maxFace()),
-		BaseLevel(Texture.baseLevel() + BaseLevel),
-		MaxLevel(Texture.baseLevel() + MaxLevel),
+		BaseLayer(Texture.baseLayer()), MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace()), MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel), MaxLevel(Texture.baseLevel() + MaxLevel),
 		Format(Texture.format())
 	{}
 
@@ -136,12 +117,9 @@ namespace gli
 
 		return image(
 			this->Storage,
-			this->baseLayer(),
-			this->maxLayer(),
-			this->baseFace(),
-			this->maxFace(),
-			this->baseLevel() + Level,
-			this->baseLevel() + Level);
+			this->baseLayer(), this->maxLayer(),
+			this->baseFace(), this->maxFace(),
+			this->baseLevel() + Level, this->baseLevel() + Level);
 	}
 
 	inline bool texture3D::empty() const
@@ -205,7 +183,7 @@ namespace gli
 	inline texture3D::size_type texture3D::size() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return this->size() / sizeof(genType);
 	}
@@ -214,7 +192,7 @@ namespace gli
 	inline genType * texture3D::data()
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -223,7 +201,7 @@ namespace gli
 	inline genType const * texture3D::data() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}
@@ -236,7 +214,7 @@ namespace gli
 	template <typename genType>
 	inline void texture3D::clear(genType const & Texel)
 	{
-		assert(block_size(this->format()) == sizeof(genType));
+		assert(block_size(this->Storage.format()) == sizeof(genType));
 
 		for(size_type TexelIndex = 0; TexelIndex < this->size<genType>(); ++TexelIndex)
 			*(this->data<genType>() + TexelIndex) = Texel;

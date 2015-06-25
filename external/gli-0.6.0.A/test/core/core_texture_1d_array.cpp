@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -33,12 +33,12 @@ int test_alloc()
 	int Error(0);
 
 	std::vector<gli::format> Formats;
-	Formats.push_back(gli::RGBA8_UNORM);
-	Formats.push_back(gli::RGB8_UNORM);
-	Formats.push_back(gli::R8_SNORM);
-	Formats.push_back(gli::RGB_DXT1);
-	Formats.push_back(gli::RGB_BP_UNORM);
-	Formats.push_back(gli::RGBA32F);
+	Formats.push_back(gli::FORMAT_RGBA8_UNORM);
+	Formats.push_back(gli::FORMAT_RGB8_UNORM);
+	Formats.push_back(gli::FORMAT_R8_SNORM);
+	Formats.push_back(gli::FORMAT_RGB_DXT1_UNORM);
+	Formats.push_back(gli::FORMAT_RGB_BP_UNORM);
+	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT);
 
 	std::vector<gli::texture1DArray::dim_type> Sizes;
 	Sizes.push_back(gli::texture1DArray::dim_type(16));
@@ -69,7 +69,7 @@ int test_texture1DArray_clear()
 
 	gli::texture1DArray::dim_type Size(16);
 
-	gli::texture1DArray Texture(2, gli::RGBA8U, Size);
+	gli::texture1DArray Texture(2, gli::FORMAT_RGBA8_UINT, Size);
 
 	Texture.clear<glm::u8vec4>(Orange);
 
@@ -83,16 +83,12 @@ int test_texture1DArray_query()
 	gli::texture1DArray::size_type Layers(2);
 	gli::texture1DArray::size_type Levels(2);
 
-	gli::texture1DArray Texture(
-		Layers, 
-		Levels,
-		gli::RGBA8U,
-		gli::texture1DArray::dim_type(2));
+	gli::texture1DArray Texture(Layers, Levels, gli::FORMAT_RGBA8_UINT, gli::texture1DArray::dim_type(2));
 
 	gli::texture1DArray::size_type Size = Texture.size();
 
 	Error += Size == sizeof(glm::u8vec4) * 3 * Layers ? 0 : 1;
-	Error += Texture.format() == gli::RGBA8U ? 0 : 1;
+	Error += Texture.format() == gli::FORMAT_RGBA8_UINT ? 0 : 1;
 	Error += Texture.layers() == Layers ? 0 : 1;
 	Error += Texture.levels() == Levels ? 0 : 1;
 	Error += !Texture.empty() ? 0 : 1;
@@ -106,11 +102,7 @@ int test_texture1DArray_access()
 	int Error(0);
 
 	{
-		gli::texture1DArray Texture1DArray(
-			gli::texture1DArray::size_type(2),
-			gli::texture1DArray::size_type(1),
-			gli::RGBA8U,
-			gli::texture1DArray::dim_type(2));
+		gli::texture1DArray Texture1DArray(2, 1, gli::FORMAT_RGBA8_UINT, gli::texture1DArray::dim_type(2));
 		assert(!Texture1DArray.empty());
 
 		gli::texture1D Texture0 = Texture1DArray[0];
@@ -171,16 +163,12 @@ int test_texture1DArray_size()
 	int Error(0);
 
 	std::vector<test> Tests;
-	Tests.push_back(test(gli::RGBA8U, gli::texture1DArray::dim_type(4), 32));
-	Tests.push_back(test(gli::R8U, gli::texture1DArray::dim_type(4), 8));
+	Tests.push_back(test(gli::FORMAT_RGBA8_UINT, gli::texture1DArray::dim_type(4), 32));
+	Tests.push_back(test(gli::FORMAT_R8_UINT, gli::texture1DArray::dim_type(4), 8));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
-		gli::texture1DArray Texture1DArray(
-			gli::texture1DArray::size_type(2),
-			gli::texture1DArray::size_type(1),
-			Tests[i].Format,
-			gli::texture1DArray::dim_type(4));
+		gli::texture1DArray Texture1DArray(2, 1, Tests[i].Format, gli::texture1DArray::dim_type(4));
 
 		Error += Texture1DArray.size() == Tests[i].Size ? 0 : 1;
 		assert(!Error);
@@ -188,11 +176,7 @@ int test_texture1DArray_size()
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
-		gli::texture1DArray Texture1DArray(
-			gli::texture1DArray::size_type(2),
-			gli::texture1DArray::size_type(1),
-			Tests[i].Format,
-			gli::texture1DArray::dim_type(4));
+		gli::texture1DArray Texture1DArray(2, 1, Tests[i].Format, gli::texture1DArray::dim_type(4));
 
 		gli::texture1D Texture1D = Texture1DArray[0];
 

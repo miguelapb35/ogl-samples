@@ -29,7 +29,7 @@ namespace
 	char const * SHADER_FRAG_SOURCE_UPDATE("gl-420/memory-barrier-update.frag");
 	char const * SHADER_VERT_SOURCE_BLIT("gl-420/memory-barrier-blit.vert");
 	char const * SHADER_FRAG_SOURCE_BLIT("gl-420/memory-barrier-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken4-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(3);
 

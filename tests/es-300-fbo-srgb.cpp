@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("es-300/fbo-srgb.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -31,13 +31,10 @@
 namespace gli
 {
 	inline texture2DArray::texture2DArray() :
-		BaseLayer(0),
-		MaxLayer(0),
-		BaseFace(0),
-		MaxFace(0),
-		BaseLevel(0),
-		MaxLevel(0),
-		Format(FORMAT_INVALID)
+		BaseLayer(0), MaxLayer(0),
+		BaseFace(0), MaxFace(0),
+		BaseLevel(0), MaxLevel(0),
+		Format(static_cast<gli::format>(FORMAT_INVALID))
 	{}
 
 	inline texture2DArray::texture2DArray
@@ -82,38 +79,27 @@ namespace gli
 	(
 		storage const & Storage,
 		format_type const & Format,
-		size_type BaseLayer,
-		size_type MaxLayer,
-		size_type BaseFace,
-		size_type MaxFace,
-		size_type BaseLevel,
-		size_type MaxLevel
+		size_type BaseLayer, size_type MaxLayer,
+		size_type BaseFace, size_type MaxFace,
+		size_type BaseLevel, size_type MaxLevel
 	) :
 		Storage(Storage),
-		BaseLayer(BaseLayer),
-		MaxLayer(MaxLayer),
-		BaseFace(BaseFace),
-		MaxFace(MaxFace),
-		BaseLevel(BaseLevel),
-		MaxLevel(MaxLevel),
+		BaseLayer(BaseLayer), MaxLayer(MaxLayer),
+		BaseFace(BaseFace), MaxFace(MaxFace),
+		BaseLevel(BaseLevel), MaxLevel(MaxLevel),
 		Format(Format)
 	{}
 
 	inline texture2DArray::texture2DArray
 	(
 		texture2DArray const & Texture,
-		size_type const & BaseLayer,
-		size_type const & MaxLayer,
-		size_type const & BaseLevel,
-		size_type const & MaxLevel
+		size_type const & BaseLayer, size_type const & MaxLayer,
+		size_type const & BaseLevel, size_type const & MaxLevel
 	) :
 		Storage(Texture.Storage),
-		BaseLayer(Texture.baseLayer() + BaseLayer),
-		MaxLayer(Texture.baseLayer() + MaxLayer),
-		BaseFace(Texture.baseFace()),
-		MaxFace(Texture.maxFace()),
-		BaseLevel(Texture.baseLevel() + BaseLevel),
-		MaxLevel(Texture.baseLevel() + MaxLevel),
+		BaseLayer(Texture.baseLayer() + BaseLayer), MaxLayer(Texture.baseLayer() + MaxLayer),
+		BaseFace(Texture.baseFace()), MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel), MaxLevel(Texture.baseLevel() + MaxLevel),
 		Format(Texture.format())
 	{}
 
@@ -124,12 +110,9 @@ namespace gli
 		size_type const & MaxLevel
 	) :
 		Storage(Texture),
-		BaseLayer(Texture.baseLayer()),
-		MaxLayer(Texture.maxLayer()),
-		BaseFace(Texture.baseFace()),
-		MaxFace(Texture.maxFace()),
-		BaseLevel(Texture.baseLevel() + BaseLevel),
-		MaxLevel(Texture.baseLevel() + MaxLevel),
+		BaseLayer(Texture.baseLayer()), MaxLayer(Texture.maxLayer()),
+		BaseFace(Texture.baseFace()), MaxFace(Texture.maxFace()),
+		BaseLevel(Texture.baseLevel() + BaseLevel), MaxLevel(Texture.baseLevel() + MaxLevel),
 		Format(Texture.format())
 	{}
 
@@ -218,7 +201,7 @@ namespace gli
 	inline texture2DArray::size_type texture2DArray::size() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return this->size() / sizeof(genType);
 	}
@@ -227,7 +210,7 @@ namespace gli
 	inline genType * texture2DArray::data()
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -236,7 +219,7 @@ namespace gli
 	inline genType const * texture2DArray::data() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}
@@ -250,7 +233,7 @@ namespace gli
 	template <typename genType>
 	inline void texture2DArray::clear(genType const & Texel)
 	{
-		assert(block_size(this->format()) == sizeof(genType));
+		assert(block_size(this->Storage.format()) == sizeof(genType));
 
 		for(size_type Layer = 0; Layer < this->layers(); ++Layer)
 			(*this)[Layer].clear<genType>(Texel);

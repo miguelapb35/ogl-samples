@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -59,27 +59,27 @@ int main()
 	std::size_t const Levels = gli::levels(TextureSize);
 
 	Error += test_texture(
-		gli::texture2D(Levels, gli::R8_UNORM, TextureSize),
+		gli::texture2D(Levels, gli::FORMAT_R8_UNORM, TextureSize),
 		glm::uint8(255), glm::uint8(0));
 
 	Error += test_texture(
-		gli::texture2D(Levels, gli::RGB8_UNORM, TextureSize),
+		gli::texture2D(Levels, gli::FORMAT_RGB8_UNORM, TextureSize),
 		glm::u8vec3(255, 128, 0), glm::u8vec3(0, 128, 255));
 
 	Error += test_texture(
-		gli::texture2D(Levels, gli::RGBA8_UNORM, TextureSize),
+		gli::texture2D(Levels, gli::FORMAT_RGBA8_UNORM, TextureSize),
 		glm::u8vec4(255, 128, 0, 255), glm::u8vec4(0, 128, 255, 255));
 
 	Error += test_texture(
-		gli::texture2D(Levels, gli::RGBA32F, TextureSize),
+		gli::texture2D(Levels, gli::FORMAT_RGBA32_SFLOAT, TextureSize),
 		glm::f32vec4(1.0, 0.5, 0.0, 1.0), glm::f32vec4(0.0, 0.5, 1.0, 1.0));
 
 	Error += test_texture(
-		gli::texture2DArray(4, Levels, gli::RGBA8_UNORM, TextureSize),
+		gli::texture2DArray(4, Levels, gli::FORMAT_RGBA8_UNORM, TextureSize),
 		glm::u8vec4(255, 128, 0, 255), glm::u8vec4(0, 128, 255, 255));
 
 	Error += test_texture(
-		gli::texture2DArray(4, Levels, gli::RGBA32F, TextureSize),
+		gli::texture2DArray(4, Levels, gli::FORMAT_RGBA32_SFLOAT, TextureSize),
 		glm::f32vec4(1.0, 0.5, 0.0, 1.0), glm::f32vec4(0.0, 0.5, 1.0, 1.0));
 
 	return Error;

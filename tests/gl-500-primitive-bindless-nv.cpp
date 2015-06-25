@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-500/primitive-bindless-nv.vert");
 	char const * FRAG_SHADER_SOURCE("gl-500/primitive-bindless-nv.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);

@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-500/fbo-multisample-position-amd.vert");
 	char const * FRAG_SHADER_SOURCE("gl-500/fbo-multisample-position-amd.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(256, 256);
 
 	GLsizei const VertexCount(4);

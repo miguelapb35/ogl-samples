@@ -5,7 +5,7 @@ project(gli)
 enable_testing()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
+add_definitions(-DSOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 include_directories(".")
 
 if(MSVC)
@@ -26,25 +26,9 @@ macro(addExternalPackageGTC NAME DIRECTORY)
 endmacro(addExternalPackageGTC)
 
 ################################
-# Add custom target to copy all data
-
-set(TARGET_DATA_COPY DATA_COPY)
-if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_target(
-		${TARGET_DATA_COPY}
-		COMMAND ${CMAKE_COMMAND} -E echo "In source build")
-else(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-	add_custom_target(
-		${TARGET_DATA_COPY}
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data)
-endif(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-
-set(OGL_DATA_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
-
-################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.6.1)
+set(GLM_DIRECTORY glm-0.9.7.A)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################

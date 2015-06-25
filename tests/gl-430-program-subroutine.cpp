@@ -29,7 +29,7 @@ namespace
 	char const * GEOM_SHADER_SOURCE("gl-430/program-subroutine.geom");
 	char const * FRAG_SHADER_SOURCE("gl-430/program-subroutine.frag");
 	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
-	char const * TEXTURE_DIFFUSE_DXT1("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE_DXT1("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -206,31 +206,28 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
+
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 			assert(!Texture.empty());
 
+			gli::gl::format const Format = GL.translate(Texture.format());
+
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGB8]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels()));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
-					GL_RGB8, 
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+				glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+					Format.Internal,
+					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
-					GL_BGR, 
-					GL_UNSIGNED_BYTE, 
+					Format.External, Format.Type,
 					Texture[Level].data());
 			}
 		}
@@ -238,6 +235,8 @@ private:
 		{
 			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
 			assert(!Texture.empty());
+
+			gli::gl::format const Format = GL.translate(Texture.format());
 
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::DXT1]);
@@ -252,7 +251,7 @@ private:
 				glCompressedTexImage2D(
 					GL_TEXTURE_2D,
 					GLint(Level),
-					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
+					Format.Internal,
 					GLsizei(Texture[Level].dimensions().x), 
 					GLsizei(Texture[Level].dimensions().y), 
 					0, 

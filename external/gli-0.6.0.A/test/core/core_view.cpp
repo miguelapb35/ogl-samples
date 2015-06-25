@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -388,12 +388,12 @@ int main()
 	int Error(0);
 
 	std::vector<gli::format> Formats;
-	Formats.push_back(gli::RGBA8_UNORM);
-	Formats.push_back(gli::RGB8_UNORM);
-	Formats.push_back(gli::R8_SNORM);
-	Formats.push_back(gli::RGB_DXT1);
-	Formats.push_back(gli::RGB_BP_UNORM);
-	Formats.push_back(gli::RGBA32F);
+	Formats.push_back(gli::FORMAT_RGBA8_UNORM);
+	Formats.push_back(gli::FORMAT_RGB8_UNORM);
+	Formats.push_back(gli::FORMAT_R8_SNORM);
+	Formats.push_back(gli::FORMAT_RGB_DXT1_UNORM);
+	Formats.push_back(gli::FORMAT_RGB_BP_UNORM);
+	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT);
 	std::size_t const TextureSize(32);
 
 	Error += test_view1D(Formats, gli::texture1D::dim_type(TextureSize));

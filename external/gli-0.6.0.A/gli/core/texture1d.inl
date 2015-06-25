@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -37,7 +37,7 @@ namespace gli
 		MaxFace(0),
 		BaseLevel(0),
 		MaxLevel(0),
-		Format(FORMAT_INVALID)
+		Format(static_cast<gli::format>(FORMAT_INVALID))
 	{}
 
 	inline texture1D::texture1D
@@ -210,7 +210,7 @@ namespace gli
 	template <typename genType>
 	inline texture1D::size_type texture1D::size() const
 	{
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(sizeof(genType) <= block_size(this->Storage.format()));
 		return this->size() / sizeof(genType);
 	}
 
@@ -218,7 +218,7 @@ namespace gli
 	inline genType * texture1D::data()
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -227,7 +227,7 @@ namespace gli
 	inline genType const * texture1D::data() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType const *>(this->data());
 	}
@@ -240,7 +240,7 @@ namespace gli
 	template <typename genType>
 	inline void texture1D::clear(genType const & Texel)
 	{
-		assert(block_size(this->format()) == sizeof(genType));
+		assert(block_size(this->Storage.format()) == sizeof(genType));
 
 		for(size_type TexelIndex = 0; TexelIndex < this->size<genType>(); ++TexelIndex)
 			*(this->data<genType>() + TexelIndex) = Texel;

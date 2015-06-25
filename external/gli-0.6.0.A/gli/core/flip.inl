@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -58,11 +58,11 @@ inline image flip(image const & Image)
 template <>
 inline texture2D flip(texture2D const & Texture)
 {
-	assert(!gli::is(Texture.format(), FORMAT_COMPRESSED_BIT));
+	assert(!gli::is_compressed(Texture.format()));
 
 	texture2D Flip(Texture.levels(), Texture.format(), Texture.dimensions());
 
-	storage::size_type const BlockSize = block_size(Texture.format());
+	std::uint32_t const BlockSize = block_size(Texture.format());
 
 	for(std::size_t Level = 0; Level < Flip.levels(); ++Level)
 		detail::flip(Flip[Level], Texture[Level], BlockSize);
@@ -73,11 +73,11 @@ inline texture2D flip(texture2D const & Texture)
 template <>
 inline texture2DArray flip(texture2DArray const & Texture)
 {
-	assert(!gli::is(Texture.format(), FORMAT_COMPRESSED_BIT));
+	assert(!gli::is_compressed(Texture.format()));
 
 	texture2DArray Flip(Texture.layers(), Texture.levels(), Texture.format(), Texture.dimensions());
 
-	storage::size_type const BlockSize = block_size(Texture.format());
+	std::uint32_t const BlockSize = block_size(Texture.format());
 
 	for(std::size_t Layer = 0; Layer < Flip.layers(); ++Layer)
 	for(std::size_t Level = 0; Level < Flip.levels(); ++Level)

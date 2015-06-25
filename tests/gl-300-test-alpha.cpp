@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("gl-300/image-2d.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-300/image-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	struct vertex
 	{

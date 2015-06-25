@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -33,12 +33,12 @@ int test_alloc()
 	int Error(0);
 
 	std::vector<gli::format> Formats;
-	Formats.push_back(gli::RGBA8_UNORM);
-	Formats.push_back(gli::RGB8_UNORM);
-	Formats.push_back(gli::R8_SNORM);
-	Formats.push_back(gli::RGB_DXT1);
-	Formats.push_back(gli::RGB_BP_UNORM);
-	Formats.push_back(gli::RGBA32F);
+	Formats.push_back(gli::FORMAT_RGBA8_UNORM);
+	Formats.push_back(gli::FORMAT_RGB8_UNORM);
+	Formats.push_back(gli::FORMAT_R8_SNORM);
+	Formats.push_back(gli::FORMAT_RGB_DXT1_UNORM);
+	Formats.push_back(gli::FORMAT_RGB_BP_UNORM);
+	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT);
 
 	std::vector<gli::texture3D::dim_type::value_type> Sizes;
 	Sizes.push_back(16);
@@ -69,7 +69,7 @@ int test_texture3d_clear()
 
 	gli::texture3D::dim_type Size(16);
 
-	gli::texture3D Texture(gli::levels(Size), gli::RGBA8U, Size);
+	gli::texture3D Texture(gli::levels(Size), gli::FORMAT_RGBA8_UINT, Size);
 
 	Texture.clear<glm::u8vec4>(Orange);
 
@@ -82,10 +82,10 @@ int test_texture3d_query()
 
 	gli::texture3D::dim_type Size(2);
 
-	gli::texture3D Texture(gli::levels(Size), gli::RGBA8U, Size);
+	gli::texture3D Texture(gli::levels(Size), gli::FORMAT_RGBA8_UINT, Size);
 
 	Error += Texture.size() == sizeof(glm::u8vec4) * 9 ? 0 : 1;
-	Error += Texture.format() == gli::RGBA8U ? 0 : 1;
+	Error += Texture.format() == gli::FORMAT_RGBA8_UINT ? 0 : 1;
 	Error += Texture.levels() == 2 ? 0 : 1;
 	Error += !Texture.empty() ? 0 : 1;
 	Error += Texture.dimensions().x == 2 ? 0 : 1;
@@ -102,9 +102,9 @@ int test_texture3d_access()
 	{
 		glm::u8vec4 const Orange(255, 127, 0, 255);
 
-		gli::image Image(gli::RGBA8U, gli::image::dim_type(2));
+		gli::image Image(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(2));
 
-		gli::texture3D Texture(gli::texture3D::size_type(1), gli::RGBA8U, gli::texture3D::dim_type(2));
+		gli::texture3D Texture(gli::texture3D::size_type(1), gli::FORMAT_RGBA8_UINT, gli::texture3D::dim_type(2));
 
 		Error += Image.size() == Texture.size() ? 0 : 1;
 	}
@@ -112,7 +112,7 @@ int test_texture3d_access()
 	{
 		gli::texture3D Texture(
 			gli::texture3D::size_type(2),
-			gli::RGBA8U,
+			gli::FORMAT_RGBA8_UINT,
 			gli::texture3D::dim_type(2));
 		assert(!Texture.empty());
 
@@ -171,12 +171,12 @@ int test_texture3d_size()
 	int Error(0);
 
 	std::vector<test> Tests;
-	Tests.push_back(test(gli::RGBA8U, gli::texture3D::dim_type(4), 256));
-	Tests.push_back(test(gli::R8U, gli::texture3D::dim_type(4), 64));
-	Tests.push_back(test(gli::RGBA_DXT1, gli::texture3D::dim_type(4), 32));
-	Tests.push_back(test(gli::RGBA_DXT1, gli::texture3D::dim_type(2), 32));
-	Tests.push_back(test(gli::RGBA_DXT1, gli::texture3D::dim_type(1), 32));
-	Tests.push_back(test(gli::RGBA_DXT5, gli::texture3D::dim_type(4), 64));
+	Tests.push_back(test(gli::FORMAT_RGBA8_UINT, gli::texture3D::dim_type(4), 256));
+	Tests.push_back(test(gli::FORMAT_R8_UINT, gli::texture3D::dim_type(4), 64));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture3D::dim_type(4), 32));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture3D::dim_type(2), 32));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture3D::dim_type(1), 32));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT5_UNORM, gli::texture3D::dim_type(4), 64));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{

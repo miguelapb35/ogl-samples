@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/fbo-blit.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/fbo-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(512, 512);
 
 	struct vertex

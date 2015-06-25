@@ -27,10 +27,10 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-420/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE_DXT5("kueken2-dxt5.dds");
-	char const * TEXTURE_DIFFUSE_RGTC("kueken2-bc4.dds");
-	char const * TEXTURE_DIFFUSE_BPTC("kueken2-bc7.dds");
-	char const * TEXTURE_DIFFUSE_RGB8("kueken2-bgra8.dds");
+	char const * TEXTURE_DIFFUSE_DXT5_SRGB("kueken7_rgba_dxt5_srgb.dds");
+	char const * TEXTURE_DIFFUSE_DXT5_UNORM("kueken7_rgba_dxt5_unorm.dds");
+	char const * TEXTURE_DIFFUSE_RGB8_SNORM("kueken7_rgba8_snorm.dds");
+	char const * TEXTURE_DIFFUSE_RG11B10_UFLOAT("kueken7_rg11b10_ufloat.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -149,7 +149,7 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BPTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5_SRGB).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -172,7 +172,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT5_UNORM).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -195,33 +195,29 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGTC).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RG11B10_UFLOAT).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::RGTC]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+			glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 			glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
 				Format.Internal, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
+				glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 					0, 0,
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
-					Format.External,
-					GLsizei(Texture[Level].size()),
+					Format.External, Format.Type,
 					Texture[Level].data());
 			}
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8_SNORM).c_str()));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 

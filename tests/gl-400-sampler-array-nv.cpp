@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("gl-400/sampler-array-nv.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-400/sampler-array-nv.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

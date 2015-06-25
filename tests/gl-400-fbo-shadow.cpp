@@ -28,7 +28,7 @@ namespace
 	char const * VERT_SHADER_SOURCE_DEPTH("gl-400/fbo-shadow-depth.vert");
 	char const * VERT_SHADER_SOURCE_RENDER("gl-400/fbo-shadow-render.vert");
 	char const * FRAG_SHADER_SOURCE_RENDER("gl-400/fbo-shadow-render.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);

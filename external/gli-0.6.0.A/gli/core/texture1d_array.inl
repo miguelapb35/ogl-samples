@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -31,13 +31,10 @@
 namespace gli
 {
 	inline texture1DArray::texture1DArray() :
-		BaseLayer(0), 
-		MaxLayer(0), 
-		BaseFace(0), 
-		MaxFace(0), 
-		BaseLevel(0), 
-		MaxLevel(0),
-		Format(FORMAT_INVALID)
+		BaseLayer(0), MaxLayer(0),
+		BaseFace(0), MaxFace(0),
+		BaseLevel(0), MaxLevel(0),
+		Format(static_cast<gli::format>(FORMAT_INVALID))
 	{}
 
 	inline texture1DArray::texture1DArray
@@ -218,7 +215,7 @@ namespace gli
 	inline texture1DArray::size_type texture1DArray::size() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return this->size() / sizeof(genType);
 	}
@@ -227,7 +224,7 @@ namespace gli
 	inline genType * texture1DArray::data()
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<genType *>(this->data());
 	}
@@ -236,7 +233,7 @@ namespace gli
 	inline genType const * texture1DArray::data() const
 	{
 		assert(!this->empty());
-		assert(block_size(this->format()) >= sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		return reinterpret_cast<const genType *>(this->data());
 	}
@@ -250,7 +247,7 @@ namespace gli
 	template <typename genType>
 	inline void texture1DArray::clear(genType const & Texel)
 	{
-		assert(block_size(this->format()) == sizeof(genType));
+		assert(block_size(this->Storage.format()) >= sizeof(genType));
 
 		for(size_type Layer = 0; Layer < this->layers(); ++Layer)
 			(*this)[Layer].clear<genType>(Texel);
@@ -286,3 +283,5 @@ namespace gli
 		return this->MaxLevel;
 	}
 }//namespace gli
+
+

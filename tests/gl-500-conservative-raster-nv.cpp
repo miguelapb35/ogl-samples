@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-500/conservative-raster.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-500/conservative-raster-blit.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-500/conservative-raster-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

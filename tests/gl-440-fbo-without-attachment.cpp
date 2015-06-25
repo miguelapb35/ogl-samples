@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_RENDER("gl-440/fbo-render.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-440/fbo-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-440/fbo-splash.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -215,10 +215,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 
 		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), Format.Internal,
 			static_cast<GLsizei>(Texture.dimensions().x),

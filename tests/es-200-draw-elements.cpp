@@ -134,6 +134,12 @@ private:
 	{
 		bool Validated(true);
 
+		char const * Vendor = (char const *)glGetString(GL_VENDOR);
+		printf(Vendor);
+		char const * Renderer = (char const *)glGetString(GL_RENDERER);
+		printf(Renderer);
+		char const * Version = (char const *)glGetString(GL_VERSION);
+		printf(Version);
 		char const * Extensions = (char const *)glGetString(GL_EXTENSIONS);
 		printf(Extensions);
 

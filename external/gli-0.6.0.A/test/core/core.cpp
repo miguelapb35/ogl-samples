@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -34,7 +34,7 @@ int test_create_texture_storage()
 {
 	int Error(0);
 
-	gli::texture2D Texture(gli::RGBA8U, gli::texture2D::dim_type(256));
+	gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(256));
 	gli::texture2D::size_type Levels = Texture.levels();
 
 	assert(!Texture.empty());

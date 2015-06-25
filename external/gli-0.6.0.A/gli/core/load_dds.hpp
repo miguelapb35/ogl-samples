@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 /// OpenGL Image (gli.g-truc.net)
 ///
-/// Copyright (c) 2008 - 2013 G-Truc Creation (www.g-truc.net)
+/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
 /// in the Software without restriction, including without limitation the rights
@@ -29,20 +29,12 @@
 #pragma once
 
 #include "storage.hpp"
+#include "dx.hpp"
 
 namespace gli
 {
 	//Loads a texture storage from file
 	storage load_dds(char const * Filename);
-
-
-	//Loads a texture storage from memory
-	storage load_dds(const char* pBuffer, size_t size);
-
-
-	//Loads a texture storage from a std::istream
-	storage load_dds(std::istream& streamIn);
-
 
 }//namespace gli
 

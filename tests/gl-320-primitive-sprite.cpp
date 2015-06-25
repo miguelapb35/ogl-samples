@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_srgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4f);
@@ -144,7 +144,6 @@ private:
 		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		assert(!gli::is(Texture.format(), gli::FORMAT_COMPRESSED_BIT));
 
 		gli::gl::format const Format = GL.translate(Texture.format());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
