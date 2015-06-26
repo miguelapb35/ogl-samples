@@ -162,10 +162,7 @@ private:
 		}
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
-		glTexImage2D(GL_TEXTURE_2D, 0,
-			Format.Internal,
-			FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0,
-			Format.External, Format.Type, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -253,7 +250,7 @@ private:
 	void renderFBO(GLuint Framebuffer)
 	{
 		glm::mat4 Perspective = glm::perspective(glm::pi<float>() * 0.25f, float(FRAMEBUFFER_SIZE.x) / FRAMEBUFFER_SIZE.y, 0.1f, 100.0f);
-		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.3f));
+		glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 		glm::mat4 MVP = Perspective * this->view() * Model;
 
 		glUniformMatrix4fv(UniformMVP, 1, GL_FALSE, &MVP[0][0]);

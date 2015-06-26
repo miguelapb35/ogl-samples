@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-420/image-unpack.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/image-unpack.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
 
 	struct vertex
 	{
