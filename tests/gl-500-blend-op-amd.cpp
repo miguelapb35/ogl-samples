@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE1("gl-500/blend-op-amd.frag");
 	char const * VERT_SHADER_SOURCE2("gl-500/blend-texture-2d-amd.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-500/blend-texture-2d-amd.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(640, 480);
 
 	GLsizei const VertexCount(4);
@@ -176,6 +176,8 @@ private:
 	{
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glGenTextures(texture::MAX, TextureName);
 
@@ -192,15 +194,11 @@ private:
 
 		for(std::size_t Level(0); Level < Texture.levels(); ++Level)
 		{
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				GLint(Level), 
-				GL_RGB8,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0,  
-				GL_BGR, 
-				GL_UNSIGNED_BYTE, 
+			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				Format.Internal,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				0,
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 

@@ -29,7 +29,6 @@ namespace
 	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-320/primitive-line-msaa-render.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/primitive-line-msaa-splash.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/primitive-line-msaa-splash.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt1.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

@@ -24,7 +24,6 @@ out gl_PerVertex
 out block
 {
 	vec2 Texcoord;
-	flat int Instance;
 } Out;
 
 void main()

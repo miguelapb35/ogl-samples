@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-500/texture-sparse-amd.vert");
 	char const * FRAG_SHADER_SOURCE("gl-500/texture-sparse-amd.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -133,8 +133,10 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
+		gli::gl::format const Format = GL.translate(Texture.format());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -143,17 +145,14 @@ private:
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(glm::log2(4096.f)) - GLint(glm::log2(256.f)));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		//glTexStorage2D(GL_TEXTURE_2D, GLint(glm::log2(4096.f)), GL_RGBA8, GLsizei(Size), GLsizei(Size));
 
-		glTextureStorageSparseAMD(TextureName, GL_TEXTURE_2D, GL_RGBA8, Size, Size, GLsizei(1), GLsizei(1), GL_TEXTURE_STORAGE_SPARSE_BIT_AMD);
+		glTextureStorageSparseAMD(TextureName, GL_TEXTURE_2D, Format.Internal, Size, Size, GLsizei(1), GLsizei(1), GL_TEXTURE_STORAGE_SPARSE_BIT_AMD);
 
 		GLint PageSizeX(0);
 		GLint PageSizeY(0);
@@ -176,11 +175,9 @@ private:
 				glTexSubImage2D(
 					GL_TEXTURE_2D, 
 					GLint(Level), 
-					i * GLsizei(Texture[0].dimensions().x), 
-					j * GLsizei(Texture[0].dimensions().y), 
-					GLsizei(Texture[0].dimensions().x), 
-					GLsizei(Texture[0].dimensions().y), 
-					GL_BGR, GL_UNSIGNED_BYTE, 
+					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y),
+					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
+					Format.External, Format.Type,
 					Texture[0].data());
 			}
 		}

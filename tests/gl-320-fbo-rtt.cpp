@@ -29,7 +29,6 @@ namespace
 	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
 	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.vert");
 	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 
 	GLsizei const VertexCount(4);

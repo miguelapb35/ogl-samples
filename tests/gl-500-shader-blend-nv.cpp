@@ -29,7 +29,7 @@ namespace
 	char const * FRAG_SHADER_SOURCE_RENDER("gl-500/shader-blend-render-nv.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("gl-500/shader-blend-blit-nv.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-500/shader-blend-blit-nv.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

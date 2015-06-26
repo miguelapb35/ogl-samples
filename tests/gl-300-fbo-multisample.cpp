@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-300/image-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-300/image-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken3-bgr8.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom

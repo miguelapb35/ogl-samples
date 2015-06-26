@@ -28,7 +28,7 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-430/program-subroutine.vert");
 	char const * GEOM_SHADER_SOURCE("gl-430/program-subroutine.geom");
 	char const * FRAG_SHADER_SOURCE("gl-430/program-subroutine.frag");
-	char const * TEXTURE_DIFFUSE_RGB8("kueken1-bgr8.dds");
+	char const * TEXTURE_DIFFUSE_RGB8("kueken7_rgba8_srgb.dds");
 	char const * TEXTURE_DIFFUSE_DXT1("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(4);
@@ -248,12 +248,10 @@ private:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glCompressedTexImage2D(
-					GL_TEXTURE_2D,
-					GLint(Level),
+				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					GLsizei(Texture[Level].dimensions().x), 
-					GLsizei(Texture[Level].dimensions().y), 
+					GLsizei(Texture[Level].dimensions().x),
+					GLsizei(Texture[Level].dimensions().y),
 					0, 
 					GLsizei(Texture[Level].size()), 
 					Texture[Level].data());

@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-330/texture-integer.vert");
 	char const * FRAG_SHADER_SOURCE("gl-330/texture-integer-10bit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb10_a2_ui.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgb10a2_uint.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);

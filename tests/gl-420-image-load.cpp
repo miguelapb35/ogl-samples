@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-420/image-load.vert");
 	char const * FRAG_SHADER_SOURCE("gl-420/image-load.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba16f.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba16_sfloat.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-fetch.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-fetch.frag");
-	char const * TEXTURE_DIFFUSE("kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba_dxt5_srgb.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -138,18 +138,18 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 
+		gli::gl GL;
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-	
+		assert(!Texture.empty());
+		gli::gl::format const Format = GL.translate(Texture.format());
+
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
-				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
+			glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
+				Format.Internal,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				0,
+				GLsizei(Texture[Level].size()),
 				Texture[Level].data());
 		}
 
