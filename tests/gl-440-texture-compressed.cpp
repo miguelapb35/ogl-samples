@@ -293,7 +293,7 @@ private:
 		Viewport[texture::BC1] = glm::ivec4(WindowSize.x >> 1, WindowSize.y >> 1, WindowSize >> 1);
 		Viewport[texture::BC3] = glm::ivec4(0, WindowSize.y >> 1, WindowSize >> 1);
 
-		bool Validated(true);
+		bool Validated = this->checkExtension("GL_ARB_multi_bind");
 
 		if(Validated)
 			Validated = initProgram();
