@@ -24,6 +24,7 @@
 #include "test.hpp"
 #include "png.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <fstream>
 
 namespace
 {
@@ -389,7 +390,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	}
 	else
 	{
-		TextureRGB = TextureRead;
+		TextureRGB[0] = TextureRead[0];
 	}
 
 	bool Success = true;

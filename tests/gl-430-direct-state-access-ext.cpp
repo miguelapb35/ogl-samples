@@ -186,7 +186,10 @@ private:
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureParameterivEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Format.Swizzle);
+		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, Format.Swizzle[0]);
+		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, Format.Swizzle[1]);
+		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, Format.Swizzle[2]);
+		glTextureParameteriEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, Format.Swizzle[3]);
 
 		glTextureStorage2DEXT(TextureName[texture::TEXTURE], GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

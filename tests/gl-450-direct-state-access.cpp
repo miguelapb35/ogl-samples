@@ -24,6 +24,56 @@
 #include "test.hpp"
 //#include "dsa.hpp"
 
+GLuint CreateTextureArray(char const* Filename)
+{
+gli::texture2D Texture(gli::load_dds(Filename));
+assert(!Texture.empty());
+gli::gl GL;
+gli::gl::format const Format = GL.translate(Texture.format());
+GLuint TextureName = 0;
+glGenTextures(1, &TextureName);
+glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Format.Swizzle[0]);
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Format.Swizzle[1]);
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Format.Swizzle[2]);
+glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Format.Swizzle[3]);
+glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
+Format.Internal,
+static_cast<GLsizei>(Texture.dimensions().x),
+static_cast<GLsizei>(Texture.dimensions().y),
+static_cast<GLsizei>(1));
+if(gli::is_compressed(Texture.format()))
+{
+for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+{
+glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+0, 0, 0,
+static_cast<GLsizei>(Texture[Level].dimensions().x),
+static_cast<GLsizei>(Texture[Level].dimensions().y),
+static_cast<GLsizei>(1),
+Format.External,
+static_cast<GLsizei>(Texture[Level].size()),
+Texture[Level].data());
+}
+}
+else
+{
+for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+{
+glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+0, 0, 0,
+static_cast<GLsizei>(Texture[Level].dimensions().x),
+static_cast<GLsizei>(Texture[Level].dimensions().y),
+static_cast<GLsizei>(1),
+Format.External, Format.Type,
+Texture[Level].data());
+}
+}
+return TextureName;
+}
+
 namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-450/direct-state-access.vert");

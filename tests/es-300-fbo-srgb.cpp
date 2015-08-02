@@ -212,6 +212,8 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		GLint Swizzle[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, Swizzle);
 
 		gli::gl::format const Format = GL.translate(Texture.format());
 		for (gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
