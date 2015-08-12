@@ -33,16 +33,16 @@ namespace
 		vertex_v3fn3fc4f
 		(
 			glm::vec3 const & Position,
-			glm::vec3 const & Texcoord,
+			glm::vec3 const & Normal,
 			glm::vec4 const & Color
 		) :
 			Position(Position),
-			Texcoord(Texcoord),
+			Normal(Normal),
 			Color(Color)
 		{}
 
 		glm::vec3 Position;
-		glm::vec3 Texcoord;
+		glm::vec3 Normal;
 		glm::vec4 Color;
 	};
 
