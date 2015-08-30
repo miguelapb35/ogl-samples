@@ -118,7 +118,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
-		gli::texture2DArray Texture(15, 1, gli::FORMAT_RGBA8_UNORM, gli::texture2DArray::dim_type(4));
+		gli::texture2DArray Texture(gli::FORMAT_RGBA8_UNORM, gli::texture2DArray::dim_type(4), 15, 1);
 		for(gli::size_t LayerIndex = 0; LayerIndex < Texture.layers(); ++LayerIndex)
 		{
 			glm::u8vec4 const Color(glm::linearRand(glm::vec4(0), glm::vec4(1)) * 255.f);

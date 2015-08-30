@@ -175,7 +175,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(6, 1, gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(2));
+		gli::textureCube Texture(gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(2), 1);
 		assert(!Texture.empty());
 
 		gli::gl GL;

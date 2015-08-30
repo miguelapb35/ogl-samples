@@ -27,10 +27,10 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-440/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-440/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE_R5G6B5_UNORM("kueken7_r5g6b5_unorm.dds");
-	char const * TEXTURE_DIFFUSE_RGB9E5_UFLOAT("kueken7_rgb9e5_ufloat.dds");
-	char const * TEXTURE_DIFFUSE_RGBA_DXT5_UNORM("kueken7_rgba_dxt5_unorm.dds");
-	char const * TEXTURE_DIFFUSE_ETC1_UNORM("kueken7_rgb_etc1_unorm.dds");
+	char const * TEXTURE_DIFFUSE_RGB_ETC2_SRGB("kueken7_rgb_etc2_srgb.ktx");
+	char const * TEXTURE_DIFFUSE_RGB9E5_UFLOAT("kueken7_rgb9e5_ufloat.ktx");
+	char const * TEXTURE_DIFFUSE_RGBA_DXT5_UNORM("kueken7_rgba_dxt5_unorm.ktx");
+	char const * TEXTURE_DIFFUSE_ETC1_UNORM("kueken7_rgb_etc1_unorm.ktx");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -148,7 +148,7 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGBA_DXT5_UNORM).c_str()));
+			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGBA_DXT5_UNORM));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -165,17 +165,19 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
+				gli::image::dim_type const Dimensions = Texture.dimensions(Level);
+
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
-					Format.External,
-					static_cast<GLsizei>(Texture[Level].size()),
-					Texture[Level].data());
+					static_cast<GLsizei>(Dimensions.x), static_cast<GLsizei>(Dimensions.y), static_cast<GLsizei>(1),
+					Format.Internal,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(0, 0, Level));
 			}
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_ETC1_UNORM).c_str()));
+			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_ETC1_UNORM));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -194,15 +196,15 @@ private:
 			{
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
-					Format.External,
-					static_cast<GLsizei>(Texture[Level].size()),
-					Texture[Level].data());
+					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
+					Format.Internal,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(0, 0, Level));
 			}
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB9E5_UFLOAT).c_str()));
+			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGB9E5_UFLOAT));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -221,14 +223,14 @@ private:
 			{
 				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
 					Format.External, Format.Type,
-					Texture[Level].data());
+					Texture.data(0, 0, Level));
 			}
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_R5G6B5_UNORM).c_str()));
+			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGB_ETC2_SRGB).c_str());
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -245,11 +247,12 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
+				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
-					Format.External, Format.Type,
-					Texture[Level].data());
+					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
+					Format.Internal,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(0, 0, Level));
 			}
 		}
 

@@ -370,12 +370,11 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	GLint WindowSizeY(0);
 	glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
 
-	gli::texture2D TextureRead(1, ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM : gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+	gli::texture2D TextureRead(ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM : gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY), 1);
+	gli::texture2D TextureRGB(gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY), 1);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.data());
-
-	gli::texture2D TextureRGB(1, gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY));
+	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.format() == gli::FORMAT_RGBA8_UNORM ? TextureRead.data() : TextureRGB.data());
 
 	if(TextureRead.format() == gli::FORMAT_RGBA8_UNORM)
 	{
@@ -384,13 +383,9 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		{
 			gli::texture2D::dim_type TexelCoord(x, y);
 
-			glm::u8vec3 Color(gli::texelFetch<glm::u8vec4>(TextureRead, TexelCoord, 0));
-			gli::texelWrite(TextureRGB, TexelCoord, 0, Color);
+			glm::u8vec3 Color(TextureRead.fetch<glm::u8vec4>(TexelCoord, 0));
+			TextureRGB.write(TexelCoord, 0, Color);
 		}
-	}
-	else
-	{
-		TextureRGB[0] = TextureRead[0];
 	}
 
 	bool Success = true;

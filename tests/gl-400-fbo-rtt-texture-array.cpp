@@ -103,14 +103,11 @@ private:
 
 		glTexImage3D(
 			GL_TEXTURE_2D_ARRAY,
-			0, 
-			GL_RGBA8, 
-			GLsizei(FramebufferSize.x),
-			GLsizei(FramebufferSize.y),
-			GLsizei(3), //depth
-			0,  
-			GL_RGB, 
-			GL_UNSIGNED_BYTE, 
+			0,
+			GL_RGBA8,
+			GLsizei(FramebufferSize.x), GLsizei(FramebufferSize.y), GLsizei(3), //depth
+			0,
+			GL_RGB, GL_UNSIGNED_BYTE,
 			NULL);
 
 		return this->checkError("initTexture");

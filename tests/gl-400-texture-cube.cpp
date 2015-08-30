@@ -27,6 +27,8 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-400/texture-cube.vert");
 	char const * FRAG_SHADER_SOURCE("gl-400/texture-cube.frag");
+	char const * TEXTURE_DIFFUSE_DDS("cube_rgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE_KTX("cube_rgba8_unorm.ktx");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -154,23 +156,19 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
-		gli::textureCube Texture(6, 1, gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(8));
+		gli::texture Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_DDS));
 		assert(!Texture.empty());
 
-		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
-		Texture[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
-		Texture[2].clear<glm::u8vec4>(glm::u8vec4(255, 255,   0, 255));
-		Texture[3].clear<glm::u8vec4>(glm::u8vec4(  0, 255,   0, 255));
-		Texture[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
-		Texture[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::target const Target = GL.translate(Texture.target());
 
-		glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
-			GL_RGBA8,
-			static_cast<GLsizei>(Texture.dimensions().x),
-			static_cast<GLsizei>(Texture.dimensions().y),
-			static_cast<GLsizei>(Texture.faces()),
+		glTexImage3D(
+			Target, 0,
+			Format.Internal,
+			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(Texture.faces()),
 			0,
-			GL_RGBA, GL_UNSIGNED_BYTE,
+			Format.External, Format.Type,
 			Texture.data());
 
 		return true;
