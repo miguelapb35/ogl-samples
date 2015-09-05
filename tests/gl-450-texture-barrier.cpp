@@ -197,7 +197,7 @@ private:
 			glCompressedTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				0, 0,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
-				Format.External,
+				Format.Internal,
 				static_cast<GLsizei>(Texture[Level].size()),
 				Texture[Level].data());
 		}

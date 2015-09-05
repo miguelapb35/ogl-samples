@@ -178,8 +178,7 @@ private:
 					continue;
 
 				glTexSubImage2D(
-					GL_TEXTURE_2D, 
-					GLint(Level), 
+					GL_TEXTURE_2D, GLint(Level),
 					i * GLsizei(Texture[0].dimensions().x), j * GLsizei(Texture[0].dimensions().y),
 					GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
 					Format.External, Format.Type,

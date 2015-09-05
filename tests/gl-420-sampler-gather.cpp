@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("gl-420/gather.vert");
 	char const * FRAGMENT_SHADER_SOURCE("gl-420/gather.frag");
-	char const * TEXTURE_DIFFUSE( "kueken1-dxt5.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba_dxt5_srgb.dds");
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -139,22 +139,25 @@ private:
 	{
 		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
+		gli::gl GL;
+		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+
 		glGenTextures(1, &TextureName);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(GL_TEXTURE_2D,
 				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				Format.Internal,
+				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 				0, 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());

@@ -28,7 +28,7 @@ namespace
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-compressed.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-compressed.frag");
 	char const * TEXTURE_DIFFUSE_BC1("kueken7_rgb_dxt1_srgb.dds");
-	char const * TEXTURE_DIFFUSE_BC3("test.dds");
+	char const * TEXTURE_DIFFUSE_BC3("kueken7_rgba_dxt5_srgb.dds");
 	char const * TEXTURE_DIFFUSE_BC4("kueken7_r_ati1n_unorm.dds");
 	char const * TEXTURE_DIFFUSE_BC5("kueken7_rg_ati2n_unorm.dds");
 
@@ -146,7 +146,8 @@ private:
 		glGenTextures(TEXTURE_MAX, TextureName);
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
+			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC1));
+			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC1]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -165,7 +166,8 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC3).c_str()));
+			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC3));
+			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC3]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -184,7 +186,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC4).c_str()));
+			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC4));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC4]);
@@ -204,7 +206,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC5).c_str()));
+			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC5));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC5]);

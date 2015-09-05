@@ -295,12 +295,12 @@ namespace gli
 	{
 		static gl::swizzle const Table[] =
 		{
-			gl::SWIZZLE_ZERO,
-			gl::SWIZZLE_ONE,
 			gl::SWIZZLE_RED,
 			gl::SWIZZLE_GREEN,
 			gl::SWIZZLE_BLUE,
-			gl::SWIZZLE_ALPHA
+			gl::SWIZZLE_ALPHA,
+			gl::SWIZZLE_ZERO,
+			gl::SWIZZLE_ONE
 		};
 		static_assert(sizeof(Table) / sizeof(Table[0]) == SWIZZLE_COUNT, "GLI error: swizzle descriptor list doesn't match number of supported swizzles");
 
