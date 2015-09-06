@@ -64,7 +64,7 @@ class instance : public test
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-420-debug-output", test::COMPATIBILITY, 4, 2)
+		: test(argc, argv, "gl-420-debug-output", test::COMPATIBILITY, 4, 2, glm::vec2(0.25f, 0.25f), GENERATE_ERROR)
 		, PipelineName(0)
 		, ProgramName(0)
 		, VertexArrayName(0)
