@@ -39,9 +39,6 @@ void caps::initVersion()
 	this->VersionData.VERSION = reinterpret_cast<const char *>(glGetString(GL_VERSION));
 	this->VersionData.SHADING_LANGUAGE_VERSION = reinterpret_cast<const char *>(glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	if(this->check(4, 3) || Extensions.KHR_debug)
-		glGetIntegerv(GL_CONTEXT_FLAGS, &VersionData.CONTEXT_FLAGS);
-
 	if(this->check(3, 0))
 		glGetIntegerv(GL_NUM_EXTENSIONS, &VersionData.NUM_EXTENSIONS);
 
@@ -67,7 +64,7 @@ void caps::initVersion()
 			else if(Version == std::string("150 compatibility"))
 				VersionData.GLSL150Comp = true;
 			else if(Version == std::string("300 es"))
-				VersionData.GLSL330Core = true;
+				VersionData.GLSL300ES  = true;
 			else if(Version == std::string("330 core"))
 				VersionData.GLSL330Core = true;
 			else if(Version == std::string("330 compatibility"))
@@ -1369,6 +1366,10 @@ caps::caps(profile const & Profile) :
 {
 	this->initVersion();
 	this->initExtensions();
+
+	if(this->check(4, 3) || Extensions.KHR_debug)
+		glGetIntegerv(GL_CONTEXT_FLAGS, &VersionData.CONTEXT_FLAGS);
+
 	this->initDebug();
 	this->initLimits();
 	this->initValues();
