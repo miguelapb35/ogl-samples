@@ -113,16 +113,16 @@ private:
 
 			ProgramName[program::PROG] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::PROG] , GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::PROG] , VertShaderName);
-			glAttachShader(ProgramName[program::PROG] , LibShaderName);
-			glAttachShader(ProgramName[program::PROG] , FragShaderProgName);
-			glLinkProgram(ProgramName[program::PROG] );
+			glAttachShader(ProgramName[program::PROG], VertShaderName);
+			glAttachShader(ProgramName[program::PROG], LibShaderName);
+			glAttachShader(ProgramName[program::PROG], FragShaderProgName);
+			glLinkProgram(ProgramName[program::PROG]);
 
 			ProgramName[program::FUNC] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::FUNC] , GL_PROGRAM_SEPARABLE, GL_TRUE);
-			glAttachShader(ProgramName[program::FUNC] , VertShaderName);
-			glAttachShader(ProgramName[program::FUNC] , FragShaderFuncName);
-			glLinkProgram(ProgramName[program::FUNC] );
+			glAttachShader(ProgramName[program::FUNC], VertShaderName);
+			glAttachShader(ProgramName[program::FUNC], FragShaderFuncName);
+			glLinkProgram(ProgramName[program::FUNC]);
 
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::PROG]);
 			Validated = Validated && Compiler.checkProgram(ProgramName[program::FUNC]);

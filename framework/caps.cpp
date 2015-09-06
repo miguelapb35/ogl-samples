@@ -549,8 +549,6 @@ void caps::initExtensions()
 				ExtensionData.ARB_vertex_attrib_binding = true;
 			else if(!strcmp("GL_ARB_robustness_isolation", Extension))
 				ExtensionData.ARB_robustness_isolation = true;
-			else if(!strcmp("GL_ARB_robustness_isolation", Extension))
-				ExtensionData.ARB_robustness_isolation = true;
 			else if(!strcmp("GL_ARB_ES3_compatibility", Extension))
 				ExtensionData.ARB_ES3_compatibility = true;
 			else if(!strcmp("GL_ARB_explicit_uniform_location", Extension))
@@ -659,10 +657,6 @@ void caps::initExtensions()
 			}
 			if(!strcmp("GL_EXT_texture_filter_anisotropic", Extension)) {
 				ExtensionData.EXT_texture_filter_anisotropic = true;
-				continue;
-			}
-			if(!strcmp("GL_EXT_texture_compression_s3tc", Extension)) {
-				ExtensionData.EXT_texture_compression_s3tc = true;
 				continue;
 			}
 			if(!strcmp("GL_EXT_texture_array", Extension)) {
