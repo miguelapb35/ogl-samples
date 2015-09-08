@@ -67,7 +67,7 @@ class gl_440_interface_matching : public test
 {
 public:
 	gl_440_interface_matching(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-interface-matching", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-interface-matching", test::CORE, 4, 3),
 		PipelineName(0),
 		VertexArrayName(0)
 	{}

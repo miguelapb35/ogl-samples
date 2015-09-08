@@ -76,7 +76,7 @@ class gl_440_transform_feedback : public test
 {
 public:
 	gl_440_transform_feedback(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-transform-feedback", test::CORE, 4, 4)
+		test(argc, argv, "gl-440-transform-feedback", test::CORE, 4, 3)
 	{}
 
 private:
@@ -183,6 +183,7 @@ private:
 	bool begin()
 	{
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_ARB_enhanced_layouts");
 
 		if(Validated)
 			Validated = initProgram();
@@ -192,11 +193,13 @@ private:
 			Validated = initVertexArray();
 		if(Validated)
 			Validated = initFeedback();
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		UniformPointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		if(Validated)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			UniformPointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		}
 
 		return Validated;
 	}

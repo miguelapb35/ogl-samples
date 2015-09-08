@@ -27,6 +27,7 @@ namespace
 {
 	char const * VERTEX_SHADER_SOURCE("es-300/flat-color.vert");
 	char const * FRAGMENT_SHADER_SOURCE("es-300/flat-color.frag");
+	char const * FRAGMENT_SHADER_SOURCE_FAIL("es-300/flat-color-fail.frag");
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint32);
@@ -65,7 +66,17 @@ private:
 	bool initProgram()
 	{
 		bool Validated = true;
-		
+
+		// Check fail positive
+		if(Validated)
+		{
+			compiler Compiler;
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE_FAIL);
+
+			Validated = Validated && !Compiler.check();
+			glDeleteShader(FragShaderName);
+		}
+
 		// Create program
 		if(Validated)
 		{

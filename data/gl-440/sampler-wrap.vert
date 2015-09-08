@@ -8,7 +8,7 @@
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
-//layout(std430, column_major) buffer; //AMD bug
+layout(std430, column_major) buffer;
 
 layout(binding = TRANSFORM0) uniform transform
 {

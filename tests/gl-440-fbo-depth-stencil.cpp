@@ -99,7 +99,7 @@ class gl_440_fbo_depth_stencil : public test
 {
 public:
 	gl_440_fbo_depth_stencil(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo-depth-stencil", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-fbo-depth-stencil", test::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -295,6 +295,7 @@ private:
 	bool begin()
 	{
 		bool Validated(true);
+		Validated = Validated && this->checkExtension("GL_ARB_texture_stencil8");
 
 		if(Validated)
 			Validated = initProgram();

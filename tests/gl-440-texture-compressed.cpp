@@ -30,7 +30,7 @@ namespace
 	char const * TEXTURE_DIFFUSE_RGB_ETC2_SRGB("kueken7_rgb_etc2_srgb.ktx");
 	char const * TEXTURE_DIFFUSE_RGB9E5_UFLOAT("kueken7_rgb9e5_ufloat.ktx");
 	char const * TEXTURE_DIFFUSE_RGBA_DXT5_UNORM("kueken7_rgba_dxt5_unorm.ktx");
-	char const * TEXTURE_DIFFUSE_ETC1_UNORM("kueken7_rgb_etc1_unorm.ktx");
+	char const * TEXTURE_DIFFUSE_RG_EAC_UNORM("kueken7_rg_eac_snorm.ktx");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -178,7 +178,7 @@ private:
 		}
 
 		{
-			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_ETC1_UNORM));
+			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RG_EAC_UNORM));
 			assert(!Texture.empty());
 			gli::gl::format const Format = GL.translate(Texture.format());
 			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());

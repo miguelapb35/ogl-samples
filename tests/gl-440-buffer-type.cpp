@@ -139,7 +139,7 @@ class gl_440_buffer_type : public test
 {
 public:
 	gl_440_buffer_type(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		UniformPointer(nullptr)
@@ -285,6 +285,7 @@ private:
 		Viewport[viewport::VIEWPORT5] = view(glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f), vertex_format::RG11B10F);
 
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_ARB_vertex_type_10f_11f_11f_rev");
 
 		if(Validated)
 			Validated = initProgram();
@@ -292,11 +293,13 @@ private:
 			Validated = initBuffer();
 		if(Validated)
 			Validated = initVertexArray();
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		UniformPointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		if(Validated)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			UniformPointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		}
 
 		return Validated;
 	}

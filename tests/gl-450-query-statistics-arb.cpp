@@ -254,7 +254,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = this->checkExtension("GL_ARB_derivative_control");
+		bool Validated = this->checkExtension("GL_ARB_query_statistics_arb");
 
 		if(Validated)
 			Validated = initQuery();

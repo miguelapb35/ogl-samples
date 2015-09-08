@@ -86,7 +86,7 @@ class gl_440_sampler_wrap : public test
 {
 public:
 	gl_440_sampler_wrap(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-sampler-wrap", test::CORE, 4, 4),
+		test(argc, argv, "gl-440-sampler-wrap", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -143,11 +143,7 @@ private:
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
-
-		glGetIntegerv(
-			GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-			&UniformBufferOffset);
-
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -248,6 +244,7 @@ private:
 		Viewport[viewport::VIEWPORT5] = glm::vec4(ViewportSize.x * 2.0f, ViewportSize.y * 1.0f, ViewportSize.x * 1.0f, ViewportSize.y * 1.0f);
 
 		bool Validated = true;
+		Validated = Validated && this->checkExtension("GL_ARB_texture_mirror_clamp_to_edge");
 
 		if(Validated)
 			Validated = initProgram();
@@ -259,11 +256,13 @@ private:
 			Validated = initSampler();
 		if(Validated)
 			Validated = initVertexArray();
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		UniformPointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+		if(Validated)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
+			UniformPointer = (glm::mat4*)glMapBufferRange(
+				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
+				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+		}
 
 		return Validated;
 	}
