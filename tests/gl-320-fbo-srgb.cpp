@@ -207,7 +207,7 @@ private:
 			//gli::texture2D Texture(gli::SRGB8, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec3(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
 			gli::texture2D Texture(gli::FORMAT_RGBA8_SRGB, gli::dim2_t(16));
-			Texture.clear(glm::u8vec4(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
+			Texture.clear(glm::u8vec4(glm::convertLinearToSRGB(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
 			//gli::texture2D Texture(gli::RGBA8_UNORM, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec4(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f) * 255.0f));
 			gli::save_dds(Texture, "orange.dds");
@@ -239,8 +239,8 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		glm::vec4 Data2(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.f);
-		glm::vec4 Data(glm::convertRgbToSrgb(glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)));
+		glm::vec4 Data2(glm::convertLinearToSRGB(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.f);
+		glm::vec4 Data(glm::convertLinearToSRGB(glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)));
 		glTexImage2D(GL_TEXTURE_2D, 0,
 			GL_SRGB8_ALPHA8,
 			1, 1, 0,
