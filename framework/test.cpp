@@ -176,7 +176,8 @@ test::test
 			{
 				glfwWindowHint(GLFW_OPENGL_PROFILE, Profile == CORE ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
 				glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, Profile == CORE ? GL_TRUE : GL_FALSE);
-			}	
+			}
+
 #			if defined(_DEBUG)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #			else
@@ -206,7 +207,7 @@ test::test
 		glewInit();
 		glGetError();
 
-#		if defined(GL_KHR_debug)
+#		if defined(_DEBUG) && defined(GL_KHR_debug)
 			if(this->isExtensionSupported("GL_KHR_debug"))
 			{
 				glEnable(GL_DEBUG_OUTPUT);
