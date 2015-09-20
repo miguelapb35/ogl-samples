@@ -14,7 +14,7 @@ layout(binding = TRANSFORM0) uniform transform
 	mat4 MVP;
 } Transform;
 
-layout(location = 0) in vec2 Position;
+layout(location = 0) in dvec4 Position;
 layout(location = 1) in dvec4 Color[12];
 
 out gl_PerVertex
@@ -35,5 +35,5 @@ void main()
 
 	Out.Color = vec4(Temp);
 
-	gl_Position = Transform.MVP * vec4(Position, 0, 1);
+	gl_Position = Transform.MVP * vec4(Position);
 }

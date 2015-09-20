@@ -6,6 +6,9 @@
 #include "test_screenspace_coherence.hpp"
 
 #include "test_buffer.hpp"
+#include "test_buffer_separated.hpp"
+#include "test_buffer_interleaved.hpp"
+
 #include "test_draw_call.hpp"
 #include "test_small_primitive.hpp"
 #include "test_uniform_caching.hpp"
@@ -480,6 +483,8 @@ int main(int argc, char* argv[])
 //	Error += main_uniform_caching(argc, argv);
 
 	Error += main_buffer(argc, argv);
+//	Error += main_buffer_separated(argc, argv);
+//	Error += main_buffer_interleaved(argc, argv);
 
 	return Error;
 }

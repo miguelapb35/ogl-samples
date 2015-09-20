@@ -16,5 +16,5 @@ in block
 
 void main()
 {
-	Color = In.Color;
+	Color = (vec4(1.0f, 0.5f, 0.0f, 1.0f) + In.Color) * 0.5;
 }
