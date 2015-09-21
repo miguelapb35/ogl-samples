@@ -7,7 +7,7 @@ ogl-samples@g-truc.net
 ================================================================================
 The MIT License
 --------------------------------------------------------------------------------
-Copyright (c) 2005 - 2014 G-Truc Creation (www.g-truc.net)
+Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,12 +61,14 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
-OpenGL Samples Pack 4.5.2.0: 2015-09-XX
+OpenGL Samples Pack 4.5.2.0: 2015-09-21
 --------------------------------------------------------------------------------
 - Added gl-320-fbo-blend-points sample
 - Added gl-400-buffer-uniform-array sample
 - Added gl-430-texture-fetch-dependent sample
 - Many updated samples
+- Updated template images for current drivers
+- Updated GLM to 0.9.7.1 and GLI to 0.7.1.0
 
 ================================================================================
 OpenGL Samples Pack 4.5.1.0: 2015-03-28
