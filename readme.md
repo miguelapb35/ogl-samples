@@ -65,6 +65,7 @@ OpenGL Samples Pack 4.5.2.0: 2015-09-21
 --------------------------------------------------------------------------------
 - Added gl-320-fbo-blend-points sample
 - Added gl-400-buffer-uniform-array sample
+- Added gl-410-buffer-uniform-array sample
 - Added gl-430-texture-fetch-dependent sample
 - Many updated samples
 - Updated template images for current drivers

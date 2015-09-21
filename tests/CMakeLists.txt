@@ -268,6 +268,8 @@ glCreateSampleGTC(transform-feedback-stream)
 # OpenGL 4.1 samples
 set(GL_VERSION_GTC 410)
 
+set(GL_SHADER_GTC buffer-uniform-array.vert buffer-uniform-array.frag)
+glCreateSampleGTC(buffer-uniform-array)
 set(GL_SHADER_GTC )
 glCreateSampleGTC(caps)
 set(GL_SHADER_GTC viewport.vert viewport.geom viewport.frag layer.vert layer.geom layer.frag)
