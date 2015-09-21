@@ -38,7 +38,7 @@
 #define TEST_F64VEC2			12
 #define TEST_F64VEC3			13
 #define TEST_F64VEC4			14
-#define TEST TEST_F16VEC2
+#define TEST TEST_F32VEC4
 
 namespace
 {
@@ -46,7 +46,7 @@ namespace
 	char const * VERT_SHADER_SOURCE_F64("micro/test_buffer_double.vert");
 	char const * FRAG_SHADER_SOURCE("micro/test_buffer.frag");
 	std::size_t const COLOR_ARRAY = 6;
-	glm::uvec2 const SCALE(2, 2);
+	glm::uvec2 const SCALE(6, 6);
 
 	struct attrib
 	{
