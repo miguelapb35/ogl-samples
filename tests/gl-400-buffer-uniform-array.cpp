@@ -73,6 +73,7 @@ private:
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLint UniformBufferAlignment;
+	GLint UniformInstance;
 
 	bool initProgram()
 	{
@@ -97,6 +98,8 @@ private:
 
 		if(Validated)
 		{
+			this->UniformInstance = glGetUniformLocation(ProgramName, "Instance");
+
 			GLint UniformMaterial = glGetUniformBlockIndex(ProgramName, "material");
 			GLint UniformTransform0 = glGetUniformBlockIndex(ProgramName, "transform[0]");
 			GLint UniformTransform1 = glGetUniformBlockIndex(ProgramName, "transform[1]");
@@ -126,7 +129,7 @@ private:
 
 	bool initBuffer()
 	{
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferAlignment);
+		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &this->UniformBufferAlignment);
 
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
@@ -138,7 +141,7 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, PositionSize, PositionData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		std::size_t UniformBufferSize = std::max<std::size_t>(UniformBufferAlignment, sizeof(glm::mat4)) * 2;
+		std::size_t UniformBufferSize = std::max<std::size_t>(this->UniformBufferAlignment, sizeof(glm::mat4)) * 2;
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
@@ -193,13 +196,12 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		std::size_t UniformBufferOffset = std::max<std::size_t>(UniformBufferAlignment, sizeof(glm::mat4));
+		std::size_t UniformBufferOffset = std::max<std::size_t>(this->UniformBufferAlignment, sizeof(glm::mat4));
 		std::size_t UniformBufferRange = UniformBufferOffset * 2;
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER,
-				0, UniformBufferRange, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, UniformBufferRange, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 const Model0 = glm::translate(glm::mat4(1.0f), glm::vec3( 1, 0, 0));
@@ -218,15 +220,19 @@ private:
 
 		glUseProgram(ProgramName);
 
+		// Attach the buffer to UBO binding point semantic::uniform::MATERIAL
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
+		glBindVertexArray(VertexArrayName);
+
 		// Attach the buffer to UBO binding point semantic::uniform::TRANSFORM0
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, sizeof(glm::mat4));
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM1, BufferName[buffer::TRANSFORM], UniformBufferOffset, sizeof(glm::mat4));
 
-		// Attach the buffer to UBO binding point semantic::uniform::MATERIAL
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::MATERIAL, BufferName[buffer::MATERIAL]);
+		glUniform1i(this->UniformInstance, 0);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0);
 
-		glBindVertexArray(VertexArrayName);
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 2, 0);
+		glUniform1i(this->UniformInstance, 1);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 1, 0);
 
 		return true;
 	}

@@ -29,6 +29,6 @@ layout(location = POSITION) in vec2 Position;
 
 void main()
 {
-	Out.Instance = gl_InstanceID;
-	gl_Position = Transform[gl_InstanceID].MVP * vec4(Position, 0.0, 1.0);
+	Out.Instance = Instance;
+	gl_Position = Transform[Instance].MVP * vec4(Position, 0.0, 1.0);
 }
