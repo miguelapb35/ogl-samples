@@ -70,6 +70,7 @@ OpenGL Samples Pack 4.5.2.0: 2015-09-21
 - Updated template images for current drivers
 - Updated GLM to 0.9.7.1 and GLI to 0.7.1.0
 - Fixed gl-320-draw-instanced #55
+- Fixed gl-430-program-binary #48
 
 ================================================================================
 OpenGL Samples Pack 4.5.1.0: 2015-03-28

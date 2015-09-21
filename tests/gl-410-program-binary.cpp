@@ -186,10 +186,11 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getBinaryDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
+				Validated = Validated && Success == GL_TRUE;
 			}
 		}
 
@@ -197,10 +198,11 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getBinaryDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
+				Validated = Validated && Success == GL_TRUE;
 			}
 		}
 
@@ -208,10 +210,11 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getBinaryDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
+			if(loadBinary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
+				Validated = Validated && Success == GL_TRUE;
 			}
 		}
 
@@ -262,9 +265,9 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		saveProgram(ProgramName[program::VERT], getBinaryDirectory() + VERT_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::GEOM], getBinaryDirectory() + GEOM_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::FRAG], getBinaryDirectory() + FRAG_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::VERT], getDataDirectory() + VERT_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::GEOM], getDataDirectory() + GEOM_PROGRAM_BINARY);
+		saveProgram(ProgramName[program::FRAG], getDataDirectory() + FRAG_PROGRAM_BINARY);
 
 		return Validated && this->checkError("initProgram");
 	}
@@ -289,8 +292,8 @@ private:
 				GL_TEXTURE_2D,
 				GLint(Level),
 				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].dimensions().x), 
-				GLsizei(Texture[Level].dimensions().y), 
+				GLsizei(Texture[Level].dimensions().x),
+				GLsizei(Texture[Level].dimensions().y),
 				0, 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());
