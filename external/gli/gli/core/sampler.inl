@@ -37,14 +37,14 @@ namespace detail
 	}
 }//namespace detail
 
-	sampler::sampler(wrap Wrap, filter Mip, filter Min)
+	inline sampler::sampler(wrap Wrap, filter Mip, filter Min)
 		: WrapMode(Wrap)
 		, WrapFunc(getFunc(Wrap))
 		, Mip(Mip)
 		, Min(Min)
 	{}
 
-	sampler::wrapFunc sampler::getFunc(wrap WrapMode) const
+	inline sampler::wrapFunc sampler::getFunc(wrap WrapMode) const
 	{
 		static wrapFunc Table[] =
 		{

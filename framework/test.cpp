@@ -385,8 +385,8 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		{
 			gli::texture2D::dim_type TexelCoord(x, y);
 
-			glm::u8vec3 Color(TextureRead.fetch<glm::u8vec4>(TexelCoord, 0));
-			TextureRGB.write(TexelCoord, 0, Color);
+			glm::u8vec3 Color(TextureRead.load<glm::u8vec4>(TexelCoord, 0));
+			TextureRGB.store(TexelCoord, 0, Color);
 		}
 	}
 
@@ -737,3 +737,4 @@ void APIENTRY test::debugOutput
 	if(Test->Success != GENERATE_ERROR && source != GL_DEBUG_SOURCE_SHADER_COMPILER_ARB)
 		assert(!Test->Error);
 }
+
