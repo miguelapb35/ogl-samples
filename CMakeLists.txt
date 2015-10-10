@@ -91,13 +91,13 @@ set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTOR
 ################################
 # Add GLM 
 
-set(GLM_DIRECTORY glm-0.9.7.1)
+set(GLM_DIRECTORY glm)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
 
 ################################
 # Add GLI 
 
-set(GLI_DIRECTORY gli-0.7.1.0)
+set(GLI_DIRECTORY gli)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
 
 ################################
