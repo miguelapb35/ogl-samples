@@ -40,17 +40,17 @@ namespace
 
 inline gli::texture2D radial
 (
-	gli::texture2D::dim_type const & Size,
-	gli::texture2D::samplecoord_type const & Center,
+	gli::texture2D::texelcoord_type const & Size,
+	gli::vec2 const & Center,
 	float const & Radius,
-	gli::texture2D::samplecoord_type const & Focal
+	gli::vec2 const & Focal
 )
 {
-	gli::texture2D Result(gli::FORMAT_RGB8_UINT, Size, 1);
+	gli::texture2D Result(gli::FORMAT_RGB8_UINT_PACK8, Size, 1);
 	glm::u8vec3 * DstData = (glm::u8vec3*)Result.data();
 
-	for(std::size_t y = 0; y < Result.dimensions().y; ++y)
-	for(std::size_t x = 0; x < Result.dimensions().x; ++x)
+	for(int y = 0; y < Result.dimensions().y; ++y)
+	for(int x = 0; x < Result.dimensions().x; ++x)
 	{
 		float Value = glm::radialGradient(
 			Center * glm::vec2(Size),
@@ -68,21 +68,21 @@ inline gli::texture2D radial
 
 inline gli::texture2D linear
 (
-	gli::texture2D::dim_type const & Size,
-	gli::texture2D::samplecoord_type const & Point0,
-	gli::texture2D::samplecoord_type const & Point1
+	gli::texture2D::texelcoord_type const & Size,
+	gli::vec2 const & Point0,
+	gli::vec2 const & Point1
 )
 {
-	gli::texture2D Result(gli::FORMAT_RGB8_UINT, gli::texture2D::dim_type(Size), 1);
+	gli::texture2D Result(gli::FORMAT_RGB8_UINT_PACK8, gli::texture2D::texelcoord_type(Size), 1);
 	glm::u8vec3 * DstData = (glm::u8vec3*)Result.data();
 
-	for(std::size_t y = 0; y < Result.dimensions().y; ++y)
-	for(std::size_t x = 0; x < Result.dimensions().x; ++x)
+	for(int y = 0; y < Result.dimensions().y; ++y)
+	for(int x = 0; x < Result.dimensions().x; ++x)
 	{
 		float Value = glm::linearGradient(
 			Point0 * glm::vec2(Size),
 			Point1 * glm::vec2(Size),
-			gli::texture2D::samplecoord_type(x, y));
+			gli::vec2(x, y));
 
 		std::size_t Index = x + y * Result.dimensions().x;
 
@@ -97,10 +97,10 @@ int test_create()
 	int Error(0);
 
 //	gli::texture2D TextureA = radial(
-//		gli::texture2D::dim_type(128), gli::texture2D::texcoord_type(0.5f), 16.f, gli::texture2D::texcoord_type(0.7f));
+//		gli::texture2D::dim_type(128), gli::vec2(0.5f), 16.f, gli::vec2(0.7f));
 
 	gli::texture2D TextureB = linear(
-		gli::texture2D::dim_type(128), gli::texture2D::samplecoord_type(0.5f), gli::texture2D::samplecoord_type(0.7f));
+		gli::texture2D::texelcoord_type(128), gli::vec2(0.5f), gli::vec2(0.7f));
 
 //	Error += TextureA != TextureB ? 0 : 1;
 
@@ -112,14 +112,14 @@ int test_alloc()
 	int Error(0);
 
 	std::vector<gli::format> Formats;
-	Formats.push_back(gli::FORMAT_RGBA8_UNORM);
-	Formats.push_back(gli::FORMAT_RGB8_UNORM);
-	Formats.push_back(gli::FORMAT_R8_SNORM);
-	Formats.push_back(gli::FORMAT_RGB_DXT1_UNORM);
-	Formats.push_back(gli::FORMAT_RGBA_BP_UNORM);
-	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT);
+	Formats.push_back(gli::FORMAT_RGBA8_UNORM_PACK8);
+	Formats.push_back(gli::FORMAT_RGB8_UNORM_PACK8);
+	Formats.push_back(gli::FORMAT_R8_SNORM_PACK8);
+	Formats.push_back(gli::FORMAT_RGB_DXT1_UNORM_BLOCK8);
+	Formats.push_back(gli::FORMAT_RGBA_BP_UNORM_BLOCK16);
+	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT_PACK32);
 
-	std::vector<gli::texture2D::dim_type::value_type> Sizes;
+	std::vector<gli::texture2D::texelcoord_type::value_type> Sizes;
 	Sizes.push_back(16);
 	Sizes.push_back(32);
 	Sizes.push_back(15);
@@ -129,7 +129,7 @@ int test_alloc()
 	for(std::size_t FormatIndex = 0; FormatIndex < Formats.size(); ++FormatIndex)
 	for(std::size_t SizeIndex = 0; SizeIndex < Sizes.size(); ++SizeIndex)
 	{
-		gli::texture2D::dim_type Size(Sizes[SizeIndex]);
+		gli::texture2D::texelcoord_type Size(Sizes[SizeIndex]);
 
 		gli::texture2D TextureA(Formats[FormatIndex], Size, gli::levels(Size));
 		gli::texture2D TextureB(Formats[FormatIndex], Size);
@@ -147,8 +147,8 @@ int test_texture2d_clear()
 	glm::u8vec4 const Orange(255, 127, 0, 255);
 
 	gli::texture2D Texture(
-		gli::FORMAT_RGBA8_UINT,
-		gli::texture2D::dim_type(16),
+		gli::FORMAT_RGBA8_UINT_PACK8,
+		gli::texture2D::texelcoord_type(16),
 		gli::texture2D::size_type(glm::log2(16u) + 1));
 
 	//Texture.clear<glm::u8vec4>(Orange);
@@ -161,10 +161,10 @@ int test_texture2d_query()
 {
 	int Error(0);
 
-	gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(2), 2);
+	gli::texture2D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(2), 2);
 
 	Error += Texture.size() == sizeof(glm::u8vec4) * 5 ? 0 : 1;
-	Error += Texture.format() == gli::FORMAT_RGBA8_UINT ? 0 : 1;
+	Error += Texture.format() == gli::FORMAT_RGBA8_UINT_PACK8 ? 0 : 1;
 	Error += Texture.levels() == 2 ? 0 : 1;
 	Error += !Texture.empty() ? 0 : 1;
 	Error += Texture.dimensions().x == 2 ? 0 : 1;
@@ -180,15 +180,15 @@ int test_texture2d_image_access()
 	{
 		glm::u8vec4 const Orange(255, 127, 0, 255);
 
-		gli::image Image0(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(2, 2, 1));
+		gli::image Image0(gli::FORMAT_RGBA8_UINT_PACK8, gli::image::texelcoord_type(2, 2, 1));
 		for(std::size_t i = 0; i < Image0.size(); ++i)
 			*(Image0.data<glm::byte>() + i) = glm::byte(i);
 
-		gli::image Image1(gli::FORMAT_RGBA8_UINT, gli::image::dim_type(1, 1, 1));
+		gli::image Image1(gli::FORMAT_RGBA8_UINT_PACK8, gli::image::texelcoord_type(1, 1, 1));
 		for(std::size_t i = 0; i < Image1.size(); ++i)
 			*(Image1.data<glm::byte>() + i) = glm::byte(i + 100);
 
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(2), 2);
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(2), 2);
 
 		/// TODO copy function
 		/// Texture[0] = Image0;
@@ -199,7 +199,7 @@ int test_texture2d_image_access()
 	}
 
 	{
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(2), 2);
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(2), 2);
 		assert(!Texture.empty());
 
 		gli::image Image0 = Texture[0];
@@ -237,7 +237,7 @@ int test_texture2d_image_access()
 	}
 
 	{
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(2), 1);
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(2), 1);
 
 		std::size_t SizeA = Texture.size();
 		Error += SizeA == sizeof(glm::u8vec4) * 4 ? 0 : 1;
@@ -268,7 +268,7 @@ struct test
 {
 	test(
 		gli::format const & Format,
-		gli::texture2D::dim_type const & Dimensions,
+		gli::texture2D::texelcoord_type const & Dimensions,
 		gli::texture2D::size_type const & Size) :
 		Format(Format),
 		Dimensions(Dimensions),
@@ -276,7 +276,7 @@ struct test
 	{}
 
 	gli::format Format;
-	gli::texture2D::dim_type Dimensions;
+	gli::texture2D::texelcoord_type Dimensions;
 	gli::texture2D::size_type Size;
 };
 
@@ -285,18 +285,18 @@ int test_texture2d_image_size()
 	int Error(0);
 
 	std::vector<test> Tests;
-	Tests.push_back(test(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(4), 64));
-	Tests.push_back(test(gli::FORMAT_R8_UINT, gli::texture2D::dim_type(4), 16));
-	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture2D::dim_type(4), 8));
-	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture2D::dim_type(2), 8));
-	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM, gli::texture2D::dim_type(1), 8));
-	Tests.push_back(test(gli::FORMAT_RGBA_DXT5_UNORM, gli::texture2D::dim_type(4), 16));
+	Tests.push_back(test(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(4), 64));
+	Tests.push_back(test(gli::FORMAT_R8_UINT_PACK8, gli::texture2D::texelcoord_type(4), 16));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, gli::texture2D::texelcoord_type(4), 8));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, gli::texture2D::texelcoord_type(2), 8));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, gli::texture2D::texelcoord_type(1), 8));
+	Tests.push_back(test(gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16, gli::texture2D::texelcoord_type(4), 16));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
 		gli::texture2D Texture(
 			Tests[i].Format,
-			gli::texture2D::dim_type(4),
+			gli::texture2D::texelcoord_type(4),
 			1);
 
 		gli::image Image = Texture[0];
@@ -317,7 +317,7 @@ namespace load_store
 	{
 		int Error = 0;
 
-		gli::texture2D::dim_type const Dimensions(8, 4);
+		gli::texture2D::texelcoord_type const Dimensions(8, 4);
 
 		gli::texture2D TextureA(Format, Dimensions);
 		TextureA.clear();
@@ -327,15 +327,15 @@ namespace load_store
 		gli::texture2D TextureB(Format, Dimensions);
 		TextureB.clear();
 		for (std::size_t i = 0, n = 8; i < n; ++i)
-			TextureB.store(gli::texture2D::dim_type(i % 4, i / 4), 1, TestSamples[i]);
+			TextureB.store(gli::texture2D::texelcoord_type(i % 4, i / 4), 1, TestSamples[i]);
 
 		std::array<genType, 8> LoadedSamplesA;
 		for (std::size_t i = 0, n = 8; i < n; ++i)
-			LoadedSamplesA[i] = TextureA.load<genType>(gli::texture2D::dim_type(i % 4, i / 4), 1);
+			LoadedSamplesA[i] = TextureA.load<genType>(gli::texture2D::texelcoord_type(i % 4, i / 4), 1);
 
 		std::array<genType, 8> LoadedSamplesB;
 		for (std::size_t i = 0, n = 8; i < n; ++i)
-			LoadedSamplesB[i] = TextureB.load<genType>(gli::texture2D::dim_type(i % 4, i / 4), 1);
+			LoadedSamplesB[i] = TextureB.load<genType>(gli::texture2D::texelcoord_type(i % 4, i / 4), 1);
 
 		for (std::size_t i = 0, n = 8; i < n; ++i)
 			Error += LoadedSamplesA[i] == TestSamples[i] ? 0 : 1;
@@ -370,7 +370,7 @@ namespace load_store
 				glm::f32vec1( 0.9f)
 			}};
 
-			Error += run(gli::FORMAT_R32_SFLOAT, TestSamples);
+			Error += run(gli::FORMAT_R32_SFLOAT_PACK32, TestSamples);
 		}
 
 		{
@@ -386,7 +386,7 @@ namespace load_store
 				glm::f32vec2( 0.0f, 0.0f)
 			}};
 
-			Error += run(gli::FORMAT_RG32_SFLOAT, TestSamples);
+			Error += run(gli::FORMAT_RG32_SFLOAT_PACK32, TestSamples);
 		}
 
 		{
@@ -402,7 +402,7 @@ namespace load_store
 				glm::f32vec3(-0.7f,-0.8f,-0.9f)
 			}};
 
-			Error += run(gli::FORMAT_RGB32_SFLOAT, TestSamples);
+			Error += run(gli::FORMAT_RGB32_SFLOAT_PACK32, TestSamples);
 		}
 
 		{
@@ -418,7 +418,7 @@ namespace load_store
 				glm::f32vec4(-0.7f,-0.8f,-0.9f, 1.0f)
 			}};
 
-			Error += run(gli::FORMAT_RGBA32_SFLOAT, TestSamples);
+			Error += run(gli::FORMAT_RGBA32_SFLOAT_PACK32, TestSamples);
 		}
 
 		{
@@ -434,8 +434,8 @@ namespace load_store
 				glm::i8vec1(   0)
 			}};
 
-			Error += run(gli::FORMAT_R8_SINT, TestSamples);
-			Error += run(gli::FORMAT_R8_SNORM, TestSamples);
+			Error += run(gli::FORMAT_R8_SINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_R8_SNORM_PACK8, TestSamples);
 		}
 
 		{
@@ -451,8 +451,8 @@ namespace load_store
 				glm::i8vec2(  64,   0)
 			}};
 
-			Error += run(gli::FORMAT_RG8_UINT, TestSamples);
-			Error += run(gli::FORMAT_RG8_UNORM, TestSamples);
+			Error += run(gli::FORMAT_RG8_UINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RG8_UNORM_PACK8, TestSamples);
 		}
 
 		{
@@ -468,8 +468,8 @@ namespace load_store
 				glm::i8vec3( -32,  32,  96)
 			}};
 
-			Error += run(gli::FORMAT_RGB8_SINT, TestSamples);
-			Error += run(gli::FORMAT_RGB8_SNORM, TestSamples);
+			Error += run(gli::FORMAT_RGB8_SINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGB8_SNORM_PACK8, TestSamples);
 		}
 
 		{
@@ -485,8 +485,8 @@ namespace load_store
 				glm::i8vec4(  63, -16,-127,  -2)
 			}};
 
-			Error += run(gli::FORMAT_RGBA8_SINT, TestSamples);
-			Error += run(gli::FORMAT_RGBA8_SNORM, TestSamples);
+			Error += run(gli::FORMAT_RGBA8_SINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGBA8_SNORM_PACK8, TestSamples);
 		}
 
 		{
@@ -502,9 +502,9 @@ namespace load_store
 				glm::u8vec1(  0)
 			}};
 
-			Error += run(gli::FORMAT_R8_UINT, TestSamples);
-			Error += run(gli::FORMAT_R8_UNORM, TestSamples);
-			Error += run(gli::FORMAT_R8_SRGB, TestSamples);
+			Error += run(gli::FORMAT_R8_UINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_R8_UNORM_PACK8, TestSamples);
+			Error += run(gli::FORMAT_R8_SRGB_PACK8, TestSamples);
 		}
 
 		{
@@ -520,9 +520,9 @@ namespace load_store
 				glm::u8vec2(255,   0)
 			}};
 
-			Error += run(gli::FORMAT_RG8_UINT, TestSamples);
-			Error += run(gli::FORMAT_RG8_UNORM, TestSamples);
-			Error += run(gli::FORMAT_RG8_SRGB, TestSamples);
+			Error += run(gli::FORMAT_RG8_UINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RG8_UNORM_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RG8_SRGB_PACK8, TestSamples);
 		}
 
 		{
@@ -538,9 +538,9 @@ namespace load_store
 				glm::u8vec3(255,   0, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGB8_UINT, TestSamples);
-			Error += run(gli::FORMAT_RGB8_UNORM, TestSamples);
-			Error += run(gli::FORMAT_RGB8_SRGB, TestSamples);
+			Error += run(gli::FORMAT_RGB8_UINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGB8_UNORM_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGB8_SRGB_PACK8, TestSamples);
 		}
 
 		{
@@ -556,9 +556,9 @@ namespace load_store
 				glm::u8vec4(255,   0, 255, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGBA8_UINT, TestSamples);
-			Error += run(gli::FORMAT_RGBA8_UNORM, TestSamples);
-			Error += run(gli::FORMAT_RGBA8_SRGB, TestSamples);
+			Error += run(gli::FORMAT_RGBA8_UINT_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGBA8_UNORM_PACK8, TestSamples);
+			Error += run(gli::FORMAT_RGBA8_SRGB_PACK8, TestSamples);
 		}
 
 		{
@@ -574,7 +574,7 @@ namespace load_store
 				glm::packUnorm3x10_1x2(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f))
 			}};
 
-			Error += run(gli::FORMAT_RGB10A2_UNORM, TestSamples);
+			Error += run(gli::FORMAT_RGB10A2_UNORM_PACK32, TestSamples);
 		}
 
 		{
@@ -590,8 +590,8 @@ namespace load_store
 				glm::u16vec1(0)
 			}};
 
-			Error += run(gli::FORMAT_R16_UINT, TestSamples);
-			Error += run(gli::FORMAT_R16_UNORM, TestSamples);
+			Error += run(gli::FORMAT_R16_UINT_PACK16, TestSamples);
+			Error += run(gli::FORMAT_R16_UNORM_PACK16, TestSamples);
 		}
 
 		{
@@ -607,8 +607,8 @@ namespace load_store
 				glm::u16vec2(255,   0)
 			}};
 
-			Error += run(gli::FORMAT_RG16_UINT, TestSamples);
-			Error += run(gli::FORMAT_RG16_UNORM, TestSamples);
+			Error += run(gli::FORMAT_RG16_UINT_PACK16, TestSamples);
+			Error += run(gli::FORMAT_RG16_UNORM_PACK16, TestSamples);
 		}
 
 		{
@@ -624,8 +624,8 @@ namespace load_store
 				glm::u16vec3(255,   0, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGB16_UINT, TestSamples);
-			Error += run(gli::FORMAT_RGB16_UNORM, TestSamples);
+			Error += run(gli::FORMAT_RGB16_UINT_PACK16, TestSamples);
+			Error += run(gli::FORMAT_RGB16_UNORM_PACK16, TestSamples);
 		}
 
 		{
@@ -641,8 +641,8 @@ namespace load_store
 				glm::u16vec4(255,   0, 255, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGBA16_UINT, TestSamples);
-			Error += run(gli::FORMAT_RGBA16_UNORM, TestSamples);
+			Error += run(gli::FORMAT_RGBA16_UINT_PACK16, TestSamples);
+			Error += run(gli::FORMAT_RGBA16_UNORM_PACK16, TestSamples);
 		}
 
 		{
@@ -658,7 +658,7 @@ namespace load_store
 				glm::u32vec1(0)
 			}};
 
-			Error += run(gli::FORMAT_R32_UINT, TestSamples);
+			Error += run(gli::FORMAT_R32_UINT_PACK32, TestSamples);
 		}
 
 		{
@@ -674,7 +674,7 @@ namespace load_store
 				glm::u32vec2(255,   0)
 			}};
 
-			Error += run(gli::FORMAT_RG32_UINT, TestSamples);
+			Error += run(gli::FORMAT_RG32_UINT_PACK32, TestSamples);
 		}
 
 		{
@@ -690,7 +690,7 @@ namespace load_store
 				glm::u32vec3(255,   0, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGB32_UINT, TestSamples);
+			Error += run(gli::FORMAT_RGB32_UINT_PACK32, TestSamples);
 		}
 
 		{
@@ -706,7 +706,7 @@ namespace load_store
 				glm::u32vec4(255,   0, 255, 255)
 			}};
 
-			Error += run(gli::FORMAT_RGBA32_UINT, TestSamples);
+			Error += run(gli::FORMAT_RGBA32_UINT_PACK32, TestSamples);
 		}
 
 		return Error;
@@ -719,12 +719,12 @@ namespace level
 	{
 		int Error(0);
 
-		gli::texture2D Texture(Format, gli::texture2D::dim_type(16));
+		gli::texture2D Texture(Format, gli::texture2D::texelcoord_type(16));
 
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
-			gli::image::dim_type const & DimensionsL = Texture[Level].dimensions();
-			gli::image::dim_type const & Dimensions0 = glm::max(gli::image::dim_type(Texture[0].dimensions() >> Level), gli::image::dim_type(1));
+			gli::image::texelcoord_type const & DimensionsL = Texture[Level].dimensions();
+			gli::image::texelcoord_type const & Dimensions0 = glm::max(Texture[0].dimensions() >> gli::image::texelcoord_type(static_cast<gli::image::texelcoord_type::value_type>(Level)), gli::image::texelcoord_type(1));
 
 			Error += DimensionsL == Dimensions0 ? 0 : 1;
 			assert(!Error);
@@ -756,25 +756,66 @@ namespace mipmaps
 		}
 
 		{
-			gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(40, 30));
+			gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(40, 30));
 			assert(!Texture.empty());
 
-			Error += Texture.dimensions(0) == gli::texture2D::dim_type(40, 30) ? 0 : 1;
-			Error += Texture.dimensions(1) == gli::texture2D::dim_type(20, 15) ? 0 : 1;
-			Error += Texture.dimensions(2) == gli::texture2D::dim_type(10, 7) ? 0 : 1;
-			Error += Texture.dimensions(3) == gli::texture2D::dim_type(5, 3) ? 0 : 1;
-			Error += Texture.dimensions(4) == gli::texture2D::dim_type(2, 1) ? 0 : 1;
+			Error += Texture.dimensions(0) == gli::texture2D::texelcoord_type(40, 30) ? 0 : 1;
+			Error += Texture.dimensions(1) == gli::texture2D::texelcoord_type(20, 15) ? 0 : 1;
+			Error += Texture.dimensions(2) == gli::texture2D::texelcoord_type(10, 7) ? 0 : 1;
+			Error += Texture.dimensions(3) == gli::texture2D::texelcoord_type(5, 3) ? 0 : 1;
+			Error += Texture.dimensions(4) == gli::texture2D::texelcoord_type(2, 1) ? 0 : 1;
 
-			Error += Texture[0].dimensions() == gli::texture::dim_type(40, 30, 1) ? 0 : 1;
-			Error += Texture[1].dimensions() == gli::texture::dim_type(20, 15, 1) ? 0 : 1;
-			Error += Texture[2].dimensions() == gli::texture::dim_type(10, 7, 1) ? 0 : 1;
-			Error += Texture[3].dimensions() == gli::texture::dim_type(5, 3, 1) ? 0 : 1;
-			Error += Texture[4].dimensions() == gli::texture::dim_type(2, 1, 1) ? 0 : 1;
+			Error += Texture[0].dimensions() == gli::texture::texelcoord_type(40, 30, 1) ? 0 : 1;
+			Error += Texture[1].dimensions() == gli::texture::texelcoord_type(20, 15, 1) ? 0 : 1;
+			Error += Texture[2].dimensions() == gli::texture::texelcoord_type(10, 7, 1) ? 0 : 1;
+			Error += Texture[3].dimensions() == gli::texture::texelcoord_type(5, 3, 1) ? 0 : 1;
+			Error += Texture[4].dimensions() == gli::texture::texelcoord_type(2, 1, 1) ? 0 : 1;
 		}
 
 		return Error;
 	}
 }//namespace mipmaps
+
+namespace clear
+{
+	int test()
+	{
+		int Error = 0;
+
+		glm::u8vec4 const Black(0, 0, 0, 255);
+		glm::u8vec4 const Color(255, 127, 0, 255);
+
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(8), 5);
+		Texture.clear(Black);
+
+		glm::u8vec4 const TexelA = Texture.load<glm::u8vec4>(gli::texture2D::texelcoord_type(0), 0);
+		glm::u8vec4 const TexelB = Texture.load<glm::u8vec4>(gli::texture2D::texelcoord_type(0), 1);
+		glm::u8vec4 const TexelC = Texture.load<glm::u8vec4>(gli::texture2D::texelcoord_type(0), 2);
+
+		Error += TexelA == Black ? 0 : 1;
+		Error += TexelB == Black ? 0 : 1;
+		Error += TexelC == Black ? 0 : 1;
+
+		Texture.clear<glm::u8vec4>(1, glm::u8vec4(255, 127, 0, 255));
+
+		gli::texture2D::texelcoord_type Coords(0);
+		for(; Coords.y < Texture.dimensions(1).y; ++Coords.y)
+		for(; Coords.x < Texture.dimensions(1).x; ++Coords.x)
+		{
+			glm::u8vec4 const TexelD = Texture.load<glm::u8vec4>(gli::texture2D::texelcoord_type(0), 1);
+			Error += TexelD == Color ? 0 : 1;
+		}
+
+		gli::texture2D TextureView(Texture, 1, 1);
+
+		gli::texture2D TextureImage(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(4), 1);
+		TextureImage.clear(Color);
+
+		Error += TextureView == TextureImage ? 0 : 1;
+
+		return Error;
+	}
+}//namespace clear
 
 int main()
 {
@@ -788,6 +829,7 @@ int main()
 	Error += test_create();
 	Error += load_store::test();
 	Error += level::test();
+	Error += clear::test();
 
 	return Error;
 }

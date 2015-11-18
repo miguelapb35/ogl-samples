@@ -93,33 +93,31 @@ namespace detail
 			static_cast<gli::gl::typeFormat>(Header.GLType));
 		assert(Format != static_cast<format>(gli::FORMAT_INVALID));
 		
-		std::uint32_t const BlockSize = block_size(Format);
+		texture::size_type const BlockSize = block_size(Format);
 
 		texture Texture(
 			detail::getTarget(Header),
 			Format,
-			texture::dim_type(
+			texture::texelcoord_type(
 				Header.PixelWidth,
-				std::max<std::uint32_t>(Header.PixelHeight, 1),
-				std::max<std::uint32_t>(Header.PixelDepth, 1)),
-			std::max<std::uint32_t>(Header.NumberOfArrayElements, 1),
-			std::max<std::uint32_t>(Header.NumberOfFaces, 1),
-			std::max<std::uint32_t>(Header.NumberOfMipmapLevels, 1));
+				std::max<texture::size_type>(Header.PixelHeight, 1),
+				std::max<texture::size_type>(Header.PixelDepth, 1)),
+			std::max<texture::size_type>(Header.NumberOfArrayElements, 1),
+			std::max<texture::size_type>(Header.NumberOfFaces, 1),
+			std::max<texture::size_type>(Header.NumberOfMipmapLevels, 1));
 
-		for(std::size_t Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
+		for(texture::size_type Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
 		{
 			Offset += sizeof(std::uint32_t);
 
-			for(std::size_t Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
 			{
-				for(std::size_t Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
-				{
-					std::uint32_t const FaceSize = static_cast<std::uint32_t>(Texture.size(Level));
+				texture::size_type const FaceSize = Texture.size(Level);
 
-					std::memcpy(Texture.data(Layer, Face, Level), Data + Offset, FaceSize);
+				std::memcpy(Texture.data(Layer, Face, Level), Data + Offset, FaceSize);
 
-					Offset += std::max(BlockSize, glm::ceilMultiple(FaceSize, static_cast<std::uint32_t>(4)));
-				}
+				Offset += std::max(BlockSize, glm::ceilMultiple(FaceSize, static_cast<texture::size_type>(4)));
 			}
 		}
 

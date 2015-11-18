@@ -93,6 +93,9 @@ namespace load_mem_only
 int main()
 {
 	std::vector<std::string> Filenames;
+	Filenames.push_back("kueken7_rgba4_unorm.ktx");
+	Filenames.push_back("kueken7_r5g6b5_unorm.ktx");
+	Filenames.push_back("kueken7_rgb5a1_unorm.ktx");
 	Filenames.push_back("kueken7_rgb8_unorm.ktx");
 	Filenames.push_back("kueken7_rgba_dxt5_srgb.ktx");
 	Filenames.push_back("kueken7_rgb_dxt1_srgb.ktx");
@@ -113,7 +116,9 @@ int main()
 	Filenames.push_back("kueken7_rg_eac_unorm.ktx");
 	Filenames.push_back("kueken7_rgb_pvrtc_2bpp_srgb.ktx");
 	Filenames.push_back("kueken7_rgb_pvrtc_4bpp_srgb.ktx");
+	Filenames.push_back("kueken7_rgba_pvrtc2_2bpp_unorm.ktx");
 	Filenames.push_back("kueken7_rgba_pvrtc2_2bpp_srgb.ktx");
+	Filenames.push_back("kueken7_rgba_pvrtc2_4bpp_unorm.ktx");
 	Filenames.push_back("kueken7_rgba_pvrtc2_4bpp_srgb.ktx");
 
 	int Error(0);

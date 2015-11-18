@@ -34,7 +34,7 @@ int test_create_texture_storage()
 {
 	int Error(0);
 
-	gli::texture2D Texture(gli::FORMAT_RGBA8_UINT, gli::texture2D::dim_type(256));
+	gli::texture2D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture2D::texelcoord_type(256));
 	Texture.clear(gli::u8vec4(255, 127, 0, 255));
 	gli::texture2D::size_type Levels = Texture.levels();
 

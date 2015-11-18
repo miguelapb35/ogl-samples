@@ -28,12 +28,21 @@
 
 #pragma once
 
-namespace gli
+namespace gli{
+namespace detail
 {
+	enum dimension
+	{
+		DIMENSION_1D,
+		DIMENSION_2D,
+		DIMENSION_3D
+	};
+}//namespace detail
+
 	enum filter
 	{
-		FILTER_NONE = 0, FILTER_FIRST = FILTER_NONE,
-		FILTER_NEAREST,
+		FILTER_NONE = 0,
+		FILTER_NEAREST, FILTER_FIRST = FILTER_NEAREST,
 		FILTER_LINEAR, FILTER_LAST = FILTER_LINEAR
 	};
 
@@ -43,3 +52,5 @@ namespace gli
 		FILTER_INVALID = -1
 	};
 }//namespace gli
+
+#include "./core/filter.inl"

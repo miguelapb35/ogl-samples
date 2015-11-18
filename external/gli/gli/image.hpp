@@ -46,7 +46,7 @@ namespace gli
 	public:
 		typedef size_t size_type;
 		typedef gli::format format_type;
-		typedef storage::dim_type dim_type;
+		typedef storage::texelcoord_type texelcoord_type;
 		typedef storage::data_type data_type;
 
 		/// Create an empty image instance
@@ -55,7 +55,7 @@ namespace gli
 		/// Create an image object and allocate an image storoge for it.
 		explicit image(
 			format_type Format,
-			dim_type const & Dimensions);
+			texelcoord_type const & Dimensions);
 
 		/// Create an image object by sharing an existing image storage from another image instance.
 		/// This image object is effectively an image view where format can be reinterpreted
@@ -72,7 +72,7 @@ namespace gli
 		format_type format() const;
 
 		/// Return the dimensions of an image instance: width, height and depth.
-		dim_type dimensions() const;
+		texelcoord_type dimensions() const;
 
 		/// Return the memory size of an image instance storage in bytes.
 		size_type size() const;
@@ -108,13 +108,13 @@ namespace gli
 		/// It's an error to call this function if the format is compressed.
 		/// It's an error if TexelCoord values aren't between [0, dimensions].
 		template <typename genType>
-		genType load(dim_type const & TexelCoord);
+		genType load(texelcoord_type const & TexelCoord);
 
 		/// Store the texel located at TexelCoord coordinates.
 		/// It's an error to call this function if the format is compressed.
 		/// It's an error if TexelCoord values aren't between [0, dimensions].
 		template <typename genType>
-		void store(dim_type const & TexelCoord, genType const & Data);
+		void store(texelcoord_type const & TexelCoord, genType const & Data);
 
 	private:
 		/// Create an image object by sharing an existing image storage from another image instance.

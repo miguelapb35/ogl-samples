@@ -30,46 +30,58 @@
 
 #include "sampler.hpp"
 #include "texture2d.hpp"
+#include "core/mipmaps_compute.hpp"
 #include "core/convert.hpp"
 
 namespace gli
 {
-	template <typename T, glm::precision P = glm::defaultp>
+	template <typename T, precision P = defaultp>
 	class sampler2D : public sampler
 	{
+	private:
+		typedef typename detail::interpolate<T>::type interpolate_type;
+
 	public:
-		typedef texture2D::size_type size_type;
-		typedef texture2D::dim_type dim_type;
-		typedef vec2 samplecoord_type;
+		typedef texture2D texture_type;
+		typedef typename texture_type::size_type size_type;
+		typedef typename texture_type::texelcoord_type texelcoord_type;
+		typedef interpolate_type level_type;
+		typedef tvec2<interpolate_type, P> samplecoord_type;
+		typedef tvec4<T, P> texel_type;
 
-		sampler2D(texture2D const & Texture, wrap Wrap, filter Mip, filter Min, glm::tvec4<T, P> const & BorderColor = glm::tvec4<T, P>(0, 0, 0, 1));
+		sampler2D(texture_type const & Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const & BorderColor = texel_type(0, 0, 0, 1));
 
-		texture2D const & operator()() const;
+		/// Access the sampler texture object
+		texture_type const & operator()() const;
 
-		glm::tvec4<T, P> texel_fetch(dim_type const & TexelCoord, size_type const & Level) const;
+		/// Fetch a texel from the sampler texture
+		texel_type texel_fetch(texelcoord_type const & TexelCoord, size_type const & Level) const;
 
-		void texel_write(dim_type const & TexelCoord, size_type const & Level, glm::tvec4<T, P> const & Texel);
+		/// Write a texel in the sampler texture
+		void texel_write(texelcoord_type const & TexelCoord, size_type const & Level, texel_type const & Texel);
 
-		void clear(glm::tvec4<T, P> const & Color);
+		/// Clear the sampler texture with a uniform texel
+		void clear(texel_type const & Texel);
 
-		void clear(glm::tvec4<T, P> const & Color, dim_type const & TexelOffset, dim_type const & TexelDim, size_type Level);
+		/// Sample the sampler texture at a specific level
+		texel_type texture_lod(samplecoord_type const & SampleCoord, level_type Level) const;
 
-		glm::tvec4<T, P> texture_lod(samplecoord_type const & Texcoord, float Level) const;
+		/// Generate all the mipmaps of the sampler texture from the texture base level
+		void generate_mipmaps(filter Minification);
 
-		/// 
-		void generate_mipmaps();
-
-		/// 
-		void generate_mipmaps(size_type BaseLevel, size_type MaxLevel);
+		/// Generate the mipmaps of the sampler texture from the texture base level to the texture max level included
+		void generate_mipmaps(size_type BaseLevel, size_type MaxLevel, filter Minification);
 
 	private:
-		glm::tvec4<T, P> texture_lod_nearest(samplecoord_type const & Texcoord, size_type Level) const;
+		typedef typename detail::convert<texture_type, T, P>::func convert_type;
+		typedef typename detail::convert<texture_type, T, P>::fetchFunc fetch_type;
+		typedef typename detail::convert<texture_type, T, P>::writeFunc write_type;
+		typedef typename detail::filterBase<detail::DIMENSION_2D, texture_type, interpolate_type, samplecoord_type, fetch_type, texel_type>::filterFunc filter_type;
 
-		glm::tvec4<T, P> texture_lod_linear(samplecoord_type const & Texcoord, size_type Level) const;
-
-		texture2D Texture;
-		typename detail::convert<texture2D, T, P>::func Convert;
-		glm::tvec4<T, P> BorderColor;
+		texture_type Texture;
+		convert_type Convert;
+		texel_type BorderColor;
+		filter_type Filter;
 	};
 
 	typedef sampler2D<float> fsampler2D;

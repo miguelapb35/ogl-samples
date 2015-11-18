@@ -29,14 +29,14 @@
 namespace gli{
 namespace detail
 {
-	inline void flip(image ImageDst, image ImageSrc, std::size_t BlockSize)
+	inline void flip(image ImageDst, image ImageSrc, size_t BlockSize)
 	{
-		std::size_t const LineSize = BlockSize * ImageDst.dimensions().x;
+		size_t const LineSize = BlockSize * ImageDst.dimensions().x;
 
-		for(std::size_t y = 0; y < ImageDst.dimensions().y; ++y)
+		for(int y = 0; y < ImageDst.dimensions().y; ++y)
 		{
-			std::size_t OffsetDst = LineSize * y;
-			std::size_t OffsetSrc = ImageSrc.size() - (LineSize * (y + 1));
+			size_t OffsetDst = LineSize * y;
+			size_t OffsetSrc = ImageSrc.size() - (LineSize * (y + 1));
 
 			memcpy(
 				ImageDst.data<glm::byte>() + OffsetDst,
@@ -62,9 +62,9 @@ inline texture2D flip(texture2D const & Texture)
 
 	texture2D Flip(Texture.format(), Texture.dimensions(), Texture.levels());
 
-	gli::size_t const BlockSize = block_size(Texture.format());
+	texture2D::size_type const BlockSize = block_size(Texture.format());
 
-	for(std::size_t Level = 0; Level < Flip.levels(); ++Level)
+	for(texture2D::size_type Level = 0; Level < Flip.levels(); ++Level)
 		detail::flip(Flip[Level], Texture[Level], BlockSize);
 
 	return Flip;
@@ -77,10 +77,10 @@ inline texture2DArray flip(texture2DArray const & Texture)
 
 	texture2DArray Flip(Texture.format(), Texture.dimensions(), Texture.layers(), Texture.levels());
 
-	gli::size_t const BlockSize = block_size(Texture.format());
+	texture2DArray::size_type const BlockSize = block_size(Texture.format());
 
-	for(std::size_t Layer = 0; Layer < Flip.layers(); ++Layer)
-	for(std::size_t Level = 0; Level < Flip.levels(); ++Level)
+	for(texture2DArray::size_type Layer = 0; Layer < Flip.layers(); ++Layer)
+	for(texture2DArray::size_type Level = 0; Level < Flip.levels(); ++Level)
 		detail::flip(Flip[Layer][Level], Texture[Layer][Level], BlockSize);
 
 	return Flip;

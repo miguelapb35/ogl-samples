@@ -27,7 +27,8 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_srgb.ktx");
+	//char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_r5g6b5_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -149,8 +150,14 @@ private:
 	{
 		gli::gl GL;
 
-		gli::texture2D Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
-		assert(!Texture.empty());
+		gli::texture2D TextureLoaded(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
+		assert(!TextureLoaded.empty());
+
+		gli::fsampler2D Sampler(TextureLoaded, gli::WRAP_CLAMP_TO_EDGE);
+		Sampler.generate_mipmaps(gli::FILTER_LINEAR);
+		//Sampler.clear(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+
+		gli::texture2D Texture = Sampler();
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -160,13 +167,17 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_NEAREST : GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
 		gli::gl::format const Format = GL.translate(Texture.format());
 		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
@@ -175,7 +186,7 @@ private:
 				Format.Internal,
 				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
 				0,
-				Format.External, Format.Type,
+				Format.External, Format.Type,//GL_UNSIGNED_SHORT_5_6_5_REV
 				Texture[Level].data());
 		}
 

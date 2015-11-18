@@ -157,7 +157,7 @@ private:
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
-					Format.Internal,
+					0x8C4D, //0x83F1
 					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
 					0,
 					GLsizei(Texture[Level].size()),

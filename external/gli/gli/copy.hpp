@@ -43,9 +43,6 @@ namespace gli
 	image copy(image const & Image);
 
 	/// Copy a texture and create a new texture with a new storage allocation.
-	texture copy(texture const & Texture);
-
-	/// Copy a texture and create a new texture with a new storage allocation.
 	template <typename texType>
 	texture copy(texType const & Texture);
 

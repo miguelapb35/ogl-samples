@@ -31,22 +31,22 @@
 namespace gli{
 namespace detail
 {
-	inline float passThrought(float const & texcoord)
+	template <typename T>
+	inline T passThrought(T const & SampleCoord)
 	{
-		return texcoord;
+		return SampleCoord;
 	}
 }//namespace detail
 
 	inline sampler::sampler(wrap Wrap, filter Mip, filter Min)
-		: WrapMode(Wrap)
-		, WrapFunc(getFunc(Wrap))
+		: Wrap(getFunc(Wrap))
 		, Mip(Mip)
 		, Min(Min)
 	{}
 
-	inline sampler::wrapFunc sampler::getFunc(wrap WrapMode) const
+	inline sampler::wrap_type sampler::getFunc(wrap WrapMode) const
 	{
-		static wrapFunc Table[] =
+		static wrap_type Table[] =
 		{
 			glm::clamp,
 			detail::passThrought,

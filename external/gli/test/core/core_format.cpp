@@ -50,7 +50,7 @@ namespace component
 
 		for(std::size_t FormatIndex = gli::FORMAT_FIRST; FormatIndex < gli::FORMAT_COUNT; ++FormatIndex)
 		{
-			std::uint32_t const Components = gli::component_count(static_cast<gli::format>(FormatIndex));
+			std::size_t const Components = gli::component_count(static_cast<gli::format>(FormatIndex));
 			Error += Components > 0 && Components <= 4 ? 0 : 1;
 			assert(!Error);
 		}
@@ -65,8 +65,8 @@ namespace compressed
 	{
 		int Error(0);
 
-		Error += !gli::is_compressed(gli::FORMAT_R8_SRGB) ? 0 : 1;
-		Error += gli::is_compressed(gli::FORMAT_RGB_DXT1_SRGB) ? 0 : 1;
+		Error += !gli::is_compressed(gli::FORMAT_R8_SRGB_PACK8) ? 0 : 1;
+		Error += gli::is_compressed(gli::FORMAT_RGB_DXT1_SRGB_BLOCK8) ? 0 : 1;
 
 		return Error;
 	}
@@ -78,8 +78,8 @@ namespace block
 	{
 		int Error(0);
 
-		Error += gli::block_size(gli::FORMAT_RGBA8_UNORM) == 4 ? 0 : 1;
-		Error += gli::block_size(gli::FORMAT_RGB10A2_UNORM) == 4 ? 0 : 1;
+		Error += gli::block_size(gli::FORMAT_RGBA8_UNORM_PACK8) == 4 ? 0 : 1;
+		Error += gli::block_size(gli::FORMAT_RGB10A2_UNORM_PACK32) == 4 ? 0 : 1;
 
 		return Error;
 	}

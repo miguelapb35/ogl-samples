@@ -28,26 +28,29 @@
 
 #pragma once
 
-#include <gli/type.hpp>
+#include "type.hpp"
 
 namespace gli
 {
-	inline std::size_t linear_index(dim1_t Coord, dim1_t Dimensions)
+	template <typename T, precision P>
+	inline size_t linear_index(tvec1<T, P> const & Coord, tvec1<T, P> const & Dimensions)
 	{
-		assert(glm::all(glm::lessThan(Coord, Dimensions)));
-		return Coord.x;
+		GLI_ASSERT(glm::all(glm::lessThan(Coord, Dimensions)));
+		return static_cast<size_t>(Coord.x);
 	}
 
-	inline std::size_t linear_index(dim2_t Coord, dim2_t Dimensions)
+	template <typename T, precision P>
+	inline size_t linear_index(tvec2<T, P> const & Coord, tvec2<T, P> const & Dimensions)
 	{
-		assert(glm::all(glm::lessThan(Coord, Dimensions)));
-		return Coord.x + Coord.y * Dimensions.x;
+		GLI_ASSERT(glm::all(glm::lessThan(Coord, Dimensions)));
+		return static_cast<size_t>(Coord.x + Coord.y * Dimensions.x);
 	}
 
-	inline std::size_t linear_index(dim3_t Coord, dim3_t Dimensions)
+	template <typename T, precision P>
+	inline size_t linear_index(tvec3<T, P> const & Coord, tvec3<T, P> const & Dimensions)
 	{
-		assert(glm::all(glm::lessThan(Coord, Dimensions)));
-		return Coord.x + Coord.y * Dimensions.x + Coord.z * Dimensions.x * Dimensions.y;
+		GLI_ASSERT(glm::all(glm::lessThan(Coord, Dimensions)));
+		return static_cast<size_t>(Coord.x + Coord.y * Dimensions.x + Coord.z * Dimensions.x * Dimensions.y);
 	}
 }//namespace gli
 

@@ -372,18 +372,18 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	GLint WindowSizeY(0);
 	glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
 
-	gli::texture2D TextureRead(ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM : gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY), 1);
-	gli::texture2D TextureRGB(gli::FORMAT_RGB8_UNORM, gli::texture2D::dim_type(WindowSizeX, WindowSizeY), 1);
+	gli::texture2D TextureRead(ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM_PACK8 : gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2D::texelcoord_type(WindowSizeX, WindowSizeY), 1);
+	gli::texture2D TextureRGB(gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2D::texelcoord_type(WindowSizeX, WindowSizeY), 1);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.format() == gli::FORMAT_RGBA8_UNORM ? TextureRead.data() : TextureRGB.data());
+	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.format() == gli::FORMAT_RGBA8_UNORM_PACK8 ? TextureRead.data() : TextureRGB.data());
 
-	if(TextureRead.format() == gli::FORMAT_RGBA8_UNORM)
+	if(TextureRead.format() == gli::FORMAT_RGBA8_UNORM_PACK8)
 	{
 		for(gli::size_t y = 0; y < TextureRGB.dimensions().y; ++y)
 		for(gli::size_t x = 0; x < TextureRGB.dimensions().x; ++x)
 		{
-			gli::texture2D::dim_type TexelCoord(x, y);
+			gli::texture2D::texelcoord_type TexelCoord(x, y);
 
 			glm::u8vec3 Color(TextureRead.load<glm::u8vec4>(TexelCoord, 0));
 			TextureRGB.store(TexelCoord, 0, Color);

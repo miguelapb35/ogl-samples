@@ -66,11 +66,11 @@ namespace gli
 
 		Offset += sizeof(detail::kmgHeader10);
 
-		for(std::size_t Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
-		for(std::size_t Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
+		for(texture::size_type Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+		for(texture::size_type Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
 		{
-			std::uint32_t const FaceSize = static_cast<std::uint32_t>(Texture.size(Level));
-			for(std::size_t Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
+			texture::size_type const FaceSize = Texture.size(Level);
+			for(texture::size_type Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
 			{
 				std::memcpy(&Memory[0] + Offset, Texture.data(Layer, Face, Level), FaceSize);
 

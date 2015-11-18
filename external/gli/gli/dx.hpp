@@ -43,7 +43,7 @@ namespace gli
 			(((std::uint32_t)(std::uint8_t)(ch1) <<  8) & 0x0000FF00) | \
 			((std::uint32_t)(std::uint8_t)(ch0)        & 0x000000FF) )
 
-		enum D3DFORMAT
+		enum d3dFormat
 		{
 			D3DFMT_UNKNOWN				=  0,
 
@@ -305,16 +305,33 @@ namespace gli
 			DXGI_FORMAT_ASTC_12X12_TYPELESS				= 185,
 			DXGI_FORMAT_ASTC_12X12_UNORM				= 186,
 			DXGI_FORMAT_ASTC_12X12_UNORM_SRGB			= 187,
+
+			DXGI_FORMAT_R64_UINT_GLI					= 0x80000000,
+			DXGI_FORMAT_R64_SINT_GLI,
 			DXGI_FORMAT_R64_FLOAT_GLI,
+			DXGI_FORMAT_R64G64_UINT_GLI,
+			DXGI_FORMAT_R64G64_SINT_GLI,
 			DXGI_FORMAT_R64G64_FLOAT_GLI,
+			DXGI_FORMAT_R64G64B64_UINT_GLI,
+			DXGI_FORMAT_R64G64B64_SINT_GLI,
 			DXGI_FORMAT_R64G64B64_FLOAT_GLI,
+			DXGI_FORMAT_R64G64B64A64_UINT_GLI,
+			DXGI_FORMAT_R64G64B64A64_SINT_GLI,
 			DXGI_FORMAT_R64G64B64A64_FLOAT_GLI,
+
+			DXGI_FORMAT_RG4_UNORM_GLI,
+			DXGI_FORMAT_RGBA4_UNORM_GLI,
+			DXGI_FORMAT_R5G6B5_UNORM_GLI,
+			DXGI_FORMAT_RGB5A1_UNORM_GLI,
+			DXGI_FORMAT_BGR5A1_UNORM_GLI,
+			DXGI_FORMAT_R8_SRGB_GLI,
+			DXGI_FORMAT_R8G8_SRGB_GLI,
 
 			DXGI_FORMAT_LAST = DXGI_FORMAT_R64G64B64A64_FLOAT_GLI,
 			DXGI_FORMAT_FORCE_UINT						= 0xffffffffUL
 		};
 
-		enum DDPF
+		enum ddpf
 		{
 			DDPF_ALPHAPIXELS = 0x1,
 			DDPF_ALPHA = 0x2,
@@ -332,8 +349,8 @@ namespace gli
 
 		struct format
 		{
-			DDPF DDPixelFormat;
-			D3DFORMAT D3DFormat;
+			ddpf DDPixelFormat;
+			d3dFormat D3DFormat;
 			dxgiFormat DXGIFormat;
 			glm::u32vec4 Mask;
 		};
@@ -342,8 +359,8 @@ namespace gli
 		dx();
 
 		format const & translate(gli::format const & Format) const;
-		gli::format find(D3DFORMAT FourCC) const;
-		gli::format find(dxgiFormat Format) const;
+		gli::format find(d3dFormat FourCC, ddpf PixelFormat) const;
+		gli::format find(dxgiFormat Format, ddpf PixelFormat) const;
 
 	private:
 		std::array<format, FORMAT_COUNT> Translation;

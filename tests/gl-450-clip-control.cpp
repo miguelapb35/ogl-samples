@@ -261,7 +261,7 @@ private:
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-		glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
+		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, WindowSize.x * 0.5f, WindowSize.y);
 		glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 

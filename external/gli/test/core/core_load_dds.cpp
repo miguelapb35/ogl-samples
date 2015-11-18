@@ -93,10 +93,32 @@ namespace load_mem_only
 int main()
 {
 	std::vector<std::string> Filenames;
+
+	Filenames.push_back("kueken7_rgba4_unorm.dds");
+	Filenames.push_back("kueken7_r5g6b5_unorm.dds");
+	Filenames.push_back("kueken7_rgb5a1_unorm.dds");
+	Filenames.push_back("kueken7_rgb_dxt1_unorm.dds");
+	Filenames.push_back("kueken7_rgb_dxt1_srgb.dds");
+	Filenames.push_back("kueken7_rgba_dxt1_unorm.dds");
+	Filenames.push_back("kueken7_rgba_dxt1_srgb.dds");
+	Filenames.push_back("kueken7_rgba_dxt5_unorm.dds");
+	Filenames.push_back("kueken7_rgba_dxt5_unorm1.dds");
+	Filenames.push_back("kueken7_rgba_dxt5_unorm2.dds");
+	Filenames.push_back("kueken7_rgba_dxt5_srgb.dds");
+	Filenames.push_back("kueken7_rgb_etc1_unorm.dds");
+	//Filenames.push_back("kueken7_rgb_etc2_srgb.dds");
+	//Filenames.push_back("kueken7_rgb_etc2_unorm.dds");
+	Filenames.push_back("kueken7_rgb_atc_unorm.dds");
+	Filenames.push_back("kueken7_rgba_atc_explicit_unorm.dds");
+	Filenames.push_back("kueken7_rgba_atc_interpolate_unorm.dds");
+	Filenames.push_back("kueken7_rgb_pvrtc_2bpp_unorm.dds");
+	Filenames.push_back("kueken7_rgb_pvrtc_4bpp_unorm.dds");
+	//Filenames.push_back("kueken7_rgba_pvrtc2_4bpp_unorm.dds");
+	//Filenames.push_back("kueken7_rgba_astc8x8.dds");
+	Filenames.push_back("kueken7_r_ati1n_unorm.dds");
+	Filenames.push_back("kueken7_rg_ati2n_unorm.dds");
 	Filenames.push_back("kueken7_rgb8_unorm.dds");
 	Filenames.push_back("kueken7_bgrx8_unorm.dds");
-	Filenames.push_back("kueken7_rgba_dxt5_srgb.dds");
-	Filenames.push_back("kueken7_rgb_dxt1_srgb.dds");
 	Filenames.push_back("kueken7_rgba8_srgb.dds");
 	Filenames.push_back("kueken7_rgb8_srgb.dds");
 	Filenames.push_back("kueken7_bgra8_srgb.dds");
@@ -104,30 +126,16 @@ int main()
 	Filenames.push_back("kueken7_bgra8_unorm.dds");
 	Filenames.push_back("kueken7_l8_unorm.dds");
 	//Filenames.push_back("kueken7_la8_unorm.dds");
-	Filenames.push_back("kueken7_r_ati1n_unorm.dds");
 	Filenames.push_back("kueken7_r5g6b5_unorm.dds");
 	Filenames.push_back("kueken7_r8_snorm.dds");
 	Filenames.push_back("kueken7_r8_unorm.dds");
 	Filenames.push_back("kueken7_r16_unorm.dds");
-	Filenames.push_back("kueken7_rg_ati2n_unorm.dds");
-	Filenames.push_back("kueken7_rg11b10_ufloat.dds");
-	Filenames.push_back("kueken7_rgb_atc_unorm.dds");
-	Filenames.push_back("kueken7_rgb_dxt1_unorm.dds");
-	Filenames.push_back("kueken7_rgb_etc1_unorm.dds");
-	//Filenames.push_back("kueken7_rgb_etc2_srgb.dds");
-	//Filenames.push_back("kueken7_rgb_etc2_unorm.dds");
-	Filenames.push_back("kueken7_rgb_pvrtc_2bpp_unorm.dds");
-	Filenames.push_back("kueken7_rgb_pvrtc_4bpp_unorm.dds");
-	Filenames.push_back("kueken7_rgb9e5_ufloat.dds");
 	Filenames.push_back("kueken7_rgb10a2_unorm.dds");
 	Filenames.push_back("kueken7_rgb10a2u.dds");
-	//Filenames.push_back("kueken7_rgba_astc8x8.dds");
-	Filenames.push_back("kueken7_rgba_atc_explicit_unorm.dds");
-	Filenames.push_back("kueken7_rgba_atc_interpolate_unorm.dds");
-	Filenames.push_back("kueken7_rgba_dxt5_unorm.dds");
-	//Filenames.push_back("kueken7_rgba_pvrtc2_4bpp_unorm.dds");
 	Filenames.push_back("kueken7_rgba8_snorm.dds");
 	Filenames.push_back("kueken7_rgba16_sfloat.dds");
+	Filenames.push_back("kueken7_rg11b10_ufloat.dds");
+	Filenames.push_back("kueken7_rgb9e5_ufloat.dds");
 
 	int Error(0);
 

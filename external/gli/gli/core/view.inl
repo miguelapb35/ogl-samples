@@ -44,6 +44,26 @@ namespace gli
 		return Texture;
 	}
 
+	inline texture view
+	(
+		texture const & Texture,
+		texture::size_type BaseLayer, texture::size_type MaxLayer,
+		texture::size_type BaseFace, texture::size_type MaxFace,
+		texture::size_type BaseLevel, texture::size_type MaxLevel
+	)
+	{
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
+		GLI_ASSERT(BaseFace >= 0 && BaseFace < Texture.faces() && MaxFace >= 0 && MaxFace < Texture.faces() && BaseFace <= MaxFace);
+		GLI_ASSERT(BaseLayer >= 0 && BaseLayer < Texture.layers() && MaxLayer >= 0 && MaxLayer < Texture.layers() && BaseLayer <= MaxLayer);
+
+		return texture(
+			Texture, Texture.target(), Texture.format(),
+			Texture.base_layer() + BaseLayer, Texture.base_layer() + MaxLayer,
+			Texture.base_face() + BaseFace, Texture.base_face() + MaxFace,
+			Texture.base_level() + BaseLevel, Texture.base_level() + MaxLevel);
+	}
+
 	template <typename texType>
 	inline texture view(texType const & Texture, format Format)
 	{
@@ -59,9 +79,8 @@ namespace gli
 		texture1D::size_type BaseLevel, texture1D::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
 
 		return texture(
 			Texture, TARGET_1D, Texture.format(),
@@ -77,12 +96,9 @@ namespace gli
 		texture1DArray::size_type BaseLevel, texture1DArray::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
-		assert(BaseLayer <= MaxLayer);
-		assert(BaseLayer < Texture.layers());
-		assert(MaxLayer < Texture.layers());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
+		GLI_ASSERT(BaseLayer >= 0 && BaseLayer < Texture.layers() && MaxLayer >= 0 && MaxLayer < Texture.layers() && BaseLayer <= MaxLayer);
 
 		return texture(
 			Texture, TARGET_1D_ARRAY, Texture.format(),
@@ -97,9 +113,8 @@ namespace gli
 		texture2D::size_type BaseLevel, texture2D::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
 
 		return texture(
 			Texture, TARGET_2D, Texture.format(),
@@ -115,12 +130,9 @@ namespace gli
 		texture2DArray::size_type BaseLevel, texture2DArray::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
-		assert(BaseLayer <= MaxLayer);
-		assert(BaseLayer < Texture.layers());
-		assert(MaxLayer < Texture.layers());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
+		GLI_ASSERT(BaseLayer >= 0 && BaseLayer < Texture.layers() && MaxLayer >= 0 && MaxLayer < Texture.layers() && BaseLayer <= MaxLayer);
 
 		return texture(
 			Texture, TARGET_2D_ARRAY, Texture.format(),
@@ -135,9 +147,8 @@ namespace gli
 		texture3D::size_type BaseLevel, texture3D::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
 
 		return texture(
 			Texture, TARGET_3D, Texture.format(),
@@ -153,12 +164,9 @@ namespace gli
 		textureCube::size_type BaseLevel, textureCube::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
-		assert(BaseFace <= MaxFace);
-		assert(BaseFace < Texture.faces());
-		assert(MaxFace < Texture.faces());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
+		GLI_ASSERT(BaseFace >= 0 && BaseFace < Texture.faces() && MaxFace >= 0 && MaxFace < Texture.faces() && BaseFace <= MaxFace);
 
 		return texture(
 			Texture, TARGET_CUBE, Texture.format(),
@@ -175,15 +183,10 @@ namespace gli
 		textureCubeArray::size_type BaseLevel, textureCubeArray::size_type MaxLevel
 	)
 	{
-		assert(BaseLevel <= MaxLevel);
-		assert(BaseLevel < Texture.levels());
-		assert(MaxLevel < Texture.levels());
-		assert(BaseFace <= MaxFace);
-		assert(BaseFace < Texture.faces());
-		assert(MaxFace < Texture.faces());
-		assert(BaseLayer <= MaxLayer);
-		assert(BaseLayer < Texture.layers());
-		assert(MaxLayer < Texture.layers());
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(BaseLevel >= 0 && BaseLevel < Texture.levels() && MaxLevel >= 0 && MaxLevel < Texture.levels() && BaseLevel <= MaxLevel);
+		GLI_ASSERT(BaseFace >= 0 && BaseFace < Texture.faces() && MaxFace >= 0 && MaxFace < Texture.faces() && BaseFace <= MaxFace);
+		GLI_ASSERT(BaseLayer >= 0 && BaseLayer < Texture.layers() && MaxLayer >= 0 && MaxLayer < Texture.layers() && BaseLayer <= MaxLayer);
 
 		return texture(
 			Texture, TARGET_CUBE_ARRAY, Texture.format(),

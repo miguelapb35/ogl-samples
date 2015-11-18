@@ -46,6 +46,13 @@ namespace gli
 	/// Create a texture view of an existing texture, sharing the same memory storage.
 	texture view(texture const & Texture);
 
+	/// Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of layers, levels and faces.
+	texture view(
+		texture const & Texture,
+		texture::size_type BaseLayer, texture::size_type MaxLayer,
+		texture::size_type BaseFace, texture::size_type MaxFace,
+		texture::size_type BaseLevel, texture::size_type MaxLevel);
+
 	/// Create a texture view of an existing texture, sharing the same memory storage.
 	template <typename texType>
 	texture view(texType const & Texture);

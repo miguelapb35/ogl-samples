@@ -101,6 +101,9 @@ namespace load_file_dds
 int main()
 {
 	std::vector<std::string> Filenames;
+	Filenames.push_back("kueken7_rgba4_unorm");
+	Filenames.push_back("kueken7_r5g6b5_unorm");
+	Filenames.push_back("kueken7_rgb5a1_unorm");
 	Filenames.push_back("kueken7_rgba8_srgb");
 	Filenames.push_back("kueken8_rgba8_srgb");
 	Filenames.push_back("kueken7_rgb8_unorm");

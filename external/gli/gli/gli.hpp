@@ -32,10 +32,10 @@
 
 #pragma once
 
-#define GLI_VERSION					71
+#define GLI_VERSION					80
 #define GLI_VERSION_MAJOR			0
-#define GLI_VERSION_MINOR			7
-#define GLI_VERSION_PATCH			1
+#define GLI_VERSION_MINOR			8
+#define GLI_VERSION_PATCH			0
 #define GLI_VERSION_REVISION		0
 
 #include "format.hpp"
@@ -52,7 +52,13 @@
 #include "texture_cube.hpp"
 #include "texture_cube_array.hpp"
 
+#include "sampler1d.hpp"
+#include "sampler1d_array.hpp"
 #include "sampler2d.hpp"
+#include "sampler2d_array.hpp"
+#include "sampler3d.hpp"
+#include "sampler_cube.hpp"
+#include "sampler_cube_array.hpp"
 
 #include "copy.hpp"
 #include "view.hpp"
@@ -65,7 +71,3 @@
 #include "dx.hpp"
 
 #include "./core/flip.hpp"
-#include "./core/fetch.hpp"
-
-
-

@@ -47,18 +47,22 @@ namespace gli
 		WRAP_COUNT = WRAP_LAST - WRAP_FIRST + 1
 	};
 
+	inline bool is_border(wrap Wrap)
+	{
+		return Wrap == WRAP_CLAMP_TO_BORDER || Wrap == WRAP_MIRROR_CLAMP_TO_BORDER;
+	}
+
 	class sampler
 	{
 	public:
 		sampler(wrap Wrap, filter Mip, filter Min);
 
 	protected:
-		typedef float(*wrapFunc)(float const & texcoord);
+		typedef float(*wrap_type)(float const & SamplerCoord);
 
-		wrapFunc getFunc(wrap WrapMode) const;
+		wrap_type getFunc(wrap WrapMode) const;
 
-		wrap WrapMode;
-		wrapFunc WrapFunc;
+		wrap_type Wrap;
 		filter Mip;
 		filter Min;
 	};

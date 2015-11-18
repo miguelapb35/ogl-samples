@@ -33,24 +33,22 @@
 namespace gli{
 namespace detail
 {
-	inline std::size_t compute_ktx_storage_size(texture const & Texture)
+	inline texture::size_type compute_ktx_storage_size(texture const & Texture)
 	{
-		std::uint32_t const BlockSize = block_size(Texture.format());
-		std::size_t TotalSize = sizeof(detail::FOURCC_KTX10) + sizeof(detail::ktxHeader10);
+		texture::size_type const BlockSize = block_size(Texture.format());
+		texture::size_type TotalSize = sizeof(detail::FOURCC_KTX10) + sizeof(detail::ktxHeader10);
 
-		for(std::size_t Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
+		for(texture::size_type Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
 		{
 			TotalSize += sizeof(std::uint32_t);
 
-			for(std::size_t Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
 			{
-				for(std::size_t Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
-				{
-					std::uint32_t const FaceSize = static_cast<std::uint32_t>(Texture.size(Level));
-					std::uint32_t const PaddedSize = std::max(BlockSize, glm::ceilMultiple(FaceSize, static_cast<std::uint32_t>(4)));
+				texture::size_type const FaceSize = Texture.size(Level);
+				texture::size_type const PaddedSize = std::max(BlockSize, glm::ceilMultiple(FaceSize, static_cast<texture::size_type>(4)));
 
-					TotalSize += PaddedSize;
-				}
+				TotalSize += PaddedSize;
 			}
 		}
 
@@ -92,26 +90,24 @@ namespace detail
 
 		Offset += sizeof(detail::ktxHeader10);
 
-		for(std::size_t Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
+		for(texture::size_type Level = 0, Levels = Texture.levels(); Level < Levels; ++Level)
 		{
 			std::uint32_t& ImageSize = *reinterpret_cast<std::uint32_t*>(&Memory[0] + Offset);
 			Offset += sizeof(std::uint32_t);
 
-			for(std::size_t Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Layer = 0, Layers = Texture.layers(); Layer < Layers; ++Layer)
+			for(texture::size_type Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
 			{
-				for(std::size_t Face = 0, Faces = Texture.faces(); Face < Faces; ++Face)
-				{
-					std::uint32_t const FaceSize = static_cast<std::uint32_t>(Texture.size(Level));
+				texture::size_type const FaceSize = Texture.size(Level);
 
-					std::memcpy(&Memory[0] + Offset, Texture.data(Layer, Face, Level), FaceSize);
+				std::memcpy(&Memory[0] + Offset, Texture.data(Layer, Face, Level), FaceSize);
 
-					std::uint32_t const PaddedSize = glm::ceilMultiple(FaceSize, static_cast<std::uint32_t>(4));
+				texture::size_type const PaddedSize = glm::ceilMultiple(FaceSize, static_cast<texture::size_type>(4));
 
-					ImageSize += PaddedSize;
-					Offset += PaddedSize;
+				ImageSize += static_cast<std::uint32_t>(PaddedSize);
+				Offset += PaddedSize;
 
-					assert(Offset <= Memory.size());
-				}
+				assert(Offset <= Memory.size());
 			}
 
 			ImageSize = glm::ceilMultiple(ImageSize, static_cast<std::uint32_t>(4));

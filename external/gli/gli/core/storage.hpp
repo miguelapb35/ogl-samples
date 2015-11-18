@@ -55,7 +55,7 @@ namespace gli
 	class storage
 	{
 	public:
-		typedef dim3_t dim_type;
+		typedef ivec3 texelcoord_type;
 		typedef size_t size_type;
 		typedef gli::format format_type;
 		typedef glm::byte data_type;
@@ -65,7 +65,7 @@ namespace gli
 
 		storage(
 			format_type Format,
-			dim_type const & Dimensions,
+			texelcoord_type const & Dimensions,
 			size_type Layers,
 			size_type Faces,
 			size_type Levels);
@@ -77,9 +77,9 @@ namespace gli
 		size_type faces() const;
 
 		size_type block_size() const;
-		dim_type block_dimensions() const;
-		dim_type block_count(size_type Level) const;
-		dim_type dimensions(size_type Level) const;
+		texelcoord_type block_dimensions() const;
+		texelcoord_type block_count(size_type Level) const;
+		texelcoord_type dimensions(size_type Level) const;
 
 		data_type * data();
 
@@ -102,9 +102,9 @@ namespace gli
 		size_type const Faces;
 		size_type const Levels;
 		size_type const BlockSize;
-		dim_type const BlockCount;
-		dim_type const BlockDimensions;
-		dim_type const Dimensions;
+		texelcoord_type const BlockCount;
+		texelcoord_type const BlockDimensions;
+		texelcoord_type const Dimensions;
 		std::vector<data_type> Data;
 	};
 

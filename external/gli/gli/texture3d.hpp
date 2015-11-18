@@ -38,8 +38,7 @@ namespace gli
 	class texture3D : public texture
 	{
 	public:
-		typedef dim3_t dim_type;
-		typedef vec3 samplecoord_type;
+		typedef ivec3 texelcoord_type;
 
 	public:
 		/// Create an empty texture 3D
@@ -48,13 +47,13 @@ namespace gli
 		/// Create a texture3D and allocate a new storage
 		explicit texture3D(
 			format_type Format,
-			dim_type const & Dimensions,
+			texelcoord_type const & Dimensions,
 			size_type Levels);
 
 		/// Create a texture3D and allocate a new storage with a complete mipmap chain
 		explicit texture3D(
 			format_type Format,
-			dim_type const & Dimensions);
+			texelcoord_type const & Dimensions);
 
 		/// Create a texture3D view with an existing storage
 		explicit texture3D(
@@ -77,22 +76,36 @@ namespace gli
 		image operator[](size_type Level) const;
 
 		/// Return the dimensions of a texture instance: width, height and depth 
-		dim_type dimensions(size_type Level = 0) const;
+		texelcoord_type dimensions(size_type Level = 0) const;
 
 		/// Fetch a texel from a texture. The texture format must be uncompressed.
 		template <typename genType>
-		genType load(texture3D::dim_type const & TexelCoord, texture3D::size_type Level) const;
+		genType load(texelcoord_type const & TexelCoord, size_type Level) const;
 
 		/// Write a texel to a texture. The texture format must be uncompressed.
 		template <typename genType>
-		void store(texture3D::dim_type const & TexelCoord, texture3D::size_type Level, genType const & Texel);
+		void store(texelcoord_type const & TexelCoord, size_type Level, genType const & Texel);
+
+		/// Clear the entire texture storage with zeros
+		void clear();
+
+		/// Clear the entire texture storage with Texel which type must match the texture storage format block size
+		/// If the type of genType doesn't match the type of the texture format, no conversion is performed and the data will be reinterpreted as if is was of the texture format. 
+		template <typename genType>
+		void clear(genType const & Texel);
+
+		/// Clear a specific image of a texture.
+		template <typename genType>
+		void clear(size_type Level, genType const & Texel);
 
 	private:
 		struct cache
 		{
 			std::uint8_t* Data;
-			texture3D::size_type Size;
-			texture3D::dim_type Dim;
+			texelcoord_type Dim;
+#			ifndef NDEBUG
+				size_type Size;
+#			endif
 		};
 
 		void build_cache();

@@ -46,7 +46,8 @@ namespace detail
 		{
 			floatType const Min = static_cast<floatType>(std::numeric_limits<T>::min());
 			floatType const Max = static_cast<floatType>(std::numeric_limits<T>::max());
-			return (vecType<floatType, P>(v) - Min) / (Max - Min) * static_cast<floatType>(2) - static_cast<floatType>(1);
+			floatType const Div = static_cast<floatType>(2) / (Max - Min);
+			return (vecType<floatType, P>(v) - Min) * Div - static_cast<floatType>(1);
 		}
 	};
 
@@ -55,7 +56,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static vecType<floatType, P> call(vecType<T, P> const & v)
 		{
-			return vecType<floatType, P>(v) / static_cast<floatType>(std::numeric_limits<T>::max());
+			return vecType<floatType, P>(v) * (static_cast<floatType>(1) / static_cast<floatType>(std::numeric_limits<T>::max()));
 		}
 	};
 

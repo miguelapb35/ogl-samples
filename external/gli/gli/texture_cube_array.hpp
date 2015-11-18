@@ -36,8 +36,7 @@ namespace gli
 	class textureCubeArray : public texture
 	{
 	public:
-		typedef dim2_t dim_type;
-		typedef vec4 samplecoord_type;
+		typedef ivec2 texelcoord_type;
 
 	public:
 		/// Create an empty texture cube array
@@ -46,14 +45,14 @@ namespace gli
 		/// Create a textureCubeArray and allocate a new storage
 		explicit textureCubeArray(
 			format_type Format,
-			dim_type const & Dimensions,
+			texelcoord_type const & Dimensions,
 			size_type Layers,
 			size_type Levels);
 
 		/// Create a textureCubeArray and allocate a new storage with a complete mipmap chain
 		explicit textureCubeArray(
 			format_type Format,
-			dim_type const & Dimensions,
+			texelcoord_type const & Dimensions,
 			size_type Layers);
 
 		/// Create a textureCubeArray view with an existing storage
@@ -79,26 +78,36 @@ namespace gli
 		textureCube operator[](size_type Layer) const;
 
 		/// Return the dimensions of a texture instance: width and height where both should be equal.
-		dim_type dimensions(size_type Level = 0) const;
+		texelcoord_type dimensions(size_type Level = 0) const;
 
 		/// Fetch a texel from a texture. The texture format must be uncompressed.
 		template <typename genType>
-		genType load(
-			textureCubeArray::dim_type const & TexelCoord,
-			textureCubeArray::size_type Layer, textureCubeArray::size_type Face, textureCubeArray::size_type Level) const;
+		genType load(texelcoord_type const & TexelCoord, size_type Layer, textureCubeArray::size_type Face, size_type Level) const;
 
 		/// Write a texel to a texture. The texture format must be uncompressed.
 		template <typename genType>
-		void store(
-			textureCubeArray::dim_type const & TexelCoord,
-			textureCubeArray::size_type Layer, textureCubeArray::size_type Face, textureCubeArray::size_type Level, genType const & Texel);
+		void store(texelcoord_type const & TexelCoord, size_type Layer, size_type Face, size_type Level, genType const & Texel);
+
+		/// Clear the entire texture storage with zeros
+		void clear();
+
+		/// Clear the entire texture storage with Texel which type must match the texture storage format block size
+		/// If the type of genType doesn't match the type of the texture format, no conversion is performed and the data will be reinterpreted as if is was of the texture format. 
+		template <typename genType>
+		void clear(genType const & Texel);
+
+		/// Clear a specific image of a texture.
+		template <typename genType>
+		void clear(size_type Layer, size_type Face, size_type Level, genType const & Texel);
 
 	private:
 		struct cache
 		{
 			std::uint8_t* Data;
-			textureCubeArray::size_type Size;
-			textureCubeArray::dim_type Dim;
+			texelcoord_type Dim;
+#			ifndef NDEBUG
+				size_type Size;
+#			endif
 		};
 
 		void build_cache();

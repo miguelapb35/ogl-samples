@@ -33,15 +33,22 @@ namespace detail
 {
 	inline bool equalData(texture const & TextureA, texture const & TextureB)
 	{
+		GLI_ASSERT(TextureA.size() == TextureB.size());
+
 		if(TextureA.data() == TextureB.data())
 			return true;
 
-		void const* PointerA = TextureA.data();
-		void const* PointerB = TextureB.data();
-		if(std::memcmp(PointerA, PointerB, TextureA.size()) == 0)
-			return true;
+		for(texture::size_type LayerIndex = 0, LayerCount = TextureA.layers(); LayerIndex < LayerCount; ++LayerIndex)
+		for(texture::size_type FaceIndex = 0, FaceCount = TextureA.faces(); FaceIndex < FaceCount; ++FaceIndex)
+		for(texture::size_type LevelIndex = 0, LevelCount = TextureA.levels(); LevelIndex < LevelCount; ++LevelIndex)
+		{
+			void const* PointerA = TextureA.data(LayerIndex, FaceIndex, LevelIndex);
+			void const* PointerB = TextureB.data(LayerIndex, FaceIndex, LevelIndex);
+			if(std::memcmp(PointerA, PointerB, TextureA.size(LevelIndex)) != 0)
+				return false;
+		}
 
-		return false;
+		return true;
 	}
 }//namespace detail
 
@@ -52,11 +59,7 @@ namespace detail
 		if(ImageA.size() != ImageB.size())
 			return false;
 
-		for(std::size_t i = 0; i < ImageA.size<glm::byte>(); ++i)
-			if(*(ImageA.data<glm::byte>() + i) != *(ImageB.data<glm::byte>() + i))
-				return false;
-
-		return true;
+		return std::memcmp(ImageA.data(), ImageB.data(), ImageA.size()) == 0;
 	}
 
 	inline bool operator!=(image const & ImageA, image const & ImageB)
@@ -66,11 +69,7 @@ namespace detail
 		if(ImageA.size() != ImageB.size())
 			return true;
 
-		for(std::size_t i = 0; i < ImageA.size<glm::byte>(); ++i)
-			if(*(ImageA.data<glm::byte>() + i) != *(ImageB.data<glm::byte>() + i))
-				return true;
-
-		return false;
+		return std::memcmp(ImageA.data(), ImageB.data(), ImageA.size()) != 0;
 	}
 
 	inline bool equal(texture const & TextureA, texture const & TextureB)
