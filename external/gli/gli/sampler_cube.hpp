@@ -31,7 +31,7 @@
 #include "sampler.hpp"
 #include "texture_cube.hpp"
 #include "core/mipmaps_compute.hpp"
-#include "core/convert.hpp"
+#include "core/convert_func.hpp"
 
 namespace gli
 {

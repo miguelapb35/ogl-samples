@@ -66,4 +66,10 @@ namespace gli
 	{
 		return Target == TARGET_CUBE || Target == TARGET_CUBE_ARRAY;
 	}
+	
+	/// Check whether a target is a rectangle target
+	inline bool is_target_rect(target Target)
+	{
+		return Target == TARGET_RECT || Target == TARGET_RECT_ARRAY;
+	}
 }//namespace gli

@@ -183,7 +183,7 @@ namespace detail
 		Offset += sizeof(detail::ddsHeader);
 
 		detail::ddsHeader10 Header10;
-		if(Header.Format.flags & dx::DDPF_FOURCC && Header.Format.fourCC == dx::D3DFMT_DX10)
+		if((Header.Format.flags & dx::DDPF_FOURCC) && (Header.Format.fourCC == dx::D3DFMT_DX10 || Header.Format.fourCC == dx::D3DFMT_GLI1))
 		{
 			std::memcpy(&Header10, Data + Offset, sizeof(Header10));
 			Offset += sizeof(detail::ddsHeader10);
@@ -192,10 +192,13 @@ namespace detail
 		dx DX;
 
 		gli::format Format(static_cast<gli::format>(gli::FORMAT_INVALID));
-		if((Header.Format.flags & (dx::DDPF_RGB | dx::DDPF_ALPHAPIXELS | dx::DDPF_ALPHA | dx::DDPF_YUV | dx::DDPF_LUMINANCE)) && Format == static_cast<format>(gli::FORMAT_INVALID) && Header.Format.flags != dx::DDPF_FOURCC_ALPHAPIXELS)
+		if((Header.Format.flags & (dx::DDPF_RGB | dx::DDPF_ALPHAPIXELS | dx::DDPF_ALPHA | dx::DDPF_YUV | dx::DDPF_LUMINANCE)) && Format == static_cast<format>(gli::FORMAT_INVALID) && Header.Format.bpp != 0)
 		{
 			switch(Header.Format.bpp)
 			{
+				default:
+					assert(0);
+					break;
 				case 8:
 				{
 					if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_RG4_UNORM_PACK8).Mask)))
@@ -208,6 +211,8 @@ namespace detail
 						Format = FORMAT_R8_UNORM_PACK8;
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_RG3B2_UNORM_PACK8).Mask)))
 						Format = FORMAT_RG3B2_UNORM_PACK8;
+					else
+						assert(0);
 					break;
 				}
 				case 16:
@@ -234,14 +239,18 @@ namespace detail
 						Format = FORMAT_A16_UNORM_PACK16;
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_R16_UNORM_PACK16).Mask)))
 						Format = FORMAT_R16_UNORM_PACK16;
+					else
+						assert(0);
 					break;
 				}
 				case 24:
 				{
 					if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_RGB8_UNORM_PACK8).Mask)))
 						Format = FORMAT_RGB8_UNORM_PACK8;
-					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_RGB8_UNORM_PACK8).Mask)))
+					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_BGR8_UNORM_PACK8).Mask)))
 						Format = FORMAT_BGR8_UNORM_PACK8;
+					else
+						assert(0);
 					break;
 				}
 				case 32:
@@ -260,14 +269,16 @@ namespace detail
 						Format = FORMAT_RG16_UNORM_PACK16;
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_R32_SFLOAT_PACK32).Mask)))
 						Format = FORMAT_R32_SFLOAT_PACK32;
+					else
+						assert(0);
+					break;
 				}
-				break;
 			}
 		}
-		else if((Header.Format.flags & dx::DDPF_FOURCC) && (Header.Format.fourCC != dx::D3DFMT_DX10) && (Format == static_cast<format>(gli::FORMAT_INVALID)))
+		else if((Header.Format.flags & dx::DDPF_FOURCC) && (Header.Format.fourCC != dx::D3DFMT_DX10) && (Header.Format.fourCC != dx::D3DFMT_GLI1) && (Format == static_cast<format>(gli::FORMAT_INVALID)))
 			Format = DX.find(Header.Format.fourCC, Header.Format.flags);
-		else if((Header.Format.fourCC == dx::D3DFMT_DX10) && (Header10.Format != dx::DXGI_FORMAT_UNKNOWN))
-			Format = DX.find(Header10.Format, Header.Format.flags);
+		else if(Header.Format.fourCC == dx::D3DFMT_DX10 || Header.Format.fourCC == dx::D3DFMT_GLI1)
+			Format = DX.find(Header.Format.fourCC, Header10.Format, Header.Format.flags);
 
 		assert(Format != static_cast<format>(gli::FORMAT_INVALID));
 

@@ -21,29 +21,13 @@
 /// THE SOFTWARE.
 ///
 /// @ref core
-/// @file gli/gli.hpp
-/// @date 2008-12-19 / 2015-08-08
+/// @file gli/transform.hpp
+/// @date 2015-11-27 / 2015-11-27
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-/*! @mainpage OpenGL Image
- *
- */
-
 #pragma once
 
-#define GLI_VERSION					80
-#define GLI_VERSION_MAJOR			0
-#define GLI_VERSION_MINOR			8
-#define GLI_VERSION_PATCH			0
-#define GLI_VERSION_REVISION		0
-
-#include "format.hpp"
-#include "target.hpp"
-#include "levels.hpp"
-
-#include "image.hpp"
-#include "texture.hpp"
 #include "texture1d.hpp"
 #include "texture1d_array.hpp"
 #include "texture2d.hpp"
@@ -52,25 +36,35 @@
 #include "texture_cube.hpp"
 #include "texture_cube_array.hpp"
 
-#include "sampler1d.hpp"
-#include "sampler1d_array.hpp"
-#include "sampler2d.hpp"
-#include "sampler2d_array.hpp"
-#include "sampler3d.hpp"
-#include "sampler_cube.hpp"
-#include "sampler_cube_array.hpp"
+namespace gli
+{
+	template <typename vec_type>
+	struct transform_func
+	{
+		typedef vec_type(*type)(vec_type const & A, vec_type const & B);
+	};
 
-#include "copy.hpp"
-#include "view.hpp"
-#include "comparison.hpp"
+	template <typename vec_type>
+	void transform(texture1D & Out, texture1D const & In0, texture1D const & In1, typename transform_func<vec_type>::type TexelFunc);
+	
+	template <typename vec_type>
+	void transform(texture1DArray & Out, texture1DArray const & In0, texture1DArray const & In1, typename transform_func<vec_type>::type Func);
+	
+	template <typename vec_type>
+	void transform(texture2D & Out, texture2D const & In0, texture2D const & In1, typename transform_func<vec_type>::type Func);
+	
+	template <typename vec_type>
+	void transform(texture2DArray & Out, texture2DArray const & In0, texture2DArray const & In1, typename transform_func<vec_type>::type Func);
+	
+	template <typename vec_type>
+	void transform(texture3D & Out, texture3D const & In0, texture3D const & In1, typename transform_func<vec_type>::type Func);
 
-#include "reduce.hpp"
-#include "transform.hpp"
+	template <typename vec_type>
+	void transform(textureCube & Out, textureCube const & In0, textureCube const & In1, typename transform_func<vec_type>::type Func);
+	
+	template <typename vec_type>
+	void transform(textureCubeArray & Out, textureCubeArray const & In0, textureCubeArray const & In1, typename transform_func<vec_type>::type Func);
+	
+}//namespace gli
 
-#include "load.hpp"
-#include "save.hpp"
-
-#include "gl.hpp"
-#include "dx.hpp"
-
-#include "./core/flip.hpp"
+#include "./core/transform.inl"

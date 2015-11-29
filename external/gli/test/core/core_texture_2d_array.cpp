@@ -260,12 +260,12 @@ namespace load
 		int Error(0);
 
 		{
-			gli::texture const Texture = gli::load(path("array_r8_unorm.ktx"));
+			gli::texture const Texture = gli::load(path("array_r8_uint.ktx"));
 			Error += Texture.target() == gli::TARGET_2D_ARRAY ? 0 : 1;
 		}
 
 		{
-			gli::texture const Texture = gli::load(path("array_r8_unorm.dds"));
+			gli::texture const Texture = gli::load(path("array_r8_uint.dds"));
 			Error += Texture.target() == gli::TARGET_2D_ARRAY ? 0 : 1;
 		}
 

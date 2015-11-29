@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "convert.hpp"
+#include "convert_func.hpp"
 
 namespace gli{
 namespace detail

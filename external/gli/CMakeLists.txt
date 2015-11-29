@@ -18,6 +18,33 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" 
 endif()
 
 ################################
+# Add source files
+
+file(GLOB ROOT_SOURCE ./gli/*.cpp)
+file(GLOB ROOT_INLINE ./gli/*.inl)
+file(GLOB ROOT_HEADER ./gli/*.hpp)
+file(GLOB ROOT_TEXT ./*.txt)
+file(GLOB ROOT_MD ./*.md)
+file(GLOB ROOT_KMG ./doc/spec/*.html)
+
+file(GLOB_RECURSE CORE_SOURCE ./gli/core/*.cpp)
+file(GLOB_RECURSE CORE_INLINE ./gli/core/*.inl)
+file(GLOB_RECURSE CORE_HEADER ./gli/core/*.hpp)
+
+file(GLOB_RECURSE GTX_SOURCE ./gli/gtx/*.cpp)
+file(GLOB_RECURSE GTX_INLINE ./gli/gtx/*.inl)
+file(GLOB_RECURSE GTX_HEADER ./gli/gtx/*.hpp)
+
+source_group("KMG Spec" FILES  ${ROOT_KMG})
+source_group("Text Files" FILES ${ROOT_TEXT} ${ROOT_MD})
+source_group("Core Files" FILES ${CORE_SOURCE})
+source_group("Core Files" FILES ${CORE_INLINE})
+source_group("Core Files" FILES ${CORE_HEADER})
+source_group("GTX Files" FILES ${GTX_SOURCE})
+source_group("GTX Files" FILES ${GTX_INLINE})
+source_group("GTX Files" FILES ${GTX_HEADER})
+
+################################
 # Add package
 
 macro(addExternalPackageGTC NAME DIRECTORY)
