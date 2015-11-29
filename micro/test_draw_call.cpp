@@ -23,6 +23,7 @@
 
 #include "test.hpp"
 #include "test_draw_call.hpp"
+#include <glm/gtc/random.hpp>
 
 namespace
 {

@@ -23,6 +23,7 @@
 
 #include "test.hpp"
 #include "test_uniform_caching.hpp"
+#include <glm/gtc/random.hpp>
 
 namespace
 {

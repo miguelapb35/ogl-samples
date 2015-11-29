@@ -23,6 +23,7 @@
 
 #include "test.hpp"
 #include "test_small_primitive.hpp"
+#include <glm/gtc/random.hpp>
 
 namespace
 {

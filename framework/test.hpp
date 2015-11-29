@@ -44,7 +44,6 @@
 #include <glm/gtc/color_space.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/packing.hpp>
-#include <glm/gtc/random.hpp>
 #include <glm/gtc/round.hpp>
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/integer.hpp>

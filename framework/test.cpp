@@ -361,6 +361,8 @@ namespace
 {
 	gli::texture absolute_difference(gli::texture const & A, gli::texture const & B)
 	{
+		assert(A.format() == gli::FORMAT_RGB8_UNORM_PACK8 && B.format() == gli::FORMAT_RGB8_UNORM_PACK8);
+
 		gli::texture Result(A.target(), A.format(), A.dimensions(), A.layers(), A.faces(), A.levels());
 		for(std::size_t TexelIndex = 0, TexelCount = A.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
 		{
