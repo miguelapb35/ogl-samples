@@ -119,7 +119,7 @@ private:
 			Format.Internal,
 			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
 			0,
-			Format.External, Format.Type,
+			Format.External, GL_UNSIGNED_INT_10_10_10_2,//Format.Type,
 			Texture[0].data());
 
 		return true;
