@@ -148,7 +148,7 @@ private:
 		gli::gl GL;
 
 		{
-			gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UNORM);
+			gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UNORM_PACK8);
 
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

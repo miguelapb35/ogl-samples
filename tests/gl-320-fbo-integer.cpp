@@ -187,7 +187,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UINT);
+		gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UINT_PACK8);
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),

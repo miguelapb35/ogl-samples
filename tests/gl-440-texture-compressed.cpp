@@ -166,7 +166,7 @@ private:
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				gli::image::dim_type const Dimensions = Texture.dimensions(Level);
+				gli::image::texelcoord_type const Dimensions = Texture.dimensions(Level);
 
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,

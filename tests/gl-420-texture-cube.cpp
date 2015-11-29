@@ -157,7 +157,7 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 2);
 
-		gli::textureCube TextureA(gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(512), 1);
+		gli::textureCube TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(512), 1);
 		assert(!TextureA.empty());
 		TextureA[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
 		TextureA[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
@@ -166,7 +166,7 @@ private:
 		TextureA[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
 		TextureA[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
 
-		gli::textureCube TextureB(gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(256), 1);
+		gli::textureCube TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(256), 1);
 		assert(!TextureB.empty());
 		TextureB[0].clear<glm::u8vec4>(glm::u8vec4(255, 128, 128, 255));
 		TextureB[1].clear<glm::u8vec4>(glm::u8vec4(255, 192, 128, 255));
@@ -175,7 +175,7 @@ private:
 		TextureB[4].clear<glm::u8vec4>(glm::u8vec4(128, 255, 255, 255));
 		TextureB[5].clear<glm::u8vec4>(glm::u8vec4(128, 128, 255, 255));
 
-		gli::textureCube TextureC(gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(128), 1);
+		gli::textureCube TextureC(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(128), 1);
 		assert(!TextureC.empty());
 		TextureC[0].clear<glm::u8vec4>(glm::u8vec4(255, 192, 192, 255));
 		TextureC[1].clear<glm::u8vec4>(glm::u8vec4(255, 224, 192, 255));

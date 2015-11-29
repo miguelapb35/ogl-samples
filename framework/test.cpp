@@ -357,6 +357,22 @@ glm::vec3 test::cameraPosition() const
 	return glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y);
 }
 
+namespace
+{
+	gli::texture absolute_difference(gli::texture const & A, gli::texture const & B)
+	{
+		gli::texture Result(A.target(), A.format(), A.dimensions(), A.layers(), A.faces(), A.levels());
+		for(std::size_t TexelIndex = 0, TexelCount = A.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
+		{
+			glm::u8vec3 const TexelA = *(A.data<glm::u8vec3>() + TexelIndex);
+			glm::u8vec3 const TexelB = *(B.data<glm::u8vec3>() + TexelIndex);
+			glm::u8vec3 const TexelResult = glm::mix(TexelA - TexelB, TexelB - TexelA, glm::greaterThan(TexelB, TexelA)) * glm::u8vec3(8);
+			*(Result.data<glm::u8vec3>() + TexelIndex) = TexelResult;
+		}
+		return Result;
+	}
+}//namespace
+
 bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 {
 	GLint ColorType = GL_UNSIGNED_BYTE;
@@ -394,17 +410,24 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 
 	if(Success)
 	{
-		gli::texture2D Template(load_png((getDataDirectory() + "references/" + ::vendor() + Title + ".png").c_str()));
+		gli::texture Template(load_png((getDataDirectory() + "templates/reference/" + Title + ".png").c_str()));
 
 		if(Success)
-			Success = Success && (!Template.empty());
+			Success = Success && !Template.empty();
 
 		if(Success)
 			Success = Success && (Template == TextureRGB);
+
+		// Save abs diff
+		if(!Success && !Template.empty())
+		{
+			gli::texture Diff = ::absolute_difference(Template, TextureRGB);
+			save_png(gli::texture2D(Diff), (getDataDirectory() + "templates/generate/" + Title + "-diff.png").c_str());
+		}
 	}
 
 	if(!Success)
-		save_png(TextureRGB, (getDataDirectory() + "generated/" + Title + ".png").c_str());
+		save_png(TextureRGB, (getDataDirectory() + "templates/generate/" + Title + ".png").c_str());
 
 	return Success;
 }

@@ -206,7 +206,7 @@ private:
 		{
 			//gli::texture2D Texture(gli::SRGB8, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec3(glm::convertRgbToSrgb(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
-			gli::texture2D Texture(gli::FORMAT_RGBA8_SRGB, gli::dim2_t(16));
+			gli::texture2D Texture(gli::FORMAT_RGBA8_SRGB_PACK8, gli::dim2_t(16));
 			Texture.clear(glm::u8vec4(glm::convertLinearToSRGB(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)) * 255.0f));
 			//gli::texture2D Texture(gli::RGBA8_UNORM, gli::dim2_t(16));
 			//Texture.clear(glm::u8vec4(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f) * 255.0f));

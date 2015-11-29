@@ -175,7 +175,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(gli::FORMAT_RGBA8_UNORM, gli::textureCube::dim_type(2), 1);
+		gli::textureCube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(2), 1);
 		assert(!Texture.empty());
 
 		gli::gl GL;

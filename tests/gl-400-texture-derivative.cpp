@@ -203,7 +203,7 @@ private:
 		bool Validated(true);
 
 		std::size_t TextureSize(128);
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM, gli::texture2D::dim_type(TextureSize));
+		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(TextureSize));
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
 		Texture[2].clear(glm::u8vec4(255, 255, 0, 255));
