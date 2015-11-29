@@ -412,10 +412,13 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 
 	if(Success)
 	{
-		gli::texture Template(load_png((getDataDirectory() + "templates/reference/" + Title + ".png").c_str()));
+		gli::texture Template(load_png((getDataDirectory() + "templates/" + Title + ".png").c_str()));
 
 		if(Success)
+		{
 			Success = Success && !Template.empty();
+
+		}
 
 		if(Success)
 			Success = Success && (Template == TextureRGB);
@@ -424,12 +427,11 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		if(!Success && !Template.empty())
 		{
 			gli::texture Diff = ::absolute_difference(Template, TextureRGB);
-			save_png(gli::texture2D(Diff), (getDataDirectory() + "templates/generate/" + Title + "-diff.png").c_str());
+			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
+			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
+			save_png(gli::texture2D(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 		}
 	}
-
-	if(!Success)
-		save_png(TextureRGB, (getDataDirectory() + "templates/generate/" + Title + ".png").c_str());
 
 	return Success;
 }
