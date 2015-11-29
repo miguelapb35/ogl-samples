@@ -394,7 +394,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 
 	if(Success)
 	{
-		gli::texture2D Template(load_png((getDataDirectory() + "templates/" + ::vendor() + Title + ".png").c_str()));
+		gli::texture2D Template(load_png((getDataDirectory() + "references/" + ::vendor() + Title + ".png").c_str()));
 
 		if(Success)
 			Success = Success && (!Template.empty());
@@ -404,7 +404,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	}
 
 	if(!Success)
-		save_png(TextureRGB, (getBinaryDirectory() + Title + ".png").c_str());
+		save_png(TextureRGB, (getDataDirectory() + "generated/" + Title + ".png").c_str());
 
 	return Success;
 }
