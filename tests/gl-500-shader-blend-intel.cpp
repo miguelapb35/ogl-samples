@@ -22,6 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
+#include <glm/gtc/random.hpp>
 
 namespace
 {
@@ -280,6 +281,19 @@ private:
 	bool begin()
 	{
 		bool Validated = this->checkExtension("GL_INTEL_fragment_shader_ordering");
+
+/*
+		glm::vec2 const WindowSize(this->getWindowSize());
+		glm::vec2 const WindowRange = WindowSize * 3.f;
+
+		this->Viewports.resize(1000);
+		for (std::size_t i = 0; i < this->Viewports.size(); ++i)
+		{
+			glm::vec2 const ViewportPos(i % 17u, i % 13u);
+			glm::vec2 const ViewportSize(i % 11u);
+			this->Viewports[i] = glm::vec4(ViewportPos / glm::vec2(17, 13) * WindowRange - WindowSize, ViewportSize / glm::vec2(11));
+		}
+*/
 
 		glm::vec2 WindowSize(this->getWindowSize());
 		this->Viewports.resize(1000);

@@ -22,7 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
-#include <glm/gtc/random.hpp>
 
 namespace
 {
@@ -102,10 +101,14 @@ private:
 			//Data[i].Position = glm::vec4(glm::linearRand(glm::vec2(-1), glm::vec2(1)), glm::gaussRand(0.0f, 1.0f), 1);
 			//Data[i].Position = glm::vec4(glm::linearRand(glm::vec2(-1), glm::vec2(1)), /*glm::gaussRand(0.0f, 1.0f)*/0, 1);
 			//Data[i].Position = glm::vec4(glm::sphericalRand(1.0f), 1);
-			Data[i].Position = glm::vec4(glm::gaussRand(glm::vec3(0), glm::vec3(1)), 1);
+			//Data[i].Position = glm::vec4(glm::gaussRand(glm::vec3(0), glm::vec3(1)), 1);
 			//Data[i].Position = glm::vec4(glm::circularRand(1.0f), 0, 1);
 			//Data[i].Position = glm::vec4(glm::diskRand(1.0f), 0, 1);
 			//Data[i].Position = glm::vec4(glm::ballRand(1.0f), 1);
+			Data[i].Position = glm::vec4(
+				glm::cos(static_cast<float>(i) / static_cast<float>(VertexCount) * glm::pi<float>() * 2.f) * 1.f,
+				glm::sin(static_cast<float>(i) / static_cast<float>(VertexCount) * glm::pi<float>() * 2.f) * 1.f,
+				0.0f, 1.0f);
 			Data[i].Color = glm::vec4(1);
 		}
 

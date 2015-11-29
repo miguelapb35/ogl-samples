@@ -256,6 +256,17 @@ private:
 	{
 		bool Validated = this->checkExtension("GL_ARB_texture_barrier");
 
+		glm::vec2 const WindowSize(this->getWindowSize());
+		glm::vec2 const WindowRange = WindowSize * 3.f;
+
+		this->Viewports.resize(1000);
+		for (std::size_t i = 0; i < this->Viewports.size(); ++i)
+		{
+			glm::vec2 const ViewportPos(i % 17u, i % 13u);
+			glm::vec2 const ViewportSize(i % 11u);
+			this->Viewports[i] = glm::vec4(ViewportPos / glm::vec2(17, 13) * WindowRange - WindowSize, WindowSize * ViewportSize / glm::vec2(11));
+		}
+/*
 		glm::vec2 WindowSize(this->getWindowSize());
 		this->Viewports.resize(1000);
 		for (std::size_t i = 0; i < this->Viewports.size(); ++i)
@@ -265,7 +276,7 @@ private:
 				glm::linearRand(-WindowSize.y, WindowSize.y * 2.0f),
 				WindowSize * glm::linearRand(0.0f, 1.0f));
 		}
-
+*/
 		caps Caps(caps::CORE);
 
 		if (Validated)

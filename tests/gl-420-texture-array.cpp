@@ -119,9 +119,10 @@ private:
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
 		gli::texture2DArray Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2DArray::texelcoord_type(4), 15, 1);
-		for(gli::size_t LayerIndex = 0; LayerIndex < Texture.layers(); ++LayerIndex)
+		for(gli::size_t LayerIndex = 0, LayerCount = Texture.layers(); LayerIndex < LayerCount; ++LayerIndex)
 		{
-			glm::u8vec4 const Color(glm::linearRand(glm::vec4(0), glm::vec4(1)) * 255.f);
+			float const Progress = static_cast<float>(LayerIndex) / static_cast<float>(LayerCount);
+			glm::u8vec4 const Color(glm::vec4(Progress, 0.5f + Progress * 0.5f, 1.f - Progress, 1.f) * 255.f);
 			Texture[LayerIndex].clear<glm::u8vec4>(Color);
 		}
 
