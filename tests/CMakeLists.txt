@@ -276,6 +276,8 @@ set(GL_SHADER_GTC viewport.vert viewport.geom viewport.frag layer.vert layer.geo
 glCreateSampleGTC(fbo-layered)
 set(GL_SHADER_GTC primitive-instancing.vert primitive-instancing.geom primitive-instancing.frag)
 glCreateSampleGTC(primitive-instanced)
+set(GL_SHADER_GTC glsl-block.vert glsl-block1.frag glsl-block2.frag)
+glCreateSampleGTC(glsl-block)
 set(GL_SHADER_GTC tess.vert tess.cont tess.eval tess.geom tess.frag)
 glCreateSampleGTC(primitive-tessellation-2)
 glCreateSampleGTC(primitive-tessellation-5)
