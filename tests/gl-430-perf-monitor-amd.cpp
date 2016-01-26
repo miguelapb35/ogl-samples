@@ -256,8 +256,8 @@ private:
 	std::array<GLuint, pipeline::MAX> PipelineName;
 	std::array<GLuint, pipeline::MAX> ProgramName;
 	std::array<GLuint, pipeline::MAX> VertexArrayName;
-	std::array<GLuint, texture::MAX> BufferName;
-	std::array<GLuint, buffer::MAX> TextureName;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, texture::MAX> TextureName;
 	std::unique_ptr<monitor> Monitor;
 
 	bool initProgram()
