@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/core_sampler_wrap.cpp
-/// @date 2015-10-10 / 2015-10-15
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/sampler2d.hpp>
 #include <gli/comparison.hpp>
 #include <glm/gtx/component_wise.hpp>
@@ -43,22 +15,22 @@ namespace wrap_clamp_to_border
 		glm::vec4 const Orange(1.0f, 0.5f, 0.0f, 1.0f);
 		glm::vec4 const Blue(0.0f, 0.5f, 1.0f, 1.0f);
 
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32), 1);
+		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32), 1);
 		Texture.clear(glm::packUnorm4x8(Orange));
 
 		gli::fsampler2D SamplerA(Texture, gli::WRAP_CLAMP_TO_BORDER, gli::FILTER_LINEAR, gli::FILTER_LINEAR, Blue);
 
 		{
-			std::array<gli::fsampler2D::samplecoord_type, 8> SampleCoord{
+			std::array<gli::fsampler2D::normalized_type, 8> SampleCoord{
 			{
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.1f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.1f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.9f),
-				gli::fsampler2D::samplecoord_type( 0.9f, 0.9f),
-				gli::fsampler2D::samplecoord_type( 0.9f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.9f)
+				gli::fsampler2D::normalized_type( 0.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.1f),
+				gli::fsampler2D::normalized_type( 0.5f, 0.1f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.5f, 0.9f),
+				gli::fsampler2D::normalized_type( 0.9f, 0.9f),
+				gli::fsampler2D::normalized_type( 0.9f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.9f)
 			}};
 
 			for(std::size_t i = 0, n = SampleCoord.size(); i < n; ++i)
@@ -68,16 +40,16 @@ namespace wrap_clamp_to_border
 			}
 		}
 		{
-			std::array<gli::fsampler2D::samplecoord_type, 8> SampleCoord{
+			std::array<gli::fsampler2D::normalized_type, 8> SampleCoord{
 			{
-				gli::fsampler2D::samplecoord_type( 0.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f, 1.5f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 1.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f, 1.5f)
+				gli::fsampler2D::normalized_type( 0.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 1.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 1.5f, 1.5f),
+				gli::fsampler2D::normalized_type( 0.5f, 1.5f),
+				gli::fsampler2D::normalized_type( 1.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f, 1.5f)
 			}};
 
 			for(std::size_t i = 0, n = SampleCoord.size(); i < n; ++i)
@@ -100,30 +72,30 @@ namespace wrap_mirror
 		glm::vec4 const Orange(1.0f, 0.5f, 0.0f, 1.0f);
 		glm::vec4 const Blue(0.0f, 0.5f, 1.0f, 1.0f);
 
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32), 1);
+		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32), 1);
 		Texture.clear(glm::packUnorm4x8(Orange));
 
 		gli::fsampler2D Sampler(Texture, gli::WRAP_REPEAT, gli::FILTER_LINEAR, gli::FILTER_LINEAR, Blue);
 
 		{
-			std::array<gli::fsampler2D::samplecoord_type, 16> SampleCoord{
+			std::array<gli::fsampler2D::normalized_type, 16> SampleCoord{
 			{
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.1f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.1f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 0.9f),
-				gli::fsampler2D::samplecoord_type( 0.9f, 0.9f),
-				gli::fsampler2D::samplecoord_type( 0.9f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 0.1f, 0.9f),
-				gli::fsampler2D::samplecoord_type( 0.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f, 0.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f, 1.5f),
-				gli::fsampler2D::samplecoord_type( 0.5f, 1.5f),
-				gli::fsampler2D::samplecoord_type( 1.5f,-0.5f),
-				gli::fsampler2D::samplecoord_type(-0.5f, 1.5f)
+				gli::fsampler2D::normalized_type( 0.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.1f),
+				gli::fsampler2D::normalized_type( 0.5f, 0.1f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.5f, 0.9f),
+				gli::fsampler2D::normalized_type( 0.9f, 0.9f),
+				gli::fsampler2D::normalized_type( 0.9f, 0.5f),
+				gli::fsampler2D::normalized_type( 0.1f, 0.9f),
+				gli::fsampler2D::normalized_type( 0.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 1.5f, 0.5f),
+				gli::fsampler2D::normalized_type( 1.5f, 1.5f),
+				gli::fsampler2D::normalized_type( 0.5f, 1.5f),
+				gli::fsampler2D::normalized_type( 1.5f,-0.5f),
+				gli::fsampler2D::normalized_type(-0.5f, 1.5f)
 			}};
 
 			for(std::size_t i = 0, n = SampleCoord.size(); i < n; ++i)

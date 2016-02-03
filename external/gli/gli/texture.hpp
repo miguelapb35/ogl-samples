@@ -1,30 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
+/// @brief Include to use generic textures which can represent any texture target but they don't have target specific built-in caches making accesses slower.
 /// @file gli/texture.hpp
-/// @date 2013-02-05 / 2013-02-05
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -42,16 +17,17 @@ namespace gli
 		typedef gli::format format_type;
 		typedef gli::swizzles swizzles_type;
 		typedef storage::data_type data_type;
-		typedef storage::texelcoord_type texelcoord_type;
+		typedef storage::extent_type extent_type;
 
 		/// Create an empty texture instance
 		texture();
 
 		/// Create a texture object and allocate a texture storoge for it
+		/// @param Extent Size of the texture: width, height and depth.
 		texture(
 			target_type Target,
 			format_type Format,
-			texelcoord_type const & Dimensions,
+			extent_type const & Extent,
 			size_type Layers,
 			size_type Faces,
 			size_type Levels,
@@ -120,8 +96,8 @@ namespace gli
 		/// Return max_level() - base_level() + 1.
 		size_type levels() const;
 
-		/// Return the dimensions of a texture instance: width, height and depth.
-		texelcoord_type dimensions(size_type Level = 0) const;
+		/// Return the size of a texture instance: width, height and depth.
+		extent_type extent(size_type Level = 0) const;
 
 		/// Return the memory size of a texture instance storage in bytes.
 		size_type size() const;
@@ -185,7 +161,7 @@ namespace gli
 
 	protected:
 		/// Compute the relative memory offset to access the data for a specific layer, face and level
-		size_type offset(size_type Layer, size_type Face, size_type Level) const;
+		size_type base_offset(size_type Layer, size_type Face, size_type Level) const;
 
 		struct cache
 		{

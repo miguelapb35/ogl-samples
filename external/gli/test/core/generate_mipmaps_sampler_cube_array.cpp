@@ -1,35 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/test/core/generate_mipmaps_sampler_cube_array.cpp
-/// @date 2015-11-08 / 2015-11-08
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/comparison.hpp>
 #include <gli/type.hpp>
 #include <gli/view.hpp>
-#include <gli/copy.hpp>
+#include <gli/duplicate.hpp>
 #include <gli/generate_mipmaps.hpp>
 
 #include <glm/gtc/epsilon.hpp>
@@ -41,7 +13,7 @@ namespace generate_mipmaps
 	{
 		int Error = 0;
 
-		gli::textureCubeArray Texture(Format, gli::textureCubeArray::texelcoord_type(static_cast<gli::textureCubeArray::texelcoord_type::value_type>(Size)), Layers);
+		gli::texture_cube_array Texture(Format, gli::texture_cube_array::extent_type(static_cast<gli::texture_cube_array::extent_type::value_type>(Size)), Layers);
 		Texture.clear(Black);
 		for(std::size_t Layer = 0; Layer < Layers; ++Layer)
 		for(std::size_t Face = 0; Face < 6; ++Face)
@@ -50,22 +22,22 @@ namespace generate_mipmaps
 		for(std::size_t Layer = 0; Layer < Layers; ++Layer)
 		for(std::size_t Face = 0; Face < 6; ++Face)
 		{
-			genType const LoadC = Texture.load<genType>(gli::textureCubeArray::texelcoord_type(0), Layer, Face, Texture.max_level());
+			genType const LoadC = Texture.load<genType>(gli::texture_cube_array::extent_type(0), Layer, Face, Texture.max_level());
 			if(Texture.levels() > 1)
 				Error += LoadC == Black ? 0 : 1;
 
-			gli::fsamplerCubeArray SamplerA(gli::textureCubeArray(gli::copy(Texture)), gli::WRAP_CLAMP_TO_EDGE);
+			gli::fsamplerCubeArray SamplerA(gli::texture_cube_array(gli::duplicate(Texture)), gli::WRAP_CLAMP_TO_EDGE);
 			SamplerA.generate_mipmaps(gli::FILTER_LINEAR);
 
-			gli::textureCubeArray MipmapsA = SamplerA();
-			genType const LoadA = MipmapsA.load<genType>(gli::textureCubeArray::texelcoord_type(0), Layer, Face, MipmapsA.max_level());
+			gli::texture_cube_array MipmapsA = SamplerA();
+			genType const LoadA = MipmapsA.load<genType>(gli::texture_cube_array::extent_type(0), Layer, Face, MipmapsA.max_level());
 			Error += LoadA == Color ? 0 : 1;
 			if(Texture.levels() > 1)
 				Error += LoadA != LoadC ? 0 : 1;
 
 			// Mipmaps generation using the wrapper function
-			gli::textureCubeArray MipmapsB = gli::generate_mipmaps(gli::textureCubeArray(gli::copy(Texture)), Filter);
-			genType const LoadB = MipmapsB.load<genType>(gli::textureCubeArray::texelcoord_type(0), Layer, Face, MipmapsB.max_level());
+			gli::texture_cube_array MipmapsB = gli::generate_mipmaps(gli::texture_cube_array(gli::duplicate(Texture)), Filter);
+			genType const LoadB = MipmapsB.load<genType>(gli::texture_cube_array::extent_type(0), Layer, Face, MipmapsB.max_level());
 			Error += LoadB == Color ? 0 : 1;
 			if(Texture.levels() > 1)
 				Error += LoadB != LoadC ? 0 : 1;

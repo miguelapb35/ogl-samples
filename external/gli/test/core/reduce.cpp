@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/transform.cpp
-/// @date 2015-11-27 / 2015-11-27
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/reduce.hpp>
 #include <glm/vector_relational.hpp>
 
@@ -43,9 +15,9 @@ namespace reduce1d
 	{
 		int Error = 0;
 		
-		gli::texture1D TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1D::texelcoord_type(32));
+		gli::texture1d TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::texture1D TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1D::texelcoord_type(32));
+		gli::texture1d TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -61,9 +33,9 @@ namespace reduce1d_array
 	{
 		int Error = 0;
 		
-		gli::texture1D TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1D::texelcoord_type(32));
+		gli::texture1d TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::texture1D TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1D::texelcoord_type(32));
+		gli::texture1d TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -79,9 +51,9 @@ namespace reduce2d
 	{
 		int Error = 0;
 		
-		gli::texture2D TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32));
+		gli::texture2d TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::texture2D TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32));
+		gli::texture2d TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -97,9 +69,9 @@ namespace reduce2d_array
 	{
 		int Error = 0;
 		
-		gli::texture2D TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32));
+		gli::texture2d TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::texture2D TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(32));
+		gli::texture2d TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -115,9 +87,9 @@ namespace reduce3d
 	{
 		int Error = 0;
 		
-		gli::texture3D TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture3D::texelcoord_type(32));
+		gli::texture3d TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture3d::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::texture3D TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture3D::texelcoord_type(32));
+		gli::texture3d TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture3d::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -133,9 +105,9 @@ namespace reduce_cube
 	{
 		int Error = 0;
 		
-		gli::textureCube TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(32));
+		gli::texture_cube TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(32));
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::textureCube TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(32));
+		gli::texture_cube TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(32));
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);
@@ -151,9 +123,9 @@ namespace reduce_cube_array
 	{
 		int Error = 0;
 		
-		gli::textureCubeArray TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCubeArray::texelcoord_type(32), 2);
+		gli::texture_cube_array TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube_array::extent_type(32), 2);
 		TextureA.clear(gli::u8vec4(255, 127, 0, 255));
-		gli::textureCubeArray TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCubeArray::texelcoord_type(32), 2);
+		gli::texture_cube_array TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube_array::extent_type(32), 2);
 		TextureB.clear(gli::u8vec4(255, 127, 0, 255));
 		
 		gli::u8vec4 const MaxAbsDiff = gli::reduce<gli::u8vec4>(TextureA, TextureB, abs_diff, gli::max);

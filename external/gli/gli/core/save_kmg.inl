@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/save_kmg.inl
-/// @date 2015-08-05 / 2015-08-05
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <cstdio>
 #include <glm/gtc/round.hpp>
 #include "../load_kmg.hpp"
@@ -54,9 +26,9 @@ namespace gli
 		Header.SwizzleGreen = Swizzle[1];
 		Header.SwizzleBlue = Swizzle[2];
 		Header.SwizzleAlpha = Swizzle[3];
-		Header.PixelWidth = static_cast<std::uint32_t>(Texture.dimensions().x);
-		Header.PixelHeight = static_cast<std::uint32_t>(Texture.dimensions().y);
-		Header.PixelDepth = static_cast<std::uint32_t>(Texture.dimensions().z);
+		Header.PixelWidth = static_cast<std::uint32_t>(Texture.extent().x);
+		Header.PixelHeight = static_cast<std::uint32_t>(Texture.extent().y);
+		Header.PixelDepth = static_cast<std::uint32_t>(Texture.extent().z);
 		Header.Layers = static_cast<std::uint32_t>(Texture.layers());
 		Header.Levels = static_cast<std::uint32_t>(Texture.levels());
 		Header.Faces = static_cast<std::uint32_t>(Texture.faces());
@@ -75,7 +47,7 @@ namespace gli
 				std::memcpy(&Memory[0] + Offset, Texture.data(Layer, Face, Level), FaceSize);
 
 				Offset += FaceSize;
-				assert(Offset <= Memory.size());
+				GLI_ASSERT(Offset <= Memory.size());
 			}
 		}
 

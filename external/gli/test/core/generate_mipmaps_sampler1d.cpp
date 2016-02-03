@@ -1,35 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/test/core/generate_mipmaps_sampler1d.cpp
-/// @date 2015-10-05 / 2015-10-05
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/comparison.hpp>
 #include <gli/type.hpp>
 #include <gli/view.hpp>
-#include <gli/copy.hpp>
+#include <gli/duplicate.hpp>
 #include <gli/generate_mipmaps.hpp>
 
 #include <glm/gtc/epsilon.hpp>
@@ -41,35 +13,35 @@ namespace generate_mipmaps
 	{
 		int Error = 0;
 
-		gli::texture1D Texture(Format, gli::texture1D::texelcoord_type(static_cast<gli::texture1D::texelcoord_type::value_type>(Size)));
+		gli::texture1d Texture(Format, gli::texture1d::extent_type(static_cast<gli::texture1d::extent_type::value_type>(Size)));
 		Texture.clear(Black);
 		Texture[0].clear(Color);
 
-		genType const LoadC = Texture.load<genType>(gli::texture1D::texelcoord_type(0), Texture.max_level());
+		genType const LoadC = Texture.load<genType>(gli::texture1d::extent_type(0), Texture.max_level());
 		if(Texture.levels() > 1)
 			Error += LoadC == Black ? 0 : 1;
 
-		gli::texture1D TextureView(gli::view(Texture, 0, 0));
-		gli::fsampler1D SamplerA(gli::texture1D(gli::copy(Texture)), gli::WRAP_CLAMP_TO_EDGE);
+		gli::texture1d TextureView(gli::view(Texture, 0, 0));
+		gli::fsampler1D SamplerA(gli::texture1d(gli::duplicate(Texture)), gli::WRAP_CLAMP_TO_EDGE);
 		SamplerA.generate_mipmaps(gli::FILTER_LINEAR);
 
-		gli::texture1D MipmapsA = SamplerA();
-		genType const LoadA = MipmapsA.load<genType>(gli::texture1D::texelcoord_type(0), MipmapsA.max_level());
+		gli::texture1d MipmapsA = SamplerA();
+		genType const LoadA = MipmapsA.load<genType>(gli::texture1d::extent_type(0), MipmapsA.max_level());
 		Error += LoadA == Color ? 0 : 1;
 		if(Texture.levels() > 1)
 			Error += LoadA != LoadC ? 0 : 1;
 
-		gli::texture1D MipmapViewA(gli::view(MipmapsA, 0, 0));
+		gli::texture1d MipmapViewA(gli::view(MipmapsA, 0, 0));
 		Error += TextureView == MipmapViewA ? 0 : 1;
 
 		// Mipmaps generation using the wrapper function
-		gli::texture1D MipmapsB = gli::generate_mipmaps(gli::texture1D(gli::copy(Texture)), Filter);
-		genType const LoadB = MipmapsB.load<genType>(gli::texture1D::texelcoord_type(0), MipmapsB.max_level());
+		gli::texture1d MipmapsB = gli::generate_mipmaps(gli::texture1d(gli::duplicate(Texture)), Filter);
+		genType const LoadB = MipmapsB.load<genType>(gli::texture1d::extent_type(0), MipmapsB.max_level());
 		Error += LoadB == Color ? 0 : 1;
 		if(Texture.levels() > 1)
 			Error += LoadB != LoadC ? 0 : 1;
 
-		gli::texture1D MipmapViewB(gli::view(MipmapsB, 0, 0));
+		gli::texture1d MipmapViewB(gli::view(MipmapsB, 0, 0));
 		Error += TextureView == MipmapViewB ? 0 : 1;
 
 		// Compare custom mipmaps generation and wrapper mipmaps generation

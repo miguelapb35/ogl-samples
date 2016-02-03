@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/load_ktx.inl
-/// @date 2015-08-05 / 2015-08-05
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "../gl.hpp"
 #include <cstdio>
 #include <cassert>
@@ -36,7 +8,7 @@ namespace detail
 	static unsigned char const FOURCC_KTX10[] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
 	static unsigned char const FOURCC_KTX20[] = {0xAB, 0x4B, 0x54, 0x58, 0x20, 0x32, 0x30, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A};
 
-	struct ktxHeader10
+	struct ktx_header10
 	{
 		std::uint32_t Endianness;
 		std::uint32_t GLType;
@@ -53,7 +25,7 @@ namespace detail
 		std::uint32_t BytesOfKeyValueData;
 	};
 
-	inline target getTarget(ktxHeader10 const & Header)
+	inline target get_target(ktx_header10 const& Header)
 	{
 		if(Header.NumberOfFaces > 1)
 		{
@@ -77,28 +49,28 @@ namespace detail
 			return TARGET_2D;
 	}
 
-	inline texture load_ktx10(char const * Data, std::size_t Size)
+	inline texture load_ktx10(char const* Data, std::size_t Size)
 	{
-		detail::ktxHeader10 const & Header(*reinterpret_cast<detail::ktxHeader10 const *>(Data));
+		detail::ktx_header10 const & Header(*reinterpret_cast<detail::ktx_header10 const*>(Data));
 
-		size_t Offset = sizeof(detail::ktxHeader10);
+		size_t Offset = sizeof(detail::ktx_header10);
 
 		// Skip key value data
 		Offset += Header.BytesOfKeyValueData;
 
-		gl GL;
+		gl GL(gl::PROFILE_CORE);
 		gli::format const Format = GL.find(
-			static_cast<gli::gl::internalFormat>(Header.GLInternalFormat),
-			static_cast<gli::gl::externalFormat>(Header.GLFormat),
-			static_cast<gli::gl::typeFormat>(Header.GLType));
-		assert(Format != static_cast<format>(gli::FORMAT_INVALID));
+			static_cast<gli::gl::internal_format>(Header.GLInternalFormat),
+			static_cast<gli::gl::external_format>(Header.GLFormat),
+			static_cast<gli::gl::type_format>(Header.GLType));
+		GLI_ASSERT(Format != static_cast<format>(gli::FORMAT_INVALID));
 		
 		texture::size_type const BlockSize = block_size(Format);
 
 		texture Texture(
-			detail::getTarget(Header),
+			detail::get_target(Header),
 			Format,
-			texture::texelcoord_type(
+			texture::extent_type(
 				Header.PixelWidth,
 				std::max<texture::size_type>(Header.PixelHeight, 1),
 				std::max<texture::size_type>(Header.PixelDepth, 1)),
@@ -125,9 +97,9 @@ namespace detail
 	}
 }//namespace detail
 
-	inline texture load_ktx(char const * Data, std::size_t Size)
+	inline texture load_ktx(char const* Data, std::size_t Size)
 	{
-		assert(Data && (Size >= sizeof(detail::ktxHeader10)));
+		GLI_ASSERT(Data && (Size >= sizeof(detail::ktx_header10)));
 
 		// KTX10
 		{
@@ -138,7 +110,7 @@ namespace detail
 		return texture();
 	}
 
-	inline texture load_ktx(char const * Filename)
+	inline texture load_ktx(char const* Filename)
 	{
 		FILE* File = std::fopen(Filename, "rb");
 		if(!File)
@@ -157,7 +129,7 @@ namespace detail
 		return load_ktx(&Data[0], Data.size());
 	}
 
-	inline texture load_ktx(std::string const & Filename)
+	inline texture load_ktx(std::string const& Filename)
 	{
 		return load_ktx(Filename.c_str());
 	}

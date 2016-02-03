@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file test/core/texture_1d.cpp
-/// @date 2015-08-19 / 2015-08-19
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/texture.hpp>
 #include <gli/levels.hpp>
 #include <gli/comparison.hpp>
@@ -57,7 +29,7 @@ namespace alloc
 
 			for(std::size_t SizeIndex = 0; SizeIndex < Sizes.size(); ++SizeIndex)
 			{
-				gli::texture::texelcoord_type Size(Sizes[SizeIndex]);
+				gli::texture::extent_type Size(Sizes[SizeIndex]);
 
 				gli::texture TextureA(Target, Format, Size, 1, Faces, gli::levels(Size));
 				gli::texture TextureB(Target, Format, Size, 1, Faces, gli::levels(Size));
@@ -78,7 +50,7 @@ namespace clear
 
 		glm::u8vec4 const Orange(255, 127, 0, 255);
 
-		gli::texture::texelcoord_type Size(16, 16, 1);
+		gli::texture::extent_type Size(16, 16, 1);
 		gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UNORM_PACK8, Size, 1, 1, gli::levels(Size));
 
 		Texture.clear<glm::u8vec4>(Orange);
@@ -93,13 +65,13 @@ namespace query
 	{
 		int Error(0);
 
-		gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
+		gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::extent_type(1), 1, 1, 1);
 
 		Error += Texture.size() == sizeof(glm::u8vec4) * 1 ? 0 : 1;
 		Error += Texture.format() == gli::FORMAT_RGBA8_UINT_PACK8 ? 0 : 1;
 		Error += Texture.levels() == 1 ? 0 : 1;
 		Error += !Texture.empty() ? 0 : 1;
-		Error += Texture.dimensions() == gli::texture::texelcoord_type(1) ? 0 : 1;
+		Error += Texture.extent() == gli::texture::extent_type(1) ? 0 : 1;
 
 		return Error;
 	}
@@ -112,8 +84,8 @@ namespace tex_access
 		int Error(0);
 
 		{
-			gli::texture1D Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1D::texelcoord_type(2), 2);
-			assert(!Texture.empty());
+			gli::texture1d Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1d::extent_type(2), 2);
+			GLI_ASSERT(!Texture.empty());
 
 			gli::image Image0 = Texture[0];
 			gli::image Image1 = Texture[1];
@@ -150,7 +122,7 @@ namespace tex_access
 		}
 
 		{
-			gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
+			gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::extent_type(1), 1, 1, 1);
 
 			std::size_t SizeA = Texture.size();
 			Error += SizeA == sizeof(glm::u8vec4) * 1 ? 0 : 1;
@@ -173,7 +145,7 @@ namespace size
 	{
 		test(
 			gli::format const & Format,
-			gli::texture::texelcoord_type const & Dimensions,
+			gli::texture::extent_type const & Dimensions,
 			gli::texture::size_type const & Size) :
 			Format(Format),
 			Dimensions(Dimensions),
@@ -181,7 +153,7 @@ namespace size
 		{}
 
 		gli::format Format;
-		gli::texture::texelcoord_type Dimensions;
+		gli::texture::extent_type Dimensions;
 		gli::texture::size_type Size;
 	};
 
@@ -190,21 +162,21 @@ namespace size
 		int Error(0);
 
 		std::vector<test> Tests;
-		Tests.push_back(test(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::texelcoord_type(1), 4));
-		Tests.push_back(test(gli::FORMAT_R8_UINT_PACK8, gli::texture::texelcoord_type(1), 1));
+		Tests.push_back(test(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture::extent_type(1), 4));
+		Tests.push_back(test(gli::FORMAT_R8_UINT_PACK8, gli::texture::extent_type(1), 1));
 
 		for(std::size_t i = 0; i < Tests.size(); ++i)
 		{
 			gli::texture Texture(
 				gli::TARGET_2D,
 				Tests[i].Format,
-				gli::texture::texelcoord_type(1),
+				gli::texture::extent_type(1),
 				gli::texture::size_type(1),
 				gli::texture::size_type(1),
 				gli::texture::size_type(1));
 
 			Error += Texture.size() == Tests[i].Size ? 0 : 1;
-			assert(!Error);
+			GLI_ASSERT(!Error);
 		}
 
 		return Error;
@@ -217,14 +189,14 @@ namespace specialize
 	{
 		int Error(0);
 
-		gli::texture Texture(gli::TARGET_1D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
-		gli::texture1D Texture1D(Texture);
-		gli::texture1DArray Texture1DArray(Texture);
-		gli::texture2D Texture2D(Texture);
-		gli::texture2DArray Texture2DArray(Texture);
-		gli::texture3D Texture3D(Texture);
-		gli::textureCube TextureCube(Texture);
-		gli::textureCubeArray TextureCubeArray(Texture);
+		gli::texture Texture(gli::TARGET_1D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 1, 1, 1);
+		gli::texture1d Texture1D(Texture);
+		gli::texture1d_array Texture1DArray(Texture);
+		gli::texture2d Texture2D(Texture);
+		gli::texture2d_array Texture2DArray(Texture);
+		gli::texture3d Texture3D(Texture);
+		gli::texture_cube TextureCube(Texture);
+		gli::texture_cube_array TextureCubeArray(Texture);
 
 		Error += Texture == Texture1D ? 0 : 1;
 		Error += Texture != Texture1DArray ? 0 : 1;
@@ -270,7 +242,7 @@ namespace load
 
 		// Texture 1D
 		{
-			gli::texture Texture(gli::TARGET_1D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
+			gli::texture Texture(gli::TARGET_1D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 1, 1, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 
 			gli::save(Texture, "texture_1d.ktx");
@@ -284,7 +256,7 @@ namespace load
 
 		// Texture 1D array
 		{
-			gli::texture Texture(gli::TARGET_1D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 2, 1, 1);
+			gli::texture Texture(gli::TARGET_1D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 2, 1, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 			gli::save(Texture, "texture_1d_array.ktx");
 			gli::save(Texture, "texture_1d_array.dds");
@@ -297,7 +269,7 @@ namespace load
 
 		// Texture 2D
 		{
-			gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
+			gli::texture Texture(gli::TARGET_2D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 1, 1, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 
 			gli::save(Texture, "texture_2d.ktx");
@@ -311,7 +283,7 @@ namespace load
 
 		// Texture 2D array
 		{
-			gli::texture Texture(gli::TARGET_2D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 2, 1, 1);
+			gli::texture Texture(gli::TARGET_2D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 2, 1, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 			gli::save(Texture, "texture_2d_array.ktx");
 			gli::save(Texture, "texture_2d_array.dds");
@@ -324,7 +296,7 @@ namespace load
 
 		// Texture 3D
 		{
-			gli::texture Texture(gli::TARGET_3D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 1, 1, 1);
+			gli::texture Texture(gli::TARGET_3D, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 1, 1, 1);
 			gli::save(Texture, "texture_3d.ktx");
 			gli::save(Texture, "texture_3d.dds");
 			gli::texture TextureKTX = gli::load("texture_3d.ktx");
@@ -336,7 +308,7 @@ namespace load
 
 		// Texture cube
 		{
-			gli::texture Texture(gli::TARGET_CUBE, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 1, 6, 1);
+			gli::texture Texture(gli::TARGET_CUBE, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 1, 6, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 			gli::save(Texture, "texture_cube.ktx");
 			gli::save(Texture, "texture_cube.dds");
@@ -349,7 +321,7 @@ namespace load
 
 		// Texture cube array
 		{
-			gli::texture Texture(gli::TARGET_CUBE_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 2, 6, 1);
+			gli::texture Texture(gli::TARGET_CUBE_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 2, 6, 1);
 			Texture.clear(glm::u8vec4(225, 127, 0, 255));
 			gli::save(Texture, "texture_cube_array.ktx");
 			gli::save(Texture, "texture_cube_array.dds");
@@ -370,9 +342,9 @@ namespace data
 	{
 		int Error = 0;
 
-		gli::texture Texture(gli::TARGET_2D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::texelcoord_type(1), 2, 1, 1);
-		Error += gli::texture2DArray(Texture)[0].data() == Texture.data(0, 0, 0) ? 0 : 1;
-		Error += gli::texture2DArray(Texture)[1].data() == Texture.data(1, 0, 0) ? 0 : 1;
+		gli::texture Texture(gli::TARGET_2D_ARRAY, gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(1), 2, 1, 1);
+		Error += gli::texture2d_array(Texture)[0].data() == Texture.data(0, 0, 0) ? 0 : 1;
+		Error += gli::texture2d_array(Texture)[1].data() == Texture.data(1, 0, 0) ? 0 : 1;
 
 		return Error;
 	}

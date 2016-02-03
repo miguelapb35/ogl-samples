@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file test/core/texture_1d_array.cpp
-/// @date 2013-01-12 / 2013-01-12
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/gli.hpp>
 
 int test_alloc()
@@ -40,20 +12,20 @@ int test_alloc()
 	Formats.push_back(gli::FORMAT_RGBA_BP_UNORM_BLOCK16);
 	Formats.push_back(gli::FORMAT_RGBA32_SFLOAT_PACK32);
 
-	std::vector<gli::texture1DArray::texelcoord_type> Sizes;
-	Sizes.push_back(gli::texture1DArray::texelcoord_type(16));
-	Sizes.push_back(gli::texture1DArray::texelcoord_type(32));
-	Sizes.push_back(gli::texture1DArray::texelcoord_type(15));
-	Sizes.push_back(gli::texture1DArray::texelcoord_type(17));
-	Sizes.push_back(gli::texture1DArray::texelcoord_type(1));
+	std::vector<gli::texture1d_array::extent_type> Sizes;
+	Sizes.push_back(gli::texture1d_array::extent_type(16));
+	Sizes.push_back(gli::texture1d_array::extent_type(32));
+	Sizes.push_back(gli::texture1d_array::extent_type(15));
+	Sizes.push_back(gli::texture1d_array::extent_type(17));
+	Sizes.push_back(gli::texture1d_array::extent_type(1));
 
 	for(gli::size_t FormatIndex = 0; FormatIndex < Formats.size(); ++FormatIndex)
 	for(gli::size_t SizeIndex = 0; SizeIndex < Sizes.size(); ++SizeIndex)
 	{
-		gli::texture1DArray::texelcoord_type Size(Sizes[SizeIndex]);
+		gli::texture1d_array::extent_type Size(Sizes[SizeIndex]);
 
-		gli::texture1DArray TextureA(Formats[FormatIndex], Size, 1);
-		gli::texture1DArray TextureB(Formats[FormatIndex], Size, 1);
+		gli::texture1d_array TextureA(Formats[FormatIndex], Size, 1);
+		gli::texture1d_array TextureB(Formats[FormatIndex], Size, 1);
 
 		Error += TextureA == TextureB ? 0 : 1;
 	}
@@ -67,9 +39,9 @@ int test_texture1DArray_clear()
 
 	gli::u8vec4 const Orange(255, 127, 0, 255);
 
-	gli::texture1DArray::texelcoord_type const Size(16);
+	gli::texture1d_array::extent_type const Size(16);
 
-	gli::texture1DArray Texture(gli::FORMAT_RGBA8_UINT_PACK8, Size, 2);
+	gli::texture1d_array Texture(gli::FORMAT_RGBA8_UINT_PACK8, Size, 2);
 
 	Texture.clear<glm::u8vec4>(Orange);
 
@@ -80,19 +52,19 @@ int test_texture1DArray_query()
 {
 	int Error(0);
 
-	gli::texture1DArray::size_type Layers(2);
-	gli::texture1DArray::size_type Levels(2);
+	gli::texture1d_array::size_type Layers(2);
+	gli::texture1d_array::size_type Levels(2);
 
-	gli::texture1DArray Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1DArray::texelcoord_type(2), Layers, Levels);
+	gli::texture1d_array Texture(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1d_array::extent_type(2), Layers, Levels);
 
-	gli::texture1DArray::size_type Size = Texture.size();
+	gli::texture1d_array::size_type Size = Texture.size();
 
 	Error += Size == sizeof(glm::u8vec4) * 3 * Layers ? 0 : 1;
 	Error += Texture.format() == gli::FORMAT_RGBA8_UINT_PACK8 ? 0 : 1;
 	Error += Texture.layers() == Layers ? 0 : 1;
 	Error += Texture.levels() == Levels ? 0 : 1;
 	Error += !Texture.empty() ? 0 : 1;
-	Error += Texture.dimensions() == gli::texture1DArray::texelcoord_type(2) ? 0 : 1;
+	Error += Texture.extent() == gli::texture1d_array::extent_type(2) ? 0 : 1;
 
 	return Error;
 }
@@ -102,11 +74,11 @@ int test_texture1DArray_access()
 	int Error(0);
 
 	{
-		gli::texture1DArray Texture1DArray(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1DArray::texelcoord_type(2), 2, 1);
-		assert(!Texture1DArray.empty());
+		gli::texture1d_array Texture1DArray(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1d_array::extent_type(2), 2, 1);
+		GLI_ASSERT(!Texture1DArray.empty());
 
-		gli::texture1D Texture0 = Texture1DArray[0];
-		gli::texture1D Texture1 = Texture1DArray[1];
+		gli::texture1d Texture0 = Texture1DArray[0];
+		gli::texture1d Texture1 = Texture1DArray[1];
 		
 		std::size_t Size0 = Texture0.size();
 		std::size_t Size1 = Texture1.size();
@@ -149,16 +121,16 @@ struct test
 {
 	test(
 		gli::format const & Format,
-		gli::texture1DArray::texelcoord_type const & Dimensions,
-		gli::texture1DArray::size_type const & Size) :
+		gli::texture1d_array::extent_type const & Dimensions,
+		gli::texture1d_array::size_type const & Size) :
 		Format(Format),
 		Dimensions(Dimensions),
 		Size(Size)
 	{}
 
 	gli::format Format;
-	gli::texture1DArray::texelcoord_type Dimensions;
-	gli::texture1DArray::size_type Size;
+	gli::texture1d_array::extent_type Dimensions;
+	gli::texture1d_array::size_type Size;
 };
 
 int test_texture1DArray_size()
@@ -166,25 +138,25 @@ int test_texture1DArray_size()
 	int Error(0);
 
 	std::vector<test> Tests;
-	Tests.push_back(test(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1DArray::texelcoord_type(4), 32));
-	Tests.push_back(test(gli::FORMAT_R8_UINT_PACK8, gli::texture1DArray::texelcoord_type(4), 8));
+	Tests.push_back(test(gli::FORMAT_RGBA8_UINT_PACK8, gli::texture1d_array::extent_type(4), 32));
+	Tests.push_back(test(gli::FORMAT_R8_UINT_PACK8, gli::texture1d_array::extent_type(4), 8));
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
-		gli::texture1DArray Texture1DArray(Tests[i].Format, gli::texture1DArray::texelcoord_type(4), 2, 1);
+		gli::texture1d_array Texture1DArray(Tests[i].Format, gli::texture1d_array::extent_type(4), 2, 1);
 
 		Error += Texture1DArray.size() == Tests[i].Size ? 0 : 1;
-		assert(!Error);
+		GLI_ASSERT(!Error);
 	}
 
 	for(std::size_t i = 0; i < Tests.size(); ++i)
 	{
-		gli::texture1DArray Texture1DArray(Tests[i].Format, gli::texture1DArray::texelcoord_type(4), 2, 1);
+		gli::texture1d_array Texture1DArray(Tests[i].Format, gli::texture1d_array::extent_type(4), 2, 1);
 
-		gli::texture1D Texture1D = Texture1DArray[0];
+		gli::texture1d Texture1D = Texture1DArray[0];
 
 		Error += Texture1DArray.size() == Tests[i].Size ? 0 : 1;
-		assert(!Error);
+		GLI_ASSERT(!Error);
 	}
 
 	return Error;
@@ -197,17 +169,17 @@ namespace load_store
 	{
 		int Error = 0;
 
-		gli::texture1DArray::texelcoord_type const Dimensions(16);
-		std::array<gli::texture1D::texelcoord_type, 8> TexelCoord;
+		gli::texture1d_array::extent_type const Dimensions(16);
+		std::array<gli::texture1d::extent_type, 8> TexelCoord;
 		for (gli::size_t i = 0, n = 8; i < n; ++i)
-			TexelCoord[i] = gli::texture1D::texelcoord_type(static_cast<int>(i));
+			TexelCoord[i] = gli::texture1d::extent_type(static_cast<int>(i));
 
-		gli::texture1DArray TextureA(Format, Dimensions, 3);
+		gli::texture1d_array TextureA(Format, Dimensions, 3);
 		TextureA.clear();
 		for(gli::size_t i = 0, n = 8; i < n; ++i)
 			*(TextureA.data<genType>(2, 0, 1) + i) = TestSamples[i];
 
-		gli::texture1DArray TextureB(Format, Dimensions, 3);
+		gli::texture1d_array TextureB(Format, Dimensions, 3);
 		TextureB.clear();
 		for(gli::size_t i = 0, n = 8; i < n; ++i)
 			TextureB.store(TexelCoord[i], 2, 1, TestSamples[i]);
@@ -228,8 +200,8 @@ namespace load_store
 
 		Error += TextureA == TextureB ? 0 : 1;
 
-		gli::texture1DArray TextureC(TextureA, 2, 2, 1, 1);
-		gli::texture1DArray TextureD(TextureB, 2, 2, 1, 1);
+		gli::texture1d_array TextureC(TextureA, 2, 2, 1, 1);
+		gli::texture1d_array TextureD(TextureB, 2, 2, 1, 1);
 
 		Error += TextureC == TextureD ? 0 : 1;
 
@@ -589,12 +561,12 @@ namespace clear
 		glm::u8vec4 const Black(0, 0, 0, 255);
 		glm::u8vec4 const Color(255, 127, 0, 255);
 
-		gli::texture1DArray Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1DArray::texelcoord_type(8), 1, 5);
+		gli::texture1d_array Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d_array::extent_type(8), 1, 5);
 		Texture.clear(Black);
 
-		glm::u8vec4 const TexelA = Texture.load<glm::u8vec4>(gli::texture1DArray::texelcoord_type(0), 0, 0);
-		glm::u8vec4 const TexelB = Texture.load<glm::u8vec4>(gli::texture1DArray::texelcoord_type(0), 0, 1);
-		glm::u8vec4 const TexelC = Texture.load<glm::u8vec4>(gli::texture1DArray::texelcoord_type(0), 0, 2);
+		glm::u8vec4 const TexelA = Texture.load<glm::u8vec4>(gli::texture1d_array::extent_type(0), 0, 0);
+		glm::u8vec4 const TexelB = Texture.load<glm::u8vec4>(gli::texture1d_array::extent_type(0), 0, 1);
+		glm::u8vec4 const TexelC = Texture.load<glm::u8vec4>(gli::texture1d_array::extent_type(0), 0, 2);
 
 		Error += TexelA == Black ? 0 : 1;
 		Error += TexelB == Black ? 0 : 1;
@@ -602,16 +574,16 @@ namespace clear
 
 		Texture.clear<glm::u8vec4>(0, 1, glm::u8vec4(255, 127, 0, 255));
 
-		gli::texture1DArray::texelcoord_type Coords(0);
-		for(; Coords.x < Texture.dimensions(1).x; ++Coords.x)
+		gli::texture1d_array::extent_type Coords(0);
+		for(; Coords.x < Texture.extent(1).x; ++Coords.x)
 		{
 			glm::u8vec4 const TexelD = Texture.load<glm::u8vec4>(Coords, 0, 1);
 			Error += TexelD == Color ? 0 : 1;
 		}
 
-		gli::texture1DArray TextureView(Texture, 0, 0, 1, 1);
+		gli::texture1d_array TextureView(Texture, 0, 0, 1, 1);
 
-		gli::texture1DArray TextureImage(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1DArray::texelcoord_type(4), 1, 1);
+		gli::texture1d_array TextureImage(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture1d_array::extent_type(4), 1, 1);
 		TextureImage.clear(Color);
 
 		Error += TextureView == TextureImage ? 0 : 1;

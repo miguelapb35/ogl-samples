@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/core_addressing.cpp
-/// @date 2012-11-19 / 2013-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/core/storage.hpp>
 #include <gli/format.hpp>
 
@@ -35,20 +7,20 @@ namespace layers
 	{
 		test
 		(
-			gli::storage::texelcoord_type const & Dimensions,
+			gli::storage::extent_type const & Dimensions,
 			gli::format const & Format,
-			std::size_t const & Offset,
+			std::size_t const & BaseOffset,
 			std::size_t const & Size
 		) :
 			Dimensions(Dimensions),
 			Format(Format),
-			Offset(Offset),
+			BaseOffset(BaseOffset),
 			Size(Size)
 		{}
 
-		gli::storage::texelcoord_type Dimensions;
+		gli::storage::extent_type Dimensions;
 		gli::format Format;
-		std::size_t Offset;
+		std::size_t BaseOffset;
 		std::size_t Size;
 	};
 
@@ -57,12 +29,12 @@ namespace layers
 		int Error(0);
 
 		std::vector<test> Tests;
-		Tests.push_back(test(gli::storage::texelcoord_type(4, 4, 1), gli::FORMAT_RGBA8_UINT_PACK8, 64, 128));
-		Tests.push_back(test(gli::storage::texelcoord_type(4, 4, 1), gli::FORMAT_RGB16_SFLOAT_PACK16, 96, 192));
-		Tests.push_back(test(gli::storage::texelcoord_type(4, 4, 1), gli::FORMAT_RGBA32_SFLOAT_PACK32, 256, 512));
-		Tests.push_back(test(gli::storage::texelcoord_type(4, 4, 1), gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, 8, 16));
-		Tests.push_back(test(gli::storage::texelcoord_type(8, 8, 1), gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, 32, 64));
-		Tests.push_back(test(gli::storage::texelcoord_type(4, 4, 1), gli::FORMAT_R_ATI1N_SNORM_BLOCK8, 8, 16));
+		Tests.push_back(test(gli::storage::extent_type(4, 4, 1), gli::FORMAT_RGBA8_UINT_PACK8, 64, 128));
+		Tests.push_back(test(gli::storage::extent_type(4, 4, 1), gli::FORMAT_RGB16_SFLOAT_PACK16, 96, 192));
+		Tests.push_back(test(gli::storage::extent_type(4, 4, 1), gli::FORMAT_RGBA32_SFLOAT_PACK32, 256, 512));
+		Tests.push_back(test(gli::storage::extent_type(4, 4, 1), gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, 8, 16));
+		Tests.push_back(test(gli::storage::extent_type(8, 8, 1), gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8, 32, 64));
+		Tests.push_back(test(gli::storage::extent_type(4, 4, 1), gli::FORMAT_R_ATI1N_SNORM_BLOCK8, 8, 16));
 
 		for(std::size_t i = 0; i < Tests.size(); ++i)
 		{
@@ -73,10 +45,10 @@ namespace layers
 				1,
 				1);
 
-			gli::storage::size_type const Offset = Storage.offset(1, 0, 0);
+			gli::storage::size_type const BaseOffset = Storage.base_offset(1, 0, 0);
 			gli::storage::size_type const Size = Storage.size();
 
-			Error += Offset == Tests[i].Offset ? 0 : 1;
+			Error += BaseOffset == Tests[i].BaseOffset ? 0 : 1;
 			Error += Size == Tests[i].Size ? 0 : 1;
 		}
 
@@ -92,18 +64,18 @@ namespace faces
 		(
 			gli::format const & Format,
 			std::size_t const & Level,
-			std::size_t const & Offset,
+			std::size_t const & BaseOffset,
 			std::size_t const & Size
 		) :
 			Format(Format),
 			Level(Level),
-			Offset(Offset),
+			BaseOffset(BaseOffset),
 			Size(Size)
 		{}
 
 		gli::format Format;
 		std::size_t Level;
-		std::size_t Offset;
+		std::size_t BaseOffset;
 		std::size_t Size;
 	};
 
@@ -124,11 +96,11 @@ namespace faces
 
 		for(std::size_t i = 0; i < Tests.size(); ++i)
 		{
-			gli::storage Storage(Tests[i].Format, gli::storage::texelcoord_type(8, 8, 1), 1, 1, 4);
-			gli::storage::size_type Offset = Storage.offset(0, 0, Tests[i].Level);
+			gli::storage Storage(Tests[i].Format, gli::storage::extent_type(8, 8, 1), 1, 1, 4);
+			gli::storage::size_type BaseOffset = Storage.base_offset(0, 0, Tests[i].Level);
 			gli::storage::size_type Size = Storage.size();
 
-			Error += Offset == Tests[i].Offset ? 0 : 1;
+			Error += BaseOffset == Tests[i].BaseOffset ? 0 : 1;
 			Error += Size == Tests[i].Size ? 0 : 1;
 		}
 
@@ -144,18 +116,18 @@ namespace levels
 		(
 			gli::format const & Format,
 			std::size_t const & Level,
-			std::size_t const & Offset,
+			std::size_t const & BaseOffset,
 			std::size_t const & Size
 		) :
 			Format(Format),
 			Level(Level),
-			Offset(Offset),
+			BaseOffset(BaseOffset),
 			Size(Size)
 		{}
 
 		gli::format Format;
 		std::size_t Level;
-		std::size_t Offset;
+		std::size_t BaseOffset;
 		std::size_t Size;
 	};
 
@@ -176,15 +148,15 @@ namespace levels
 		{
 			gli::storage Storage(
 				Tests[i].Format,
-				gli::storage::texelcoord_type(8, 8, 1),
+				gli::storage::extent_type(8, 8, 1),
 				1,
 				1,
 				4);
 
-			gli::storage::size_type Offset = Storage.offset(0, 0, Tests[i].Level);
+			gli::storage::size_type BaseOffset = Storage.base_offset(0, 0, Tests[i].Level);
 			gli::storage::size_type Size = Storage.size();
 
-			Error += Offset == Tests[i].Offset ? 0 : 1;
+			Error += BaseOffset == Tests[i].BaseOffset ? 0 : 1;
 			Error += Size == Tests[i].Size ? 0 : 1;
 		}
 

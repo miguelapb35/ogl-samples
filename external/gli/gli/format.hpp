@@ -1,30 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2012 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
+/// @brief Include to use the format enum and query properties of formats.
 /// @file gli/format.hpp
-/// @date 2012-10-16 / 2015-06-16
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -33,6 +8,7 @@
 
 namespace gli
 {
+	/// Texture data format
 	enum format
 	{
 		FORMAT_UNDEFINED = 0,
@@ -279,6 +255,7 @@ namespace gli
 		FORMAT_RG3B2_UNORM_PACK8, FORMAT_LAST = FORMAT_RG3B2_UNORM_PACK8
 	};
 
+	/// Represent the source of a channel
 	enum swizzle
 	{
 		SWIZZLE_RED, SWIZZLE_FIRST = SWIZZLE_RED, SWIZZLE_CHANNEL_FIRST = SWIZZLE_RED,
@@ -289,6 +266,7 @@ namespace gli
 		SWIZZLE_ONE, SWIZZLE_LAST = SWIZZLE_ONE
 	};
 
+	/// Determine whether the Swizzle value represent a channel
 	inline bool is_channel(swizzle Swizzle)
 	{
 		return Swizzle >= SWIZZLE_CHANNEL_FIRST && Swizzle <= SWIZZLE_CHANNEL_LAST;
@@ -301,6 +279,7 @@ namespace gli
 		SWIZZLE_COUNT = SWIZZLE_LAST - SWIZZLE_FIRST + 1
 	};
 
+	/// Evaluate whether a format value is value or not
 	inline bool is_valid(format Format)
 	{
 		return Format >= FORMAT_FIRST && Format <= FORMAT_LAST;
@@ -308,10 +287,19 @@ namespace gli
 
 	typedef glm::tvec4<swizzle> swizzles;
 
+	/// Evaluate whether a format is compressed
 	bool is_compressed(format Format);
+
+	/// Evaluate whether a format stores sRGB color space values
 	bool is_srgb(format Format);
+
+	/// Return the size in bytes of a block for a format.
 	size_t block_size(format Format);
-	ivec3 block_dimensions(format Format);
+
+	/// Return the dimensions in texels of the block for a format
+	ivec3 block_extent(format Format);
+
+	/// Return the number of components of a format
 	size_t component_count(format Format);
 }//namespace gli
 

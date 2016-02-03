@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/test/core/core_load_dds.cpp
-/// @date 2013-11-25 / 2015-08-08
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/gli.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/vec1.hpp>
@@ -123,19 +95,14 @@ int main()
 {
 	std::vector<params> Params;
 
-	// TOFIX:
-	// Params.push_back(params("kueken7_rgba_dxt1_srgb.dds", gli::FORMAT_RGBA_DXT1_SRGB_BLOCK8));
-	// Params.push_back(params("kueken7_bgrx8_unorm.dds", gli::FORMAT_BGR8_UNORM_PACK32));
-	//Params.push_back(params("kueken7_la8_unorm.dds", gli::FORMAT_LA8_UNORM_PACK8));
-
 	// GLI DDS extensions:
 	//Params.push_back(params("kueken7_rgb_etc2_srgb.dds", gli::FORMAT_RGB_ETC2_SRGB_BLOCK8));
 	//Params.push_back(params("kueken7_rgb_etc2_unorm.dds", gli::FORMAT_RGB_ETC2_UNORM_BLOCK8));
 	//Params.push_back(params("kueken7_rgba_pvrtc2_4bpp_unorm.dds", gli::FORMAT_RGBA_PVRTC2_4X4_UNORM_BLOCK8));
 
+	Params.push_back(params("kueken7_bgrx8_unorm.dds", gli::FORMAT_BGR8_UNORM_PACK32));
 	Params.push_back(params("kueken7_rgba_dxt5_unorm1.dds", gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16));
 	Params.push_back(params("kueken7_rgba_dxt5_unorm2.dds", gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16));
-	Params.push_back(params("kueken7_rgb_dxt1_srgb.dds", gli::FORMAT_RGBA_DXT1_SRGB_BLOCK8));
 	Params.push_back(params("array_r8_uint.dds", gli::FORMAT_R8_UINT_PACK8));
 	Params.push_back(params("kueken7_rgba_astc4x4_srgb.dds", gli::FORMAT_RGBA_ASTC_4X4_SRGB_BLOCK16));
 	Params.push_back(params("kueken7_bgra8_srgb.dds", gli::FORMAT_BGRA8_SRGB_PACK8));
@@ -146,6 +113,7 @@ int main()
 	Params.push_back(params("kueken7_r5g6b5_unorm.dds", gli::FORMAT_B5G6R5_UNORM_PACK16));
 	Params.push_back(params("kueken7_rgb5a1_unorm.dds", gli::FORMAT_BGR5A1_UNORM_PACK16));
 	Params.push_back(params("kueken7_rgba_dxt1_unorm.dds", gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8));
+	Params.push_back(params("kueken7_rgba_dxt1_srgb.dds", gli::FORMAT_RGBA_DXT1_SRGB_BLOCK8));
 	Params.push_back(params("kueken8_rgba_dxt1_unorm.dds", gli::FORMAT_RGBA_DXT1_UNORM_BLOCK8));
 	Params.push_back(params("kueken7_rgba_dxt5_unorm.dds", gli::FORMAT_RGBA_DXT5_UNORM_BLOCK16));
 	Params.push_back(params("kueken7_rgba_dxt5_srgb.dds", gli::FORMAT_RGBA_DXT5_SRGB_BLOCK16));
@@ -158,7 +126,6 @@ int main()
 	Params.push_back(params("kueken7_r_ati1n_unorm.dds", gli::FORMAT_R_ATI1N_UNORM_BLOCK8));
 	Params.push_back(params("kueken7_rg_ati2n_unorm.dds", gli::FORMAT_RG_ATI2N_UNORM_BLOCK16));
 	Params.push_back(params("kueken7_bgr8_unorm.dds", gli::FORMAT_BGR8_UNORM_PACK8));
-	//Params.push_back(params("kueken7_bgr8_srgb.dds", gli::FORMAT_BGR8_UNORM_PACK32));
 	Params.push_back(params("kueken7_rgba8_srgb.dds", gli::FORMAT_RGBA8_SRGB_PACK8));
 	Params.push_back(params("kueken7_bgra8_unorm.dds", gli::FORMAT_BGRA8_UNORM_PACK8));
 	Params.push_back(params("kueken7_a8_unorm.dds", gli::FORMAT_A8_UNORM_PACK8));
@@ -193,7 +160,7 @@ int main()
 		for(std::size_t Index = 0; Index < Params.size(); ++Index)
 		{
 			FILE* File = std::fopen(Params[Index].Filename.c_str(), "rb");
-			assert(File);
+			GLI_ASSERT(File);
 
 			long Beg = std::ftell(File);
 			std::fseek(File, 0, SEEK_END);

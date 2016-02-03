@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/format.inl
-/// @date 2012-10-16 / 2015-06-16
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 namespace gli{
 namespace detail
 {
@@ -52,7 +24,7 @@ namespace detail
 	struct formatInfo
 	{
 		std::uint8_t BlockSize;
-		glm::u8vec3 BlockDimensions;
+		glm::u8vec3 BlockExtent;
 		std::uint8_t Component;
 		swizzles Swizzles;
 		std::uint16_t Flags;
@@ -60,7 +32,7 @@ namespace detail
 
 	inline formatInfo const & get_format_info(format Format)
 	{
-		assert(Format >= FORMAT_FIRST && Format <= FORMAT_LAST);
+		GLI_ASSERT(Format >= FORMAT_FIRST && Format <= FORMAT_LAST);
 
 		static formatInfo const Table[] =
 		{
@@ -307,7 +279,7 @@ namespace detail
 		};
 
 		GLM_STATIC_ASSERT(sizeof(Table) / sizeof(Table[0]) == FORMAT_COUNT, "GLI error: format descriptor list doesn't match number of supported formats");
-		assert(Format != static_cast<format>(FORMAT_INVALID));
+		GLI_ASSERT(Format != static_cast<format>(FORMAT_INVALID));
 
 		return Table[Format - FORMAT_FIRST];
 	};
@@ -316,7 +288,7 @@ namespace detail
 	{
 		detail::formatInfo const & Info = detail::get_format_info(Format);
 
-		return Info.BlockSize * 8 / (Info.BlockDimensions.x * Info.BlockDimensions.y * Info.BlockDimensions.z);
+		return Info.BlockSize * 8 / (Info.BlockExtent.x * Info.BlockExtent.y * Info.BlockExtent.z);
 	}
 }//namespace detail
 
@@ -335,9 +307,9 @@ namespace detail
 		return detail::get_format_info(Format).BlockSize;
 	}
 
-	inline ivec3 block_dimensions(format Format)
+	inline ivec3 block_extent(format Format)
 	{
-		return gli::ivec3(detail::get_format_info(Format).BlockDimensions);
+		return gli::ivec3(detail::get_format_info(Format).BlockExtent);
 	}
 
 	inline size_t component_count(format Format)

@@ -1,31 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/test/core/core_load_ktx.cpp
-/// @date 2013-11-25 / 2015-08-08
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/gli.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <glm/gtc/vec1.hpp>
@@ -47,9 +19,9 @@ namespace load_file
 	{
 		int Error(0);
 
-		gli::texture2D TextureA(gli::load_ktx(path(Filename.c_str())));
+		gli::texture2d TextureA(gli::load_ktx(path(Filename.c_str())));
 		gli::save_ktx(TextureA, Filename.c_str());
-		gli::texture2D TextureB(gli::load_ktx(Filename.c_str()));
+		gli::texture2d TextureB(gli::load_ktx(Filename.c_str()));
 
 		Error += TextureA == TextureB ? 0 : 1;
 
@@ -63,9 +35,9 @@ namespace load_mem
 	{
 		int Error(0);
 
-		gli::texture2D TextureA(gli::load_ktx(path(Filename.c_str())));
+		gli::texture2d TextureA(gli::load_ktx(path(Filename.c_str())));
 		gli::save_ktx(TextureA, Filename.c_str());
-		gli::texture2D TextureB(gli::load_ktx(Filename.c_str()));
+		gli::texture2d TextureB(gli::load_ktx(Filename.c_str()));
 
 		Error += TextureA == TextureB ? 0 : 1;
 
@@ -79,10 +51,10 @@ namespace load_mem_only
 	{
 		int Error(0);
 
-		gli::texture2D TextureA(gli::load_ktx(&Data[0], Data.size()));
+		gli::texture2d TextureA(gli::load_ktx(&Data[0], Data.size()));
 		std::vector<char> Memory;
 		gli::save_ktx(TextureA, Memory);
-		gli::texture2D TextureB(gli::load_ktx(&Memory[0], Memory.size()));
+		gli::texture2d TextureB(gli::load_ktx(&Memory[0], Memory.size()));
 
 		Error += TextureA == TextureB ? 0 : 1;
 
@@ -146,7 +118,7 @@ int main()
 			char const* Filename = Filenames[Index].c_str();
 
 			FILE* File = std::fopen(Filename, "rb");
-			assert(File);
+			GLI_ASSERT(File);
 
 			long Beg = std::ftell(File);
 			std::fseek(File, 0, SEEK_END);

@@ -1,30 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
+/// @brief Include to translate GLI enums to OpenGL enums
 /// @file gli/gl.hpp
-/// @date 2013-11-09 / 2013-11-09
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
@@ -34,10 +9,11 @@
 
 namespace gli
 {
+	/// Translation class to convert GLI enums into OpenGL values
 	class gl
 	{
 	public:
-		enum internalFormat
+		enum internal_format
 		{
 			// unorm formats
 			INTERNAL_R8_UNORM = 0x8229,			//GL_R8
@@ -253,7 +229,7 @@ namespace gli
 			INTERNAL_RGBA16_SSCALED_GTC,
 		};
 
-		enum externalFormat
+		enum external_format
 		{
 			EXTERNAL_NONE = 0,					//GL_NONE
 			EXTERNAL_RED = 0x1903,				//GL_RED
@@ -277,7 +253,7 @@ namespace gli
 			EXTERNAL_LUMINANCE_ALPHA = 0x190A,			//GL_LUMINANCE_ALPHA
 		};
 
-		enum typeFormat
+		enum type_format
 		{
 			TYPE_NONE = 0,						//GL_NONE
 			TYPE_I8 = 0x1400,					//GL_BYTE
@@ -333,22 +309,36 @@ namespace gli
 			SWIZZLE_ONE = 0x0001,		//GL_ONE
 		};
 
+		enum profile
+		{
+			PROFILE_ES20,
+			PROFILE_ES3X,
+			PROFILE_CORE
+		};
+
 		typedef glm::tvec4<int> swizzles;
 
 		struct format
 		{
-			internalFormat Internal;
-			externalFormat External;
-			typeFormat Type;
+			internal_format Internal;
+			external_format External;
+			type_format Type;
 			swizzles Swizzles;
 		};
 
-		gl();
+		gl(profile Profile = PROFILE_CORE);
 
+		/// Convert GLI targets into OpenGL texture targets
 		target const & translate(gli::target Target) const;
+
+		/// Convert GLI formats into OpenGL texture formats
 		format const & translate(gli::format Format) const;
+
+		/// Convert GLI swizzles into OpenGL swizzles
 		swizzles translate(gli::swizzles const & Swizzle) const;
-		gli::format find(internalFormat InternalFormat, externalFormat ExternalFormat, typeFormat Type);
+
+		/// Convert an OpenGL format into a GLI format
+		gli::format find(internal_format InternalFormat, external_format ExternalFormat, type_format Type);
 
 	private:
 		std::array<format, FORMAT_COUNT> Translation;

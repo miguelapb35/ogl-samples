@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/view.inl
-/// @date 2013-02-07 / 2013-02-07
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 namespace gli
 {
 	inline image view(image const & Image)
@@ -75,8 +47,8 @@ namespace gli
 
 	inline texture view
 	(
-		texture1D const & Texture,
-		texture1D::size_type BaseLevel, texture1D::size_type MaxLevel
+		texture1d const & Texture,
+		texture1d::size_type BaseLevel, texture1d::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -91,9 +63,9 @@ namespace gli
 
 	inline texture view
 	(
-		texture1DArray const & Texture,
-		texture1DArray::size_type BaseLayer, texture1DArray::size_type MaxLayer,
-		texture1DArray::size_type BaseLevel, texture1DArray::size_type MaxLevel
+		texture1d_array const & Texture,
+		texture1d_array::size_type BaseLayer, texture1d_array::size_type MaxLayer,
+		texture1d_array::size_type BaseLevel, texture1d_array::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -109,8 +81,8 @@ namespace gli
 
 	inline texture view
 	(
-		texture2D const & Texture,
-		texture2D::size_type BaseLevel, texture2D::size_type MaxLevel
+		texture2d const & Texture,
+		texture2d::size_type BaseLevel, texture2d::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -125,9 +97,9 @@ namespace gli
 
 	inline texture view
 	(
-		texture2DArray const & Texture,
-		texture2DArray::size_type BaseLayer, texture2DArray::size_type MaxLayer,
-		texture2DArray::size_type BaseLevel, texture2DArray::size_type MaxLevel
+		texture2d_array const & Texture,
+		texture2d_array::size_type BaseLayer, texture2d_array::size_type MaxLayer,
+		texture2d_array::size_type BaseLevel, texture2d_array::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -143,8 +115,8 @@ namespace gli
 
 	inline texture view
 	(
-		texture3D const & Texture,
-		texture3D::size_type BaseLevel, texture3D::size_type MaxLevel
+		texture3d const & Texture,
+		texture3d::size_type BaseLevel, texture3d::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -159,9 +131,9 @@ namespace gli
 
 	inline texture view
 	(
-		textureCube const & Texture,
-		textureCube::size_type BaseFace, textureCube::size_type MaxFace,
-		textureCube::size_type BaseLevel, textureCube::size_type MaxLevel
+		texture_cube const & Texture,
+		texture_cube::size_type BaseFace, texture_cube::size_type MaxFace,
+		texture_cube::size_type BaseLevel, texture_cube::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());
@@ -177,10 +149,10 @@ namespace gli
 
 	inline texture view
 	(
-		textureCubeArray const & Texture,
-		textureCubeArray::size_type BaseLayer, textureCubeArray::size_type MaxLayer,
-		textureCubeArray::size_type BaseFace, textureCubeArray::size_type MaxFace,
-		textureCubeArray::size_type BaseLevel, textureCubeArray::size_type MaxLevel
+		texture_cube_array const & Texture,
+		texture_cube_array::size_type BaseLayer, texture_cube_array::size_type MaxLayer,
+		texture_cube_array::size_type BaseFace, texture_cube_array::size_type MaxFace,
+		texture_cube_array::size_type BaseLevel, texture_cube_array::size_type MaxLevel
 	)
 	{
 		GLI_ASSERT(!Texture.empty());

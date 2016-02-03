@@ -1,38 +1,10 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/clear.cpp
-/// @date 2013-02-07 / 2013-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include <gli/gli.hpp>
 #include <ctime>
 
 namespace clear
 {
 	template <typename texture, typename genType>
-	int test_texture(typename texture::texelcoord_type Size, gli::format const & Format, std::vector<genType> const & Colors)
+	int test_texture(typename texture::extent_type Size, gli::format const & Format, std::vector<genType> const & Colors)
 	{
 		int Error(0);
 
@@ -44,17 +16,17 @@ namespace clear
 		texture TextureB = TextureA;
 		Error += TextureB == TextureA ? 0 : 1;
 
-		texture TextureC(gli::copy(TextureA));
+		texture TextureC(gli::duplicate(TextureA));
 		Error += TextureC == TextureA ? 0 : 1;
 
-		texture TextureD(gli::copy(TextureB));
+		texture TextureD(gli::duplicate(TextureB));
 		Error += TextureD == TextureB ? 0 : 1;
 
-		texture TextureE(gli::copy(TextureC, 1, 2));
+		texture TextureE(gli::duplicate(TextureC, 1, 2));
 		texture TextureF(TextureC, 1, 2);
 		Error += TextureE == TextureF ? 0 : 1;
 
-		texture TextureG(gli::copy(TextureD, 1, 2));
+		texture TextureG(gli::duplicate(TextureD, 1, 2));
 		texture TextureH(TextureD, 1, 2);
 		Error += TextureG == TextureH ? 0 : 1;
 
@@ -128,21 +100,21 @@ namespace clear
 
 		for(std::size_t i = 0; i < Sizes.size(); ++i)
 		{
-			//Error += test_texture<gli::texture1D>(gli::texture1D::dim_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
-			Error += test_texture<gli::texture2D>(gli::texture2D::texelcoord_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
-			Error += test_texture<gli::texture3D>(gli::texture3D::texelcoord_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
-			Error += test_texture<gli::texture1D>(gli::texture1D::texelcoord_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
-			Error += test_texture<gli::texture2D>(gli::texture2D::texelcoord_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
-			Error += test_texture<gli::texture3D>(gli::texture3D::texelcoord_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
-			Error += test_texture<gli::texture1D>(gli::texture1D::texelcoord_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
-			Error += test_texture<gli::texture2D>(gli::texture2D::texelcoord_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
-			Error += test_texture<gli::texture3D>(gli::texture3D::texelcoord_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
-			Error += test_texture<gli::texture1D>(gli::texture1D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
-			Error += test_texture<gli::texture2D>(gli::texture2D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
-			Error += test_texture<gli::texture3D>(gli::texture3D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
-			Error += test_texture<gli::texture1D>(gli::texture1D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
-			Error += test_texture<gli::texture2D>(gli::texture2D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
-			Error += test_texture<gli::texture3D>(gli::texture3D::texelcoord_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
+			//Error += test_texture<gli::texture1d>(gli::texture1d::dim_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
+			Error += test_texture<gli::texture2d>(gli::texture2d::extent_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
+			Error += test_texture<gli::texture3d>(gli::texture3d::extent_type(Sizes[i]), gli::FORMAT_RGB_DXT1_UNORM_BLOCK8, ColorDXT1);
+			Error += test_texture<gli::texture1d>(gli::texture1d::extent_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
+			Error += test_texture<gli::texture2d>(gli::texture2d::extent_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
+			Error += test_texture<gli::texture3d>(gli::texture3d::extent_type(Sizes[i]), gli::FORMAT_R8_UNORM_PACK8, ColorR8_UNORM);
+			Error += test_texture<gli::texture1d>(gli::texture1d::extent_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
+			Error += test_texture<gli::texture2d>(gli::texture2d::extent_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
+			Error += test_texture<gli::texture3d>(gli::texture3d::extent_type(Sizes[i]), gli::FORMAT_RGB8_UNORM_PACK8, ColorRGB8_UNORM);
+			Error += test_texture<gli::texture1d>(gli::texture1d::extent_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
+			Error += test_texture<gli::texture2d>(gli::texture2d::extent_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
+			Error += test_texture<gli::texture3d>(gli::texture3d::extent_type(Sizes[i]), gli::FORMAT_RGBA8_UNORM_PACK8, ColorRGBA8_UNORM);
+			Error += test_texture<gli::texture1d>(gli::texture1d::extent_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
+			Error += test_texture<gli::texture2d>(gli::texture2d::extent_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
+			Error += test_texture<gli::texture3d>(gli::texture3d::extent_type(Sizes[i]), gli::FORMAT_RGBA32_SFLOAT_PACK32, ColorRGBA32F);
 		}
 
 		return Error;

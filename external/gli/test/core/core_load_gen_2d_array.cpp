@@ -1,32 +1,6 @@
-//////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/test/core/core_load_gen_1d_array.cpp
-/// @date 2015-11-22 / 2015-11-22
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
-#include <gli/gli.hpp>
+#include <gli/load.hpp>
+#include <gli/save.hpp>
+#include <gli/comparison.hpp>
 
 namespace
 {
@@ -51,9 +25,9 @@ int main()
 		gli::target const Target = gli::TARGET_2D_ARRAY;
 		gli::format Format = static_cast<gli::format>(FormatIndex);
 		
-		gli::ivec3 const BlockDimensions = gli::block_dimensions(Format);
+		gli::ivec3 const BlockExtent = gli::block_extent(Format);
 		
-		gli::texture Texture(Target, Format, BlockDimensions * gli::ivec3(BlockDimensions.y, BlockDimensions.x, 1), 2, 1, 2);
+		gli::texture Texture(Target, Format, BlockExtent * gli::ivec3(BlockExtent.y, BlockExtent.x, 1), 2, 1, 2);
 		Texture.clear();
 		
 		gli::save(Texture, "test2d_array.dds");
@@ -68,7 +42,7 @@ int main()
 		gli::texture TextureKMG(gli::load("test2d_array.kmg"));
 		Error += Texture == TextureKMG ? 0 : 1;
 		
-		assert(!Error);
+		GLI_ASSERT(!Error);
 	}
 	
 	return Error;

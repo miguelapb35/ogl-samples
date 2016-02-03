@@ -1,31 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Image (gli.g-truc.net)
-///
-/// Copyright (c) 2008 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @ref core
-/// @file gli/core/load_dds.inl
-/// @date 2010-09-26 / 2015-06-16
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "../dx.hpp"
 #include <cstdio>
 #include <cassert>
@@ -35,7 +7,7 @@ namespace detail
 {
 	static char const FOURCC_DDS[] = {'D', 'D', 'S', ' '};
 
-	enum ddsCubemapflag
+	enum dds_cubemap_flag
 	{
 		DDSCAPS2_CUBEMAP				= 0x00000200,
 		DDSCAPS2_CUBEMAP_POSITIVEX		= 0x00000400,
@@ -52,7 +24,7 @@ namespace detail
 		DDSCAPS2_CUBEMAP_ALLFACES = DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ
 	};
 
-	enum ddsFlag
+	enum dds_flag
 	{
 		DDSD_CAPS			= 0x00000001,
 		DDSD_HEIGHT			= 0x00000002,
@@ -64,23 +36,23 @@ namespace detail
 		DDSD_DEPTH			= 0x00800000
 	};
 
-	enum ddsSurfaceflag
+	enum dds_surface_flag
 	{
 		DDSCAPS_COMPLEX				= 0x00000008,
 		DDSCAPS_MIPMAP				= 0x00400000,
 		DDSCAPS_TEXTURE				= 0x00001000
 	};
 
-	struct ddsPixelFormat
+	struct dds_pixel_format
 	{
 		std::uint32_t size; // 32
 		dx::ddpf flags;
-		dx::d3dFormat fourCC;
+		dx::d3dfmt fourCC;
 		std::uint32_t bpp;
 		glm::u32vec4 Mask;
 	};
 
-	struct ddsHeader
+	struct dds_header
 	{
 		std::uint32_t Size;
 		std::uint32_t Flags;
@@ -90,15 +62,15 @@ namespace detail
 		std::uint32_t Depth;
 		std::uint32_t MipMapLevels;
 		std::uint32_t Reserved1[11];
-		ddsPixelFormat Format;
+		dds_pixel_format Format;
 		std::uint32_t SurfaceFlags;
 		std::uint32_t CubemapFlags;
 		std::uint32_t Reserved2[3];
 	};
 
-	static_assert(sizeof(ddsHeader) == 124, "DDS Header size mismatch");
+	static_assert(sizeof(dds_header) == 124, "DDS Header size mismatch");
 
-	enum D3D10_RESOURCE_DIMENSION 
+	enum d3d10_resource_dimension
 	{
 		D3D10_RESOURCE_DIMENSION_UNKNOWN     = 0,
 		D3D10_RESOURCE_DIMENSION_BUFFER      = 1,
@@ -107,7 +79,7 @@ namespace detail
 		D3D10_RESOURCE_DIMENSION_TEXTURE3D   = 4 
 	};
 
-	enum D3D10_RESOURCE_MISC_FLAG
+	enum d3d10_resource_misc_flag
 	{
 		D3D10_RESOURCE_MISC_GENERATE_MIPS		= 0x01,
 		D3D10_RESOURCE_MISC_SHARED				= 0x02,
@@ -116,7 +88,7 @@ namespace detail
 		D3D10_RESOURCE_MISC_GDI_COMPATIBLE		= 0x20,
 	};
 
-	enum ddsAlphaMode
+	enum dds_alpha_mode
 	{
 		DDS_ALPHA_MODE_UNKNOWN					= 0x0,
 		DDS_ALPHA_MODE_STRAIGHT					= 0x1,
@@ -125,9 +97,9 @@ namespace detail
 		DDS_ALPHA_MODE_CUSTOM					= 0x4
 	};
 
-	struct ddsHeader10
+	struct dds_header10
 	{
-		ddsHeader10() :
+		dds_header10() :
 			Format(dx::DXGI_FORMAT_UNKNOWN),
 			ResourceDimension(D3D10_RESOURCE_DIMENSION_UNKNOWN),
 			MiscFlag(0),
@@ -136,15 +108,15 @@ namespace detail
 		{}
 
 		dx::dxgiFormat				Format;
-		D3D10_RESOURCE_DIMENSION	ResourceDimension;
+		d3d10_resource_dimension	ResourceDimension;
 		std::uint32_t				MiscFlag; // D3D10_RESOURCE_MISC_GENERATE_MIPS
 		std::uint32_t				ArraySize;
-		ddsAlphaMode				AlphaFlags; // Should be 0 whenever possible to avoid D3D utility library to fail
+		dds_alpha_mode				AlphaFlags; // Should be 0 whenever possible to avoid D3D utility library to fail
 	};
 
-	static_assert(sizeof(ddsHeader10) == 20, "DDS DX10 Extended Header size mismatch");
+	static_assert(sizeof(dds_header10) == 20, "DDS DX10 Extended Header size mismatch");
 
-	inline target getTarget(ddsHeader const & Header, ddsHeader10 const & Header10)
+	inline target get_target(dds_header const& Header, dds_header10 const& Header10)
 	{
 		if(Header.CubemapFlags & detail::DDSCAPS2_CUBEMAP)
 		{
@@ -171,22 +143,22 @@ namespace detail
 
 	inline texture load_dds(char const * Data, std::size_t Size)
 	{
-		assert(Data && (Size >= sizeof(detail::FOURCC_DDS)));
+		GLI_ASSERT(Data && (Size >= sizeof(detail::FOURCC_DDS)));
 
 		if(strncmp(Data, detail::FOURCC_DDS, 4) != 0)
 			return texture();
 		std::size_t Offset = sizeof(detail::FOURCC_DDS);
 
-		assert(Size >= sizeof(detail::ddsHeader));
+		GLI_ASSERT(Size >= sizeof(detail::dds_header));
 
-		detail::ddsHeader const & Header(*reinterpret_cast<detail::ddsHeader const *>(Data + Offset));
-		Offset += sizeof(detail::ddsHeader);
+		detail::dds_header const & Header(*reinterpret_cast<detail::dds_header const *>(Data + Offset));
+		Offset += sizeof(detail::dds_header);
 
-		detail::ddsHeader10 Header10;
+		detail::dds_header10 Header10;
 		if((Header.Format.flags & dx::DDPF_FOURCC) && (Header.Format.fourCC == dx::D3DFMT_DX10 || Header.Format.fourCC == dx::D3DFMT_GLI1))
 		{
 			std::memcpy(&Header10, Data + Offset, sizeof(Header10));
-			Offset += sizeof(detail::ddsHeader10);
+			Offset += sizeof(detail::dds_header10);
 		}
 
 		dx DX;
@@ -197,7 +169,7 @@ namespace detail
 			switch(Header.Format.bpp)
 			{
 				default:
-					assert(0);
+					GLI_ASSERT(0);
 					break;
 				case 8:
 				{
@@ -212,7 +184,7 @@ namespace detail
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_RG3B2_UNORM_PACK8).Mask)))
 						Format = FORMAT_RG3B2_UNORM_PACK8;
 					else
-						assert(0);
+						GLI_ASSERT(0);
 					break;
 				}
 				case 16:
@@ -240,7 +212,7 @@ namespace detail
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_R16_UNORM_PACK16).Mask)))
 						Format = FORMAT_R16_UNORM_PACK16;
 					else
-						assert(0);
+						GLI_ASSERT(0);
 					break;
 				}
 				case 24:
@@ -250,7 +222,7 @@ namespace detail
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_BGR8_UNORM_PACK8).Mask)))
 						Format = FORMAT_BGR8_UNORM_PACK8;
 					else
-						assert(0);
+						GLI_ASSERT(0);
 					break;
 				}
 				case 32:
@@ -270,7 +242,7 @@ namespace detail
 					else if(glm::all(glm::equal(Header.Format.Mask, DX.translate(FORMAT_R32_SFLOAT_PACK32).Mask)))
 						Format = FORMAT_R32_SFLOAT_PACK32;
 					else
-						assert(0);
+						GLI_ASSERT(0);
 					break;
 				}
 			}
@@ -280,7 +252,7 @@ namespace detail
 		else if(Header.Format.fourCC == dx::D3DFMT_DX10 || Header.Format.fourCC == dx::D3DFMT_GLI1)
 			Format = DX.find(Header.Format.fourCC, Header10.Format, Header.Format.flags);
 
-		assert(Format != static_cast<format>(gli::FORMAT_INVALID));
+		GLI_ASSERT(Format != static_cast<format>(gli::FORMAT_INVALID));
 
 		size_t const MipMapCount = (Header.Flags & detail::DDSD_MIPMAPCOUNT) ? Header.MipMapLevels : 1;
 		size_t FaceCount = 1;
@@ -292,12 +264,12 @@ namespace detail
 			DepthCount = Header.Depth;
 
 		texture Texture(
-			getTarget(Header, Header10), Format,
-			texture::texelcoord_type(Header.Width, Header.Height, DepthCount),
+			get_target(Header, Header10), Format,
+			texture::extent_type(Header.Width, Header.Height, DepthCount),
 			std::max<texture::size_type>(Header10.ArraySize, 1), FaceCount, MipMapCount);
 
 		std::size_t const SourceSize = Offset + Texture.size();
-		assert(SourceSize == Size);
+		GLI_ASSERT(SourceSize == Size);
 
 		std::memcpy(Texture.data(), Data + Offset, Texture.size());
 
