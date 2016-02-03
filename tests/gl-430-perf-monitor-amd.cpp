@@ -335,7 +335,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -351,13 +351,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), GL_COMPRESSED_RGB_S3TC_DXT1_EXT, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				GL_COMPRESSED_RGB_S3TC_DXT1_EXT, 
 				GLsizei(Texture[Level].size()), 
 				Texture[Level].data());

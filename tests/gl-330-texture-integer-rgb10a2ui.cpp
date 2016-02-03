@@ -98,7 +98,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
+		gli::texture2d Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
 		if(Texture.empty())
 			return false;
 
@@ -117,7 +117,7 @@ private:
 
 		glTexImage2D(GL_TEXTURE_2D, 0,
 			Format.Internal,
-			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y),
+			GLsizei(Texture[0].extent().x), GLsizei(Texture[0].extent().y),
 			0,
 			Format.External, GL_UNSIGNED_INT_10_10_10_2,//Format.Type,
 			Texture[0].data());

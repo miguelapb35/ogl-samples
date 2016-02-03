@@ -139,7 +139,7 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 
 		gli::gl GL;
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -147,7 +147,7 @@ private:
 		{
 			glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 				Format.Internal,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				0,
 				GLsizei(Texture[Level].size()),
 				Texture[Level].data());

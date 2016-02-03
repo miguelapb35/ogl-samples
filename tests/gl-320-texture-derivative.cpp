@@ -134,8 +134,8 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL;
-		gli::texture2D Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(64));
-		gli::texture2D::size_type Level = Texture.levels();
+		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(64));
+		gli::texture2d::size_type Level = Texture.levels();
 
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
@@ -159,11 +159,11 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		gli::gl::format const Format = GL.translate(Texture.format());
-		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),
 				Format.Internal,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				0,
 				Format.External, Format.Type,
 				Texture[Level].data());

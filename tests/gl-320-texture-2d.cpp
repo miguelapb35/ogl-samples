@@ -28,7 +28,10 @@ namespace
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
 	//char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
-	char const * TEXTURE_DIFFUSE("kueken7_r5g6b5_unorm.dds");
+	//char const * TEXTURE_DIFFUSE("kueken7_r5g6b5_unorm.dds");
+	//char const * TEXTURE_DIFFUSE("kueken7_bgra8_srgb.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rg11b10_ufloat.ktx");
+	//char const * TEXTURE_DIFFUSE("kueken7_rgb9e5_ufloat.ktx");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -68,6 +71,177 @@ namespace
 			MAX
 		};
 	}//namespace shader
+
+	class context_handle
+	{
+	public:
+		context_handle()
+			: Window(InvalidName)
+		{
+			assert(this->Window);
+		}
+
+		context_handle(GLFWwindow* window)
+			: Window(reinterpret_cast<std::size_t>(window))
+		{
+			assert(this->Window);
+		}
+
+		friend bool operator==(context_handle const & A, context_handle const & B)
+		{
+			return A.Window == B.Window;
+		}
+
+		friend bool operator!=(context_handle const & A, context_handle const & B)
+		{
+			return A.Window != B.Window;
+		}
+
+		static const context_handle Invalidhandle;
+
+	private:
+		static const std::size_t InvalidName = static_cast<std::size_t>(-1);
+
+		std::size_t Window;
+	};
+
+	context_handle const context_handle::Invalidhandle;
+
+	enum object_type
+	{
+		OBJECT_BUFFER, ONJECT_FIRST = OBJECT_BUFFER,
+		OBJECT_TEXTURE,
+		OBJECT_SAMPLER,
+		OBJECT_SHADER,
+		OBJECT_PROGRAM,
+		OBJECT_PIPELINE,
+		OBJECT_FRAMEBUFFER,
+		OBJECT_VERTEXARRAY,
+		OBJECT_QUERY, ONJECT_LAST = OBJECT_QUERY
+	};
+
+	enum
+	{
+		OBJECT_COUNT = ONJECT_LAST - ONJECT_FIRST + 1
+	};
+
+	char const* get_name(object_type Type)
+	{
+		static char const* Table[]
+		{
+			"Buffer",			//OBJECT_BUFFER
+			"Texture",			//OBJECT_TEXTURE
+			"Sampler",			//OBJECT_SAMPLER
+			"Shader",			//OBJECT_SHADER
+			"Program",			//OBJECT_PROGRAM
+			"Pipeline",			//OBJECT_PIPELINE
+			"Framebuffer",		//OBJECT_FRAMEBUFFER
+			"Vertexarray",		//OBJECT_VERTEXARRAY
+			"Query"				//OBJECT_QUERY
+		};
+		static_assert(sizeof(Table) / sizeof(Table[0]) == OBJECT_COUNT, "Table needs to be updated");
+
+		return Table[Type];
+	}
+
+	bool is_per_context(object_type Type)
+	{
+		static bool Table[]
+		{
+			false,			//OBJECT_BUFFER
+			false,			//OBJECT_TEXTURE
+			false,			//OBJECT_SAMPLER
+			false,			//OBJECT_SHADER
+			false,			//OBJECT_PROGRAM
+			true,			//OBJECT_PIPELINE
+			true,			//OBJECT_FRAMEBUFFER
+			true,			//OBJECT_VERTEXARRAY
+			true			//OBJECT_QUERY
+		};
+		static_assert(sizeof(Table) / sizeof(Table[0]) == OBJECT_COUNT, "Table needs to be updated");
+
+		return Table[Type];
+	}
+
+	template <object_type Type>
+	class handle
+	{
+	public:
+		handle()
+			: Name(InvalidName)
+			, Context(context_handle::Invalidhandle)
+		{}
+
+		handle(context_handle Context, std::uint32_t Name)
+			: Name(Name)
+			, Context(Context)
+		{
+			assert(Name != InvalidName);
+		}
+
+		bool is_valid() const
+		{
+			return this->Name != InvalidName;
+		}
+
+		std::uint32_t get(context_handle Context) const
+		{
+			if(is_per_context(Type))
+			{
+				assert(this->Context == Context);
+				if(this->Context != Context)
+					return InvalidName;
+			}
+
+			return this->Name;
+		}
+
+		char const* name() const
+		{
+			return get_name(Type);
+		}
+
+		static handle<Type> const Invalidhandle;
+
+	private:
+		static const std::uint32_t InvalidName = 0xFFFFFFFF;
+
+		std::uint32_t Name;
+		context_handle Context;
+	};
+
+	template <object_type Type>
+	handle<Type> const handle<Type>::Invalidhandle;
+
+	typedef handle<OBJECT_BUFFER> buffer_handle;
+	typedef handle<OBJECT_TEXTURE> texture_handle;
+	typedef handle<OBJECT_SAMPLER> sampler_handle;
+	typedef handle<OBJECT_SHADER> shader_handle;
+	typedef handle<OBJECT_PROGRAM> program_handle;
+	typedef handle<OBJECT_PIPELINE> pipeline_handle;
+	typedef handle<OBJECT_FRAMEBUFFER> framebuffer_handle;
+	typedef handle<OBJECT_VERTEXARRAY> vertexarray_handle;
+	typedef handle<OBJECT_QUERY> query_handle;
+
+	texture_handle create_texture(context_handle Context)
+	{
+		GLuint TextureName = 0;
+		glGenTextures(1, &TextureName);
+		return texture_handle(Context, TextureName);
+	}
+
+	void release_texture(context_handle Context, texture_handle& Texture)
+	{
+		GLuint TextureName = Texture.get(Context);
+		glDeleteTextures(1, &TextureName);
+		Texture = texture_handle::Invalidhandle;
+	}
+
+	std::uint32_t access_texture(context_handle Context, texture_handle Texture)
+	{
+		return Texture.get(Context);
+	}
+	
 }//namespace
 
 class gl_320_texture2d : public test
@@ -76,15 +250,15 @@ public:
 	gl_320_texture2d(int argc, char* argv[]) :
 		test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2),
 		VertexArrayName(0),
-		ProgramName(0),
-		TextureName(0)
+		ProgramName(0)
 	{}
 
 private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint VertexArrayName;
 	GLuint ProgramName;
-	GLuint TextureName;
+	texture_handle TextureHandle;
+	context_handle ContextHandle;
 
 	bool initProgram()
 	{
@@ -150,21 +324,21 @@ private:
 	{
 		gli::gl GL;
 
-		gli::texture2D TextureLoaded(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
+		gli::texture2d TextureLoaded(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
 		assert(!TextureLoaded.empty());
 
 		gli::fsampler2D Sampler(TextureLoaded, gli::WRAP_CLAMP_TO_EDGE);
 		Sampler.generate_mipmaps(gli::FILTER_LINEAR);
 		//Sampler.clear(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		gli::texture2D Texture = Sampler();
+		gli::texture2d Texture = Sampler();
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-		glGenTextures(1, &TextureName);
+		this->TextureHandle = ::create_texture(this->ContextHandle);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glBindTexture(GL_TEXTURE_2D, ::access_texture(this->ContextHandle, this->TextureHandle));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
@@ -174,17 +348,19 @@ private:
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+
+		gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 
 		gli::gl::format const Format = GL.translate(Texture.format());
-		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				Format.Internal,
-				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y),
+				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y),
 				0,
 				Format.External, Format.Type,//GL_UNSIGNED_SHORT_5_6_5_REV
 				Texture[Level].data());
@@ -236,7 +412,7 @@ private:
 	{
 		glDeleteProgram(ProgramName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
-		glDeleteTextures(1, &TextureName);
+		::release_texture(this->ContextHandle, this->TextureHandle);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
 		return true;
@@ -246,7 +422,7 @@ private:
 	{
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
@@ -268,7 +444,7 @@ private:
 
 		glDisable(GL_FRAMEBUFFER_SRGB);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glBindTexture(GL_TEXTURE_2D, access_texture(this->ContextHandle, this->TextureHandle));
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 

@@ -176,7 +176,7 @@ private:
 		gli::gl GL;
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
+			gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_RGB8).c_str()));
 			gli::gl::format const Format = GL.translate(Texture.format());
 
 			glActiveTexture(GL_TEXTURE0);
@@ -193,7 +193,7 @@ private:
 			{
 				glTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 					0,
 					Format.External, Format.Type,
 					Texture[Level].data());
@@ -201,7 +201,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
+			gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_DXT1).c_str()));
 			gli::gl::format const Format = GL.translate(Texture.format());
 			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
 
@@ -219,7 +219,7 @@ private:
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 					0, 
 					GLsizei(Texture[Level].size()), 
 					Texture[Level].data());

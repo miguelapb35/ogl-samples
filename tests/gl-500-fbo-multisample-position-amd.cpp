@@ -156,7 +156,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		if(Texture.empty())
 			return false;
 
@@ -176,13 +176,13 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 			Format.Internal,
-			static_cast<GLsizei>(Texture[0].dimensions().x), static_cast<GLsizei>(Texture[0].dimensions().y), static_cast<GLsizei>(1));
+			static_cast<GLsizei>(Texture[0].extent().x), static_cast<GLsizei>(Texture[0].extent().y), static_cast<GLsizei>(1));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 				0, 0, 0,
-				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), GLsizei(1),
+				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), GLsizei(1),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

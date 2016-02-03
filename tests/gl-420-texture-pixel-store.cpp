@@ -151,7 +151,7 @@ private:
 		glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_DEPTH, DXT1BlockDepth);
 		glPixelStorei(GL_UNPACK_COMPRESSED_BLOCK_SIZE, DXT1BlockSize);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE_BC1).c_str()));
 		assert(!Texture.empty());
 
 		glGenTextures(1, &TextureName);
@@ -167,18 +167,18 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexStorage2D(GL_TEXTURE_2D,
 			GLint(Texture.levels() - 1), GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-			GLsizei(Texture[0].dimensions().x / 2), GLsizei(Texture[0].dimensions().y / 2));
+			GLsizei(Texture[0].extent().x / 2), GLsizei(Texture[0].extent().y / 2));
 
 		for(std::size_t Level = 0; Level < Texture.levels() - 1; ++Level)
 		{
-			glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture[Level].dimensions().x);
-			glPixelStorei(GL_UNPACK_SKIP_PIXELS, glm::max(GLsizei(Texture[Level].dimensions().x) / 4, 4));
-			glPixelStorei(GL_UNPACK_SKIP_ROWS, glm::max(GLsizei(Texture[Level].dimensions().y) / 4, 4));
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture[Level].extent().x);
+			glPixelStorei(GL_UNPACK_SKIP_PIXELS, glm::max(GLsizei(Texture[Level].extent().x) / 4, 4));
+			glPixelStorei(GL_UNPACK_SKIP_ROWS, glm::max(GLsizei(Texture[Level].extent().y) / 4, 4));
 
-			GLsizei LevelWidth(Texture[Level].dimensions().x / 2);
-			GLsizei LevelHeight(Texture[Level].dimensions().y / 2);
+			GLsizei LevelWidth(Texture[Level].extent().x / 2);
+			GLsizei LevelHeight(Texture[Level].extent().y / 2);
 			GLsizei LevelSize(glm::max(GLsizei(Texture[Level].size() / 4), DXT1BlockSize));
-			//GLsizei(DXT1BlockSize * GLsizei(glm::ceil(Texture[Level].dimensions().x / DXT1BlockWidth)) * GLsizei(glm::ceil(Texture[Level].dimensions().y / DXT1BlockHeight))),
+			//GLsizei(DXT1BlockSize * GLsizei(glm::ceil(Texture[Level].extent().x / DXT1BlockWidth)) * GLsizei(glm::ceil(Texture[Level].extent().y / DXT1BlockHeight))),
 
 			if(LevelWidth < DXT1BlockWidth)
 				break;

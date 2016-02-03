@@ -157,7 +157,7 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 2);
 
-		gli::textureCube TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(512), 1);
+		gli::texture_cube TextureA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(512), 1);
 		assert(!TextureA.empty());
 		TextureA[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
 		TextureA[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));
@@ -166,7 +166,7 @@ private:
 		TextureA[4].clear<glm::u8vec4>(glm::u8vec4(  0, 255, 255, 255));
 		TextureA[5].clear<glm::u8vec4>(glm::u8vec4(  0,   0, 255, 255));
 
-		gli::textureCube TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(256), 1);
+		gli::texture_cube TextureB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(256), 1);
 		assert(!TextureB.empty());
 		TextureB[0].clear<glm::u8vec4>(glm::u8vec4(255, 128, 128, 255));
 		TextureB[1].clear<glm::u8vec4>(glm::u8vec4(255, 192, 128, 255));
@@ -175,7 +175,7 @@ private:
 		TextureB[4].clear<glm::u8vec4>(glm::u8vec4(128, 255, 255, 255));
 		TextureB[5].clear<glm::u8vec4>(glm::u8vec4(128, 128, 255, 255));
 
-		gli::textureCube TextureC(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(128), 1);
+		gli::texture_cube TextureC(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(128), 1);
 		assert(!TextureC.empty());
 		TextureC[0].clear<glm::u8vec4>(glm::u8vec4(255, 192, 192, 255));
 		TextureC[1].clear<glm::u8vec4>(glm::u8vec4(255, 224, 192, 255));
@@ -185,28 +185,28 @@ private:
 		TextureC[5].clear<glm::u8vec4>(glm::u8vec4(192, 192, 255, 255));
 
 		glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 3,
-			GL_RGBA8, GLsizei(TextureA.dimensions().x), GLsizei(TextureA.dimensions().y), GLsizei(TextureA.faces()));
+			GL_RGBA8, GLsizei(TextureA.extent().x), GLsizei(TextureA.extent().y), GLsizei(TextureA.faces()));
 
 		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
 			0, 0, 0,
-			static_cast<GLsizei>(TextureA.dimensions().x),
-			static_cast<GLsizei>(TextureA.dimensions().y),
+			static_cast<GLsizei>(TextureA.extent().x),
+			static_cast<GLsizei>(TextureA.extent().y),
 			static_cast<GLsizei>(TextureA.faces()),
 			GL_RGBA, GL_UNSIGNED_BYTE,
 			TextureA.data());
 
 		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1,
 			0, 0, 0,
-			static_cast<GLsizei>(TextureB.dimensions().x),
-			static_cast<GLsizei>(TextureB.dimensions().y),
+			static_cast<GLsizei>(TextureB.extent().x),
+			static_cast<GLsizei>(TextureB.extent().y),
 			static_cast<GLsizei>(TextureB.faces()),
 			GL_RGBA, GL_UNSIGNED_BYTE,
 			TextureB.data());
 
 		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 2,
 			0, 0, 0,
-			static_cast<GLsizei>(TextureC.dimensions().x),
-			static_cast<GLsizei>(TextureC.dimensions().y),
+			static_cast<GLsizei>(TextureC.extent().x),
+			static_cast<GLsizei>(TextureC.extent().y),
 			static_cast<GLsizei>(TextureC.faces()),
 			GL_RGBA, GL_UNSIGNED_BYTE,
 			TextureC.data());

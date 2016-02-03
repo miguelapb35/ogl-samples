@@ -127,7 +127,7 @@ private:
 		bool Validated(true);
 
 		gli::gl GL;
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -143,13 +143,13 @@ private:
 		glTextureParameteri(TextureName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTextureParameteri(TextureName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureStorage3D(TextureName, static_cast<GLint>(Texture.levels()), Format.Internal,
-			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), 1);
+			static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), 1);
 
-		for(gli::texture2D::size_type Level(0); Level < Texture.levels(); ++Level)
+		for(gli::texture2d::size_type Level(0); Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage3D(TextureName, static_cast<GLint>(Level),
 				0, 0, 0,
-				static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 1,
+				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), 1,
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

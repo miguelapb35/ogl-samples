@@ -148,7 +148,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -168,13 +168,13 @@ private:
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY,
 			GLint(Texture.levels()), Format.Internal,
-			GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y), GLsizei(1));
+			GLsizei(Texture[0].extent().x), GLsizei(Texture[0].extent().y), GLsizei(1));
 
-		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 				0, 0, 0,
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y), GLsizei(1),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y), GLsizei(1),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

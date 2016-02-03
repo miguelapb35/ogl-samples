@@ -47,19 +47,19 @@ namespace
 }//namespace
 
 /// Loading a PNG file
-gli::texture2D load_png(char const * Filename)
+gli::texture load_png(char const* Filename)
 {
 	FreeImageInit();
 
 	FIBITMAP * Bitmap = FreeImage_Load(FIF_PNG, Filename, 0);
 	if(!Bitmap)
-		return gli::texture2D();
+		return gli::texture();
 
 	glm::uint BPP = FreeImage_GetBPP(Bitmap);
 	glm::uint Width = FreeImage_GetWidth(Bitmap);
 	glm::uint Height = FreeImage_GetHeight(Bitmap);
 
-	gli::texture2D Texture(BPP == 24 ? gli::FORMAT_RGB8_UNORM_PACK8 : gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2D::texelcoord_type(Width, Height), 1);
+	gli::texture Texture(gli::TARGET_2D, BPP == 24 ? gli::FORMAT_RGB8_UNORM_PACK8 : gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture::extent_type(Width, Height, 1), 1, 1, 1);
 	memcpy(Texture.data(), FreeImage_GetBits(Bitmap), Texture.size());
 	FreeImage_Unload(Bitmap);
 
@@ -87,9 +87,9 @@ gli::texture2D load_png(char const * Filename)
 	return Texture;
 }
 
-void save_png(gli::texture2D const & Texture, char const * Filename)
+void save_png(gli::texture const& Texture, char const* Filename)
 {
-	gli::texture2D Copy(gli::copy(Texture));
+	gli::texture Copy(gli::duplicate(Texture));
 
 	switch(gli::component_count(Copy.format()))
 	{
@@ -116,8 +116,8 @@ void save_png(gli::texture2D const & Texture, char const * Filename)
 
 	FIBITMAP* Bitmap = FreeImage_ConvertFromRawBits(
 		Copy.data<BYTE>(),
-		Copy.dimensions().x, Copy.dimensions().y,
-		static_cast<int>(Copy.dimensions().x * gli::component_count(Copy.format())),
+		Copy.extent().x, Copy.extent().y,
+		static_cast<int>(Copy.extent().x * gli::component_count(Copy.format())),
 		static_cast<unsigned int>(gli::component_count(Copy.format()) * 8), 0x0000FF, 0x00FF00, 0xFF0000, false);
 
 	BOOL Result = FreeImage_Save(FIF_PNG, Bitmap, Filename, 0);

@@ -162,15 +162,15 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
-				gli::image::texelcoord_type const Dimensions = Texture.dimensions(Level);
+				gli::image::extent_type const Extent = Texture.extent(Level);
 
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Dimensions.x), static_cast<GLsizei>(Dimensions.y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Extent.x), static_cast<GLsizei>(Extent.y), static_cast<GLsizei>(1),
 					Format.Internal,
 					static_cast<GLsizei>(Texture.size(Level)),
 					Texture.data(0, 0, Level));
@@ -192,13 +192,13 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture.extent(Level).x), static_cast<GLsizei>(Texture.extent(Level).y), static_cast<GLsizei>(1),
 					Format.Internal,
 					static_cast<GLsizei>(Texture.size(Level)),
 					Texture.data(0, 0, Level));
@@ -220,13 +220,13 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture.extent(Level).x), static_cast<GLsizei>(Texture.extent(Level).y), static_cast<GLsizei>(1),
 					Format.External, Format.Type,
 					Texture.data(0, 0, Level));
 			}
@@ -247,13 +247,13 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(1));
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexSubImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					0, 0, 0,
-					static_cast<GLsizei>(Texture.dimensions(Level).x), static_cast<GLsizei>(Texture.dimensions(Level).y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture.extent(Level).x), static_cast<GLsizei>(Texture.extent(Level).y), static_cast<GLsizei>(1),
 					Format.Internal,
 					static_cast<GLsizei>(Texture.size(Level)),
 					Texture.data(0, 0, Level));

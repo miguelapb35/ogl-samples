@@ -224,7 +224,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
@@ -242,12 +242,12 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
-		for(gli::texture2D::size_type Level = 0; Level < Texture.levels(); ++Level)
+		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
+		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

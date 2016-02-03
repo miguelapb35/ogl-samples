@@ -145,7 +145,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -159,7 +159,7 @@ private:
 
 		glTexImage2D(GL_TEXTURE_2D, GLint(0),
 			Format.Internal,
-			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
+			GLsizei(Texture.extent().x), GLsizei(Texture.extent().y),
 			0,
 			Format.External, Format.Type,
 			nullptr);
@@ -175,7 +175,7 @@ private:
 		glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER);
 
 		glTexSubImage2D(GL_TEXTURE_2D, 0,
-			0, 0, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
+			0, 0, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y),
 			Format.External, Format.Type, nullptr);
 		glDeleteBuffers(1, &PixelBuffer);
 

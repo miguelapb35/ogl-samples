@@ -126,17 +126,17 @@ private:
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
 		assert(
-			Texture.dimensions().x <= std::size_t(TextureSize) && 
-			Texture.dimensions().y <= std::size_t(TextureSize));
+			Texture.extent().x <= std::size_t(TextureSize) && 
+			Texture.extent().y <= std::size_t(TextureSize));
 
 		glTexImage2D(GL_TEXTURE_RECTANGLE, static_cast<GLint>(0),
 			Format.Internal,
-			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y),
 			0,
 			Format.External, Format.Type,
 			Texture.data());

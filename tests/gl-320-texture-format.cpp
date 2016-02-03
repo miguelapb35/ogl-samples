@@ -182,7 +182,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -199,7 +199,7 @@ private:
 
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0),
 				TextureInternalFormat[i],
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y),
 				0,
 				TextureFormat[i], GL_UNSIGNED_BYTE,
 				Texture.data());

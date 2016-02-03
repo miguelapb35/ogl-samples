@@ -146,7 +146,7 @@ private:
 		glGenTextures(TEXTURE_MAX, TextureName);
 
 		{
-			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC1));
+			gli::texture2d Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC1));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC1]);
@@ -158,7 +158,7 @@ private:
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					0x8C4D, //0x83F1
-					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 					0,
 					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
@@ -166,7 +166,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC3));
+			gli::texture2d Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC3));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC3]);
@@ -178,7 +178,7 @@ private:
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), 
+					static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), 
 					0, 
 					static_cast<GLsizei>(Texture[Level].size()),
 					Texture[Level].data());
@@ -186,7 +186,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC4));
+			gli::texture2d Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC4));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC4]);
@@ -198,7 +198,7 @@ private:
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 					0,
 					GLsizei(Texture[Level].size()),
 					Texture[Level].data());
@@ -206,7 +206,7 @@ private:
 		}
 
 		{
-			gli::texture2D Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC5));
+			gli::texture2d Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_BC5));
 			assert(!Texture.empty());
 
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC5]);
@@ -218,7 +218,7 @@ private:
 			{
 				glCompressedTexImage2D(GL_TEXTURE_2D, GLint(Level),
 					Format.Internal,
-					GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 					0,
 					GLsizei(Texture[Level].size()),
 					Texture[Level].data());

@@ -43,9 +43,13 @@ namespace
 		enum type
 		{
 			CONSTANT,
+			TRANSFORM,
+			VERTEX,
 			MAX
 		};
 	}//namespace buffer
+
+	std::size_t const QuadOverlapCount = 1;
 }//namespace
 
 class instance : public test
@@ -62,6 +66,7 @@ private:
 	GLuint PipelineName;
 	GLuint ProgramName;
 	GLuint VertexArrayName;
+	GLuint VertexCount;
 	std::array<GLuint, buffer::MAX> BufferName;
 
 	bool initProgram()
@@ -95,19 +100,55 @@ private:
 	bool initVertexArray()
 	{
 		glCreateVertexArrays(1, &VertexArrayName);
+		glVertexArrayAttribBinding(VertexArrayName, semantic::attr::POSITION, 0);
+		glVertexArrayAttribFormat(VertexArrayName, semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, 0);
+		glEnableVertexArrayAttrib(VertexArrayName, semantic::attr::POSITION);
+
+		glVertexArrayVertexBuffer(VertexArrayName, 0, BufferName[buffer::VERTEX], 0, sizeof(glm::vec2));
 
 		return true;
 	}
 
 	bool initBuffer()
 	{
+		glCreateBuffers(buffer::MAX, &BufferName[0]);
+
+		glm::vec2 WindowSizeF(this->getWindowSize());
+		glm::mat4 const MVP = glm::ortho(0.0f, WindowSizeF.x * 1.0f, 0.0f, WindowSizeF.y * 1.0f);
+		//glm::mat4 const MVP(1.0f);//glm::ortho(0.0f, WindowSizeF.x * 1.0f, 0.0f, WindowSizeF.y * 1.0f);
+
+		glNamedBufferStorage(BufferName[buffer::TRANSFORM], static_cast<GLsizeiptr>(sizeof(MVP)), &MVP[0], 0);
+
 		std::array<GLint, 3> Constants;
 		glGetIntegerv(GL_WARP_SIZE_NV, &Constants[0]);
 		glGetIntegerv(GL_WARPS_PER_SM_NV, &Constants[1]);
 		glGetIntegerv(GL_SM_COUNT_NV, &Constants[2]);
 
-		glCreateBuffers(buffer::MAX, &BufferName[0]);
 		glNamedBufferStorage(BufferName[buffer::CONSTANT], static_cast<GLsizeiptr>(sizeof(GLint) * Constants.size()), &Constants[0], 0);
+
+		glm::uvec2 WindowSize(this->getWindowSize());
+
+		glm::uint const WindowDiv = 1;
+
+		this->VertexCount =  (WindowSize.x / WindowDiv) * (WindowSize.y / WindowDiv) * 6 * QuadOverlapCount;
+		std::vector<glm::vec2> VertexPosition(this->VertexCount);
+		for(std::size_t QuadCoordIndexY = 0, QuadCoordCountY = WindowSize.y / WindowDiv; QuadCoordIndexY < QuadCoordCountY; ++QuadCoordIndexY)
+		for(std::size_t QuadCoordIndexX = 0, QuadCoordCountX = WindowSize.x / WindowDiv; QuadCoordIndexX < QuadCoordCountX; ++QuadCoordIndexX)
+		{
+			for(std::size_t QuadOverlapIndex = 0; QuadOverlapIndex < QuadOverlapCount; ++QuadOverlapIndex)
+			{
+				//std::size_t const QuadIndex = (QuadCoordIndexY + QuadCoordCountY * QuadCoordIndexX) * QuadOverlapCount + QuadOverlapIndex;
+				std::size_t const QuadIndex = (QuadCoordIndexX + QuadCoordCountX * QuadCoordIndexY) * QuadOverlapCount + QuadOverlapIndex;
+				VertexPosition[QuadIndex * 6 + 0] = glm::vec2(QuadCoordIndexX * 1 + 0, QuadCoordIndexY * 1 + 0);
+				VertexPosition[QuadIndex * 6 + 1] = glm::vec2(QuadCoordIndexX * 1 + 1, QuadCoordIndexY * 1 + 0);
+				VertexPosition[QuadIndex * 6 + 2] = glm::vec2(QuadCoordIndexX * 1 + 1, QuadCoordIndexY * 1 + 1);
+				VertexPosition[QuadIndex * 6 + 3] = glm::vec2(QuadCoordIndexX * 1 + 0, QuadCoordIndexY * 1 + 0);
+				VertexPosition[QuadIndex * 6 + 4] = glm::vec2(QuadCoordIndexX * 1 + 1, QuadCoordIndexY * 1 + 1);
+				VertexPosition[QuadIndex * 6 + 5] = glm::vec2(QuadCoordIndexX * 1 + 0, QuadCoordIndexY * 1 + 1);
+			}
+		}
+
+		glNamedBufferStorage(BufferName[buffer::VERTEX], static_cast<GLsizeiptr>(sizeof(glm::vec2) * VertexPosition.size()), &VertexPosition[0], 0);
 
 		return true;
 	}
@@ -138,16 +179,17 @@ private:
 
 	bool render()
 	{
-		glm::vec2 WindowSize(this->getWindowSize());
+		glm::uvec2 WindowSize(this->getWindowSize());
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::CONSTANT, BufferName[buffer::CONSTANT]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
-		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
+		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6 * this->VertexCount, 1, 0);
 
 		return true;
 	}

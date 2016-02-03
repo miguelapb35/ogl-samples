@@ -302,7 +302,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		if(Texture.empty())
 			return false;
 
@@ -314,12 +314,12 @@ private:
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].extent().x), GLsizei(Texture[0].extent().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage2D(TextureName[texture::TEXTURE], GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

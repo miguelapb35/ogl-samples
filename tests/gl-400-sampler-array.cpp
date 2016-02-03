@@ -175,13 +175,13 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+			gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-					GLsizei(Texture[Level].dimensions().x),
-					GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x),
+					GLsizei(Texture[Level].extent().y),
 					GLsizei(1),
 					0,
 					GLsizei(Texture[Level].size()),
@@ -197,13 +197,13 @@ private:
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, GL_RED);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-			gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+			gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 			{
 				glCompressedTexImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 					GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-					GLsizei(Texture[Level].dimensions().x),
-					GLsizei(Texture[Level].dimensions().y),
+					GLsizei(Texture[Level].extent().x),
+					GLsizei(Texture[Level].extent().y),
 					GLsizei(1),
 					0, 
 					GLsizei(Texture[Level].size()), 

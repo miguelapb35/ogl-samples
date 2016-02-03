@@ -164,7 +164,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -183,17 +183,17 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()),
-			Format.Internal, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y));
+			Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage2D(GL_TEXTURE_2D, GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}
-		ImageSize = glm::uvec2(Texture.dimensions());
+		ImageSize = glm::uvec2(Texture.extent());
 	
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 

@@ -118,7 +118,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName);
 
-		gli::texture2DArray Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2DArray::texelcoord_type(4), 15, 1);
+		gli::texture2d_array Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d_array::extent_type(4), 15, 1);
 		for(gli::size_t LayerIndex = 0, LayerCount = Texture.layers(); LayerIndex < LayerCount; ++LayerIndex)
 		{
 			float const Progress = static_cast<float>(LayerIndex) / static_cast<float>(LayerCount);
@@ -131,14 +131,14 @@ private:
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(Texture.levels()),
 			Format.Internal,
-			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.layers()));
+			GLsizei(Texture.extent().x), GLsizei(Texture.extent().y), GLsizei(Texture.layers()));
 
-		for(gli::texture2DArray::size_type Array = 0; Array < Texture.layers(); ++Array)
-		for(gli::texture2DArray::size_type Level = 0; Level < Texture.levels(); ++Level)
+		for(gli::texture2d_array::size_type Array = 0; Array < Texture.layers(); ++Array)
+		for(gli::texture2d_array::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, GLint(Level),
 				0, 0, GLint(Array),
-				GLsizei(Texture[Array][Level].dimensions().x), GLsizei(Texture[Array][Level].dimensions().y), GLsizei(1),
+				GLsizei(Texture[Array][Level].extent().x), GLsizei(Texture[Array][Level].extent().y), GLsizei(1),
 				Format.External, Format.Type,
 				Texture[Array][Level].data());
 		}

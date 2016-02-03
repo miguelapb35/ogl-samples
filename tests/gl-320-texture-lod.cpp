@@ -144,7 +144,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl::format const Format = GL.translate(Texture.format());
 
 		{
@@ -161,7 +161,7 @@ private:
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					Format.Internal,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), static_cast<GLsizei>(1),
 					0,
 					Format.External, Format.Type,
 					Texture[Level].data());
@@ -182,7 +182,7 @@ private:
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					Format.Internal,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), static_cast<GLsizei>(1),
 					0,
 					Format.External, Format.Type,
 					Texture[Level].data());
@@ -203,7 +203,7 @@ private:
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					Format.Internal,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), static_cast<GLsizei>(1),
 					0,
 					Format.External, Format.Type,
 					Texture[Level].data());
@@ -224,7 +224,7 @@ private:
 			{
 				glTexImage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Level),
 					Format.Internal,
-					static_cast<GLsizei>(Texture[Level].dimensions().x), static_cast<GLsizei>(Texture[Level].dimensions().y), static_cast<GLsizei>(1),
+					static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y), static_cast<GLsizei>(1),
 					0,
 					Format.External, Format.Type,
 					Texture[Level].data());

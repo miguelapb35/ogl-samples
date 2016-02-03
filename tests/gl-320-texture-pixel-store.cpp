@@ -149,18 +149,18 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture
-		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture.dimensions().x);
-		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture.dimensions().x) / 4);
-		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture.dimensions().y) / 4);
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture.extent().x);
+		glPixelStorei(GL_UNPACK_SKIP_PIXELS, GLsizei(Texture.extent().x) / 4);
+		glPixelStorei(GL_UNPACK_SKIP_ROWS, GLsizei(Texture.extent().y) / 4);
 
 		glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(0),
 			Format.Internal,
-			static_cast<GLsizei>(Texture.dimensions().x) / 2, static_cast<GLsizei>(Texture.dimensions().y) / 2,
+			static_cast<GLsizei>(Texture.extent().x) / 2, static_cast<GLsizei>(Texture.extent().y) / 2,
 			0,
 			Format.External, Format.Type,
 			Texture.data());

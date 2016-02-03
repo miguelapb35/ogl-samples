@@ -166,7 +166,7 @@ private:
 		glTexImage3D(
 			Target, 0,
 			Format.Internal,
-			static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y), static_cast<GLsizei>(Texture.faces()),
+			static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(Texture.faces()),
 			0,
 			Format.External, Format.Type,
 			Texture.data());

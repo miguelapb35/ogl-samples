@@ -363,7 +363,7 @@ namespace
 	{
 		assert(A.format() == gli::FORMAT_RGB8_UNORM_PACK8 && B.format() == gli::FORMAT_RGB8_UNORM_PACK8);
 
-		gli::texture Result(A.target(), A.format(), A.dimensions(), A.layers(), A.faces(), A.levels());
+		gli::texture Result(A.target(), A.format(), A.extent(), A.layers(), A.faces(), A.levels());
 		for(std::size_t TexelIndex = 0, TexelCount = A.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
 		{
 			glm::u8vec3 const TexelA = *(A.data<glm::u8vec3>() + TexelIndex);
@@ -390,18 +390,18 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 	GLint WindowSizeY(0);
 	glfwGetFramebufferSize(pWindow, &WindowSizeX, &WindowSizeY);
 
-	gli::texture2D TextureRead(ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM_PACK8 : gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2D::texelcoord_type(WindowSizeX, WindowSizeY), 1);
-	gli::texture2D TextureRGB(gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2D::texelcoord_type(WindowSizeX, WindowSizeY), 1);
+	gli::texture2d TextureRead(ColorFormat == GL_RGBA ? gli::FORMAT_RGBA8_UNORM_PACK8 : gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2d::extent_type(WindowSizeX, WindowSizeY), 1);
+	gli::texture2d TextureRGB(gli::FORMAT_RGB8_UNORM_PACK8, gli::texture2d::extent_type(WindowSizeX, WindowSizeY), 1);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glReadPixels(0, 0, WindowSizeX, WindowSizeY, ColorFormat, ColorType, TextureRead.format() == gli::FORMAT_RGBA8_UNORM_PACK8 ? TextureRead.data() : TextureRGB.data());
 
 	if(TextureRead.format() == gli::FORMAT_RGBA8_UNORM_PACK8)
 	{
-		for(gli::size_t y = 0; y < TextureRGB.dimensions().y; ++y)
-		for(gli::size_t x = 0; x < TextureRGB.dimensions().x; ++x)
+		for(gli::size_t y = 0; y < TextureRGB.extent().y; ++y)
+		for(gli::size_t x = 0; x < TextureRGB.extent().x; ++x)
 		{
-			gli::texture2D::texelcoord_type TexelCoord(x, y);
+			gli::texture2d::extent_type TexelCoord(x, y);
 
 			glm::u8vec3 Color(TextureRead.load<glm::u8vec4>(TexelCoord, 0));
 			TextureRGB.store(TexelCoord, 0, Color);
@@ -429,7 +429,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 			gli::texture Diff = ::absolute_difference(Template, TextureRGB);
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
-			save_png(gli::texture2D(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
+			save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 		}
 	}
 

@@ -157,7 +157,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2D Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
 
@@ -169,7 +169,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, GLint(0),
 			Format.Internal,
-			GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
+			GLsizei(Texture.extent().x), GLsizei(Texture.extent().y),
 			0,
 			Format.External, Format.Type,
 			Texture.data());
@@ -197,7 +197,7 @@ private:
 			glBindTexture(GL_TEXTURE_2D, Texture2DName[i]);
 			glTexImage2D(GL_TEXTURE_2D, 0,
 				GL_R8,
-				GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y),
+				GLsizei(Texture.extent().x), GLsizei(Texture.extent().y),
 				0,
 				GL_RGB, GL_UNSIGNED_BYTE,
 				nullptr);

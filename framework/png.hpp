@@ -23,8 +23,7 @@
 
 #pragma once
 
-#define GLM_FORCE_RADIANS
 #include <gli/gli.hpp>
 
-gli::texture2D load_png(char const * Filename);
-void save_png(gli::texture2D const & Texture, char const * Filename);
+gli::texture load_png(char const* Filename);
+void save_png(gli::texture const& Texture, char const* Filename);

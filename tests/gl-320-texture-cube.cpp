@@ -115,7 +115,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(2), 1);
+		gli::texture_cube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(2), 1);
 		assert(!Texture.empty());
 
 		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
@@ -144,13 +144,14 @@ private:
 
 		gli::gl GL;
 		gli::gl::format const Format = GL.translate(Texture.format());
-		for(gli::textureCube::size_type Face = 0; Face < Texture.faces(); ++Face)
+
+		for(gli::texture_cube::size_type Face = 0; Face < Texture.faces(); ++Face)
 		{
 			glTexImage2D(
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(Face),
 				0,
 				Format.Internal,
-				static_cast<GLsizei>(Texture.dimensions().x), static_cast<GLsizei>(Texture.dimensions().y),
+				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y),
 				0,
 				Format.External, Format.Type,
 				Texture[Face].data());

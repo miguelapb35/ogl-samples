@@ -47,7 +47,7 @@ namespace glu
 		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
 		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
 
-		glm::tvec3<GLsizei> const Dimensions(Texture.dimensions());
+		glm::tvec3<GLsizei> const Dimensions(Texture.extent());
 
 		switch(Texture.target())
 		{
@@ -78,7 +78,7 @@ namespace glu
 		for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
-			glm::tvec3<GLsizei> Dimensions(Texture.dimensions(Level));
+			glm::tvec3<GLsizei> Dimensions(Texture.extent(Level));
 			Target = gli::is_target_cube(Texture.target()) ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face) : Target;
 
 			switch(Texture.target())
@@ -409,7 +409,7 @@ private:
 		TextureName[texture::TEXTURE] = glu::createTexture((getDataDirectory() + TEXTURE_DIFFUSE).c_str());
 
 		/*
-		gli::texture2D Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		if(Texture.empty())
 			return false;
 
@@ -421,12 +421,12 @@ private:
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].dimensions().x), GLsizei(Texture[0].dimensions().y));
+		glTextureStorage2D(TextureName[texture::TEXTURE], GLint(Texture.levels()), Format.Internal, GLsizei(Texture[0].extent().x), GLsizei(Texture[0].extent().y));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTextureSubImage2D(TextureName[texture::TEXTURE], GLint(Level),
 				0, 0, 
-				GLsizei(Texture[Level].dimensions().x), GLsizei(Texture[Level].dimensions().y),
+				GLsizei(Texture[Level].extent().x), GLsizei(Texture[Level].extent().y),
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}

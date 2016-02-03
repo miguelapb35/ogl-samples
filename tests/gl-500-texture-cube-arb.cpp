@@ -175,7 +175,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::textureCube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::textureCube::texelcoord_type(2), 1);
+		gli::texture_cube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(2), 1);
 		assert(!Texture.empty());
 
 		gli::gl GL;
@@ -194,12 +194,12 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
 
 		glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, GLint(Texture.levels()),
-			Format.Internal, GLsizei(Texture.dimensions().x), GLsizei(Texture.dimensions().y), GLsizei(Texture.faces()));
+			Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y), GLsizei(Texture.faces()));
 
 		glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0,
 			0, 0, 0,
-			static_cast<GLsizei>(Texture.dimensions().x),
-			static_cast<GLsizei>(Texture.dimensions().y),
+			static_cast<GLsizei>(Texture.extent().x),
+			static_cast<GLsizei>(Texture.extent().y),
 			static_cast<GLsizei>(Texture.faces()),
 			Format.External, Format.Type,
 			Texture.data());
