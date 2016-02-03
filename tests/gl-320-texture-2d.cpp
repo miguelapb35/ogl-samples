@@ -27,11 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	//char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
-	//char const * TEXTURE_DIFFUSE("kueken7_r5g6b5_unorm.dds");
-	//char const * TEXTURE_DIFFUSE("kueken7_bgra8_srgb.dds");
-	char const * TEXTURE_DIFFUSE("kueken7_rg11b10_ufloat.ktx");
-	//char const * TEXTURE_DIFFUSE("kueken7_rgb9e5_ufloat.ktx");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -362,7 +358,7 @@ private:
 				Format.Internal,
 				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y),
 				0,
-				Format.External, Format.Type,//GL_UNSIGNED_SHORT_5_6_5_REV
+				Format.External, Format.Type,
 				Texture[Level].data());
 		}
 

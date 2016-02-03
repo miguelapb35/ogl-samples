@@ -427,7 +427,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		if(!Success && !Template.empty())
 		{
 			gli::texture Diff = ::absolute_difference(Template, TextureRGB);
-			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
+			save_png(Template, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
 			save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 		}
