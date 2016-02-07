@@ -6,19 +6,19 @@ namespace gli
 	inline texture3d::texture3d()
 	{}
 
-	inline texture3d::texture3d(format_type Format, extent_type const & Dimensions)
-		: texture(TARGET_3D, Format, Dimensions, 1, 1, gli::levels(Dimensions))
+	inline texture3d::texture3d(format_type Format, extent_type const& Extent, swizzles_type const& Swizzles)
+		: texture(TARGET_3D, Format, Extent, 1, 1, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture3d::texture3d(format_type Format, extent_type const & Dimensions, size_type Levels)
-		: texture(TARGET_3D, Format, Dimensions, 1, 1, Levels)
+	inline texture3d::texture3d(format_type Format, extent_type const& Extent, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_3D, Format, Extent, 1, 1, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture3d::texture3d(texture const & Texture)
+	inline texture3d::texture3d(texture const& Texture)
 		: texture(Texture, TARGET_3D, Texture.format())
 	{
 		this->build_cache();
@@ -26,24 +26,26 @@ namespace gli
 
 	inline texture3d::texture3d
 	(
-		texture const & Texture,
+		texture const& Texture,
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const& Swizzles
 	)
 		: texture(
 			Texture, TARGET_3D, Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+			Swizzles)
 	{
 		this->build_cache();
 	}
  
 	inline texture3d::texture3d
 	(
-		texture3d const & Texture,
+		texture3d const& Texture,
 		size_type BaseLevel, size_type MaxLevel
 	)
 		: texture(

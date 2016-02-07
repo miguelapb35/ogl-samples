@@ -161,8 +161,8 @@ private:
 	{
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 

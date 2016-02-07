@@ -27,22 +27,22 @@ namespace gli
 		typedef tvec1<interpolate_type, P> normalized_type;
 		typedef tvec4<T, P> texel_type;
 
-		sampler1d(texture_type const & Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const & BorderColor = texel_type(0, 0, 0, 1));
+		sampler1d(texture_type const& Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const& BorderColor = texel_type(0, 0, 0, 1));
 
 		/// Access the sampler texture object
-		texture_type const & operator()() const;
+		texture_type const& operator()() const;
 
 		/// Fetch a texel from the sampler texture
-		texel_type texel_fetch(extent_type const & TexelCoord, size_type const & Level) const;
+		texel_type texel_fetch(extent_type const& TexelCoord, size_type const& Level) const;
 
 		/// Write a texel in the sampler texture
-		void texel_write(extent_type const & TexelCoord, size_type const & Level, texel_type const & Texel);
+		void texel_write(extent_type const& TexelCoord, size_type const& Level, texel_type const& Texel);
 
 		/// Clear the sampler texture with a uniform texel
-		void clear(texel_type const & Texel);
+		void clear(texel_type const& Texel);
 
 		/// Sample the sampler texture at a specific level
-		texel_type texture_lod(normalized_type const & SampleCoord, level_type Level) const;
+		texel_type texture_lod(normalized_type const& SampleCoord, level_type Level) const;
 
 		/// Generate all the mipmaps of the sampler texture from the texture base level
 		void generate_mipmaps(filter Minification);

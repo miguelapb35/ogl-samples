@@ -102,8 +102,8 @@ private:
 		if(Texture.empty())
 			return false;
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glGenTextures(1, &TextureName);
 
@@ -114,6 +114,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, &Format.Swizzles[0]);
 
 		glTexImage2D(GL_TEXTURE_2D, 0,
 			Format.Internal,

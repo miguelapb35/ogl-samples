@@ -138,10 +138,10 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{

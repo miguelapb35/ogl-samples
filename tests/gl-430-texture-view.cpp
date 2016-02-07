@@ -145,20 +145,20 @@ private:
 	{
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL33);
 
 		{
-			gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UNORM_PACK8);
+			gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UNORM_PACK8, Texture.swizzles());
 
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 			glGenTextures(texture::MAX, &TextureName[0]);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_RED);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, GL_GREEN);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 
@@ -179,7 +179,7 @@ private:
 		}
 
 		{
-			gli::gl::format const Format = GL.translate(Texture.format());
+			gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 			glTextureView(TextureName[texture::VIEW_A], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], Format.Internal, 0, GLuint(Texture.levels()), 0, 1);
 			glTextureView(TextureName[texture::VIEW_B], GL_TEXTURE_2D_ARRAY, TextureName[texture::TEXTURE], Format.Internal, 0, 1, 0, 1);
 		}

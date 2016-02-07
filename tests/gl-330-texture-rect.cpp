@@ -127,8 +127,8 @@ private:
 		glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		assert(
 			Texture.extent().x <= std::size_t(TextureSize) && 

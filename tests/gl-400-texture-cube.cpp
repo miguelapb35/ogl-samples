@@ -159,8 +159,8 @@ private:
 		gli::texture Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE_DDS));
 		assert(!Texture.empty());
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		gli::gl::target const Target = GL.translate(Texture.target());
 
 		glTexImage3D(

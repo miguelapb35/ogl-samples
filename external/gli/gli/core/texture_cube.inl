@@ -3,19 +3,19 @@ namespace gli
 	inline texture_cube::texture_cube()
 	{}
 
-	inline texture_cube::texture_cube(format_type Format, extent_type const & Dimensions)
-		: texture(TARGET_CUBE, Format, texture::extent_type(Dimensions, 1), 1, 6, gli::levels(Dimensions))
+	inline texture_cube::texture_cube(format_type Format, extent_type const& Extent, swizzles_type const& Swizzles)
+		: texture(TARGET_CUBE, Format, texture::extent_type(Extent, 1), 1, 6, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture_cube::texture_cube(format_type Format, extent_type const & Dimensions, size_type Levels)
-		: texture(TARGET_CUBE, Format, texture::extent_type(Dimensions, 1), 1, 6, Levels)
+	inline texture_cube::texture_cube(format_type Format, extent_type const& Extent, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_CUBE, Format, texture::extent_type(Extent, 1), 1, 6, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture_cube::texture_cube(texture const & Texture)
+	inline texture_cube::texture_cube(texture const& Texture)
 		: texture(Texture, TARGET_CUBE, Texture.format())
 	{
 		this->build_cache();
@@ -27,13 +27,15 @@ namespace gli
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const& Swizzles
 	)
 		: texture(
 			Texture, TARGET_CUBE, Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+			Swizzles)
 	{
 		this->build_cache();
 	}
@@ -72,7 +74,7 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline genType texture_cube::load(extent_type const & TexelCoord, size_type Face, size_type Level) const
+	inline genType texture_cube::load(extent_type const& TexelCoord, size_type Face, size_type Level) const
 	{
 		GLI_ASSERT(!this->empty());
 		GLI_ASSERT(!is_compressed(this->format()));
@@ -87,7 +89,7 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline void texture_cube::store(extent_type const & TexelCoord, size_type Face, size_type Level, genType const & Texel)
+	inline void texture_cube::store(extent_type const& TexelCoord, size_type Face, size_type Level, genType const& Texel)
 	{
 		GLI_ASSERT(!this->empty());
 		GLI_ASSERT(!is_compressed(this->format()));
@@ -109,13 +111,13 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline void texture_cube::clear(genType const & Texel)
+	inline void texture_cube::clear(genType const& Texel)
 	{
 		this->texture::clear<genType>(Texel);
 	}
 
 	template <typename genType>
-	inline void texture_cube::clear(size_type Face, size_type Level, genType const & Texel)
+	inline void texture_cube::clear(size_type Face, size_type Level, genType const& Texel)
 	{
 		this->texture::clear<genType>(0, Face, Level, Texel);
 	}

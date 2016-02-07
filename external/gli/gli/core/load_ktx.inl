@@ -58,7 +58,7 @@ namespace detail
 		// Skip key value data
 		Offset += Header.BytesOfKeyValueData;
 
-		gl GL(gl::PROFILE_CORE);
+		gl GL(gl::PROFILE_KTX);
 		gli::format const Format = GL.find(
 			static_cast<gli::gl::internal_format>(Header.GLInternalFormat),
 			static_cast<gli::gl::external_format>(Header.GLFormat),

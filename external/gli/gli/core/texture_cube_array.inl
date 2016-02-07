@@ -3,14 +3,14 @@ namespace gli
 	inline texture_cube_array::texture_cube_array()
 	{}
 
-	inline texture_cube_array::texture_cube_array(format_type Format, extent_type const & Dimensions, size_type Layers)
-		: texture(TARGET_CUBE_ARRAY, Format, texture::extent_type(Dimensions, 1), Layers, 6, gli::levels(Dimensions))
+	inline texture_cube_array::texture_cube_array(format_type Format, extent_type const& Extent, size_type Layers, swizzles_type const& Swizzles)
+		: texture(TARGET_CUBE_ARRAY, Format, texture::extent_type(Extent, 1), Layers, 6, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture_cube_array::texture_cube_array(format_type Format, extent_type const & Dimensions, size_type Layers, size_type Levels)
-		: texture(TARGET_CUBE_ARRAY, Format, texture::extent_type(Dimensions, 1), Layers, 6, Levels)
+	inline texture_cube_array::texture_cube_array(format_type Format, extent_type const& Extent, size_type Layers, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_CUBE_ARRAY, Format, texture::extent_type(Extent, 1), Layers, 6, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
@@ -27,14 +27,16 @@ namespace gli
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const& Swizzles
 	)
 		: texture(
 			Texture, gli::TARGET_CUBE_ARRAY,
 			Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+			Swizzles)
 	{
 		this->build_cache();
 	}

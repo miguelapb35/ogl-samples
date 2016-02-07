@@ -306,8 +306,8 @@ private:
 		if(Texture.empty())
 			return false;
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);

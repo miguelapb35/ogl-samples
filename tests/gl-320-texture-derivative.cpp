@@ -133,7 +133,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(64));
 		gli::texture2d::size_type Level = Texture.levels();
 
@@ -158,7 +158,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),

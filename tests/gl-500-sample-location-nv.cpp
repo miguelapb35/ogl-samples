@@ -207,12 +207,12 @@ private:
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
+		glTextureStorage3D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 1);
 
 		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 1, &TextureName[texture::RENDERBUFFER]);
-		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
-		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
-		glTextureStorage2DMultisample(TextureName[texture::COLORBUFFER], 8, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), GL_TRUE);
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::RENDERBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureStorage3DMultisample(TextureName[texture::RENDERBUFFER], 8, GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 1, GL_TRUE);
 
 		return Validated;
 	}

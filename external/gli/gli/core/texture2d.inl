@@ -5,14 +5,14 @@ namespace gli
 	inline texture2d::texture2d()
 	{}
 
-	inline texture2d::texture2d(format_type Format, extent_type const& Extent)
-		: texture(TARGET_2D, Format, texture::extent_type(Extent, 1), 1, 1, gli::levels(Extent))
+	inline texture2d::texture2d(format_type Format, extent_type const& Extent, swizzles_type const& Swizzles)
+		: texture(TARGET_2D, Format, texture::extent_type(Extent, 1), 1, 1, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture2d::texture2d(format_type Format, extent_type const& Extent, size_type Levels)
-		: texture(TARGET_2D, Format, texture::extent_type(Extent, 1), 1, 1, Levels)
+	inline texture2d::texture2d(format_type Format, extent_type const& Extent, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_2D, Format, texture::extent_type(Extent, 1), 1, 1, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
@@ -29,13 +29,15 @@ namespace gli
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const& Swizzles
 	)
 		: texture(
 			Texture, TARGET_2D, Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+			Swizzles)
 	{
 		this->build_cache();
 	}

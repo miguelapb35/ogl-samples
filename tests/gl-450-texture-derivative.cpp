@@ -133,8 +133,9 @@ private:
 	{
 		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(64));
 		gli::texture2d::size_type Level = Texture.levels();
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
 		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));

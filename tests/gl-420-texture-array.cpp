@@ -126,8 +126,8 @@ private:
 			Texture[LayerIndex].clear<glm::u8vec4>(Color);
 		}
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, GLsizei(Texture.levels()),
 			Format.Internal,

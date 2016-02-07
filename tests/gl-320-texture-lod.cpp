@@ -137,7 +137,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -145,7 +145,7 @@ private:
 		glGenTextures(TEXTURE_MAX, TextureName);
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		{
 			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[TEXTURE0]);

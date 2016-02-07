@@ -150,8 +150,8 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL32);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		// Setup the pixel storage to load only a rectangle in the middle of the source texture
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, Texture.extent().x);

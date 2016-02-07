@@ -142,8 +142,8 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL32);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);

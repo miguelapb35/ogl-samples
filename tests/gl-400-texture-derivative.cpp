@@ -215,8 +215,8 @@ private:
 
 		assert(!Texture.empty());
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

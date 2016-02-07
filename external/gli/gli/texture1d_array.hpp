@@ -22,17 +22,19 @@ namespace gli
 			format_type Format,
 			extent_type const& Extent,
 			size_type Layers,
-			size_type Levels);
+			size_type Levels,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture1d_array and allocate a new storage with a complete mipmap chain
 		explicit texture1d_array(
 			format_type Format,
 			extent_type const& Extent,
-			size_type Layers);
+			size_type Layers,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture1d_array view with an existing storage
 		explicit texture1d_array(
-			texture const & Texture);
+			texture const& Texture);
 
 		/// Create a texture1d_array view with an existing storage
 		explicit texture1d_array(
@@ -40,11 +42,12 @@ namespace gli
 			format_type Format,
 			size_type BaseLayer, size_type MaxLayer,
 			size_type BaseFace, size_type MaxFace,
-			size_type BaseLevel, size_type MaxLevel);
+			size_type BaseLevel, size_type MaxLevel,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture view, reference a subset of an exiting storage
 		explicit texture1d_array(
-			texture1d_array const & Texture,
+			texture1d_array const& Texture,
 			size_type BaseLayer, size_type MaxLayer,
 			size_type BaseLevel, size_type MaxLevel);
 

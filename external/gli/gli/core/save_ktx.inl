@@ -33,8 +33,8 @@ namespace detail
 		if(Texture.empty())
 			return false;
 
-		gl GL(gl::PROFILE_CORE);
-		gl::format const& Format = GL.translate(Texture.format());
+		gl GL(gl::PROFILE_KTX);
+		gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 		target const Target = Texture.target();
 
 		detail::formatInfo const& Desc = detail::get_format_info(Texture.format());

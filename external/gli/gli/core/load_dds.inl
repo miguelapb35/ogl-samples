@@ -139,6 +139,24 @@ namespace detail
 		else
 			return TARGET_2D;
 	}
+
+	// Some formats have multiple fourcc values. This function allows remapping to the default fourcc value of a format
+	inline dx::d3dfmt remap_four_cc(dx::d3dfmt FourCC)
+	{
+		switch(FourCC)
+		{
+		default:
+			return FourCC;
+		case dx::D3DFMT_BC4U:
+			return dx::D3DFMT_ATI1;
+		case dx::D3DFMT_BC4S:
+			return dx::D3DFMT_AT1N;
+		case dx::D3DFMT_BC5U:
+			return dx::D3DFMT_ATI2;
+		case dx::D3DFMT_BC5S:
+			return dx::D3DFMT_AT2N;
+		}
+	}
 }//namespace detail
 
 	inline texture load_dds(char const * Data, std::size_t Size)
@@ -248,7 +266,10 @@ namespace detail
 			}
 		}
 		else if((Header.Format.flags & dx::DDPF_FOURCC) && (Header.Format.fourCC != dx::D3DFMT_DX10) && (Header.Format.fourCC != dx::D3DFMT_GLI1) && (Format == static_cast<format>(gli::FORMAT_INVALID)))
-			Format = DX.find(Header.Format.fourCC, Header.Format.flags);
+		{
+			dx::d3dfmt const FourCC = detail::remap_four_cc(Header.Format.fourCC);
+			Format = DX.find(FourCC, Header.Format.flags);
+		}
 		else if(Header.Format.fourCC == dx::D3DFMT_DX10 || Header.Format.fourCC == dx::D3DFMT_GLI1)
 			Format = DX.find(Header.Format.fourCC, Header10.Format, Header.Format.flags);
 

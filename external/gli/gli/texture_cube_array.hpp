@@ -20,31 +20,34 @@ namespace gli
 		/// Create a texture_cube_array and allocate a new storage
 		explicit texture_cube_array(
 			format_type Format,
-			extent_type const & Extent,
+			extent_type const& Extent,
 			size_type Layers,
-			size_type Levels);
+			size_type Levels,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture_cube_array and allocate a new storage with a complete mipmap chain
 		explicit texture_cube_array(
 			format_type Format,
-			extent_type const & Extent,
-			size_type Layers);
+			extent_type const& Extent,
+			size_type Layers,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture_cube_array view with an existing storage
 		explicit texture_cube_array(
-			texture const & Texture);
+			texture const& Texture);
 
 		/// Reference a subset of an exiting storage constructor
 		explicit texture_cube_array(
-			texture const & Texture,
+			texture const& Texture,
 			format_type Format,
 			size_type BaseLayer, size_type MaxLayer,
 			size_type BaseFace, size_type MaxFace,
-			size_type BaseLevel, size_type MaxLevel);
+			size_type BaseLevel, size_type MaxLevel,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture view, reference a subset of an exiting texture_cube_array instance
 		explicit texture_cube_array(
-			texture_cube_array const & Texture,
+			texture_cube_array const& Texture,
 			size_type BaseLayer, size_type MaxLayer,
 			size_type BaseFace, size_type MaxFace,
 			size_type BaseLevel, size_type MaxLevel);

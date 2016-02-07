@@ -5,14 +5,14 @@ namespace gli
 	inline texture1d::texture1d()
 	{}
 
-	inline texture1d::texture1d(format_type Format, extent_type const & Dimensions)
-		: texture(TARGET_1D, Format, texture::extent_type(Dimensions.x, 1, 1), 1, 1, gli::levels(Dimensions))
+	inline texture1d::texture1d(format_type Format, extent_type const& Extent, swizzles_type const& Swizzles)
+		: texture(TARGET_1D, Format, texture::extent_type(Extent.x, 1, 1), 1, 1, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture1d::texture1d(format_type Format, extent_type const & Dimensions, size_type Levels)
-		: texture(TARGET_1D, Format, texture::extent_type(Dimensions.x, 1, 1), 1, 1, Levels)
+	inline texture1d::texture1d(format_type Format, extent_type const& Extent, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_1D, Format, texture::extent_type(Extent.x, 1, 1), 1, 1, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
@@ -29,14 +29,16 @@ namespace gli
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const & Swizzles
 	)
 		: texture(
 			Texture, TARGET_1D,
 			Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+		Swizzles)
 	{
 		this->build_cache();
 	}
@@ -76,13 +78,13 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline genType texture1d::load(extent_type const & TexelCoord, size_type Level) const
+	inline genType texture1d::load(extent_type const& TexelCoord, size_type Level) const
 	{
 		GLI_ASSERT(!this->empty());
 		GLI_ASSERT(!is_compressed(this->format()));
 		GLI_ASSERT(block_size(this->format()) == sizeof(genType));
 
-		cache const & Cache = this->Caches[this->index_cache(Level)];
+		cache const& Cache = this->Caches[this->index_cache(Level)];
 
 		std::size_t const Index = linear_index(TexelCoord, Cache.Extent);
 		GLI_ASSERT(Index < Cache.Size / sizeof(genType));
@@ -97,7 +99,7 @@ namespace gli
 		GLI_ASSERT(!is_compressed(this->format()));
 		GLI_ASSERT(block_size(this->format()) == sizeof(genType));
 
-		cache const & Cache = this->Caches[this->index_cache(Level)];
+		cache const& Cache = this->Caches[this->index_cache(Level)];
 		GLI_ASSERT(glm::all(glm::lessThan(TexelCoord, Cache.Extent)));
 
 		std::size_t const Index = linear_index(TexelCoord, Cache.Extent);

@@ -143,23 +143,22 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL33);
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 
 		{
 			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGBA_DXT5_UNORM));
 			assert(!Texture.empty());
-			gli::gl::format const Format = GL.translate(Texture.format());
-			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+			gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BC1]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
 				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
@@ -180,16 +179,15 @@ private:
 		{
 			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RG_EAC_UNORM));
 			assert(!Texture.empty());
-			gli::gl::format const Format = GL.translate(Texture.format());
-			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+			gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::BC3]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
 				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
@@ -208,16 +206,15 @@ private:
 		{
 			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGB9E5_UFLOAT));
 			assert(!Texture.empty());
-			gli::gl::format const Format = GL.translate(Texture.format());
-			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+			gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGB8]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
 				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));
@@ -235,16 +232,15 @@ private:
 		{
 			gli::texture Texture = gli::load((getDataDirectory() + TEXTURE_DIFFUSE_RGB_ETC2_SRGB).c_str());
 			assert(!Texture.empty());
-			gli::gl::format const Format = GL.translate(Texture.format());
-			gli::gl::swizzles const Swizzles = GL.translate(Texture.swizzles());
+			gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 			glBindTexture(GL_TEXTURE_2D_ARRAY, TextureName[texture::RGB10]);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Swizzles[0]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Swizzles[1]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Swizzles[2]);
-			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Swizzles[3]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+			glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
 			glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 				Format.Internal,
 				static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y), static_cast<GLsizei>(1));

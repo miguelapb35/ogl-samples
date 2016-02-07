@@ -23,12 +23,14 @@ namespace gli
 		explicit texture3d(
 			format_type Format,
 			extent_type const & Extent,
-			size_type Levels);
+			size_type Levels,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture3d and allocate a new storage with a complete mipmap chain
 		explicit texture3d(
 			format_type Format,
-			extent_type const & Extent);
+			extent_type const & Extent,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture3d view with an existing storage
 		explicit texture3d(
@@ -40,7 +42,8 @@ namespace gli
 			format_type Format,
 			size_type BaseLayer, size_type MaxLayer,
 			size_type BaseFace, size_type MaxFace,
-			size_type BaseLevel, size_type MaxLevel);
+			size_type BaseLevel, size_type MaxLevel,
+			swizzles_type const& Swizzles = swizzles_type(SWIZZLE_RED, SWIZZLE_GREEN, SWIZZLE_BLUE, SWIZZLE_ALPHA));
 
 		/// Create a texture3d view, reference a subset of an existing texture3d instance
 		explicit texture3d(

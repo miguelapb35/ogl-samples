@@ -200,10 +200,10 @@ private:
 	{
 		bool Validated(true);
 
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

@@ -177,7 +177,7 @@ private:
 		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
@@ -187,7 +187,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UINT_PACK8);
+		gli::gl::format const Format = GL.translate(gli::FORMAT_RGB8_UINT_PACK8, Texture.swizzles());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),

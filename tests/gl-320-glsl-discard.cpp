@@ -118,7 +118,7 @@ private:
 	bool initTexture()
 	{
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		gli::gl GL;
+		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glGenTextures(1, &Texture2DName);
 
@@ -131,7 +131,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glTexImage2D(GL_TEXTURE_2D, GLint(Level),

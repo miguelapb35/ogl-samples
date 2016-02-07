@@ -5,19 +5,19 @@ namespace gli
 	inline texture2d_array::texture2d_array()
 	{}
 
-	inline texture2d_array::texture2d_array(format_type Format, extent_type const & Dimensions, size_type Layers)
-		: texture(TARGET_2D_ARRAY, Format, texture::extent_type(Dimensions, 1), Layers, 1, gli::levels(Dimensions))
+	inline texture2d_array::texture2d_array(format_type Format, extent_type const& Extent, size_type Layers, swizzles_type const& Swizzles)
+		: texture(TARGET_2D_ARRAY, Format, texture::extent_type(Extent, 1), Layers, 1, gli::levels(Extent), Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture2d_array::texture2d_array(format_type Format, extent_type const & Dimensions, size_type Layers, size_type Levels)
-		: texture(TARGET_2D_ARRAY, Format, texture::extent_type(Dimensions, 1), Layers, 1, Levels)
+	inline texture2d_array::texture2d_array(format_type Format, extent_type const& Extent, size_type Layers, size_type Levels, swizzles_type const& Swizzles)
+		: texture(TARGET_2D_ARRAY, Format, texture::extent_type(Extent, 1), Layers, 1, Levels, Swizzles)
 	{
 		this->build_cache();
 	}
 
-	inline texture2d_array::texture2d_array(texture const & Texture)
+	inline texture2d_array::texture2d_array(texture const& Texture)
 		: texture(Texture, gli::TARGET_2D_ARRAY, Texture.format())
 	{
 		this->build_cache();
@@ -25,25 +25,27 @@ namespace gli
 
 	inline texture2d_array::texture2d_array
 	(
-		texture const & Texture,
+		texture const& Texture,
 		format_type Format,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseFace, size_type MaxFace,
-		size_type BaseLevel, size_type MaxLevel
+		size_type BaseLevel, size_type MaxLevel,
+		swizzles_type const& Swizzles
 	)
 		: texture(
 			Texture, TARGET_2D_ARRAY,
 			Format,
 			BaseLayer, MaxLayer,
 			BaseFace, MaxFace,
-			BaseLevel, MaxLevel)
+			BaseLevel, MaxLevel,
+			Swizzles)
 	{
 		this->build_cache();
 	}
 
 	inline texture2d_array::texture2d_array
 	(
-		texture2d_array const & Texture,
+		texture2d_array const& Texture,
 		size_type BaseLayer, size_type MaxLayer,
 		size_type BaseLevel, size_type MaxLevel
 	)
@@ -76,7 +78,7 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline genType texture2d_array::load(extent_type const & TexelCoord, size_type Layer, size_type Level) const
+	inline genType texture2d_array::load(extent_type const& TexelCoord, size_type Layer, size_type Level) const
 	{
 		GLI_ASSERT(!this->empty());
 		GLI_ASSERT(!is_compressed(this->format()));
@@ -91,7 +93,7 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline void texture2d_array::store(extent_type const & TexelCoord, size_type Layer, size_type Level, genType const & Texel)
+	inline void texture2d_array::store(extent_type const& TexelCoord, size_type Layer, size_type Level, genType const& Texel)
 	{
 		GLI_ASSERT(!this->empty());
 		GLI_ASSERT(!is_compressed(this->format()));
@@ -112,13 +114,13 @@ namespace gli
 	}
 
 	template <typename genType>
-	inline void texture2d_array::clear(genType const & Texel)
+	inline void texture2d_array::clear(genType const& Texel)
 	{
 		this->texture::clear<genType>(Texel);
 	}
 
 	template <typename genType>
-	inline void texture2d_array::clear(size_type Layer, size_type Level, genType const & Texel)
+	inline void texture2d_array::clear(size_type Layer, size_type Level, genType const& Texel)
 	{
 		this->texture::clear<genType>(Layer, 0, Level, Texel);
 	}

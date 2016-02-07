@@ -178,8 +178,8 @@ private:
 		gli::texture_cube Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube::extent_type(2), 1);
 		assert(!Texture.empty());
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		Texture[0].clear<glm::u8vec4>(glm::u8vec4(255,   0,   0, 255));
 		Texture[1].clear<glm::u8vec4>(glm::u8vec4(255, 128,   0, 255));

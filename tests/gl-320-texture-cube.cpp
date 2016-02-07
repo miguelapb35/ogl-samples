@@ -142,8 +142,8 @@ private:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		gli::gl GL;
-		gli::gl::format const Format = GL.translate(Texture.format());
+		gli::gl GL(gli::gl::PROFILE_GL32);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		for(gli::texture_cube::size_type Face = 0; Face < Texture.faces(); ++Face)
 		{
