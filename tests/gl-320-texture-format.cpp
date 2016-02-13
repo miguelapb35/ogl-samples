@@ -159,7 +159,7 @@ private:
 			glBindAttribLocation(ProgramName[i], semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[i], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[i]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[i]);
+			Validated = Validated && Compiler.check_program(ProgramName[i]);
 
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			Validated = Validated && (UniformMVP[i] != -1);

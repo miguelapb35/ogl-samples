@@ -102,7 +102,7 @@ bool testCompiler::render()
 
 			Compiler.check();
 			for(std::size_t ProgramIndex = 0; ProgramIndex < ProgramName.size(); ++ProgramIndex)
-				Compiler.checkProgram(ProgramName[ProgramIndex]);
+				Compiler.check_program(ProgramName[ProgramIndex]);
 		}
 		break;
 		case DUALTHREADED:
@@ -120,7 +120,7 @@ bool testCompiler::render()
 				glAttachShader(ProgramName[ProgramIndex], VertShaderName[ProgramIndex]);
 				glAttachShader(ProgramName[ProgramIndex], FragShaderName[ProgramIndex]);
 				glLinkProgram(ProgramName[ProgramIndex]);
-				Compiler.checkProgram(ProgramName[ProgramIndex]);
+				Compiler.check_program(ProgramName[ProgramIndex]);
 			}
 		}
 		break;
@@ -136,7 +136,7 @@ bool testCompiler::render()
 				glAttachShader(ProgramName[ProgramIndex], VertShaderName[ProgramIndex]);
 				glAttachShader(ProgramName[ProgramIndex], FragShaderName[ProgramIndex]);
 				glLinkProgram(ProgramName[ProgramIndex]);
-				Compiler.checkProgram(ProgramName[ProgramIndex]);
+				Compiler.check_program(ProgramName[ProgramIndex]);
 			}
 		}
 		break;

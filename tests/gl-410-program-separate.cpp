@@ -106,7 +106,7 @@ private:
 			glLinkProgram(UnifiedProgramName);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(UnifiedProgramName);
+			Validated = Validated && Compiler.check_program(UnifiedProgramName);
 		}
 
 		if(Validated)
@@ -140,8 +140,8 @@ private:
 
 		if(Validated)
 		{
-			Validated = Validated && Compiler.checkProgram(SeparateProgramName[program::VERTEX]);
-			Validated = Validated && Compiler.checkProgram(SeparateProgramName[program::FRAGMENT]);
+			Validated = Validated && Compiler.check_program(SeparateProgramName[program::VERTEX]);
+			Validated = Validated && Compiler.check_program(SeparateProgramName[program::FRAGMENT]);
 		}
 
 		if(Validated)

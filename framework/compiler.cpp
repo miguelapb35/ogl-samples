@@ -94,7 +94,7 @@ std::string compiler::commandline::getDefines() const
 
 std::string compiler::parser::operator()(commandline const & CommandLine, std::string const & Filename) const
 {
-	std::string Source = loadFile(Filename);
+	std::string Source = load_file(Filename);
 	assert(!Source.empty());
 
 	std::stringstream Stream;
@@ -142,7 +142,7 @@ std::string compiler::parser::operator()(commandline const & CommandLine, std::s
 			for(std::size_t i = 0; i < Includes.size(); ++i)
 			{
 				std::string PathName = Includes[i] + Include;
-				std::string IncludeSource = loadFile(PathName);
+				std::string IncludeSource = load_file(PathName);
 				if (!IncludeSource.empty())
 				{
 					Text += IncludeSource;
@@ -224,7 +224,7 @@ bool compiler::destroy(GLuint const & Name)
 	return true;
 }
 
-bool compiler::validateProgram(GLuint ProgramName) const
+bool compiler::validate_program(GLuint ProgramName) const
 {
 	if(!ProgramName)
 		return false;
@@ -249,7 +249,7 @@ bool compiler::validateProgram(GLuint ProgramName) const
 	return Result == GL_TRUE;
 }
 
-bool compiler::checkProgram(GLuint ProgramName) const
+bool compiler::check_program(GLuint ProgramName) const
 {
 	if(!ProgramName)
 		return false;
@@ -320,7 +320,7 @@ void compiler::clear()
 	this->PendingChecks.clear();
 }
 
-std::string loadFile(std::string const & Filename)
+std::string load_file(std::string const & Filename)
 {
 	std::string Result;
 		
@@ -339,7 +339,7 @@ std::string loadFile(std::string const & Filename)
 	return Result;
 }
 
-bool loadBinary
+bool load_binary
 (
 	std::string const & Filename,
 	GLenum & Format,
@@ -353,17 +353,20 @@ bool loadBinary
 	{
 		fread(&Format, sizeof(GLenum), 1, File);
 		fread(&Size, sizeof(Size), 1, File);
-		Data.resize(Size);
-		fread(&Data[0], Size, 1, File);
+		if(Size > 0)
+		{
+			Data.resize(Size);
+			fread(&Data[0], Size, 1, File);
+			return true;
+		}
 		fclose(File);
-		return true;
 	}
 	return false;
 }
 	
-bool saveBinary
+bool save_binary
 (
-	std::string const & Filename, 
+	std::string const & Filename,
 	GLenum const & Format,
 	std::vector<glm::uint8> const & Data,
 	GLint const & Size

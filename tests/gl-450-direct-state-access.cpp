@@ -356,7 +356,7 @@ private:
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -388,8 +388,8 @@ private:
 	bool initSampler()
 	{
 		glCreateSamplers(1, &SamplerName);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -454,12 +454,12 @@ private:
 			return false;
 		if(glCheckNamedFramebufferStatus(FramebufferName[framebuffer::RESOLVE], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
-
+/*
 		GLint Samples = 0;
 		glGetNamedFramebufferParameteriv(FramebufferName[framebuffer::RENDER], GL_SAMPLES, &Samples);
 		if (Samples != 4)
 			return false;
-
+*/
 		return true;
 	}
 

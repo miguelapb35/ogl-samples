@@ -104,10 +104,10 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT_READ]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG_READ]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT_SAVE]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG_SAVE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERT_READ]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAG_READ]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERT_SAVE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAG_SAVE]);
 		}
 
 		if(Validated)

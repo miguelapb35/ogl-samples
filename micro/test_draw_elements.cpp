@@ -101,7 +101,7 @@ bool testDrawElements::initProgram()
 	glAttachShader(this->ProgramName, VertShaderName);
 	glAttachShader(this->ProgramName, FragShaderName);
 	glLinkProgram(this->ProgramName);
-	Validated = Validated && Compiler.checkProgram(this->ProgramName);
+	Validated = Validated && Compiler.check_program(this->ProgramName);
 
 	if(Validated)
 		glUseProgramStages(this->PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);

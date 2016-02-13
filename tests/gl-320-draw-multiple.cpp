@@ -101,7 +101,7 @@ private:
 			glLinkProgram(ProgramName);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		// Get variables locations

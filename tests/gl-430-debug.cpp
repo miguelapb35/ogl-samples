@@ -116,8 +116,8 @@ private:
 			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
 			glLinkProgram(ProgramName[program::FRAGMENT]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERTEX]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAGMENT]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERTEX]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAGMENT]);
 		}
 
 		if(Validated)

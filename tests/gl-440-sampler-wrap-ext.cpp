@@ -82,11 +82,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_sampler_wrap : public test
+class gl_440_sampler_wrap_ext : public test
 {
 public:
-	gl_440_sampler_wrap(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-sampler-wrap", test::CORE, 4, 3),
+	gl_440_sampler_wrap_ext(int argc, char* argv[]) :
+		test(argc, argv, "gl-440-sampler-wrap-ext", test::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -170,14 +170,14 @@ private:
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_EDGE);
-		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_S, GL_MIRROR_CLAMP_TO_BORDER_EXT);
 
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT0], GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT1], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT2], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT3], GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		glSamplerParameteri(SamplerName[viewport::VIEWPORT4], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_EDGE);
-		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glSamplerParameteri(SamplerName[viewport::VIEWPORT5], GL_TEXTURE_WRAP_T, GL_MIRROR_CLAMP_TO_BORDER_EXT);
 
 		return this->checkError("initSampler");
 	}
@@ -239,6 +239,7 @@ private:
 
 		bool Validated = true;
 		Validated = Validated && this->checkExtension("GL_ARB_texture_mirror_clamp_to_edge");
+		Validated = Validated && this->checkExtension("GL_EXT_texture_mirror_clamp");
 
 		if(Validated)
 			Validated = initProgram();
@@ -294,7 +295,11 @@ private:
 
 		for(std::size_t Index = 0; Index < viewport::MAX; ++Index)
 		{
-			glViewportIndexedf(0, Viewport[Index].x, Viewport[Index].y, Viewport[Index].z, Viewport[Index].w);
+			glViewportIndexedf(0, 
+				Viewport[Index].x, 
+				Viewport[Index].y, 
+				Viewport[Index].z, 
+				Viewport[Index].w);
 
 			glBindSamplers(0, 1, &SamplerName[Index]);
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
@@ -308,7 +313,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_440_sampler_wrap Test(argc, argv);
+	gl_440_sampler_wrap_ext Test(argc, argv);
 	Error += Test();
 
 	return Error;

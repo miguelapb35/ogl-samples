@@ -105,7 +105,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -130,12 +130,16 @@ private:
 
 	bool initTexture()
 	{
-		glGenTextures(1, &Texture2DName);
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glActiveTexture(GL_TEXTURE0);
+		glGenTextures(1, &Texture2DName);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(

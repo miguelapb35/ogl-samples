@@ -100,7 +100,7 @@ private:
 			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -133,15 +133,18 @@ private:
 
 	bool initTexture()
 	{
-		glGenTextures(1, &TextureName);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
-
 		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+
+		glActiveTexture(GL_TEXTURE0);
+		glGenTextures(1, &TextureName);
+		glBindTexture(GL_TEXTURE_2D, TextureName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{

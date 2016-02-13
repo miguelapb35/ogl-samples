@@ -108,8 +108,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERT]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAG]);
 		}
 
 		if(Validated)

@@ -144,8 +144,8 @@ private:
 			UniformDiffuseSingle = glGetUniformLocation(this->ProgramName[program::BLIT], "Diffuse");
 		}
 
-		Validated = Validated && Compiler.checkProgram(this->ProgramName[program::COLORBUFFERS]);
-		Validated = Validated && Compiler.checkProgram(this->ProgramName[program::BLIT]);
+		Validated = Validated && Compiler.check_program(this->ProgramName[program::COLORBUFFERS]);
+		Validated = Validated && Compiler.check_program(this->ProgramName[program::BLIT]);
 
 		return Validated;
 	}

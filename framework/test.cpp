@@ -24,6 +24,7 @@
 #include "test.hpp"
 #include "png.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <gli/generate_mipmaps.hpp>
 #include <fstream>
 
 namespace
@@ -359,7 +360,7 @@ glm::vec3 test::cameraPosition() const
 
 namespace
 {
-	gli::texture absolute_difference(gli::texture const & A, gli::texture const & B)
+	gli::texture absolute_difference(gli::texture const& A, gli::texture const& B, glm::u8 Scale)
 	{
 		assert(A.format() == gli::FORMAT_RGB8_UNORM_PACK8 && B.format() == gli::FORMAT_RGB8_UNORM_PACK8);
 
@@ -368,10 +369,83 @@ namespace
 		{
 			glm::u8vec3 const TexelA = *(A.data<glm::u8vec3>() + TexelIndex);
 			glm::u8vec3 const TexelB = *(B.data<glm::u8vec3>() + TexelIndex);
-			glm::u8vec3 const TexelResult = glm::mix(TexelA - TexelB, TexelB - TexelA, glm::greaterThan(TexelB, TexelA)) * glm::u8vec3(8);
+			glm::u8vec3 const TexelResult = glm::mix(TexelA - TexelB, TexelB - TexelA, glm::greaterThan(TexelB, TexelA)) * glm::u8vec3(Scale);
 			*(Result.data<glm::u8vec3>() + TexelIndex) = TexelResult;
 		}
 		return Result;
+	}
+
+	struct heuristic
+	{
+		virtual bool test(gli::texture const& A, gli::texture const& B) const = 0;
+	};
+
+	struct heuristic_equal : public heuristic
+	{
+		bool test(gli::texture const& A, gli::texture const& B) const override
+		{
+			return A == B;
+		}
+	};
+
+	struct heuristic_absolute_difference_max_one
+	{
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture Texture = absolute_difference(A, B, 1);
+			glm::u8vec3 AbsDiffMax(0);
+			glm::u32vec3 AbsDiffCount(0);
+			for(std::size_t TexelIndex = 0, TexelCount = Texture.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
+			{
+				glm::u8vec3 AbsDiff = *(Texture.data<glm::u8vec3>() + TexelIndex);
+				if(AbsDiff.x > 0)
+					++AbsDiffCount.x;
+				if(AbsDiff.y > 0)
+					++AbsDiffCount.y;
+				if(AbsDiff.z > 0)
+					++AbsDiffCount.z;
+				AbsDiffMax = glm::max(AbsDiff, AbsDiffMax);
+			}
+			return glm::all(glm::lessThanEqual(AbsDiffMax, glm::u8vec3(1)));
+		}
+	};
+
+	struct heuristic_mipmaps_absolute_difference_max_one
+	{
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture2d TextureA(A);
+			gli::texture2d TextureB(B);
+			gli::texture2d MipmapsA(TextureA.format(), TextureA.extent());
+			gli::texture2d MipmapsB(TextureB.format(), TextureB.extent());
+			memcpy(MipmapsA.data(), TextureA.data(), TextureA.size());
+			memcpy(MipmapsB.data(), TextureB.data(), TextureB.size());
+			gli::texture2d GeneratedA = gli::generate_mipmaps(MipmapsA, gli::FILTER_LINEAR);
+			gli::texture2d GeneratedB = gli::generate_mipmaps(MipmapsB, gli::FILTER_LINEAR);
+			gli::texture ViewA = gli::view(GeneratedA, 3, 3);
+			gli::texture ViewB = gli::view(GeneratedB, 3, 3);
+			gli::texture Texture = absolute_difference(ViewA, ViewB, 1);
+			glm::u8vec3 AbsDiffMax(0);
+			glm::u32vec3 AbsDiffCount(0);
+			for(std::size_t TexelIndex = 0, TexelCount = Texture.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
+			{
+				glm::u8vec3 AbsDiff = *(Texture.data<glm::u8vec3>() + TexelIndex);
+				if(AbsDiff.x > 0)
+					++AbsDiffCount.x;
+				if(AbsDiff.y > 0)
+					++AbsDiffCount.y;
+				if(AbsDiff.z > 0)
+					++AbsDiffCount.z;
+				AbsDiffMax = glm::max(AbsDiff, AbsDiffMax);
+			}
+			return glm::all(glm::lessThanEqual(AbsDiffMax, glm::u8vec3(1)));
+		}
+	};
+
+	template <typename heuristic>
+	bool compare(gli::texture const& A, gli::texture const& B, heuristic const& Euristic)
+	{
+		return Euristic.test(A, B);
 	}
 }//namespace
 
@@ -415,18 +489,15 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		gli::texture Template(load_png((getDataDirectory() + "templates/" + Title + ".png").c_str()));
 
 		if(Success)
-		{
 			Success = Success && !Template.empty();
 
-		}
-
 		if(Success)
-			Success = Success && (Template == TextureRGB);
+			Success = Success && compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
 
 		// Save abs diff
 		if(!Success && !Template.empty())
 		{
-			gli::texture Diff = ::absolute_difference(Template, TextureRGB);
+			gli::texture Diff = ::absolute_difference(Template, TextureRGB, 8);
 			save_png(Template, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
 			save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());

@@ -114,8 +114,8 @@ private:
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerName);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -147,7 +147,7 @@ private:
 			glAttachShader(ProgramName[i], ShaderName[shader::VERT]);
 			glAttachShader(ProgramName[i], ShaderName[shader::FRAG_THROUGH + i]);
 			glLinkProgram(ProgramName[i]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[i]);
+			Validated = Validated && Compiler.check_program(ProgramName[i]);
 
 			UniformMVP[i] = glGetUniformLocation(ProgramName[i], "MVP");
 			UniformDiffuse[i] = glGetUniformLocation(ProgramName[i], "Diffuse");

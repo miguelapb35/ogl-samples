@@ -124,8 +124,8 @@ private:
 			glAttachShader(ProgramName[program::FUNC], FragShaderFuncName);
 			glLinkProgram(ProgramName[program::FUNC]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::PROG]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FUNC]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::PROG]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FUNC]);
 		}
 
 		if(Validated)

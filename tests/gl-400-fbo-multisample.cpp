@@ -61,7 +61,8 @@ namespace
 	GLuint Texture2DName = 0;
 	GLuint MultisampleTextureName = 0;
 	GLuint ColorTextureName = 0;
-	GLuint SamplerName = 0;
+	GLuint SamplerNameFBO = 0;
+	GLuint SamplerNameFB = 0;
 	GLuint FramebufferRenderName = 0;
 	GLuint FramebufferResolveName = 0;
 	GLint UniformMVP = 0;
@@ -92,7 +93,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -121,36 +122,46 @@ private:
 
 	bool initSampler()
 	{
-		glGenSamplers(1, &SamplerName);
+		glGenSamplers(1, &SamplerNameFBO);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glSamplerParameterfv(SamplerNameFBO, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
+		glSamplerParameterf(SamplerNameFBO, GL_TEXTURE_MIN_LOD, -1000.f);
+		glSamplerParameterf(SamplerNameFBO, GL_TEXTURE_MAX_LOD, 1000.f);
+		glSamplerParameterf(SamplerNameFBO, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glSamplerParameteri(SamplerNameFBO, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glSamplerParameterfv(SamplerName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
-		glSamplerParameterf(SamplerName, GL_TEXTURE_MIN_LOD, -1000.f);
-		glSamplerParameterf(SamplerName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerName, GL_TEXTURE_LOD_BIAS, 0.0f);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-		glBindSampler(0, SamplerName);
+		glGenSamplers(1, &SamplerNameFB);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glSamplerParameterfv(SamplerNameFB, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
+		glSamplerParameterf(SamplerNameFB, GL_TEXTURE_MIN_LOD, -1000.f);
+		glSamplerParameterf(SamplerNameFB, GL_TEXTURE_MAX_LOD, 1000.f);
+		glSamplerParameterf(SamplerNameFB, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		glSamplerParameteri(SamplerNameFB, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
 		return true;
 	}
 
 	bool initTexture()
 	{
-		glGenTextures(1, &Texture2DName);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture2DName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+
+		glActiveTexture(GL_TEXTURE0);
+		glGenTextures(1, &Texture2DName);
+		glBindTexture(GL_TEXTURE_2D, Texture2DName);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -246,7 +257,8 @@ private:
 		glDeleteFramebuffers(1, &FramebufferRenderName);
 		glDeleteFramebuffers(1, &FramebufferResolveName);
 		glDeleteVertexArrays(1, &VertexArrayName);
-		glDeleteSamplers(1, &SamplerName);
+		glDeleteSamplers(1, &SamplerNameFB);
+		glDeleteSamplers(1, &SamplerNameFBO);
 
 		return true;
 	}
@@ -264,6 +276,7 @@ private:
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName);
+		glBindSampler(0, SamplerNameFBO);
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);
@@ -280,6 +293,7 @@ private:
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, Texture2DName);
+		glBindSampler(0, SamplerNameFB);
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, NULL, 1, 0);

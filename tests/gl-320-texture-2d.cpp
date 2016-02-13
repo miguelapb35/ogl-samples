@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_unorm.dds");
+	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -276,7 +276,7 @@ private:
 			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -322,7 +322,14 @@ private:
 
 		gli::texture2d TextureLoaded(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
 		assert(!TextureLoaded.empty());
-
+/*
+		gli::texture2d TextureLoaded(gli::FORMAT_RGB8_SRGB_PACK8, gli::texture2d::extent_type(256), 1);
+		for(int TexelCoordY = 0; TexelCoordY < TextureLoaded.extent().y; ++TexelCoordY)
+		for(int TexelCoordX = 0; TexelCoordX < TextureLoaded.extent().x; ++TexelCoordX)
+		{
+			TextureLoaded.store(gli::texture2d::extent_type(TexelCoordX, TexelCoordY), 0, glm::u8vec3(TexelCoordX, TexelCoordY, TexelCoordY));
+		}
+*/
 		gli::fsampler2D Sampler(TextureLoaded, gli::WRAP_CLAMP_TO_EDGE);
 		Sampler.generate_mipmaps(gli::FILTER_LINEAR);
 		//Sampler.clear(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));

@@ -136,7 +136,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::TEXTURE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::TEXTURE]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::TEXTURE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::TEXTURE]);
 		}
 
 		if(Validated)
@@ -159,7 +159,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::SPLASH], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SPLASH]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::SPLASH]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::SPLASH]);
 		}
 	
 		if(Validated)

@@ -92,7 +92,7 @@ private:
 			glAttachShader(ProgramName[LAYERING], FragShaderName);
 			glLinkProgram(ProgramName[LAYERING]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.check_program(ProgramName[LAYERING]);
 		}
 
 		if(Validated)
@@ -110,7 +110,7 @@ private:
 			glAttachShader(ProgramName[VIEWPORT], FragShaderName);
 			glLinkProgram(ProgramName[VIEWPORT]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[VIEWPORT]);
+			Validated = Validated && Compiler.check_program(ProgramName[VIEWPORT]);
 		}
 
 		if(Validated)

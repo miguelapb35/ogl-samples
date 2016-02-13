@@ -116,7 +116,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -144,15 +144,15 @@ private:
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerAName);
-		glSamplerParameteri(SamplerAName, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glSamplerParameteri(SamplerAName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerAName, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glSamplerParameteri(SamplerAName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		glSamplerParameterfv(SamplerAName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MIN_LOD, -1000.f);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 3.0f);
+		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 2.0f);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
@@ -165,7 +165,7 @@ private:
 		glSamplerParameterfv(SamplerBName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
 		glSamplerParameterf(SamplerBName, GL_TEXTURE_MIN_LOD, -1000.f);
 		glSamplerParameterf(SamplerBName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerBName, GL_TEXTURE_LOD_BIAS, 3.0f);
+		glSamplerParameterf(SamplerBName, GL_TEXTURE_LOD_BIAS, 4.0f);
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerBName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 

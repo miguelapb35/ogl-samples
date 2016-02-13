@@ -116,7 +116,7 @@ private:
 			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)
@@ -152,6 +152,8 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC1]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -172,6 +174,8 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC3]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -192,6 +196,8 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC4]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -212,6 +218,8 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[TEXTURE_BC5]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 			gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

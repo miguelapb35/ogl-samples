@@ -114,7 +114,7 @@ private:
 			glAttachShader(ProgramNameSingle, ShaderName[shader::VERT2]);
 			glAttachShader(ProgramNameSingle, ShaderName[shader::FRAG2]);
 			glLinkProgram(ProgramNameSingle);
-			Validated = Validated && Compiler.checkProgram(ProgramNameSingle);
+			Validated = Validated && Compiler.check_program(ProgramNameSingle);
 		}
 
 		if(Validated)
@@ -140,8 +140,8 @@ private:
 	bool initSampler()
 	{
 		glGenSamplers(1, &SamplerName);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glSamplerParameteri(SamplerName, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glSamplerParameteri(SamplerName, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -165,8 +165,8 @@ private:
 		glGenTextures(TEXTURE_MAX, Texture2DName);
 
 		glBindTexture(GL_TEXTURE_2D, Texture2DName[TEXTURE_RGB8]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexImage2D(GL_TEXTURE_2D, GLint(0),
 			Format.Internal,
 			GLsizei(Texture.extent().x), GLsizei(Texture.extent().y),

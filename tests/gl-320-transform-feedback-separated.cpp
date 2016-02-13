@@ -120,7 +120,7 @@ private:
 	#endif
 			glLinkProgram(ProgramName[program::TRANSFORM]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::TRANSFORM]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::TRANSFORM]);
 
 			char Name[64];
 			memset(Name, 0, 64);
@@ -158,7 +158,7 @@ private:
 			glBindAttribLocation(ProgramName[program::FEEDBACK], semantic::attr::COLOR, "Color");
 			glBindFragDataLocation(ProgramName[program::FEEDBACK], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::FEEDBACK]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FEEDBACK]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FEEDBACK]);
 		}
 
 		return Validated && this->checkError("initProgram");

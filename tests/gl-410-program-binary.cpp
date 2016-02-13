@@ -91,7 +91,7 @@ public:
 	{}
 
 private:
-	bool saveProgram(GLuint ProgramName, std::string const & String)
+	bool save_program(GLuint ProgramName, std::string const & String)
 	{
 		GLint Size(0);
 		GLenum Format(0);
@@ -99,71 +99,12 @@ private:
 		glGetProgramiv(ProgramName, GL_PROGRAM_BINARY_LENGTH, &Size);
 		std::vector<glm::byte> Data(Size);
 		glGetProgramBinary(ProgramName, Size, nullptr, &Format, &Data[0]);
-		saveBinary(String, Format, Data, Size);
+		save_binary(String, Format, Data, Size);
 
-		return this->checkError("saveProgram");
-	}
-/*
-	char const * retrieveBinaryCache(char const* Path)
-	{
-		return 0;
+		return true;
 	}
 
-	enum
-	{
-		PROGRAM_SEPARATE_BIT = (1 << 0),
-		PROGRAM_CACHE_BIT = (1 << 1),
-		PROGRAM_BYPASS_CACHE_BIT = (1 << 2)
-	};
-
-	bool hasProgramBinarySPIRVSupport()
-	{
-		GLint NumProgramBinaryFormats(0);
-		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
-
-		std::vector<GLint> ProgramBinaryFormats(static_cast<std::size_t>(NumProgramBinaryFormats));
-		glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, &ProgramBinaryFormats[0]);
-
-		for(std::size_t FormatIndex = 0; FormatIndex < ProgramBinaryFormats.size(); ++FormatIndex)
-		{
-			if(ProgramBinaryFormats[FormatIndex] == GL_PROGRAM_BINARY_SPIR_V)
-				return true;
-		}
-
-		return false;
-	}
-
-	bool isProgramBinarySPIRV(GLubyte * binary)
-	{
-		return *reinterpret_cast<GLuint*>(binary) == 0x07230203;
-	}
-
-	GLuint createProgram(char const* Path, GLbitfield Flags)
-	{
-		assert(HasProgramBinarySPIRVSupport());
-		assert(Path);
-
-		if(!(Flags & PROGRAM_BYPASS_CACHE_BIT))
-			Path = retrieveBinaryCache(Path);
-
-		GLenum Format = 0;
-		GLint Size = 0;
-		std::vector<glm::byte> Data;
-		if(!loadBinary(Path, Format, Data, Size))
-			return 0;
-
-		assert((isProgramBinarySPIRV(&Data[0]) && Format == GL_PROGRAM_BINARY_SPIR_V) || Format != GL_PROGRAM_BINARY_SPIR_V);
-
-		GLuint ProgramName = glCreateProgram();
-		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, Flags & PROGRAM_SEPARATE_BIT ? GL_TRUE : GL_FALSE);
-		glProgramParameteri(ProgramName, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, Flags & PROGRAM_CACHE_BIT ? GL_TRUE : GL_FALSE);
-		glProgramBinary(ProgramName, Format, &Data[0], Size);
-		glLinkProgram(ProgramName);
-
-		return ProgramName;
-	}
-*/
-	bool initProgram()
+	bool init_program()
 	{
 		bool Validated = true;
 		GLint Success = 0;
@@ -186,7 +127,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
+			if(load_binary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
@@ -198,7 +139,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
+			if(load_binary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
@@ -210,7 +151,7 @@ private:
 			GLenum Format = 0;
 			GLint Size = 0;
 			std::vector<glm::byte> Data;
-			if(loadBinary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
+			if(load_binary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
 				glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
 				glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
@@ -254,9 +195,9 @@ private:
 
 		if(Validated)
 		{
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERT]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::GEOM]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAG]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERT]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::GEOM]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAG]);
 		}
 
 		if(Validated)
@@ -265,14 +206,14 @@ private:
 			UniformDiffuse = glGetUniformLocation(ProgramName[program::FRAG], "Diffuse");
 		}
 
-		saveProgram(ProgramName[program::VERT], getDataDirectory() + VERT_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::GEOM], getDataDirectory() + GEOM_PROGRAM_BINARY);
-		saveProgram(ProgramName[program::FRAG], getDataDirectory() + FRAG_PROGRAM_BINARY);
+		save_program(ProgramName[program::VERT], getDataDirectory() + VERT_PROGRAM_BINARY);
+		save_program(ProgramName[program::GEOM], getDataDirectory() + GEOM_PROGRAM_BINARY);
+		save_program(ProgramName[program::FRAG], getDataDirectory() + FRAG_PROGRAM_BINARY);
 
-		return Validated && this->checkError("initProgram");
+		return Validated;
 	}
 
-	bool initTexture()
+	bool init_texture()
 	{
 		glGenTextures(1, &Texture2DName);
 
@@ -303,7 +244,7 @@ private:
 		return this->checkError("initTexture");
 	}
 
-	bool initBuffer()
+	bool init_buffer()
 	{
 		glGenBuffers(buffer::MAX, BufferName);
 
@@ -318,7 +259,7 @@ private:
 		return this->checkError("initBuffer");
 	}
 
-	bool initVertexArray()
+	bool init_vertexarray()
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 
@@ -346,13 +287,13 @@ private:
 		bool Validated = NumProgramBinaryFormats > 0 ? true : false;
 		
 		if(Validated)
-			Validated = initProgram();
+			Validated = init_program();
 		if(Validated)
-			Validated = initBuffer();
+			Validated = init_buffer();
 		if(Validated)
-			Validated = initVertexArray();
+			Validated = init_vertexarray();
 		if(Validated)
-			Validated = initTexture();
+			Validated = init_texture();
 
 		return Validated;
 	}

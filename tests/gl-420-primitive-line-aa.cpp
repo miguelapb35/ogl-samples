@@ -107,7 +107,7 @@ private:
 			glLinkProgram(ProgramName[pipeline::MULTISAMPLE]);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::MULTISAMPLE]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::MULTISAMPLE]);
 		}
 
 		if(Validated)
@@ -122,7 +122,7 @@ private:
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::SPLASH]);
 		}
 
 		if(Validated)

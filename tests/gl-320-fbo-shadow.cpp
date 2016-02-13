@@ -147,7 +147,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::RENDER], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::RENDER]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::RENDER]);
 		}
 
 		if(Validated)
@@ -167,7 +167,7 @@ private:
 			glBindAttribLocation(ProgramName[program::DEPTH], semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName[program::DEPTH]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::DEPTH]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::DEPTH]);
 		}
 
 		if(Validated)

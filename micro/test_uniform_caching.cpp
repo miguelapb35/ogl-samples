@@ -112,7 +112,7 @@ private:
 			glLinkProgram(this->ProgramName);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(this->ProgramName);
+			Validated = Validated && Compiler.check_program(this->ProgramName);
 		}
 
 		if(Validated)

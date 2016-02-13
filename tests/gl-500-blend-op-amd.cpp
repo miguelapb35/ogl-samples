@@ -122,7 +122,7 @@ private:
 			glAttachShader(ProgramName[pipeline::BLEND_OP], VertShaderName);
 			glAttachShader(ProgramName[pipeline::BLEND_OP], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::BLEND_OP]);
-			Validated = Compiler.checkProgram(ProgramName[pipeline::BLEND_OP]);
+			Validated = Compiler.check_program(ProgramName[pipeline::BLEND_OP]);
 		}
 
 		if(Validated)
@@ -140,7 +140,7 @@ private:
 			glAttachShader(ProgramName[pipeline::SPLASH], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
-			Validated = Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
+			Validated = Compiler.check_program(ProgramName[pipeline::SPLASH]);
 		}
 
 		if(Validated)

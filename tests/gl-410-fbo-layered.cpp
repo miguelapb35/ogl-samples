@@ -117,8 +117,8 @@ private:
 		if(Validated)
 		{
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[VIEWPORT]);
+			Validated = Validated && Compiler.check_program(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.check_program(ProgramName[VIEWPORT]);
 		}
 
 		if(Validated)

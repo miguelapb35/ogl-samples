@@ -75,7 +75,7 @@ private:
 			glAttachShader(ProgramName[pipeline::READ], VertShaderName);
 			glAttachShader(ProgramName[pipeline::READ], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::READ]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::READ]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::READ]);
 		}
 
 		if(Validated)
@@ -89,7 +89,7 @@ private:
 			glAttachShader(ProgramName[pipeline::SAVE], VertShaderName);
 			glAttachShader(ProgramName[pipeline::SAVE], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SAVE]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SAVE]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::SAVE]);
 		}
 
 		if(Validated)

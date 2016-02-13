@@ -78,8 +78,8 @@ public:
 	GLuint create(GLenum Type, std::string const & Filename, std::string const & Arguments = std::string());
 	bool destroy(GLuint const & Name);
 
-	bool checkProgram(GLuint ProgramName) const;
-	bool validateProgram(GLuint ProgramName) const;
+	bool check_program(GLuint ProgramName) const;
+	bool validate_program(GLuint ProgramName) const;
 
 	bool check();
 	// TODO: Not defined
@@ -92,6 +92,6 @@ private:
 	names_map PendingChecks;
 };
 
-std::string loadFile(std::string const & Filename);
-bool loadBinary(std::string const & Filename, GLenum & Format, std::vector<glm::uint8> & Data, GLint & Size);
-bool saveBinary(std::string const & Filename, GLenum const & Format, std::vector<glm::uint8> const & Data, GLint const & Size);
+std::string load_file(std::string const & Filename);
+bool load_binary(std::string const & Filename, GLenum & Format, std::vector<glm::uint8> & Data, GLint & Size);
+bool save_binary(std::string const & Filename, GLenum const & Format, std::vector<glm::uint8> const & Data, GLint const & Size);

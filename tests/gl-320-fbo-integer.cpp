@@ -138,8 +138,8 @@ private:
 		if(Validated)
 		{
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::RENDER]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::SPLASH]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::RENDER]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::SPLASH]);
 		}
 
 		if(Validated)

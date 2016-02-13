@@ -128,7 +128,7 @@ private:
 			glAttachShader(ProgramName[pipeline::RENDER], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::RENDER]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::RENDER]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::RENDER]);
 		}
 
 		if(Validated)
@@ -144,7 +144,7 @@ private:
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::SPLASH]);
 		}
 
 		if(Validated)

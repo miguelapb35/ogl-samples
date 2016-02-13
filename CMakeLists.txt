@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 cmake_policy(VERSION 2.8)
+if (NOT CMAKE_VERSION VERSION_LESS "3.1")
+	cmake_policy(SET CMP0054 NEW)
+endif()
 
 set(OGL_SAMPLES_NAME ogl-samples)
 set(FRAMEWORK_NAME framework)

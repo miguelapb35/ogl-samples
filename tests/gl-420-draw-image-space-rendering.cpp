@@ -109,7 +109,7 @@ private:
 			glAttachShader(ProgramName[pipeline::SPLASH], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::SPLASH]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::SPLASH]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::SPLASH]);
 		}
 
 		if(Validated)
@@ -269,8 +269,8 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindProgramPipeline(PipelineName[pipeline::SPLASH]);
-		glActiveTexture(GL_TEXTURE0);
 		glBindVertexArray(VertexArrayName);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
 		glBindSampler(0, SamplerName);
 

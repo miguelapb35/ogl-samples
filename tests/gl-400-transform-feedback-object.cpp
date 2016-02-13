@@ -109,8 +109,8 @@ private:
 		if(Validated)
 		{
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(TransformProgramName);
-			Validated = Validated && Compiler.checkProgram(FeedbackProgramName);
+			Validated = Validated && Compiler.check_program(TransformProgramName);
+			Validated = Validated && Compiler.check_program(FeedbackProgramName);
 		}
 
 		return Validated && this->checkError("initProgram");

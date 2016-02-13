@@ -94,7 +94,7 @@ bool testDrawIndexing::initProgram()
 		glAttachShader(this->ProgramName, VertShaderName);
 		glAttachShader(this->ProgramName, FragShaderName);
 		glLinkProgram(this->ProgramName);
-		Validated = Validated && Compiler.checkProgram(this->ProgramName);
+		Validated = Validated && Compiler.check_program(this->ProgramName);
 	}
 
 	if(Validated)

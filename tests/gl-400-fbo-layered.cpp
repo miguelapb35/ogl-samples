@@ -116,8 +116,8 @@ private:
 
 		if(Validated)
 		{
-			Validated = Validated && Compiler.checkProgram(ProgramName[LAYERING]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[IMAGE_2D]);
+			Validated = Validated && Compiler.check_program(ProgramName[LAYERING]);
+			Validated = Validated && Compiler.check_program(ProgramName[IMAGE_2D]);
 		}
 
 		if(Validated)

@@ -131,7 +131,7 @@ private:
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], semantic::frag::GREEN, "Green");
 			glBindFragDataLocation(ProgramName[program::MULTIPLE], semantic::frag::BLUE, "Blue");
 			glLinkProgram(ProgramName[program::MULTIPLE]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::MULTIPLE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::MULTIPLE]);
 		}
 
 		if(Validated)
@@ -153,7 +153,7 @@ private:
 			glBindAttribLocation(ProgramName[program::SINGLE], semantic::attr::TEXCOORD, "Texcoord");
 			glBindFragDataLocation(ProgramName[program::SINGLE], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::SINGLE]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::SINGLE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::SINGLE]);
 		}
 
 		if(Validated)

@@ -113,7 +113,7 @@ private:
 			glTransformFeedbackVaryings(ProgramName[pipeline::TRANSFORM], 2, Strings, GL_INTERLEAVED_ATTRIBS);
 			glLinkProgram(ProgramName[pipeline::TRANSFORM]);
 
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::TRANSFORM]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::TRANSFORM]);
 		}
 
 		// Get variables locations
@@ -135,7 +135,7 @@ private:
 			glAttachShader(ProgramName[pipeline::FEEDBACK], VertShaderName);
 			glAttachShader(ProgramName[pipeline::FEEDBACK], FragShaderName);
 			glLinkProgram(ProgramName[pipeline::FEEDBACK]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[pipeline::FEEDBACK]);
+			Validated = Validated && Compiler.check_program(ProgramName[pipeline::FEEDBACK]);
 		}
 
 		// Get variables locations

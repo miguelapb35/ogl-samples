@@ -116,8 +116,8 @@ private:
 
 		if(Validated)
 		{
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::UPDATE]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::BLIT]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::UPDATE]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::BLIT]);
 		}
 
 		if(Validated)

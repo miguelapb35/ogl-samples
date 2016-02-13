@@ -100,7 +100,7 @@ private:
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
 			glLinkProgram(ProgramName);
-			Validated = Compiler.checkProgram(ProgramName);
+			Validated = Compiler.check_program(ProgramName);
 		}
 
 		if(Validated)

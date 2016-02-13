@@ -105,7 +105,7 @@ private:
 			glLinkProgram(ProgramName[program::USED]);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::USED]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::USED]);
 		}
 
 		if(Validated)

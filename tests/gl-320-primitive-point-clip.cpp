@@ -40,7 +40,7 @@ class gl_320_primitive_point : public test
 {
 public:
 	gl_320_primitive_point(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-point-clip", test::CORE, 3, 2)
+		test(argc, argv, "gl-320-primitive-point-clip", test::CORE, 3, 2, glm::uvec2(640, 480), glm::vec2(0, 0), glm::vec2(0, 12))
 	{}
 
 private:
@@ -66,7 +66,7 @@ private:
 			glLinkProgram(ProgramName);
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName);
+			Validated = Validated && Compiler.check_program(ProgramName);
 		}
 
 		// Get variables locations

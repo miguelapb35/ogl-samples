@@ -159,13 +159,13 @@ private:
 			glProgramParameteri(ProgramName[program::VERTEX], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::VERTEX], VertShaderName);
 			glLinkProgram(ProgramName[program::VERTEX]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::VERTEX]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::VERTEX]);
 
 			ProgramName[program::FRAGMENT] = glCreateProgram();
 			glProgramParameteri(ProgramName[program::FRAGMENT], GL_PROGRAM_SEPARABLE, GL_TRUE);
 			glAttachShader(ProgramName[program::FRAGMENT], FragShaderName);
 			glLinkProgram(ProgramName[program::FRAGMENT]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[program::FRAGMENT]);
+			Validated = Validated && Compiler.check_program(ProgramName[program::FRAGMENT]);
 		}
 
 		if(Validated)

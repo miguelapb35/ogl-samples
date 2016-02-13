@@ -98,7 +98,7 @@ private:
 			}
 
 			for(std::size_t i = 0; i < program::MAX; ++i)
-				Validated = Validated && Compiler.checkProgram(ProgramName[i]);
+				Validated = Validated && Compiler.check_program(ProgramName[i]);
 		}
 
 		if(Validated)

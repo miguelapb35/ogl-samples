@@ -114,8 +114,8 @@ private:
 		if(Validated)
 		{
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.checkProgram(ProgramName[0]);
-			Validated = Validated && Compiler.checkProgram(ProgramName[1]);
+			Validated = Validated && Compiler.check_program(ProgramName[0]);
+			Validated = Validated && Compiler.check_program(ProgramName[1]);
 		}
 
 		if(Validated)

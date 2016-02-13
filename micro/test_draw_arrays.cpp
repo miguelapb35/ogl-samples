@@ -127,7 +127,7 @@ bool testDrawArrays::initProgram()
 	glAttachShader(this->ProgramName, VertShaderName);
 	glAttachShader(this->ProgramName, FragShaderName);
 	glLinkProgram(this->ProgramName);
-	Validated = Validated && Compiler.checkProgram(this->ProgramName);
+	Validated = Validated && Compiler.check_program(this->ProgramName);
 
 	UniformDiffuse0 = glGetUniformLocation(ProgramName, "Diffuse0");
 	UniformDiffuse1 = glGetUniformLocation(ProgramName, "Diffuse1");
