@@ -454,12 +454,12 @@ private:
 			return false;
 		if(glCheckNamedFramebufferStatus(FramebufferName[framebuffer::RESOLVE], GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
-/*
+
 		GLint Samples = 0;
 		glGetNamedFramebufferParameteriv(FramebufferName[framebuffer::RENDER], GL_SAMPLES, &Samples);
 		if (Samples != 4)
 			return false;
-*/
+
 		return true;
 	}
 

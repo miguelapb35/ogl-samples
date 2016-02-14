@@ -388,6 +388,46 @@ namespace
 		}
 	};
 
+	struct heuristic_absolute_difference_max_one_kernel
+	{
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture2d Texture(absolute_difference(A, B, 1));
+			glm::u8vec3 AbsDiffMax(0);
+			for(std::size_t TexelIndexY = 0, TexelCountY = Texture.extent().y; TexelIndexY < TexelCountY; ++TexelIndexY)
+			for(std::size_t TexelIndexX = 0, TexelCountX = Texture.extent().x; TexelIndexX < TexelCountX; ++TexelIndexX)
+			{
+				gli::texture2d::extent_type const TexelCoord(TexelIndexX, TexelIndexY);
+				glm::u8vec3 TexelDiff = Texture.load<glm::u8vec3>(TexelCoord, 0);
+
+				if(glm::all(glm::lessThanEqual(TexelDiff, glm::u8vec3(1))))
+					continue;
+
+				gli::texture2d TextureA(A);
+				gli::texture2d TextureB(B);
+				glm::u8vec3 const TexelA = TextureA.load<glm::u8vec3>(TexelCoord, 0);
+
+				bool KernelAbsDiffMax = false;
+				for(int KernelIndexY = -1; KernelIndexY <= 1; ++KernelIndexY)
+				for(int KernelIndexX = -1; KernelIndexX <= 1; ++KernelIndexX)
+				{
+					glm::ivec2 const KernelCoord(KernelIndexX, KernelIndexY);
+					gli::texture2d::extent_type ClampedTexelCoord = glm::clamp(glm::ivec2(TexelCoord) + KernelCoord, glm::ivec2(0), glm::ivec2(Texture.extent()) - glm::ivec2(1));
+					glm::u8vec3 const TexelB = TextureB.load<glm::u8vec3>(ClampedTexelCoord, 0);
+
+					if(glm::all(glm::lessThanEqual(glm::abs(glm::vec3(TexelB) - glm::vec3(TexelA)), glm::vec3(1))))
+						KernelAbsDiffMax = true;
+				}
+
+				if(KernelAbsDiffMax)
+					TexelDiff = glm::min(TexelDiff, glm::u8vec3(1));
+				AbsDiffMax = glm::max(TexelDiff, AbsDiffMax);
+			}
+
+			return glm::all(glm::lessThanEqual(AbsDiffMax, glm::u8vec3(1)));
+		}
+	};
+
 	struct heuristic_absolute_difference_max_one
 	{
 		bool test(gli::texture const& A, gli::texture const& B) const
@@ -492,7 +532,16 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 			Success = Success && !Template.empty();
 
 		if(Success)
-			Success = Success && compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
+		{
+			bool Heuristic = compare(Template, TextureRGB, heuristic_equal());
+			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one());
+			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_kernel());
+			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
+			Success = Heuristic;
+		}
 
 		// Save abs diff
 		if(!Success && !Template.empty())

@@ -232,7 +232,7 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 1000.0f);
+		glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.1f, WindowSize.x / WindowSize.y, 0.1f, 1000.0f);
 		glm::mat4 Model = glm::mat4(1.0f);
 		glm::mat4 MVP = Projection * this->view() * Model;
 

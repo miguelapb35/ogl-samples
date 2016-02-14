@@ -37,17 +37,17 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(  0.f,   0.f), glm::vec2(0.25f, 0.75f)),
+		glf::vertex_v2fv2f(glm::vec2(256.f,   0.f), glm::vec2(0.75f, 0.75f)),
+		glf::vertex_v2fv2f(glm::vec2(256.f, 256.f), glm::vec2(0.75f, 0.25f)),
+		glf::vertex_v2fv2f(glm::vec2(  0.f, 256.f), glm::vec2(0.25f, 0.25f))
 	};
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
 	GLushort const ElementData[ElementCount] =
 	{
-		0, 1, 2, 
+		0, 1, 2,
 		2, 3, 0
 	};
 
@@ -102,10 +102,10 @@ namespace
 
 	glm::ivec4 const Viewport[texture::MAX] = 
 	{
-		glm::ivec4(  0,   0, 320, 240),
-		glm::ivec4(320,   0, 320, 240),
-		glm::ivec4(320, 240, 320, 240),
-		glm::ivec4(  0, 240, 320, 240)
+		glm::ivec4(  0,   0, 256, 256),
+		glm::ivec4(256,   0, 256, 256),
+		glm::ivec4(256, 256, 256, 256),
+		glm::ivec4(  0, 256, 256, 256)
 	};
 }//namespace
 
@@ -113,7 +113,7 @@ class gl_420_texture_conversion : public test
 {
 public:
 	gl_420_texture_conversion(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-conversion", test::CORE, 4, 2),
+		test(argc, argv, "gl-420-texture-conversion", test::CORE, 4, 2, glm::uvec2(512)),
 		VertexArrayName(0)
 	{}
 
@@ -205,8 +205,8 @@ private:
 			glBindTexture(GL_TEXTURE_2D, TextureName[i]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, TextureFormat[i] == GL_RGB_INTEGER ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, TextureFormat[i] == GL_RGB_INTEGER ? GL_NEAREST :  GL_LINEAR);
 			glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), TextureInternalFormat[i], GLsizei(Texture[0].extent().x), GLsizei(Texture[0].extent().y));
 
 			for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
@@ -283,7 +283,7 @@ private:
 				GL_UNIFORM_BUFFER, 0,	sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Projection = glm::ortho(0.f, 256.f, 0.f, 256.f, 0.f, 16.f);
 			glm::mat4 Model = glm::mat4(1.0f);
 		
 			*Pointer = Projection * this->view() * Model;
