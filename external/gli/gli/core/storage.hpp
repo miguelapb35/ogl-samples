@@ -24,7 +24,7 @@ static_assert(GLM_VERSION >= 97, "GLI requires at least GLM 0.9.7");
 
 namespace gli
 {
-	class storage
+	class storage_linear
 	{
 	public:
 		typedef extent3d extent_type;
@@ -33,9 +33,9 @@ namespace gli
 		typedef glm::byte data_type;
 
 	public:
-		storage();
+		storage_linear();
 
-		storage(
+		storage_linear(
 			format_type Format,
 			extent_type const & Extent,
 			size_type Layers,
@@ -53,13 +53,21 @@ namespace gli
 		extent_type block_count(size_type Level) const;
 		extent_type extent(size_type Level) const;
 
-		data_type * data();
+		data_type* data();
+		data_type const* const data() const;
 
 		/// Compute the relative memory offset to access the data for a specific layer, face and level
 		size_type base_offset(
 			size_type Layer,
 			size_type Face,
 			size_type Level) const;
+
+		/// Copy a subset of a specific image of a texture 
+		void copy(
+			storage_linear const& StorageSrc,
+			size_t LayerSrc, size_t FaceSrc, size_t LevelSrc, extent_type const& BlockIndexSrc,
+			size_t LayerDst, size_t FaceDst, size_t LevelDst, extent_type const& BlockIndexDst,
+			extent_type const& BlockCount);
 
 		size_type level_size(
 			size_type Level) const;
@@ -81,4 +89,4 @@ namespace gli
 	};
 }//namespace gli
 
-#include "storage.inl"
+#include "storage_linear.inl"

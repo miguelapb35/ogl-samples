@@ -7,11 +7,6 @@
 
 namespace
 {
-	std::string path(std::string const & filename, char const * ext)
-	{
-		return std::string(SOURCE_DIR) + "/data/" + filename + ext;
-	}
-
 	struct params
 	{
 		params(std::string const & Filename, gli::format Format)

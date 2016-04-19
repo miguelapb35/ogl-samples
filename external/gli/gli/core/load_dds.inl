@@ -134,7 +134,7 @@ namespace detail
 		}
 		else if(Header10.ResourceDimension == D3D10_RESOURCE_DIMENSION_TEXTURE1D)
 			return TARGET_1D;
-		else if(Header10.ResourceDimension == D3D10_RESOURCE_DIMENSION_TEXTURE3D || Header.Flags & detail::DDSD_DEPTH)
+		else if(Header10.ResourceDimension == D3D10_RESOURCE_DIMENSION_TEXTURE3D || Header.Flags & detail::DDSD_DEPTH || Header.CubemapFlags & detail::DDSCAPS2_VOLUME)
 			return TARGET_3D;
 		else
 			return TARGET_2D;

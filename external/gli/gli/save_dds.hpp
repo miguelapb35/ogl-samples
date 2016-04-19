@@ -7,7 +7,7 @@
 
 namespace gli
 {
-	/// Save a texture storage to a DDS file.
+	/// Save a texture storage_linear to a DDS file.
 	///
 	/// @param Texture Source texture to save
 	/// @param Path Path for where to save the file. It must include the filaname and filename extension.
@@ -15,7 +15,7 @@ namespace gli
 	/// @return Returns false if the function fails to save the file.
 	bool save_dds(texture const & Texture, char const* Path);
 
-	/// Save a texture storage to a DDS file.
+	/// Save a texture storage_linear to a DDS file.
 	///
 	/// @param Texture Source texture to save
 	/// @param Path Path for where to save the file. It must include the filaname and filename extension.
@@ -23,10 +23,10 @@ namespace gli
 	/// @return Returns false if the function fails to save the file.
 	bool save_dds(texture const & Texture, std::string const & Path);
 
-	/// Save a texture storage to a DDS file.
+	/// Save a texture storage_linear to a DDS file.
 	///
 	/// @param Texture Source texture to save
-	/// @param Memory Storage for the DDS container. The function resizes the containers to fit the necessary storage.
+	/// @param Memory Storage for the DDS container. The function resizes the containers to fit the necessary storage_linear.
 	/// @return Returns false if the function fails to save the file.
 	bool save_dds(texture const & Texture, std::vector<char> & Memory);
 }//namespace gli

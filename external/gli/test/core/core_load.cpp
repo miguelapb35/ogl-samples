@@ -95,21 +95,6 @@ namespace load_file_dds
 	}
 }//namespace load_file_dds
 
-namespace make_file_ktx
-{
-	int test(params const & Params)
-	{
-		int Error(0);
-
-		gli::texture TextureDDS(gli::load(path(Params.Filename, ".ktx")));
-		Error += TextureDDS.format() == Params.Format ? 0 : 1;
-
-		gli::save(TextureDDS, Params.Filename + ".dds");
-
-		return Error;
-	}
-}//namespace make_file_ktx
-
 int main()
 {
 	//make_file_ktx::test(params("kueken7_rgba_astc4x4_srgb", gli::FORMAT_RGB8_UNORM_PACK8));

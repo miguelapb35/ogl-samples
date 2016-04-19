@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.8.0: texture2d.hpp File Reference</title>
+<title>0.8.0 API documentation: sampler.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.8.0
+   <div id="projectname">0.8.0 API documentation
    </div>
   </td>
  </tr>
@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
@@ -87,33 +88,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">texture2d.hpp File Reference</div>  </div>
+<div class="title">sampler.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Include to use 2d textures.  
+<p>Include to use wrap modes and the sampler base class.  
 <a href="#details">More...</a></p>
 
 <p><a href="a00052_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00015.html">texture2D</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">2d texture  <a href="a00015.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html">sampler</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Genetic sampler class.  <a href="a00014.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:a00060"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00060.html">gli</a></td></tr>
-<tr class="memdesc:a00060"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
+<tr class="memitem:a00076"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html">gli</a></td></tr>
+<tr class="memdesc:a00076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:aebe62ec9f60e9b393ea9735fbf18ec91"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebe62ec9f60e9b393ea9735fbf18ec91"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#aebe62ec9f60e9b393ea9735fbf18ec91">wrap</a> <tr class="memdesc:aebe62ec9f60e9b393ea9735fbf18ec91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Texture coordinate wrapping mode. <br /></td></tr>
+<tr class="separator:aebe62ec9f60e9b393ea9735fbf18ec91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a9175971af94a83b7fe6667b3c5b276c9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9175971af94a83b7fe6667b3c5b276c9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#a9175971af94a83b7fe6667b3c5b276c9">is_border</a> (wrap Wrap)</td></tr>
+<tr class="memdesc:a9175971af94a83b7fe6667b3c5b276c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate whether the texture coordinate wrapping mode relies on border color. <br /></td></tr>
+<tr class="separator:a9175971af94a83b7fe6667b3c5b276c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Include to use 2d textures. </p>
+<div class="textblock"><p>Include to use wrap modes and the sampler base class. </p>
 
-<p>Definition in file <a class="el" href="a00052_source.html">texture2d.hpp</a>.</p>
+<p>Definition in file <a class="el" href="a00052_source.html">sampler.hpp</a>.</p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

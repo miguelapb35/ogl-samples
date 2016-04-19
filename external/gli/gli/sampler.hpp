@@ -38,7 +38,7 @@ namespace gli
 	protected:
 		typedef float(*wrap_type)(float const & SamplerCoord);
 
-		wrap_type getFunc(wrap WrapMode) const;
+		wrap_type get_func(wrap WrapMode) const;
 
 		wrap_type Wrap;
 		filter Mip;

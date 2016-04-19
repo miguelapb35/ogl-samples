@@ -90,7 +90,7 @@ namespace detail
 		format_type Format,
 		extent_type const& Extent
 	)
-		: Storage(std::make_shared<storage>(Format, Extent, 1, 1, 1))
+		: Storage(std::make_shared<storage_linear>(Format, Extent, 1, 1, 1))
 		, Format(Format)
 		, BaseLevel(0)
 		, Data(Storage->data())
@@ -99,7 +99,7 @@ namespace detail
 
 	inline image::image
 	(
-		std::shared_ptr<storage> Storage,
+		std::shared_ptr<storage_linear> Storage,
 		format_type Format,
 		size_type BaseLayer,
 		size_type BaseFace,
@@ -158,10 +158,10 @@ namespace detail
 	{
 		GLI_ASSERT(!this->empty());
 
-		storage::extent_type const& SrcExtent = this->Storage->extent(this->BaseLevel);
-		storage::extent_type const& DstExtent = SrcExtent * block_extent(this->format()) / this->Storage->block_extent();
+		storage_linear::extent_type const& SrcExtent = this->Storage->extent(this->BaseLevel);
+		storage_linear::extent_type const& DstExtent = SrcExtent * block_extent(this->format()) / this->Storage->block_extent();
 
-		return glm::max(DstExtent, storage::extent_type(1));
+		return glm::max(DstExtent, storage_linear::extent_type(1));
 	}
 
 	inline void* image::data()

@@ -5,14 +5,9 @@
 
 namespace
 {
-	std::string path(const char* filename)
-	{
-		return std::string(SOURCE_DIR) + "/data/" + filename;
-	}
-
 	struct params
 	{
-		params(std::string const & Filename, gli::format Format)
+		params(std::string const& Filename, gli::format Format)
 			: Filename(Filename)
 			, Format(Format)
 		{}

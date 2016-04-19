@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "./core/storage.hpp"
+#include "./core/storage_linear.hpp"
 
 namespace gli
 {
@@ -18,8 +18,8 @@ namespace gli
 	public:
 		typedef size_t size_type;
 		typedef gli::format format_type;
-		typedef storage::extent_type extent_type;
-		typedef storage::data_type data_type;
+		typedef storage_linear::extent_type extent_type;
+		typedef storage_linear::data_type data_type;
 
 		/// Create an empty image instance
 		image();
@@ -29,7 +29,7 @@ namespace gli
 			format_type Format,
 			extent_type const& Extent);
 
-		/// Create an image object by sharing an existing image storage from another image instance.
+		/// Create an image object by sharing an existing image storage_linear from another image instance.
 		/// This image object is effectively an image view where format can be reinterpreted
 		/// with a different compatible image format.
 		/// For formats to be compatible, the block size of source and destination must match.
@@ -37,7 +37,7 @@ namespace gli
 			image const& Image,
 			format_type Format);
 
-		/// Return whether the image instance is empty, no storage or description have been assigned to the instance.
+		/// Return whether the image instance is empty, no storage_linear or description have been assigned to the instance.
 		bool empty() const;
 
 		/// Return the image instance format.
@@ -46,10 +46,10 @@ namespace gli
 		/// Return the dimensions of an image instance: width, height and depth.
 		extent_type extent() const;
 
-		/// Return the memory size of an image instance storage in bytes.
+		/// Return the memory size of an image instance storage_linear in bytes.
 		size_type size() const;
 
-		/// Return the number of blocks contained in an image instance storage.
+		/// Return the number of blocks contained in an image instance storage_linear.
 		/// genType size must match the block size conresponding to the image format. 
 		template <typename genType>
 		size_type size() const;
@@ -68,10 +68,10 @@ namespace gli
 		template <typename genType>
 		genType const* data() const;
 
-		/// Clear the entire image storage with zeros
+		/// Clear the entire image storage_linear with zeros
 		void clear();
 
-		/// Clear the entire image storage with Texel which type must match the image storage format block size
+		/// Clear the entire image storage_linear with Texel which type must match the image storage_linear format block size
 		/// If the type of genType doesn't match the type of the image format, no conversion is performed and the data will be reinterpreted as if is was of the image format. 
 		template <typename genType>
 		void clear(genType const& Texel);
@@ -89,19 +89,19 @@ namespace gli
 		void store(extent_type const& TexelCoord, genType const& Data);
 
 	private:
-		/// Create an image object by sharing an existing image storage from another image instance.
+		/// Create an image object by sharing an existing image storage_linear from another image instance.
 		/// This image object is effectively an image view where the layer, the face and the level allows identifying
-		/// a specific subset of the image storage source. 
+		/// a specific subset of the image storage_linear source. 
 		/// This image object is effectively a image view where the format can be reinterpreted
 		/// with a different compatible image format.
 		explicit image(
-			std::shared_ptr<storage> Storage,
+			std::shared_ptr<storage_linear> Storage,
 			format_type Format,
 			size_type BaseLayer,
 			size_type BaseFace,
 			size_type BaseLevel);
 
-		std::shared_ptr<storage> Storage;
+		std::shared_ptr<storage_linear> Storage;
 		format_type const Format;
 		size_type const BaseLevel;
 		data_type* Data;

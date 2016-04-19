@@ -9,7 +9,7 @@
 namespace gli
 {
 	inline texture1d generate_mipmaps(
-		texture1d const & Texture,
+		texture1d const& Texture,
 		texture1d::size_type BaseLevel, texture1d::size_type MaxLevel,
 		filter Minification)
 	{
@@ -19,7 +19,7 @@ namespace gli
 	}
 
 	inline texture1d_array generate_mipmaps(
-		texture1d_array const & Texture,
+		texture1d_array const& Texture,
 		texture1d_array::size_type BaseLayer, texture1d_array::size_type MaxLayer,
 		texture1d_array::size_type BaseLevel, texture1d_array::size_type MaxLevel,
 		filter Minification)
@@ -30,7 +30,7 @@ namespace gli
 	}
 
 	inline texture2d generate_mipmaps(
-		texture2d const & Texture,
+		texture2d const& Texture,
 		texture2d::size_type BaseLevel, texture2d::size_type MaxLevel,
 		filter Minification)
 	{
@@ -40,7 +40,7 @@ namespace gli
 	}
 
 	inline texture2d_array generate_mipmaps(
-		texture2d_array const & Texture,
+		texture2d_array const& Texture,
 		texture2d_array::size_type BaseLayer, texture2d_array::size_type MaxLayer,
 		texture2d_array::size_type BaseLevel, texture2d_array::size_type MaxLevel,
 		filter Minification)
@@ -51,7 +51,7 @@ namespace gli
 	}
 
 	inline texture3d generate_mipmaps(
-		texture3d const & Texture,
+		texture3d const& Texture,
 		texture3d::size_type BaseLevel, texture3d::size_type MaxLevel,
 		filter Minification)
 	{
@@ -61,7 +61,7 @@ namespace gli
 	}
 
 	inline texture_cube generate_mipmaps(
-		texture_cube const & Texture,
+		texture_cube const& Texture,
 		texture_cube::size_type BaseFace, texture_cube::size_type MaxFace,
 		texture_cube::size_type BaseLevel, texture_cube::size_type MaxLevel,
 		filter Minification)
@@ -72,7 +72,7 @@ namespace gli
 	}
 
 	inline texture_cube_array generate_mipmaps(
-		texture_cube_array const & Texture,
+		texture_cube_array const& Texture,
 		texture_cube_array::size_type BaseLayer, texture_cube_array::size_type MaxLayer,
 		texture_cube_array::size_type BaseFace, texture_cube_array::size_type MaxFace,
 		texture_cube_array::size_type BaseLevel, texture_cube_array::size_type MaxLevel,
@@ -84,43 +84,43 @@ namespace gli
 	}
 
 	template <>
-	inline texture1d generate_mipmaps<texture1d>(texture1d const & Texture, filter Minification)
+	inline texture1d generate_mipmaps<texture1d>(texture1d const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture1d_array generate_mipmaps<texture1d_array>(texture1d_array const & Texture, filter Minification)
+	inline texture1d_array generate_mipmaps<texture1d_array>(texture1d_array const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_layer(), Texture.max_layer(), Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture2d generate_mipmaps<texture2d>(texture2d const & Texture, filter Minification)
+	inline texture2d generate_mipmaps<texture2d>(texture2d const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture2d_array generate_mipmaps<texture2d_array>(texture2d_array const & Texture, filter Minification)
+	inline texture2d_array generate_mipmaps<texture2d_array>(texture2d_array const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_layer(), Texture.max_layer(), Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture3d generate_mipmaps<texture3d>(texture3d const & Texture, filter Minification)
+	inline texture3d generate_mipmaps<texture3d>(texture3d const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture_cube generate_mipmaps<texture_cube>(texture_cube const & Texture, filter Minification)
+	inline texture_cube generate_mipmaps<texture_cube>(texture_cube const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_face(), Texture.max_face(), Texture.base_level(), Texture.max_level(), Minification);
 	}
 
 	template <>
-	inline texture_cube_array generate_mipmaps<texture_cube_array>(texture_cube_array const & Texture, filter Minification)
+	inline texture_cube_array generate_mipmaps<texture_cube_array>(texture_cube_array const& Texture, filter Minification)
 	{
 		return generate_mipmaps(Texture, Texture.base_layer(), Texture.max_layer(), Texture.base_face(), Texture.max_face(), Texture.base_level(), Texture.max_level(), Minification);
 	}

@@ -33,7 +33,7 @@ namespace gli
 		texture_type const& operator()() const;
 
 		/// Fetch a texel from the sampler texture
-		texel_type texel_fetch(extent_type const& TexelCoord, size_type const & Level) const;
+		texel_type texel_fetch(extent_type const& TexelCoord, size_type const& Level) const;
 
 		/// Write a texel in the sampler texture
 		void texel_write(extent_type const& TexelCoord, size_type const& Level, texel_type const& Texel);

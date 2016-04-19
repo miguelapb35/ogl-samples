@@ -1,4 +1,9 @@
-#include <gli/gli.hpp>
+#include <gli/texture1d.hpp>
+#include <gli/texture2d.hpp>
+#include <gli/texture3d.hpp>
+#include <gli/clear.hpp>
+#include <gli/comparison.hpp>
+#include <gli/duplicate.hpp>
 #include <ctime>
 
 namespace clear
@@ -89,11 +94,11 @@ namespace clear
 		ColorRGBA32F.push_back(glm::vec4(1.0,   0, 1.0, 1.0));
 
 		std::vector<int> Sizes;
+		Sizes.push_back(12);
 		Sizes.push_back(32);
 		Sizes.push_back(16);
 		Sizes.push_back(17);
 		Sizes.push_back(15);
-		Sizes.push_back(12);
 		Sizes.push_back(5);
 
 		int Error(0);
@@ -121,10 +126,80 @@ namespace clear
 	}
 }//namespace clear
 
+namespace can_clear_level
+{
+	int test()
+	{
+		int Error = 0;
+
+		{
+			gli::texture2d TextureMember(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(4), 1);
+			TextureMember.clear(glm::u8vec4(255, 127, 0, 255));
+
+			gli::texture2d TextureExternal(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(4), 1);
+			gli::clear(TextureExternal, glm::u8vec4(255, 127, 0, 255));
+
+			Error += TextureMember == TextureExternal ? 0 : 1;
+		}
+
+		{
+			gli::texture2d TextureMember(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(4));
+			TextureMember.clear(glm::u8vec4(127, 95, 63, 255));
+			TextureMember.clear(0, 0, 1, glm::u8vec4(255, 127, 0, 255));
+
+			Error += *TextureMember.data<glm::u8vec4>(0, 0, 0) == glm::u8vec4(127, 95, 63, 255) ? 0 : 1;
+			Error += *TextureMember.data<glm::u8vec4>(0, 0, 1) == glm::u8vec4(255, 127, 0, 255) ? 0 : 1;
+			Error += *TextureMember.data<glm::u8vec4>(0, 0, 2) == glm::u8vec4(127, 95, 63, 255) ? 0 : 1;
+
+			gli::texture2d TextureExternal(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(4));
+			gli::clear(TextureExternal, glm::u8vec4(127, 95, 63, 255));
+			gli::clear(TextureExternal, 0, 0, 1, glm::u8vec4(255, 127, 0, 255));
+
+			Error += *TextureExternal.data<glm::u8vec4>(0, 0, 0) == glm::u8vec4(127, 95, 63, 255) ? 0 : 1;
+			Error += *TextureExternal.data<glm::u8vec4>(0, 0, 1) == glm::u8vec4(255, 127, 0, 255) ? 0 : 1;
+			Error += *TextureExternal.data<glm::u8vec4>(0, 0, 2) == glm::u8vec4(127, 95, 63, 255) ? 0 : 1;
+
+			Error += TextureMember == TextureExternal ? 0 : 1;
+
+		}
+
+		return Error;
+	}
+}//namespace can_clear_level
+
+namespace can_clear_layer
+{
+	int test()
+	{
+		int Error = 0;
+
+		{
+			gli::texture2d_array TextureMember(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d_array::extent_type(2), 2, 1);
+			TextureMember.clear(0, 0, 0, glm::u8vec4(255, 127, 0, 255));
+			TextureMember.clear(1, 0, 0, glm::u8vec4(255, 127, 0, 255));
+
+			gli::texture2d_array TextureExternalA(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d_array::extent_type(2), 2, 1);
+			clear_layer(TextureExternalA, 0, TextureExternalA.layers(), glm::u8vec4(255, 127, 0, 255));
+			
+			Error += TextureMember == TextureExternalA ? 0 : 1;
+
+			gli::texture2d_array TextureExternalB(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d_array::extent_type(2), 2, 1);
+			clear_layer(TextureExternalB, 0, glm::u8vec4(255, 127, 0, 255));
+			clear_layer(TextureExternalB, 1, glm::u8vec4(255, 127, 0, 255));
+
+			Error += TextureMember == TextureExternalB ? 0 : 1;
+		}
+
+		return Error;
+	}
+}//namespace can_clear_layer
+
 int main()
 {
 	int Error(0);
 
+	Error += can_clear_layer::test();
+	Error += can_clear_level::test();
 	Error += clear::test();
 
 	return Error;

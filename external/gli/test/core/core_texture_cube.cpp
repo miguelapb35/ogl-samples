@@ -608,14 +608,12 @@ namespace clear
 
 		glm::u8vec4 const TexelA = Texture.load<glm::u8vec4>(gli::texture_cube::extent_type(0), 0, 0);
 		glm::u8vec4 const TexelB = Texture.load<glm::u8vec4>(gli::texture_cube::extent_type(0), 0, 1);
-		glm::u8vec4 const TexelC = Texture.load<glm::u8vec4>(gli::texture_cube::extent_type(0), 0, 2);
 
 		Error += TexelA == Black ? 0 : 1;
 		Error += TexelB == Black ? 0 : 1;
-		Error += TexelC == Black ? 0 : 1;
 
 		for(gli::texture_cube::size_type FaceIndex = 0, FaceCount = Texture.faces(); FaceIndex < FaceCount; ++FaceIndex)
-			Texture.clear<glm::u8vec4>(FaceIndex, 1, Color);
+			Texture.clear<glm::u8vec4>(0, FaceIndex, 1, Color);
 
 		gli::texture_cube::extent_type Coords(0);
 		for(; Coords.y < Texture.extent(1).y; ++Coords.y)

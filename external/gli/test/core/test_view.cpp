@@ -607,14 +607,14 @@ namespace format
 		{
 			gli::texture2d TextureA(gli::FORMAT_RG32_UINT_PACK32, gli::texture2d::extent_type(4));
 			gli::texture2d TextureB(gli::view(TextureA, gli::FORMAT_RG32_UINT_PACK32));
-			gli::texture2d TextureC(gli::view(TextureA, gli::FORMAT_R32_UINT_PACK32));
-			gli::texture2d TextureD(gli::view(TextureA, gli::FORMAT_RGB32_UINT_PACK32));
-			gli::texture2d TextureE(gli::view(TextureA, gli::FORMAT_RGBA32_UINT_PACK32));
+			gli::texture2d TextureC(gli::view(TextureA, gli::FORMAT_RGBA16_UINT_PACK16));
 
 			Error += TextureA == TextureB ? 0 : 1;
-			Error += TextureC.empty() ? 0 : 1;
-			Error += TextureD.empty() ? 0 : 1;
-			Error += TextureE.empty() ? 0 : 1;
+			Error += !TextureC.empty() ? 0 : 1;
+			Error += TextureC.size() == TextureA.size() ? 0 : 1;
+			Error += TextureC.extent() == TextureA.extent() ? 0 : 1;
+			Error += TextureC.base_level() == TextureA.base_level() ? 0 : 1;
+			Error += TextureC.max_level() == TextureA.max_level() ? 0 : 1;
 		}
 
 		return Error;

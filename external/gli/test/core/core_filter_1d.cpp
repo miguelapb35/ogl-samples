@@ -60,11 +60,36 @@ namespace filter1d
 			gli::vec4 const TexelA = Sampler.texture_lod(gli::fsampler1D::normalized_type(0.5f), 0.0f);
 			Error += gli::all(gli::epsilonEqual(TexelA, ColorFill, 0.01f)) ? 0 : 1;
 
-			gli::vec4 const TexelB = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.5f), 0.0f);
-			Error += gli::all(gli::epsilonEqual(TexelB, ColorBorder, 0.01f)) ? 0 : 1;
+			gli::vec4 const TexelB = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.4f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelB, ColorFill, 0.01f)) ? 0 : 1;
 
-			gli::vec4 const TexelC = Sampler.texture_lod(gli::fsampler1D::normalized_type(1.5f), 0.0f);
+			gli::vec4 const TexelC = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.5f), 0.0f);
 			Error += gli::all(gli::epsilonEqual(TexelC, ColorBorder, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelD = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.6f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelD, ColorBorder, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelE = Sampler.texture_lod(gli::fsampler1D::normalized_type(1.5f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelE, ColorBorder, 0.01f)) ? 0 : 1;
+		}
+
+		{
+			gli::fsampler1D Sampler(Texture, gli::WRAP_MIRROR_REPEAT, gli::FILTER_NEAREST, gli::FILTER_NEAREST, ColorBorder);
+
+			gli::vec4 const TexelA = Sampler.texture_lod(gli::fsampler1D::normalized_type(0.5f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelA, ColorFill, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelB = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.4f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelB, ColorFill, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelC = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.5f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelC, ColorFill, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelD = Sampler.texture_lod(gli::fsampler1D::normalized_type(-0.6f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelD, ColorFill, 0.01f)) ? 0 : 1;
+
+			gli::vec4 const TexelE = Sampler.texture_lod(gli::fsampler1D::normalized_type(1.5f), 0.0f);
+			Error += gli::all(gli::epsilonEqual(TexelE, ColorFill, 0.01f)) ? 0 : 1;
 		}
 
 		return Error;

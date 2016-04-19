@@ -29,6 +29,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-3d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-3d.frag");
+	char const * TEXTURE_DIFFUSE("3dTexture.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -103,6 +104,53 @@ private:
 
 	bool initTexture()
 	{
+		gli::gl GL(gli::gl::PROFILE_GL32);
+
+		gli::texture3d Texture(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
+		assert(!Texture.empty());
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+
+		glActiveTexture(GL_TEXTURE0);
+		glGenTextures(1, &TextureName);
+		glBindTexture(GL_TEXTURE_3D, TextureName);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_LOD, -1000.f);
+		glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAX_LOD, 1000.f);
+		glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+
+		for(gli::texture3d::size_type Level = 0; Level < Texture.levels(); ++Level)
+		{
+			gli::texture3d::extent_type const Extent = Texture[Level].extent();
+			glTexImage3D(GL_TEXTURE_3D, static_cast<GLint>(Level),
+				GL_R8,
+				static_cast<GLsizei>(Extent.x), static_cast<GLsizei>(Extent.y), static_cast<GLsizei>(Extent.z),
+				0,
+				GL_RED, Format.Type,
+				Texture[Level].data());
+		}
+
+		if(Texture.levels() == 1)
+			glGenerateMipmap(GL_TEXTURE_3D);
+	
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+		return true;
+	}
+/*
+	bool initTexture()
+	{
 		std::size_t const Size(32);
 
 		std::vector<float> Data(Size * Size * Size);
@@ -141,7 +189,7 @@ private:
 
 		return this->checkError("initTexture");
 	}
-
+*/
 	bool initVertexArray()
 	{
 		glGenVertexArrays(1, &VertexArrayName);

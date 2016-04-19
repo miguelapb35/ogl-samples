@@ -67,6 +67,47 @@ namespace
 			MAX
 		};
 	}//namespace buffer
+
+	static char const* GetCounterTypeString(GLenum counterType)
+	{
+		switch(counterType)
+		{
+		case GL_PERFQUERY_COUNTER_EVENT_INTEL:
+			return "EVENT";
+		case GL_PERFQUERY_COUNTER_DURATION_NORM_INTEL:
+			return "DURATION_NORM";
+		case GL_PERFQUERY_COUNTER_DURATION_RAW_INTEL:
+			return "DURATION_RAW";
+		case GL_PERFQUERY_COUNTER_THROUGHPUT_INTEL:
+			return "THROUGHPUT";
+		case GL_PERFQUERY_COUNTER_RAW_INTEL:
+			return "RAW";
+		case GL_PERFQUERY_COUNTER_TIMESTAMP_INTEL:
+			return "TIMESTAMP";
+		default:
+			return "UNKNOWN";
+		}
+	}
+
+	static char const* GetCounterDataTypeString(GLenum counterDataType)
+	{
+		switch(counterDataType)
+		{
+		case GL_PERFQUERY_COUNTER_DATA_UINT32_INTEL:
+			return "UINT32";
+		case GL_PERFQUERY_COUNTER_DATA_UINT64_INTEL:
+			return "UINT64";
+		case GL_PERFQUERY_COUNTER_DATA_FLOAT_INTEL:
+			return "FLOAT";
+		case GL_PERFQUERY_COUNTER_DATA_DOUBLE_INTEL:
+			return "DOUBLE";
+		case GL_PERFQUERY_COUNTER_DATA_BOOL32_INTEL:
+			return "BOOL32";
+		default:
+			return "UNKNOWN";
+		}
+	}
+
 }//namespace
 
 class gl_430_perf_query : public test
@@ -88,58 +129,77 @@ private:
 
 	bool initPerf()
 	{
-		const GLuint queryNameLen = 256;
+		GLint QueryNameMaxLength = 0;
+		glGetIntegerv(GL_PERFQUERY_QUERY_NAME_LENGTH_MAX_INTEL, &QueryNameMaxLength);
+		GLint CounterNameMaxLength = 0;
+		glGetIntegerv(GL_PERFQUERY_COUNTER_NAME_LENGTH_MAX_INTEL, &CounterNameMaxLength);
+		GLint CounterDescMaxLength = 0;
+		glGetIntegerv(GL_PERFQUERY_COUNTER_DESC_LENGTH_MAX_INTEL, &CounterDescMaxLength);
+
+		const GLuint queryNameLen = 1024;
 		GLchar queryName[queryNameLen];
-		memset(queryName, 0, sizeof(queryName));
 
-		const GLuint counterNameLen = 256;
+		const GLuint counterNameLen = 1024;
 		GLchar counterName[counterNameLen];
-		memset(counterName, 0, sizeof(counterName));
 
-		const GLuint counterDescLen = 2048;
+		const GLuint counterDescLen = 4096;
 		GLchar counterDesc[counterDescLen];
-		memset(counterDesc, 0, sizeof(counterDesc));
 
 		GLuint queryId;
 		glGetFirstPerfQueryIdINTEL(&queryId);
 
-		GLuint nextQueryId = queryId;
-		//while(nextQueryId)
+		while(queryId)
+		{
 			GLuint dataSize = 0;
 			GLuint noCounters = 0;
 			GLuint noInstances = 0;
-			GLuint capsMask = GL_PERFQUERY_GLOBAL_CONTEXT_INTEL;
- 
+			GLuint capsMask = 0;
+
+			memset(queryName, 0, sizeof(queryName));
+
 			glGetPerfQueryInfoINTEL(
-				nextQueryId,
-				queryNameLen,
+				queryId,
+				QueryNameMaxLength,
 				queryName,
 				&dataSize,
 				&noCounters,
 				&noInstances,
 				&capsMask);
 
-			for(int counterId = 1; counterId <= noCounters; counterId++)
+			printf("%d - %s (%s)/ output size: %d, counters: %d, instances: %d\n", queryId, queryName, capsMask & GL_PERFQUERY_GLOBAL_CONTEXT_INTEL ? "global" : "local", dataSize, noCounters, noInstances);
+
+			glGetNextPerfQueryIdINTEL(queryId, &queryId);
+
+			for(GLuint counterId = 1; counterId <= noCounters; counterId++)
 			{
-				GLuint counterOffset;
-				GLuint counterDataSize;
-				GLuint counterTypeEnum;
-				GLuint counterDataTypeEnum;
-				GLuint64 rawCounterMaxValue;
+				GLuint counterOffset = 0;
+				GLuint counterDataSize = 0;
+				GLuint counterTypeEnum = 0;
+				GLuint counterDataTypeEnum = 0;
+				GLuint64 rawCounterMaxValue = 0;
+
+				memset(counterName, 0, sizeof(counterName));
+				memset(counterDesc, 0, sizeof(counterDesc));
 
 				glGetPerfCounterInfoINTEL(
-					nextQueryId,
+					queryId,
 					counterId,
-					counterNameLen,
+					CounterNameMaxLength,
 					counterName,
-					counterDescLen,
+					CounterDescMaxLength,
 					counterDesc,
 					&counterOffset,
 					&counterDataSize,
 					&counterTypeEnum,
 					&counterDataTypeEnum,
 					&rawCounterMaxValue);
+
+				printf("- %d - %s output: %s - %s - %d, max counter values: %lld\n", counterId, counterName, GetCounterTypeString(counterTypeEnum), GetCounterDataTypeString(counterDataTypeEnum), dataSize, rawCounterMaxValue);
+				printf("\t%s\n", counterDesc);
+
+				continue;
 			}
+		}
 
 		return true;
 	}

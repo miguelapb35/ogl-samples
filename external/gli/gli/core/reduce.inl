@@ -11,12 +11,12 @@ namespace gli
 	template <typename val_type>
 	struct binary_func
 	{
-		typedef tvec4<val_type>(*type)(tvec4<val_type> const & A, tvec4<val_type> const & B);
+		typedef tvec4<val_type>(*type)(tvec4<val_type> const& A, tvec4<val_type> const& B);
 	};
 
 namespace detail
 {
-	inline bool are_compatible(texture const & A, texture const & B)
+	inline bool are_compatible(texture const& A, texture const& B)
 	{
 		return all(equal(A.extent(), B.extent())) && A.levels() == B.levels() && A.faces() == B.faces() && A.layers() == B.layers();
 	}
@@ -28,7 +28,7 @@ namespace detail
 		typedef texture1d::size_type size_type;
 		typedef texture1d::extent_type extent_type;
 
-		static tvec4<val_type> call(texture1d const & A, texture1d const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture1d const& A, texture1d const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
@@ -58,7 +58,7 @@ namespace detail
 		typedef texture1d_array::size_type size_type;
 		typedef texture1d_array::extent_type extent_type;
 
-		static tvec4<val_type> call(texture1d_array const & A, texture1d_array const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture1d_array const& A, texture1d_array const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
@@ -89,7 +89,7 @@ namespace detail
 		typedef texture2d::size_type size_type;
 		typedef texture2d::extent_type extent_type;
 
-		static tvec4<val_type> call(texture2d const & A, texture2d const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture2d const& A, texture2d const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
@@ -120,7 +120,7 @@ namespace detail
 		typedef texture2d_array::size_type size_type;
 		typedef texture2d_array::extent_type extent_type;
 
-		static tvec4<val_type> call(texture2d_array const & A, texture2d_array const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture2d_array const& A, texture2d_array const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
@@ -152,7 +152,7 @@ namespace detail
 		typedef texture3d::size_type size_type;
 		typedef texture3d::extent_type extent_type;
 
-		static tvec4<val_type> call(texture3d const & A, texture3d const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture3d const& A, texture3d const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
@@ -184,11 +184,11 @@ namespace detail
 		typedef texture_cube::size_type size_type;
 		typedef texture_cube::extent_type extent_type;
 
-		static tvec4<val_type> call(texture_cube const& A, texture_cube const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture_cube const& A, texture_cube const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
-			samplerCube<val_type> const SamplerA(A, gli::WRAP_CLAMP_TO_EDGE), SamplerB(B, gli::WRAP_CLAMP_TO_EDGE);
+			sampler_cube<val_type> const SamplerA(A, gli::WRAP_CLAMP_TO_EDGE), SamplerB(B, gli::WRAP_CLAMP_TO_EDGE);
 			extent_type TexelIndex(0);
 			tvec4<val_type> Result(TexelFunc(SamplerA.template fetch(TexelIndex, 0, 0), SamplerB.template fetch(TexelIndex, 0, 0)));
 
@@ -216,11 +216,11 @@ namespace detail
 		typedef texture_cube_array::size_type size_type;
 		typedef texture_cube_array::extent_type extent_type;
 
-		static tvec4<val_type> call(texture_cube_array const & A, texture_cube_array const & B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
+		static tvec4<val_type> call(texture_cube_array const& A, texture_cube_array const& B, binary_func<val_type> TexelFunc, binary_func<val_type> ReduceFunc)
 		{
 			GLI_ASSERT(are_compatible(A, B));
 
-			samplerCubeArray<val_type> const SamplerA(A, gli::WRAP_CLAMP_TO_EDGE), SamplerB(B, gli::WRAP_CLAMP_TO_EDGE);
+			sampler_cube_array<val_type> const SamplerA(A, gli::WRAP_CLAMP_TO_EDGE), SamplerB(B, gli::WRAP_CLAMP_TO_EDGE);
 			extent_type TexelIndex(0);
 			tvec4<val_type> Result(TexelFunc(SamplerA.template fetch(TexelIndex, 0, 0, 0), SamplerB.template fetch(TexelIndex, 0, 0, 0)));
 
@@ -252,7 +252,7 @@ namespace detail
 		typedef texture1d::size_type size_type;
 		typedef texture1d::extent_type extent_type;
 		
-		static vec_type call(texture1d const & A, texture1d const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture1d const& A, texture1d const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -285,7 +285,7 @@ namespace detail
 		typedef texture1d_array::size_type size_type;
 		typedef texture1d_array::extent_type extent_type;
 		
-		static vec_type call(texture1d_array const & A, texture1d_array const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture1d_array const& A, texture1d_array const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -319,7 +319,7 @@ namespace detail
 		typedef texture2d::size_type size_type;
 		typedef texture2d::extent_type extent_type;
 		
-		static vec_type call(texture2d const & A, texture2d const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture2d const& A, texture2d const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -353,7 +353,7 @@ namespace detail
 		typedef texture2d_array::size_type size_type;
 		typedef texture2d_array::extent_type extent_type;
 		
-		static vec_type call(texture2d_array const & A, texture2d_array const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture2d_array const& A, texture2d_array const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -388,7 +388,7 @@ namespace detail
 		typedef texture3d::size_type size_type;
 		typedef texture3d::extent_type extent_type;
 		
-		static vec_type call(texture3d const & A, texture3d const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture3d const& A, texture3d const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -423,7 +423,7 @@ namespace detail
 		typedef texture_cube::size_type size_type;
 		typedef texture_cube::extent_type extent_type;
 		
-		static vec_type call(texture_cube const & A, texture_cube const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture_cube const& A, texture_cube const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -458,7 +458,7 @@ namespace detail
 		typedef texture_cube_array::size_type size_type;
 		typedef texture_cube_array::extent_type extent_type;
 		
-		static vec_type call(texture_cube_array const & A, texture_cube_array const & B, func_type TexelFunc, func_type ReduceFunc)
+		static vec_type call(texture_cube_array const& A, texture_cube_array const& B, func_type TexelFunc, func_type ReduceFunc)
 		{
 			GLI_ASSERT(all(equal(A.extent(), B.extent())));
 			GLI_ASSERT(A.levels() == B.levels());
@@ -489,43 +489,43 @@ namespace detail
 }//namepsace detail
 
 template <typename vec_type>
-inline vec_type reduce(texture1d const & In0, texture1d const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture1d const& In0, texture1d const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_1d<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture1d_array const & In0, texture1d_array const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture1d_array const& In0, texture1d_array const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_1d_array<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture2d const & In0, texture2d const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture2d const& In0, texture2d const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_2d<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture2d_array const & In0, texture2d_array const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture2d_array const& In0, texture2d_array const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_2d_array<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture3d const & In0, texture3d const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture3d const& In0, texture3d const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_3d<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture_cube const & In0, texture_cube const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture_cube const& In0, texture_cube const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_cube<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }
 
 template <typename vec_type>
-inline vec_type reduce(texture_cube_array const & In0, texture_cube_array const & In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
+inline vec_type reduce(texture_cube_array const& In0, texture_cube_array const& In1, typename reduce_func<vec_type>::type TexelFunc, typename reduce_func<vec_type>::type ReduceFunc)
 {
 	return detail::compute_reduce_cube_array<vec_type>::call(In0, In1, TexelFunc, ReduceFunc);
 }

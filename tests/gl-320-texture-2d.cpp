@@ -27,7 +27,7 @@ namespace
 {
 	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
 	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const * TEXTURE_DIFFUSE("gli_bad_BGR_and_swizzle.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -318,23 +318,25 @@ private:
 
 	bool initTexture()
 	{
-		gli::gl GL(gli::gl::PROFILE_GL32);
+		gli::gl GL(gli::gl::PROFILE_GL33);
 
-		gli::texture2d TextureLoaded(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
-		assert(!TextureLoaded.empty());
-/*
-		gli::texture2d TextureLoaded(gli::FORMAT_RGB8_SRGB_PACK8, gli::texture2d::extent_type(256), 1);
-		for(int TexelCoordY = 0; TexelCoordY < TextureLoaded.extent().y; ++TexelCoordY)
-		for(int TexelCoordX = 0; TexelCoordX < TextureLoaded.extent().x; ++TexelCoordX)
-		{
-			TextureLoaded.store(gli::texture2d::extent_type(TexelCoordX, TexelCoordY), 0, glm::u8vec3(TexelCoordX, TexelCoordY, TexelCoordY));
-		}
-*/
-		gli::fsampler2D Sampler(TextureLoaded, gli::WRAP_CLAMP_TO_EDGE);
-		Sampler.generate_mipmaps(gli::FILTER_LINEAR);
+		gli::texture TextureLoad(gli::load((getDataDirectory() + TEXTURE_DIFFUSE)));
+		assert(!TextureLoad.empty());
+
+		gli::texture2d Texture(TextureLoad);
+
+		//gli::texture2d TextureLoaded(gli::FORMAT_RGB8_SRGB_PACK8, gli::texture2d::extent_type(256), 1);
+		//for(int TexelCoordY = 0; TexelCoordY < TextureLoaded.extent().y; ++TexelCoordY)
+		//for(int TexelCoordX = 0; TexelCoordX < TextureLoaded.extent().x; ++TexelCoordX)
+		//{
+		//	TextureLoaded.store(gli::texture2d::extent_type(TexelCoordX, TexelCoordY), 0, glm::u8vec3(TexelCoordX, TexelCoordY, TexelCoordY));
+		//}
+
+		//gli::fsampler2D Sampler(TextureLoaded, gli::WRAP_CLAMP_TO_EDGE);
+		//Sampler.generate_mipmaps(gli::FILTER_LINEAR);
 		//Sampler.clear(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
-		gli::texture2d Texture = Sampler();
+		//gli::texture2d Texture = Sampler();
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -360,9 +362,10 @@ private:
 
 		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
+			gli::texture2d::extent_type const Extent = Texture[Level].extent();
 			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
 				Format.Internal,
-				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y),
+				static_cast<GLsizei>(Extent.x), static_cast<GLsizei>(Extent.y),
 				0,
 				Format.External, Format.Type,
 				Texture[Level].data());
@@ -426,7 +429,8 @@ private:
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glm::mat4* Pointer = static_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+			//glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+			glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
 		
 			*Pointer = Projection * this->view() * Model;

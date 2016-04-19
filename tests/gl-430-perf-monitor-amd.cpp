@@ -116,6 +116,8 @@ namespace
 				memset(GroupName, 0, sizeof(GroupName));
 				glGetPerfMonitorGroupStringAMD(Groups[GroupIndex], GROUP_NAME_SIZE, NULL, GroupName);
 
+				printf("%s: ", GroupName);
+
 				GLint NumCounters(0);
 				GLint MaxActiveCounters(0);
 				glGetPerfMonitorCountersAMD(Groups[GroupIndex], &NumCounters, &MaxActiveCounters, 0, NULL);
@@ -129,7 +131,12 @@ namespace
 					memset(CounterName, 0, sizeof(CounterName));
 
 					glGetPerfMonitorCounterStringAMD(Groups[GroupIndex], Counters[CounterIndex], GROUP_NAME_SIZE, NULL, CounterName);
+					//printf("%s ", CounterName);
+
+					continue;
 				}
+
+				printf("\n");
 
 				std::string GroupString;
 				for (std::size_t i = 0; i < sizeof(GroupName); ++i)

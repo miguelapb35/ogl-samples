@@ -689,7 +689,7 @@ namespace clear
 		Error += TexelB == Black ? 0 : 1;
 		Error += TexelC == Black ? 0 : 1;
 
-		Texture.clear<glm::u8vec4>(0, 1, glm::u8vec4(255, 127, 0, 255));
+		Texture.clear<glm::u8vec4>(0, 0, 1, glm::u8vec4(255, 127, 0, 255));
 
 		gli::texture2d::extent_type Coords(0);
 		for(; Coords.y < Texture.extent(1).y; ++Coords.y)

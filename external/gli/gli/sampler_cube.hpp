@@ -14,7 +14,7 @@ namespace gli
 	/// @tparam T Sampler can fetch, write and interpret any texture format but will expose and process the data through type T conversions.
 	/// @tparam P Precision in term of ULPs
 	template <typename T, precision P = defaultp>
-	class samplerCube : public sampler
+	class sampler_cube : public sampler
 	{
 	private:
 		typedef typename detail::interpolate<T>::type interpolate_type;
@@ -27,7 +27,7 @@ namespace gli
 		typedef tvec2<interpolate_type, P> normalized_type;
 		typedef tvec4<T, P> texel_type;
 
-		samplerCube(texture_type const& Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const& BorderColor = texel_type(0, 0, 0, 1));
+		sampler_cube(texture_type const& Texture, wrap Wrap, filter Mip = FILTER_NEAREST, filter Min = FILTER_NEAREST, texel_type const& BorderColor = texel_type(0, 0, 0, 1));
 
 		/// Access the sampler texture object
 		texture_type const& operator()() const;
@@ -62,10 +62,10 @@ namespace gli
 		filter_type Filter;
 	};
 
-	typedef samplerCube<float> fsamplerCube;
-	typedef samplerCube<double> dsamplerCube;
-	typedef samplerCube<unsigned int> usamplerCube;
-	typedef samplerCube<int> isamplerCube;
+	typedef sampler_cube<float> fsamplerCube;
+	typedef sampler_cube<double> dsamplerCube;
+	typedef sampler_cube<unsigned int> usamplerCube;
+	typedef sampler_cube<int> isamplerCube;
 
 }//namespace gli
 

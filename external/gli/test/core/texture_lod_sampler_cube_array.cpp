@@ -79,17 +79,17 @@ namespace sampler_type
 
 		{
 			gli::texture_cube_array Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube_array::extent_type(4), 1, 1);
-			gli::samplerCubeArray<float> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
+			gli::sampler_cube_array<float> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
 		}
 
 		{
 			gli::texture_cube_array Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube_array::extent_type(4), 1, 1);
-			gli::samplerCubeArray<double> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
+			gli::sampler_cube_array<double> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_LINEAR, gli::FILTER_LINEAR);
 		}
 
 		{
 			gli::texture_cube_array Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture_cube_array::extent_type(4), 1, 1);
-			gli::samplerCubeArray<int> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_NEAREST, gli::FILTER_NEAREST);
+			gli::sampler_cube_array<int> Sampler(Texture, gli::WRAP_CLAMP_TO_EDGE, gli::FILTER_NEAREST, gli::FILTER_NEAREST);
 		}
 
 		return Error;

@@ -1,24 +1,24 @@
 namespace gli
 {
-	inline image view(image const & Image)
+	inline image view(image const& Image)
 	{
 		return Image;
 	}
 
-	inline texture view(texture const & Texture)
+	inline texture view(texture const& Texture)
 	{
 		return Texture;
 	}
 
 	template <typename texType>
-	inline texture view(texType const & Texture)
+	inline texture view(texType const& Texture)
 	{
 		return Texture;
 	}
 
 	inline texture view
 	(
-		texture const & Texture,
+		texture const& Texture,
 		texture::size_type BaseLayer, texture::size_type MaxLayer,
 		texture::size_type BaseFace, texture::size_type MaxFace,
 		texture::size_type BaseLevel, texture::size_type MaxLevel
@@ -37,17 +37,17 @@ namespace gli
 	}
 
 	template <typename texType>
-	inline texture view(texType const & Texture, format Format)
+	inline texture view(texType const& Texture, format Format)
 	{
-		if(block_size(Texture.format()) != block_size(Format))
-			return texture();
+		GLI_ASSERT(!Texture.empty());
+		GLI_ASSERT(block_size(Texture.format()) == block_size(Format));
 
 		return texture(Texture, Texture.target(), Format);
 	}
 
 	inline texture view
 	(
-		texture1d const & Texture,
+		texture1d const& Texture,
 		texture1d::size_type BaseLevel, texture1d::size_type MaxLevel
 	)
 	{

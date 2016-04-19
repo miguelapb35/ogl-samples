@@ -5,7 +5,7 @@
 
 namespace gli
 {
-	/// Texture target: type/shape of the texture storage
+	/// Texture target: type/shape of the texture storage_linear
 	enum target
 	{
 		TARGET_1D = 0, TARGET_FIRST = TARGET_1D,
