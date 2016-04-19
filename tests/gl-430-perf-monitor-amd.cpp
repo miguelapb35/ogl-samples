@@ -212,28 +212,28 @@ namespace
 					case GL_UNSIGNED_INT64_AMD:
 					{
 						glm::uint64 * counterResult = reinterpret_cast<glm::uint64*>(&Result[wordCount + 2]);
-						printf("%s(%d): %ld\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
+						printf("\r%s(%d): %lld", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 4;
 						break;
 					}
 					case GL_FLOAT:
 					{
 						float * counterResult = reinterpret_cast<float*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
+						printf("\r%s(%d): %f", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}
 					case GL_UNSIGNED_INT:
 					{
 						glm::uint32 * counterResult = reinterpret_cast<glm::uint32*>(&Result[wordCount + 2]);
-						printf("%s(%d): %d\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
+						printf("\r%s(%d): %d", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}
 					case GL_PERCENTAGE_AMD:
 					{
 						float * counterResult = reinterpret_cast<float*>(&Result[wordCount + 2]);
-						printf("%s(%d): %f\n", GroupIt->second.Name.c_str(), CounterId, *counterResult);
+						printf("\r%s(%d): %f", GroupIt->second.Name.c_str(), CounterId, *counterResult);
 						wordCount += 3;
 						break;
 					}
@@ -276,8 +276,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TEXTURE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_TEXTURE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::TEXTURE] = glCreateProgram();
@@ -295,8 +295,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_SPLASH, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_SPLASH, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName[pipeline::SPLASH] = glCreateProgram();
@@ -432,7 +432,7 @@ private:
 		if(Validated)
 		{
 			this->Monitor.reset(new monitor());
-			this->Monitor->record("CP", 1);
+			this->Monitor->record("VGT", 1);
 		}
 
 		if(Validated)
