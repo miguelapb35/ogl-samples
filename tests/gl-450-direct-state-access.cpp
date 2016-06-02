@@ -550,6 +550,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
+		glBindSamplers(0, 1, &SamplerName);
 		glBindTextureUnit(0, TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 
