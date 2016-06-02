@@ -1,14 +1,15 @@
 var searchData=
 [
-  ['target_2ehpp',['target.hpp',['../a00064.html',1,'']]],
-  ['texture_2ehpp',['texture.hpp',['../a00065.html',1,'']]],
-  ['texture1d_2ehpp',['texture1d.hpp',['../a00066.html',1,'']]],
-  ['texture1d_5farray_2ehpp',['texture1d_array.hpp',['../a00067.html',1,'']]],
-  ['texture2d_2ehpp',['texture2d.hpp',['../a00068.html',1,'']]],
-  ['texture2d_5farray_2ehpp',['texture2d_array.hpp',['../a00069.html',1,'']]],
-  ['texture3d_2ehpp',['texture3d.hpp',['../a00070.html',1,'']]],
-  ['texture_5fcube_2ehpp',['texture_cube.hpp',['../a00071.html',1,'']]],
-  ['texture_5fcube_5farray_2ehpp',['texture_cube_array.hpp',['../a00072.html',1,'']]],
-  ['transform_2ehpp',['transform.hpp',['../a00073.html',1,'']]],
-  ['type_2ehpp',['type.hpp',['../a00074.html',1,'']]]
+  ['sampler_2ehpp',['sampler.hpp',['../a00054.html',1,'']]],
+  ['sampler1d_2ehpp',['sampler1d.hpp',['../a00055.html',1,'']]],
+  ['sampler1d_5farray_2ehpp',['sampler1d_array.hpp',['../a00056.html',1,'']]],
+  ['sampler2d_2ehpp',['sampler2d.hpp',['../a00057.html',1,'']]],
+  ['sampler2d_5farray_2ehpp',['sampler2d_array.hpp',['../a00058.html',1,'']]],
+  ['sampler3d_2ehpp',['sampler3d.hpp',['../a00059.html',1,'']]],
+  ['sampler_5fcube_2ehpp',['sampler_cube.hpp',['../a00060.html',1,'']]],
+  ['sampler_5fcube_5farray_2ehpp',['sampler_cube_array.hpp',['../a00061.html',1,'']]],
+  ['save_2ehpp',['save.hpp',['../a00062.html',1,'']]],
+  ['save_5fdds_2ehpp',['save_dds.hpp',['../a00063.html',1,'']]],
+  ['save_5fkmg_2ehpp',['save_kmg.hpp',['../a00064.html',1,'']]],
+  ['save_5fktx_2ehpp',['save_ktx.hpp',['../a00065.html',1,'']]]
 ];

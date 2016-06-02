@@ -1,6 +1,6 @@
 # Release notes
 
-## [GLI 0.8.1.0](https://github.com/g-truc/gli/releases/latest) - 2016-0X-XX
+## [GLI 0.8.1.0](https://github.com/g-truc/gli/releases/latest) - 2016-03-16
 #### Features:
 - Added texture copy, no allocation involved, only transfer
 - Added sub-image copy
@@ -10,6 +10,7 @@
 #### Improvements:
 - Added compressed npot textures support #73
 - Added image access cache to generic textures
+- Added luminance alpha format translation to OpenGL 3.3+ through RG swizzling. #93
 - Improved performance when sampling using mipmaps
 - Improved nearest filter without border using texture_lod performance (~2.5x faster with texture2d)
 - Improved texture::data() (~18x with cube array, ~68x with 2D)
@@ -18,6 +19,8 @@
 
 #### Fixes:
 - Fixed DX10 DDS saving of 3D textures #91
+- Fixed BGRX translation with PROFILE_GL33 profile #92
+- Fixed DDS9 loading of 3D texture detected as 2D texture #93
 
 ## [GLI 0.8.0.0](https://github.com/g-truc/gli/releases/tag/0.8.0.0) - 2016-02-16
 #### Features:

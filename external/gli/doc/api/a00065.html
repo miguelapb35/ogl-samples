@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.8.0 API documentation: texture.hpp File Reference</title>
+<title>0.8.1 API documentation: save_ktx.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.8.0 API documentation
+   <div id="projectname">0.8.1 API documentation
    </div>
   </td>
  </tr>
@@ -87,34 +87,40 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#namespaces">Namespaces</a>  </div>
+<a href="#namespaces">Namespaces</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">texture.hpp File Reference</div>  </div>
+<div class="title">save_ktx.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Include to use generic textures which can represent any texture target but they don't have target specific built-in caches making accesses slower.  
+<p>Include to save KTX textures to files or memory.  
 <a href="#details">More...</a></p>
 
 <p><a href="a00065_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00022.html">texture</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Genetic texture class. It can support any target.  <a href="a00022.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:a00076"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html">gli</a></td></tr>
-<tr class="memdesc:a00076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
+<tr class="memitem:a00078"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00078.html">gli</a></td></tr>
+<tr class="memdesc:a00078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:abdcd778524c1954592218048200f1147"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00078.html#abdcd778524c1954592218048200f1147">save_ktx</a> (texture const &amp;Texture, char const *Path)</td></tr>
+<tr class="memdesc:abdcd778524c1954592218048200f1147"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a texture storage_linear to a KTX file.  <a href="a00078.html#abdcd778524c1954592218048200f1147">More...</a><br /></td></tr>
+<tr class="separator:abdcd778524c1954592218048200f1147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab20d6a4a57ae2fb61fbc642992636758"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00078.html#ab20d6a4a57ae2fb61fbc642992636758">save_ktx</a> (texture const &amp;Texture, std::string const &amp;Path)</td></tr>
+<tr class="memdesc:ab20d6a4a57ae2fb61fbc642992636758"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a texture storage_linear to a KTX file.  <a href="a00078.html#ab20d6a4a57ae2fb61fbc642992636758">More...</a><br /></td></tr>
+<tr class="separator:ab20d6a4a57ae2fb61fbc642992636758"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb6b768b59519e3b86460a40f6ccdf64"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00078.html#abb6b768b59519e3b86460a40f6ccdf64">save_ktx</a> (texture const &amp;Texture, std::vector&lt; char &gt; &amp;Memory)</td></tr>
+<tr class="memdesc:abb6b768b59519e3b86460a40f6ccdf64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a texture storage_linear to a KTX file.  <a href="a00078.html#abb6b768b59519e3b86460a40f6ccdf64">More...</a><br /></td></tr>
+<tr class="separator:abb6b768b59519e3b86460a40f6ccdf64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Include to use generic textures which can represent any texture target but they don't have target specific built-in caches making accesses slower. </p>
+<div class="textblock"><p>Include to save KTX textures to files or memory. </p>
 
-<p>Definition in file <a class="el" href="a00065_source.html">texture.hpp</a>.</p>
+<p>Definition in file <a class="el" href="a00065_source.html">save_ktx.hpp</a>.</p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

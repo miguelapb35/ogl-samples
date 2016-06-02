@@ -1,34 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
 /// @ref gtc_packing
 /// @file glm/gtc/packing.inl
-/// @date 2013-08-08 / 2013-08-08
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #include "../common.hpp"
 #include "../vec2.hpp"
@@ -151,7 +122,7 @@ namespace detail
 		else if(glm::isinf(x))
 			return 0x1Fu << 6u;
 
-#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & (GLM_COMPILER_APPLE_CLANG | GLM_COMPILER_LLVM))
+#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & GLM_COMPILER_LLVM)
 			uint Pack = 0u;
 			memcpy(&Pack, &x, sizeof(Pack));
 #		else	
@@ -172,7 +143,7 @@ namespace detail
 
 		uint Result = packed11ToFloat(x);
 
-#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & (GLM_COMPILER_APPLE_CLANG | GLM_COMPILER_LLVM))
+#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & GLM_COMPILER_LLVM)
 			float Temp = 0;
 			memcpy(&Temp, &Result, sizeof(Temp));
 			return Temp;
@@ -190,7 +161,7 @@ namespace detail
 		else if(glm::isinf(x))
 			return 0x1Fu << 5u;
 
-#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & (GLM_COMPILER_APPLE_CLANG | GLM_COMPILER_LLVM))
+#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & GLM_COMPILER_LLVM)
 			uint Pack = 0;
 			memcpy(&Pack, &x, sizeof(Pack));
 #		else	
@@ -211,7 +182,7 @@ namespace detail
 
 		uint Result = packed10ToFloat(x);
 
-#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & (GLM_COMPILER_APPLE_CLANG | GLM_COMPILER_LLVM))
+#		if(GLM_COMPILER & GLM_COMPILER_GCC || GLM_COMPILER & GLM_COMPILER_LLVM)
 			float Temp = 0;
 			memcpy(&Temp, &Result, sizeof(Temp));
 			return Temp;

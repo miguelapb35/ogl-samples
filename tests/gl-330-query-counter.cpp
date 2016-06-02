@@ -187,11 +187,11 @@ private:
 
 		glQueryCounter(QueryName[query::END], GL_TIMESTAMP);
 
-		GLint AvailableBegin = GL_FALSE;
-		glGetQueryObjectiv(QueryName[query::BEGIN], GL_QUERY_RESULT_AVAILABLE, &AvailableBegin);
+		GLuint64 AvailableBegin = GL_FALSE;
+		glGetQueryObjectui64v(QueryName[query::BEGIN], GL_QUERY_RESULT_AVAILABLE, &AvailableBegin);
 
-		GLint AvailableEnd = GL_FALSE;
-		glGetQueryObjectiv(QueryName[query::END], GL_QUERY_RESULT_AVAILABLE, &AvailableEnd);
+		GLuint64 AvailableEnd = GL_FALSE;
+		glGetQueryObjectui64v(QueryName[query::END], GL_QUERY_RESULT_AVAILABLE, &AvailableEnd);
 
 		// The OpenGL implementations will wait for the query if it's not available
 		GLint64 TimeBegin = 0, TimeEnd = 0;

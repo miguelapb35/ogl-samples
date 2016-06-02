@@ -56,7 +56,7 @@ namespace detail
 		Header.PixelHeight = !is_target_1d(Target) ? static_cast<std::uint32_t>(Texture.extent().y) : 0;
 		Header.PixelDepth = Target == TARGET_3D ? static_cast<std::uint32_t>(Texture.extent().z) : 0;
 		Header.NumberOfArrayElements = is_target_array(Target) ? static_cast<std::uint32_t>(Texture.layers()) : 0;
-		Header.NumberOfFaces = is_target_cube(Target) ? static_cast<std::uint32_t>(Texture.faces()) : 0;
+		Header.NumberOfFaces = is_target_cube(Target) ? static_cast<std::uint32_t>(Texture.faces()) : 1;
 		Header.NumberOfMipmapLevels = static_cast<std::uint32_t>(Texture.levels());
 		Header.BytesOfKeyValueData = 0;
 

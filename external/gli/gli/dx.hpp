@@ -98,11 +98,11 @@ namespace gli
 
 			D3DFMT_L16					= 81,
 
-			D3DFMT_VERTEXDATA			=100,
-			D3DFMT_INDEX16				=101,
-			D3DFMT_INDEX32				=102,
+			D3DFMT_VERTEXDATA			= 100,
+			D3DFMT_INDEX16				= 101,
+			D3DFMT_INDEX32				= 102,
 
-			D3DFMT_Q16W16V16U16			=110,
+			D3DFMT_Q16W16V16U16			= 110,
 
 			D3DFMT_MULTI2_ARGB8			= GLI_MAKEFOURCC('M','E','T','1'),
 
@@ -471,7 +471,7 @@ namespace gli
 		dx();
 
 		/// Convert GLI formats into Direct3D formats
-		format const & translate(gli::format const & Format) const;
+		format const& translate(gli::format Format) const;
 
 		/// Convert a Direct3D 9 format into a GLI format
 		gli::format find(d3dfmt FourCC, ddpf PixelFormat) const;

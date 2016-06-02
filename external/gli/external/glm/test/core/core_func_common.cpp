@@ -444,7 +444,7 @@ namespace mix_
 
 	entry<glm::vec4, glm::bvec4> TestBVec4[] = 
 	{
-		{glm::vec4(0.0f), glm::vec4(1.0f), glm::bvec4(false), glm::vec4(0.0f)},
+		{glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), glm::vec4(2.0f, 2.0f, 3.0f, 3.0f), glm::bvec4(false, true, false, true), glm::vec4(0.0f, 2.0f, 1.0f, 3.0f)},
 		{glm::vec4(0.0f), glm::vec4(1.0f), glm::bvec4(true), glm::vec4(1.0f)},
 		{glm::vec4(-1.0f), glm::vec4(1.0f), glm::bvec4(false), glm::vec4(-1.0f)},
 		{glm::vec4(-1.0f), glm::vec4(1.0f), glm::bvec4(true), glm::vec4(1.0f)},
@@ -555,8 +555,8 @@ namespace step_
 
 	entry<float, glm::vec4> TestVec4Scalar [] =
 	{
-		{ 0.0f, glm::vec4(1.0f, 2.0f, 3.0f, 4.0f), glm::vec4(1.0f) },
 		{ 1.0f, glm::vec4(1.0f, 2.0f, 3.0f, 4.0f), glm::vec4(1.0f) },
+		{ 0.0f, glm::vec4(1.0f, 2.0f, 3.0f, 4.0f), glm::vec4(1.0f) },
 		{ 0.0f, glm::vec4(-1.0f, -2.0f, -3.0f, -4.0f), glm::vec4(0.0f) }
 	};
 
@@ -1235,7 +1235,21 @@ namespace ldexp_
 
 int main()
 {
-	int Error(0);
+	int Error = 0;
+
+	glm::ivec4 const a(1);
+	glm::ivec4 const b = ~a;
+
+	glm::int32 const c(1);
+	glm::int32 const d = ~c;
+
+#	if GLM_ARCH & GLM_ARCH_AVX_BIT
+	glm_vec4 const A = _mm_set_ps(4, 3, 2, 1);
+	glm_vec4 const B = glm_vec4_swizzle_xyzw(A);
+	glm_vec4 const C = _mm_permute_ps(A, _MM_SHUFFLE(3, 2, 1, 0));
+	glm_vec4 const D = _mm_permute_ps(A, _MM_SHUFFLE(0, 1, 2, 3));
+	glm_vec4 const E = _mm_shuffle_ps(A, A, _MM_SHUFFLE(0, 1, 2, 3));
+#	endif
 
 	Error += sign::test();
 	Error += floor_::test();
@@ -1243,10 +1257,10 @@ int main()
 	Error += modf_::test();
 	Error += floatBitsToInt::test();
 	Error += floatBitsToUint::test();
+	Error += mix_::test();
 	Error += step_::test();
 	Error += max_::test();
 	Error += min_::test();
-	Error += mix_::test();
 	Error += round_::test();
 	Error += roundEven::test();
 	Error += isnan_::test();

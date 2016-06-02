@@ -52,8 +52,10 @@ namespace detail
 		normalized_type const TexelExtentF(TexelExtent);
 		normalized_type const TexelLast = TexelExtentF - normalized_type(1);
 		normalized_type const ScaledCoord(SampleCoord * TexelLast);
-		normalized_type const ScaledCoordFloor(floor(ScaledCoord));
-		normalized_type const ScaledCoordCeil(ceil(ScaledCoord));
+		normalized_type const ScaledCoordFloor = normalized_type(extent_type(ScaledCoord));
+		normalized_type const ScaledCoordCeil = normalized_type(extent_type(ScaledCoord + normalized_type(0.5)));
+		//normalized_type const ScaledCoordFloor(floor(ScaledCoord));
+		//normalized_type const ScaledCoordCeil(ceil(ScaledCoord));
 
 		Coord.Blend = ScaledCoord - ScaledCoordFloor;
 		Coord.TexelFloor = extent_type(ScaledCoordFloor);

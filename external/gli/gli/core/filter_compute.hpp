@@ -144,7 +144,7 @@ namespace detail
 		typedef typename base_type::extent_type extent_type;
 		typedef coord_linear_border<extent_type, normalized_type> coord_type;
 
-		static texel_type call(texture_type const & Texture, fetch_type Fetch, normalized_type const & SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const & BorderColor)
+		static texel_type call(texture_type const& Texture, fetch_type Fetch, normalized_type const& SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const& BorderColor)
 		{
 			coord_type const& Coord = make_coord_linear_border(Texture.extent(Level), SampleCoordWrap);
 
@@ -176,11 +176,11 @@ namespace detail
 		typedef filterBase<DIMENSION_2D, texture_type, interpolate_type, normalized_type, fetch_type, texel_type> base_type;
 		typedef typename base_type::size_type size_type;
 		typedef typename base_type::extent_type extent_type;
-		typedef coord_linear_border<extent_type, normalized_type> coord_type;
+		typedef coord_linear<extent_type, normalized_type> coord_type;
 
-		static texel_type call(texture_type const & Texture, fetch_type Fetch, normalized_type const & SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const & BorderColor)
+		static texel_type call(texture_type const& Texture, fetch_type Fetch, normalized_type const& SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const& BorderColor)
 		{
-			coord_type const& Coord = make_coord_linear_border(Texture.extent(Level), SampleCoordWrap);
+			coord_type const& Coord = make_coord_linear(Texture.extent(Level), SampleCoordWrap);
 
 			texel_type const& Texel00 = Fetch(Texture, extent_type(Coord.TexelFloor.s, Coord.TexelFloor.t), Layer, Face, Level);
 			texel_type const& Texel10 = Fetch(Texture, extent_type(Coord.TexelCeil.s, Coord.TexelFloor.t), Layer, Face, Level);
@@ -201,9 +201,9 @@ namespace detail
 		typedef typename base_type::extent_type extent_type;
 		typedef coord_linear_border<extent_type, normalized_type> coord_type;
 
-		static texel_type call(texture_type const & Texture, fetch_type Fetch, normalized_type const & SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const & BorderColor)
+		static texel_type call(texture_type const& Texture, fetch_type Fetch, normalized_type const& SampleCoordWrap, size_type Layer, size_type Face, size_type Level, texel_type const& BorderColor)
 		{
-			coord_type const & Coord = make_coord_linear_border(Texture.extent(Level), SampleCoordWrap);
+			coord_type const& Coord = make_coord_linear_border(Texture.extent(Level), SampleCoordWrap);
 
 			texel_type Texel000(BorderColor);
 			if(Coord.UseTexelFloor.s && Coord.UseTexelFloor.t && Coord.UseTexelFloor.p)

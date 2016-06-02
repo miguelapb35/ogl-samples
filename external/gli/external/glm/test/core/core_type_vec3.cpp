@@ -29,11 +29,7 @@
 /// @author Christophe Riccio
 ///////////////////////////////////////////////////////////////////////////////////
 
-#if !(GLM_COMPILER & GLM_COMPILER_GCC)
-#	define GLM_META_PROG_HELPERS
-#endif
 #define GLM_SWIZZLE
-#define GLM_STATIC_CONST_MEMBERS
 #include <glm/vector_relational.hpp>
 #include <glm/geometric.hpp>
 #include <glm/vec2.hpp>
@@ -75,7 +71,7 @@ int test_vec3_ctor()
 	}
 #endif
 
-#if(GLM_HAS_ANONYMOUS_UNION && defined(GLM_SWIZZLE))
+#if(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
 	{
 		glm::vec3 A = glm::vec3(1.0f, 2.0f, 3.0f);
 		glm::vec3 B = A.xyz;
@@ -94,7 +90,7 @@ int test_vec3_ctor()
 		Error += glm::all(glm::equal(A, G)) ? 0 : 1;
 		Error += glm::all(glm::equal(A, H)) ? 0 : 1;
 	}
-#endif//(GLM_HAS_ANONYMOUS_UNION && defined(GLM_SWIZZLE))
+#endif//(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
 
 	{
 		glm::vec3 A(1);
@@ -115,6 +111,13 @@ int test_vec3_ctor()
 	}
 		
 	return Error;
+}
+
+float foo()
+{
+	glm::vec3 bar = glm::vec3(0.0f, 1.0f, 1.0f);
+
+	return glm::length(bar);
 }
 
 int test_vec3_operators()
@@ -267,7 +270,6 @@ int test_vec3_size()
 	Error += 24 == sizeof(glm::highp_dvec3) ? 0 : 1;
 	Error += glm::vec3().length() == 3 ? 0 : 1;
 	Error += glm::dvec3().length() == 3 ? 0 : 1;
-	Error += glm::vec3::components == 3 ? 0 : 1;
 	return Error;
 }
 
@@ -494,21 +496,6 @@ int test_operator_increment()
 	return Error;
 }
 
-int test_vec3_static_const() {
-	int Error(0);
-
-	Error += (glm::ivec3(0, 0, 0) == glm::ivec3::ZERO) ? 0 : 1;
-	Error += (glm::vec3(1, 0, 0) == glm::vec3::X) ? 0 : 1;
-	Error += (glm::bvec3(false, true, false) == glm::bvec3::Y) ? 0 : 1;
-	Error += (glm::bvec3(false, false, true) == glm::bvec3::Z) ? 0 : 1;
-	Error += (glm::dvec3(1, 1, 0) == glm::dvec3::XY) ? 0 : 1;
-	Error += (glm::vec3(1, 0, 1) == glm::vec3::XZ) ? 0 : 1;
-	Error += (glm::uvec3(0u, 1u, 1u) == glm::uvec3::YZ) ? 0 : 1;
-	Error += (glm::dvec3(1, 1, 1) == glm::dvec3::XYZ) ? 0 : 1;
-
-	return Error;
-}
-
 int main()
 {
 	int Error = 0;
@@ -516,12 +503,6 @@ int main()
 	glm::vec3 v;
 	assert(v.length() == 3);
 
-#	ifdef GLM_META_PROG_HELPERS
-		assert(glm::vec3::components == glm::vec3().length());
-		assert(glm::vec3::components == 3);
-#	endif
-
-	Error += test_vec3_static_const();
 	Error += test_vec3_ctor();
 	Error += test_vec3_operators();
 	Error += test_vec3_size();

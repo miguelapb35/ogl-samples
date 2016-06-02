@@ -84,36 +84,6 @@ int test_compiler()
 	{
 		std::printf("GLM_COMPILER_CUDA\n");
 	}
-	else if(GLM_COMPILER & GLM_COMPILER_APPLE_CLANG)
-	{
-		switch(GLM_COMPILER)
-		{
-		case GLM_COMPILER_APPLE_CLANG40:
-			std::printf("GLM_COMPILER_APPLE_CLANG40\n");
-			break;
-		case GLM_COMPILER_APPLE_CLANG41:
-			std::printf("GLM_COMPILER_APPLE_CLANG41\n");
-			break;
-		case GLM_COMPILER_APPLE_CLANG42:
-			std::printf("GLM_COMPILER_APPLE_CLANG42\n");
-			break;
-		case GLM_COMPILER_APPLE_CLANG50:
-			std::printf("GLM_COMPILER_APPLE_CLANG50\n");
-			break;
-		case GLM_COMPILER_APPLE_CLANG51:
-			std::printf("GLM_COMPILER_APPLE_CLANG51\n");
-			break;
-		case GLM_COMPILER_APPLE_CLANG60:
-			std::printf("GLM_COMPILER_APPLE_CLANG60\n");	
-			break;
-		case GLM_COMPILER_APPLE_CLANG61:
-			std::printf("GLM_COMPILER_APPLE_CLANG61\n");	
-			break;
-		default:
-			std::printf("Apple Clang version not detected\n");
-			break;
-		}
-	}
 	else if(GLM_COMPILER & GLM_COMPILER_LLVM)
 	{
 		switch(GLM_COMPILER)
@@ -206,18 +176,24 @@ int test_instruction_set()
 
 	if(GLM_ARCH == GLM_ARCH_PURE)
 		std::printf("GLM_ARCH_PURE ");
-	if(GLM_ARCH & GLM_ARCH_ARM)
-		std::printf("GLM_ARCH_ARM ");
+	if(GLM_ARCH & GLM_ARCH_ARM_BIT)
+		std::printf("ARM ");
+	if(GLM_ARCH & GLM_ARCH_NEON_BIT)
+		std::printf("NEON ");
 	if(GLM_ARCH & GLM_ARCH_AVX2)
-		std::printf("GLM_ARCH_AVX2 ");
+		std::printf("AVX2 ");
 	if(GLM_ARCH & GLM_ARCH_AVX)
-		std::printf("GLM_ARCH_AVX ");
-	if(GLM_ARCH & GLM_ARCH_AVX)
-		std::printf("GLM_ARCH_SSE4 ");
-	if(GLM_ARCH & GLM_ARCH_SSE3)
-		std::printf("GLM_ARCH_SSE3 ");
-	if(GLM_ARCH & GLM_ARCH_SSE2)
-		std::printf("GLM_ARCH_SSE2 ");
+		std::printf("AVX ");
+	if(GLM_ARCH & GLM_ARCH_SSE42_BIT)
+		std::printf("SSE4.2 ");
+	if(GLM_ARCH & GLM_ARCH_SSE41_BIT)
+		std::printf("SSE4.1 ");
+	if(GLM_ARCH & GLM_ARCH_SSSE3_BIT)
+		std::printf("SSSE3 ");
+	if(GLM_ARCH & GLM_ARCH_SSE3_BIT)
+		std::printf("SSE3 ");
+	if(GLM_ARCH & GLM_ARCH_SSE2_BIT)
+		std::printf("SSE2 ");
 
 	std::printf("\n");
 
@@ -226,7 +202,7 @@ int test_instruction_set()
 
 int test_cpp_version()
 {
-	std::printf("__cplusplus: %ld\n", __cplusplus);
+	std::printf("__cplusplus: %lld\n", __cplusplus);
 	
 	return 0;
 }

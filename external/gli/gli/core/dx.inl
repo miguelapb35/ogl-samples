@@ -252,7 +252,7 @@ namespace gli
 		std::copy(&Table[0], &Table[0] + FORMAT_COUNT, this->Translation.begin());
 	}
 
-	inline dx::format const & dx::translate(gli::format const & Format) const
+	inline dx::format const& dx::translate(gli::format Format) const
 	{
 		GLI_ASSERT(Format >= FORMAT_FIRST && Format <= FORMAT_LAST);
 		return Translation[Format - FORMAT_FIRST];

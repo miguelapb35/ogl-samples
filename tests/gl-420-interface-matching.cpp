@@ -216,12 +216,12 @@ private:
 		for(GLint i = 0; i < ActiveAttribute; ++i)
 		{
 			glGetActiveAttrib(ProgramName,
- 				GLuint(i),
- 				GLsizei(ActiveAttributeMaxLength),
- 				&AttribLength,
- 				&AttribSize,
- 				&AttribType,
- 				&AttribName[0]);
+				GLuint(i),
+				GLsizei(ActiveAttributeMaxLength),
+				&AttribLength,
+				&AttribSize,
+				&AttribType,
+				&AttribName[0]);
 
 			std::string NameString;
 			NameString.insert(NameString.begin(), AttribName.begin(), AttribName.end());

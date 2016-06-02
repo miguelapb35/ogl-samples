@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.8.0 API documentation: Release notes</title>
+<title>0.8.1 API documentation: Release notes</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.8.0 API documentation
+   <div id="projectname">0.8.1 API documentation
    </div>
   </td>
  </tr>
@@ -81,7 +81,32 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Release notes </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2><a href="https://github.com/g-truc/gli/releases/latest">GLI 0.8.0.0</a> - 2016-02-16</h2>
+<div class="textblock"><h2><a href="https://github.com/g-truc/gli/releases/latest">GLI 0.8.1.0</a> - 2016-03-16</h2>
+<h4>Features:</h4>
+<ul>
+<li>Added texture copy, no allocation involved, only transfer</li>
+<li>Added sub-image copy</li>
+<li>Added non-member clear</li>
+<li>Added make_texture* helper functions</li>
+</ul>
+<h4>Improvements:</h4>
+<ul>
+<li>Added compressed npot textures support #73</li>
+<li>Added image access cache to generic textures</li>
+<li>Added luminance alpha format translation to OpenGL 3.3+ through RG swizzling. #93</li>
+<li>Improved performance when sampling using mipmaps</li>
+<li>Improved nearest filter without border using texture_lod performance (~2.5x faster with texture2d)</li>
+<li>Improved texture::data() (~18x with cube array, ~68x with 2D)</li>
+<li>Improved texture::size() (~3.1x with cube array, ~3.9x with 2D)</li>
+<li>Improved simultaneous texture::size() and texture::extent() calls (~2.1x with cube array, ~2.3x with 2D)</li>
+</ul>
+<h4>Fixes:</h4>
+<ul>
+<li>Fixed DX10 DDS saving of 3D textures #91</li>
+<li>Fixed BGRX translation with PROFILE_GL33 profile #92</li>
+<li>Fixed DDS9 loading of 3D texture detected as 2D texture #93</li>
+</ul>
+<h2><a href="https://github.com/g-truc/gli/releases/tag/0.8.0.0">GLI 0.8.0.0</a> - 2016-02-16</h2>
 <h4>Features:</h4>
 <ul>
 <li>Added texture swizzle support #79</li>
@@ -120,8 +145,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h2><a href="https://github.com/g-truc/gli/releases/tag/0.7.0.0">GLI 0.7.0.0</a> - 2015-09-01</h2>
 <ul>
 <li>Added KTX loading and saving</li>
-<li>Added <a class="el" href="a00076.html#a6ceab391900a9c196b639c66dfe1eb34" title="Loads a texture storage from file. ">gli::load</a> for generic file loading, either DDS or KTX files depending on filename extensions</li>
-<li>Added <a class="el" href="a00076.html#abeb29ead6c93382440a84615453578cf" title="Save a texture storage to file. ">gli::save</a> for generic file saving, either DDS or KTX files depending on filename extensions</li>
+<li>Added <a class="el" href="a00078.html#a6ceab391900a9c196b639c66dfe1eb34" title="Loads a texture storage_linear from file. ">gli::load</a> for generic file loading, either DDS or KTX files depending on filename extensions</li>
+<li>Added <a class="el" href="a00078.html#abeb29ead6c93382440a84615453578cf" title="Save a texture storage_linear to file. ">gli::save</a> for generic file saving, either DDS or KTX files depending on filename extensions</li>
 <li>Added texture views using different texture format, including compressed texture formats</li>
 <li>Added fine granularity includes</li>
 <li>Improved API documentation</li>
@@ -139,7 +164,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h2><a href="https://github.com/g-truc/gli/releases/tag/0.6.1.0">GLI 0.6.1.0</a> - 2015-07-18</h2>
 <ul>
 <li>Fixed interface inconsistencies</li>
-<li>Improved clear(), data() and size() performance using caching</li>
+<li>Improved <a class="el" href="a00078.html#af4adb12c1d85d1813e9090f51a40beef" title="Clear a complete texture. ">clear()</a>, data() and size() performance using caching</li>
 <li>Removed internal dependence to std::fstream</li>
 <li>Added FORMAT_BGRX8_UNORM and FORMAT_BGRX8_SRGB support #48, #43</li>
 <li>Improved FORMAT_RGB8_UNORM loading</li>

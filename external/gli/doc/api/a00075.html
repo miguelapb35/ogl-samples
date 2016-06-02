@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.10"/>
-<title>0.8.0 API documentation: view.hpp File Reference</title>
+<title>0.8.1 API documentation: transform.hpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -24,7 +24,7 @@
  <tr style="height: 56px;">
   <td id="projectlogo"><img alt="Logo" src="logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">0.8.0 API documentation
+   <div id="projectname">0.8.1 API documentation
    </div>
   </td>
  </tr>
@@ -90,77 +90,56 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">view.hpp File Reference</div>  </div>
+<div class="title">transform.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Include create views of textures, either to isolate a subset or to reinterpret data without memory copy.  
+<p>Include to perform arithmetic per texel between two textures.  
 <a href="#details">More...</a></p>
 
 <p><a href="a00075_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
-<tr class="memitem:a00076"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html">gli</a></td></tr>
-<tr class="memdesc:a00076"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
+<tr class="memitem:a00078"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00078.html">gli</a></td></tr>
+<tr class="memdesc:a00078"><td class="mdescLeft">&#160;</td><td class="mdescRight">Namespace where all the classes and functions provided by GLI are exposed. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae0fac6ef8ea038fb77b196f33c3a92a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae0fac6ef8ea038fb77b196f33c3a92a3"></a>
-image&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#ae0fac6ef8ea038fb77b196f33c3a92a3">view</a> (image const &amp;Image)</td></tr>
-<tr class="memdesc:ae0fac6ef8ea038fb77b196f33c3a92a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an image view of an existing image, sharing the same memory storage. <br /></td></tr>
-<tr class="separator:ae0fac6ef8ea038fb77b196f33c3a92a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdb51bdf4fcdf9a62f4aa224f0c7dcfb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afdb51bdf4fcdf9a62f4aa224f0c7dcfb"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#afdb51bdf4fcdf9a62f4aa224f0c7dcfb">view</a> (texture const &amp;Texture)</td></tr>
-<tr class="memdesc:afdb51bdf4fcdf9a62f4aa224f0c7dcfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage. <br /></td></tr>
-<tr class="separator:afdb51bdf4fcdf9a62f4aa224f0c7dcfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0f21026a76c1b4c0c7473f30a511d12"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0f21026a76c1b4c0c7473f30a511d12"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#af0f21026a76c1b4c0c7473f30a511d12">view</a> (texture const &amp;Texture, texture::size_type BaseLayer, texture::size_type MaxLayer, texture::size_type BaseFace, texture::size_type MaxFace, texture::size_type BaseLevel, texture::size_type MaxLevel)</td></tr>
-<tr class="memdesc:af0f21026a76c1b4c0c7473f30a511d12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of layers, levels and faces. <br /></td></tr>
-<tr class="separator:af0f21026a76c1b4c0c7473f30a511d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e73aee157c95b80a6dffe3958feb12b"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0e73aee157c95b80a6dffe3958feb12b"></a>
-template&lt;typename texType &gt; </td></tr>
-<tr class="memitem:a0e73aee157c95b80a6dffe3958feb12b"><td class="memTemplItemLeft" align="right" valign="top">texture&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00076.html#a0e73aee157c95b80a6dffe3958feb12b">view</a> (texType const &amp;Texture)</td></tr>
-<tr class="memdesc:a0e73aee157c95b80a6dffe3958feb12b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage. <br /></td></tr>
-<tr class="separator:a0e73aee157c95b80a6dffe3958feb12b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e5c7c1298290ba8e185a725738f7220"><td class="memTemplParams" colspan="2">template&lt;typename texType &gt; </td></tr>
-<tr class="memitem:a0e5c7c1298290ba8e185a725738f7220"><td class="memTemplItemLeft" align="right" valign="top">texture&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00076.html#a0e5c7c1298290ba8e185a725738f7220">view</a> (texType const &amp;Texture, format Format)</td></tr>
-<tr class="memdesc:a0e5c7c1298290ba8e185a725738f7220"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but a different format.  <a href="a00076.html#a0e5c7c1298290ba8e185a725738f7220">More...</a><br /></td></tr>
-<tr class="separator:a0e5c7c1298290ba8e185a725738f7220"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a043baf9cfef0c9c64757c6f6def43eb6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a043baf9cfef0c9c64757c6f6def43eb6"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#a043baf9cfef0c9c64757c6f6def43eb6">view</a> (texture1d const &amp;Texture, texture1d::size_type BaseLevel, texture1d::size_type MaxLevel)</td></tr>
-<tr class="memdesc:a043baf9cfef0c9c64757c6f6def43eb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels. <br /></td></tr>
-<tr class="separator:a043baf9cfef0c9c64757c6f6def43eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92c9c5a5cd290a1a304886953eb40398"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92c9c5a5cd290a1a304886953eb40398"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#a92c9c5a5cd290a1a304886953eb40398">view</a> (texture1d_array const &amp;Texture, texture1d_array::size_type BaseLayer, texture1d_array::size_type MaxLayer, texture1d_array::size_type BaseLevel, texture1d_array::size_type MaxLevel)</td></tr>
-<tr class="memdesc:a92c9c5a5cd290a1a304886953eb40398"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels and layers. <br /></td></tr>
-<tr class="separator:a92c9c5a5cd290a1a304886953eb40398"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d877aa20daa84293690732e5f6af14d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d877aa20daa84293690732e5f6af14d"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#a5d877aa20daa84293690732e5f6af14d">view</a> (texture2d const &amp;Texture, texture2d::size_type BaseLevel, texture2d::size_type MaxLevel)</td></tr>
-<tr class="memdesc:a5d877aa20daa84293690732e5f6af14d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels. <br /></td></tr>
-<tr class="separator:a5d877aa20daa84293690732e5f6af14d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad05aacedd684dadaabe23e44dafde7ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad05aacedd684dadaabe23e44dafde7ce"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#ad05aacedd684dadaabe23e44dafde7ce">view</a> (texture2d_array const &amp;Texture, texture2d_array::size_type BaseLayer, texture2d_array::size_type MaxLayer, texture2d_array::size_type BaseLevel, texture2d_array::size_type MaxLevel)</td></tr>
-<tr class="memdesc:ad05aacedd684dadaabe23e44dafde7ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels and layers. <br /></td></tr>
-<tr class="separator:ad05aacedd684dadaabe23e44dafde7ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9025f23af9b6ceb3bd58bfc867f23f5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9025f23af9b6ceb3bd58bfc867f23f5e"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#a9025f23af9b6ceb3bd58bfc867f23f5e">view</a> (texture3d const &amp;Texture, texture3d::size_type BaseLevel, texture3d::size_type MaxLevel)</td></tr>
-<tr class="memdesc:a9025f23af9b6ceb3bd58bfc867f23f5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels. <br /></td></tr>
-<tr class="separator:a9025f23af9b6ceb3bd58bfc867f23f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab481dc87fe89a9080cec1299482f097"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab481dc87fe89a9080cec1299482f097"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#aab481dc87fe89a9080cec1299482f097">view</a> (texture_cube const &amp;Texture, texture_cube::size_type BaseFace, texture_cube::size_type MaxFace, texture_cube::size_type BaseLevel, texture_cube::size_type MaxLevel)</td></tr>
-<tr class="memdesc:aab481dc87fe89a9080cec1299482f097"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of levels and faces. <br /></td></tr>
-<tr class="separator:aab481dc87fe89a9080cec1299482f097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac246d291176b59d7234eeb139a3ad6c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac246d291176b59d7234eeb139a3ad6c"></a>
-texture&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00076.html#aac246d291176b59d7234eeb139a3ad6c">view</a> (texture_cube_array const &amp;Texture, texture_cube_array::size_type BaseLayer, texture_cube_array::size_type MaxLayer, texture_cube_array::size_type BaseFace, texture_cube_array::size_type MaxFace, texture_cube_array::size_type BaseLevel, texture_cube_array::size_type MaxLevel)</td></tr>
-<tr class="memdesc:aac246d291176b59d7234eeb139a3ad6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a texture view of an existing texture, sharing the same memory storage but giving access only to a subset of layers, levels and faces. <br /></td></tr>
-<tr class="separator:aac246d291176b59d7234eeb139a3ad6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17d099b47ede0719a1634f26f3935d62"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:a17d099b47ede0719a1634f26f3935d62"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#a17d099b47ede0719a1634f26f3935d62">transform</a> (texture1d &amp;Out, texture1d const &amp;In0, texture1d const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:a17d099b47ede0719a1634f26f3935d62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#a17d099b47ede0719a1634f26f3935d62">More...</a><br /></td></tr>
+<tr class="separator:a17d099b47ede0719a1634f26f3935d62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9f00aadf2455035d385a4f02de9bfeb"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:ab9f00aadf2455035d385a4f02de9bfeb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#ab9f00aadf2455035d385a4f02de9bfeb">transform</a> (texture1d_array &amp;Out, texture1d_array const &amp;In0, texture1d_array const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:ab9f00aadf2455035d385a4f02de9bfeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#ab9f00aadf2455035d385a4f02de9bfeb">More...</a><br /></td></tr>
+<tr class="separator:ab9f00aadf2455035d385a4f02de9bfeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56f06a5726380a7b3e254c21dd322588"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:a56f06a5726380a7b3e254c21dd322588"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#a56f06a5726380a7b3e254c21dd322588">transform</a> (texture2d &amp;Out, texture2d const &amp;In0, texture2d const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:a56f06a5726380a7b3e254c21dd322588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#a56f06a5726380a7b3e254c21dd322588">More...</a><br /></td></tr>
+<tr class="separator:a56f06a5726380a7b3e254c21dd322588"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d3e2ba9817e93948a04809cd6d06fcb"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:a6d3e2ba9817e93948a04809cd6d06fcb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#a6d3e2ba9817e93948a04809cd6d06fcb">transform</a> (texture2d_array &amp;Out, texture2d_array const &amp;In0, texture2d_array const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:a6d3e2ba9817e93948a04809cd6d06fcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#a6d3e2ba9817e93948a04809cd6d06fcb">More...</a><br /></td></tr>
+<tr class="separator:a6d3e2ba9817e93948a04809cd6d06fcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf822fba0b62772e022d6702509f557b"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:acf822fba0b62772e022d6702509f557b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#acf822fba0b62772e022d6702509f557b">transform</a> (texture3d &amp;Out, texture3d const &amp;In0, texture3d const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:acf822fba0b62772e022d6702509f557b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#acf822fba0b62772e022d6702509f557b">More...</a><br /></td></tr>
+<tr class="separator:acf822fba0b62772e022d6702509f557b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acfa1b227a008a334741f26b93ce1ab63"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:acfa1b227a008a334741f26b93ce1ab63"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#acfa1b227a008a334741f26b93ce1ab63">transform</a> (texture_cube &amp;Out, texture_cube const &amp;In0, texture_cube const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:acfa1b227a008a334741f26b93ce1ab63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#acfa1b227a008a334741f26b93ce1ab63">More...</a><br /></td></tr>
+<tr class="separator:acfa1b227a008a334741f26b93ce1ab63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0c4c1531720ffc9df8732dd443dfcdd"><td class="memTemplParams" colspan="2">template&lt;typename vec_type &gt; </td></tr>
+<tr class="memitem:ae0c4c1531720ffc9df8732dd443dfcdd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="a00078.html#ae0c4c1531720ffc9df8732dd443dfcdd">transform</a> (texture_cube_array &amp;Out, texture_cube_array const &amp;In0, texture_cube_array const &amp;In1, typename transform_func&lt; vec_type &gt;::type TexelFunc)</td></tr>
+<tr class="memdesc:ae0c4c1531720ffc9df8732dd443dfcdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute per-texel operations using a user defined function.  <a href="a00078.html#ae0c4c1531720ffc9df8732dd443dfcdd">More...</a><br /></td></tr>
+<tr class="separator:ae0c4c1531720ffc9df8732dd443dfcdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Include create views of textures, either to isolate a subset or to reinterpret data without memory copy. </p>
+<div class="textblock"><p>Include to perform arithmetic per texel between two textures. </p>
 
-<p>Definition in file <a class="el" href="a00075_source.html">view.hpp</a>.</p>
+<p>Definition in file <a class="el" href="a00075_source.html">transform.hpp</a>.</p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
