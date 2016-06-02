@@ -171,10 +171,10 @@ private:
 		GLint MaxDepthTextureSamples(0);
 		GLint MaxIntegerSamples(0);
 
-		glGetIntegerv(GL_MAX_SAMPLE_MASK_WORDS, &MaxSampleMaskWords); 
-		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &MaxColorTextureSamples); 
-		glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
-		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
+		glGetIntegerv(GL_MAX_SAMPLE_MASK_WORDS, &MaxSampleMaskWords);
+		glGetIntegerv(GL_MAX_COLOR_TEXTURE_SAMPLES, &MaxColorTextureSamples);
+		glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples);
+		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples);
 
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
@@ -182,7 +182,7 @@ private:
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 3);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
