@@ -74,7 +74,6 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAGMENT_SHADER_SOURCE_FAIL);
 
 			Validated = Validated && !Compiler.check();
-			glDeleteShader(FragShaderName);
 		}
 
 		// Create program
