@@ -305,23 +305,23 @@ private:
 			glGetNamedFramebufferParameteriv(currentFramebufferName, GL_SAMPLES, &Samples);
 
 			//glGetIntegerv(GL_SAMPLES, &Samples);
-
+/*
 			if(FramebufferIndex == 0)
 			{
 				for(GLint i = 0; i < Samples; ++i)
 				{
 					glGetMultisamplefv(GL_SAMPLE_POSITION, i, &SamplesPositions8[0][i][0]);
-					glGetMultisamplefv(GL_SAMPLE_POSITION, i, &SampleLocationsRead[i][0]);
+					//glGetMultisamplefv(GL_SAMPLE_POSITION, i, &SampleLocationsRead[i][0]);
 				}
 			}
-
+*/
 			glNamedFramebufferParameteri(currentFramebufferName, GL_FRAMEBUFFER_PROGRAMMABLE_SAMPLE_LOCATIONS_NV, GL_TRUE);
 			glNamedFramebufferParameteri(currentFramebufferName, GL_FRAMEBUFFER_SAMPLE_LOCATION_PIXEL_GRID_NV, GL_FALSE);
 			glNamedFramebufferSampleLocationsfvNV(currentFramebufferName, 0, Samples, &SamplesPositions8[FramebufferIndex][0][0]);
 		}
 
-		for(std::size_t i = 0; i < SampleLocationsRead.size(); ++i)
-			SampleLocationsRead[i] *= 16.0f;
+		//for(std::size_t i = 0; i < SampleLocationsRead.size(); ++i)
+		//	SampleLocationsRead[i] *= 16.0f;
 
 		GLint SubPixelBits(0);
 		glm::ivec2 PixelGrid(0);

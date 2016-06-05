@@ -23,6 +23,7 @@
 
 #include "test.hpp"
 #include "png.hpp"
+#include <glm/vector_relational.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gli/generate_mipmaps.hpp>
 #include <fstream>
@@ -532,8 +533,13 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 			Success = Success && !Template.empty();
 
 		if(Success)
+			Success = gli::texture2d(Template).extent() == TextureRGB.extent();
+
+		if(Success)
 		{
-			bool Heuristic = compare(Template, TextureRGB, heuristic_equal());
+			bool Heuristic = false;
+			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_equal());
 			if(!Heuristic)
 				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one());
 			if(!Heuristic)

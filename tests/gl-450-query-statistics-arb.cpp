@@ -253,7 +253,7 @@ private:
 
 		return Validated;
 	}
-
+/*
 	void rand_vector(std::vector<GLenum>& v)
 	{
 		for(std::size_t i = 0; i < v.size(); ++i)
@@ -328,13 +328,13 @@ private:
 
 		printf("test_intersect_set: %d\n", TimeEnd - TimeStart);
 	}
-
+*/
 	bool begin()
 	{
 		bool Validated = this->checkExtension("GL_ARB_query_statistics_arb");
 
-		test_intersect_vector();
-		test_intersect_set();
+//		test_intersect_vector();
+//		test_intersect_set();
 
 		if(Validated)
 			Validated = initQuery();
