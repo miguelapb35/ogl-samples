@@ -389,6 +389,56 @@ namespace
 		}
 	};
 
+	struct heuristic_absolute_difference_max_one_large_kernel
+	{
+		bool kernel(gli::texture2d::extent_type const& TexelCoordA, glm::u8vec3 const& TexelA, gli::texture2d const& TextureB) const
+		{
+			int const KernelSize = 9;
+
+			gli::texture2d::extent_type const TexelCoordInvA(TexelCoordA.x, 480 - TexelCoordA.y);
+			glm::u8vec3 TexelB[KernelSize * KernelSize];
+
+			for(int KernelIndexY = 0; KernelIndexY < KernelSize; ++KernelIndexY)
+			for(int KernelIndexX = 0; KernelIndexX < KernelSize; ++KernelIndexX)
+			{
+				gli::texture2d::extent_type const KernelCoordB(KernelIndexX - KernelSize / 2, KernelIndexY - KernelSize / 2);
+				gli::texture2d::extent_type const TexelCoordB = TexelCoordA + KernelCoordB;
+
+				gli::texture2d::extent_type ClampedTexelCoord = glm::clamp(TexelCoordB, glm::ivec2(0), glm::ivec2(TextureB.extent()) - glm::ivec2(1));
+				TexelB[KernelIndexY * KernelSize + KernelIndexX] = TextureB.load<glm::u8vec3>(ClampedTexelCoord, 0);
+			}
+
+			for(int KernelIndex = 0; KernelIndex < KernelSize * KernelSize; ++KernelIndex)
+			{
+				glm::vec3 const TexelDiff = glm::abs(glm::vec3(TexelB[KernelIndex]) - glm::vec3(TexelA));
+				if(glm::all(glm::lessThanEqual(TexelDiff, glm::vec3(2))))
+					return true;
+				continue;
+			}
+
+			return false;
+		}
+
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture2d TextureA(A);
+			gli::texture2d TextureB(B);
+
+			for(std::size_t TexelIndexY = 0, TexelCountY = A.extent().y; TexelIndexY < TexelCountY; ++TexelIndexY)
+			for(std::size_t TexelIndexX = 0, TexelCountX = A.extent().x; TexelIndexX < TexelCountX; ++TexelIndexX)
+			{
+				gli::texture2d::extent_type const TexelCoordA(TexelIndexX, TexelIndexY);
+				glm::u8vec3 const TexelA = TextureA.load<glm::u8vec3>(TexelCoordA, 0);
+
+				bool const ValidTexel = this->kernel(TexelCoordA, TexelA, TextureB);
+				if(!ValidTexel)
+					return false;
+			}
+
+			return true;
+		}
+	};
+
 	struct heuristic_absolute_difference_max_one_kernel
 	{
 		bool test(gli::texture const& A, gli::texture const& B) const
@@ -532,8 +582,12 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		if(Success)
 			Success = Success && !Template.empty();
 
+		bool SameSize = false;
 		if(Success)
-			Success = gli::texture2d(Template).extent() == TextureRGB.extent();
+		{
+			SameSize = gli::texture2d(Template).extent() == TextureRGB.extent();
+			Success = Success && SameSize;
+		}
 
 		if(Success)
 		{
@@ -545,6 +599,8 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 			if(!Heuristic)
 				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_kernel());
 			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_large_kernel());
+			if(!Heuristic)
 				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
 			Success = Heuristic;
 		}
@@ -552,10 +608,14 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		// Save abs diff
 		if(!Success && !Template.empty())
 		{
-			gli::texture Diff = ::absolute_difference(Template, TextureRGB, 8);
+			if(SameSize)
+			{
+				gli::texture Diff = ::absolute_difference(Template, TextureRGB, 8);
+				save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
+			}
+
 			save_png(Template, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
-			save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 		}
 	}
 
