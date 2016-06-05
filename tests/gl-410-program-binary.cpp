@@ -91,6 +91,22 @@ public:
 	{}
 
 private:
+	bool is_valid_binary_format(GLenum Format)
+	{
+		GLint NumProgramBinaryFormats = 0;
+		glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &NumProgramBinaryFormats);
+		std::vector<GLint> ProgramBinaryFormats(static_cast<std::size_t>(NumProgramBinaryFormats));
+		glGetIntegerv(GL_PROGRAM_BINARY_FORMATS, &ProgramBinaryFormats[0]);
+
+		for(GLint Index = 0; Index < NumProgramBinaryFormats; ++Index)
+		{
+			if(static_cast<GLenum>(ProgramBinaryFormats[Index]) == Format)
+				return true;
+		}
+
+		return false;
+	}
+
 	bool save_program(GLuint ProgramName, std::string const & String)
 	{
 		GLint Size(0);
@@ -129,9 +145,12 @@ private:
 			std::vector<glm::byte> Data;
 			if(load_binary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
-				glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
-				glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
-				Validated = Validated && Success == GL_TRUE;
+				if(is_valid_binary_format(Format))
+				{
+					glProgramBinary(ProgramName[program::VERT], Format, &Data[0], Size);
+					glGetProgramiv(ProgramName[program::VERT], GL_LINK_STATUS, &Success);
+					Validated = Validated && Success == GL_TRUE;
+				}
 			}
 		}
 
@@ -141,9 +160,12 @@ private:
 			std::vector<glm::byte> Data;
 			if(load_binary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
-				glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
-				glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
-				Validated = Validated && Success == GL_TRUE;
+				if(is_valid_binary_format(Format))
+				{
+					glProgramBinary(ProgramName[program::GEOM], Format, &Data[0], Size);
+					glGetProgramiv(ProgramName[program::GEOM], GL_LINK_STATUS, &Success);
+					Validated = Validated && Success == GL_TRUE;
+				}
 			}
 		}
 
@@ -153,9 +175,12 @@ private:
 			std::vector<glm::byte> Data;
 			if(load_binary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
-				glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
-				glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
-				Validated = Validated && Success == GL_TRUE;
+				if(is_valid_binary_format(Format))
+				{
+					glProgramBinary(ProgramName[program::FRAG], Format, &Data[0], Size);
+					glGetProgramiv(ProgramName[program::FRAG], GL_LINK_STATUS, &Success);
+					Validated = Validated && Success == GL_TRUE;
+				}
 			}
 		}
 
