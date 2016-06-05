@@ -569,6 +569,8 @@ private:
 			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::scale(glm::mat4(1), glm::vec3(2));
 		}
 
+		glBindSampler(0, this->SamplerName);
+
 		// Step 1, render the scene in a multisampled framebuffer
 		glBindProgramPipeline(PipelineName);
 
