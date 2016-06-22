@@ -374,6 +374,7 @@ private:
 
 		{
 			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_STENCIL_TEST);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
