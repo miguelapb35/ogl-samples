@@ -366,6 +366,7 @@ private:
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 

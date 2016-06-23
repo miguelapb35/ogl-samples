@@ -4,11 +4,9 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform sampler2D Diffuse;
-
 in block
 {
-	vec2 Texcoord;
+	vec4 Color;
 } In;
 
 out vec4 Color;
@@ -88,12 +86,12 @@ vec3 ContrastSaturationBrightness(vec3 color, float brt, float sat, float con)
 
 void main()
 {
-	vec3 ColorRGB = texture(Diffuse, In.Texcoord).rgb;
+	//vec3 ColorRGB = texture(Diffuse, In.Texcoord).rgb;
 
 	//ColorRGB = convertRgbToSrgb(convertSrgbToRgb(convertRgbToSrgb(ColorRGB)));
 
 	//ColorRGB = ContrastSaturationBrightness(ColorRGB, 1.0, 0.5, 1.0);
 
-	Color = vec4(ColorRGB, 1.0);
+	Color = In.Color;
 	//Color = vec4(convertRgbToSrgb(ColorRGB), 1.0);
 }
