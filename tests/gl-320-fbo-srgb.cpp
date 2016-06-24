@@ -31,25 +31,62 @@ namespace
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
-	GLsizei const VertexCount(4);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);
-	glf::vertex_v3fv4u8 const VertexData[VertexCount] =
-	{
-		glf::vertex_v3fv4u8(glm::vec3(+1.0f, 0.0f,-0.70710678118f), glm::u8vec4(255,   0,   0, 255)),
-		glf::vertex_v3fv4u8(glm::vec3(-1.0f, 0.0f,-0.70710678118f), glm::u8vec4(255, 255,   0, 255)),
-		glf::vertex_v3fv4u8(glm::vec3(+0.0f,+1.0f,+0.70710678118f), glm::u8vec4(  0, 255,   0, 255)),
-		glf::vertex_v3fv4u8(glm::vec3(+0.0f,-1.0f,+0.70710678118f), glm::u8vec4(  0,   0, 255, 255))
-	};
-
 	GLsizei const ElementCount(12);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
+	GLushort const g_ElementData[ElementCount] =
 	{
 		0, 2, 3,
 		0, 3, 1,
 		1, 2, 3,
 		1, 2, 0
 	};
+
+	void subdivise(std::vector<glm::vec3>& VertexData, std::size_t& VertexIndex, std::vector<GLushort>& ElementData, glm::uint32 I0, glm::uint32 J0, glm::uint32 K0, std::size_t Subdivise)
+	{
+		if(Subdivise == 0)
+		{
+			ElementData.push_back(I0);
+			ElementData.push_back(J0);
+			ElementData.push_back(K0);
+		}
+		else
+		{
+			if(VertexData.capacity() < VertexData.size() + 3)
+				VertexData.resize(VertexIndex * 2);
+
+			glm::vec3 const& A0 = VertexData[I0];
+			glm::vec3 const& B0 = VertexData[J0];
+			glm::vec3 const& C0 = VertexData[K0];
+
+			glm::uint32 const I1 = VertexIndex++;
+			glm::uint32 const J1 = VertexIndex++;
+			glm::uint32 const K1 = VertexIndex++;
+
+			VertexData[I1] = glm::normalize((B0 + C0) * 0.5f);
+			VertexData[J1] = glm::normalize((C0 + A0) * 0.5f);
+			VertexData[K1] = glm::normalize((B0 + A0) * 0.5f);
+
+			subdivise(VertexData, VertexIndex, ElementData, I0, J1, K1, Subdivise - 1);
+			subdivise(VertexData, VertexIndex, ElementData, J0, K1, I1, Subdivise - 1);
+			subdivise(VertexData, VertexIndex, ElementData, K0, I1, J1, Subdivise - 1);
+			subdivise(VertexData, VertexIndex, ElementData, I1, J1, K1, Subdivise - 1);
+		}
+	}
+
+	void generate_sphere(std::vector<glm::vec3>& VertexData, std::vector<GLushort>& ElementData, std::size_t Subdivision)
+	{
+		VertexData.resize(4);
+		VertexData[0] = glm::normalize(glm::vec3(+1.0f, 0.0f,-0.70710678118f));
+		VertexData[1] = glm::normalize(glm::vec3(-1.0f, 0.0f,-0.70710678118f));
+		VertexData[2] = glm::normalize(glm::vec3(+0.0f,+1.0f,+0.70710678118f));
+		VertexData[3] = glm::normalize(glm::vec3(+0.0f,-1.0f,+0.70710678118f));
+
+		std::size_t VertexIndex = 4;
+		subdivise(VertexData, VertexIndex, ElementData, 0, 2, 3, Subdivision);
+		subdivise(VertexData, VertexIndex, ElementData, 0, 3, 1, Subdivision);
+		subdivise(VertexData, VertexIndex, ElementData, 1, 2, 3, Subdivision);
+		subdivise(VertexData, VertexIndex, ElementData, 1, 2, 0, Subdivision);
+	}
 
 	namespace buffer
 	{
@@ -115,6 +152,7 @@ private:
 	GLint UniformTransform;
 	GLuint FramebufferName;
 	glm::uint FramebufferScale;
+	GLuint ElementCount;
 
 	bool initProgram()
 	{
@@ -176,14 +214,20 @@ private:
 
 	bool initBuffer()
 	{
+		std::vector<glm::vec3> VertexData;
+		std::vector<GLushort> ElementData;
+		generate_sphere(VertexData, ElementData, 0);
+
+		this->ElementCount = ElementData.size();
+
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementData.size() * sizeof(GLushort), &g_ElementData[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec3), &VertexData[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
@@ -227,12 +271,10 @@ private:
 		glGenVertexArrays(program::MAX, &VertexArrayName[0]);
 		glBindVertexArray(VertexArrayName[program::RENDER]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v3fv4u8), BUFFER_OFFSET(0));
-			glVertexAttribPointer(semantic::attr::COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glf::vertex_v3fv4u8), BUFFER_OFFSET(sizeof(glm::vec3)));
+			glVertexAttribPointer(semantic::attr::POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
-			glEnableVertexAttribArray(semantic::attr::COLOR);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
@@ -338,7 +380,7 @@ private:
 			glBindVertexArray(VertexArrayName[program::RENDER]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, this->ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 		}
 
 		// Blit the sRGB framebuffer to the default framebuffer back buffer.

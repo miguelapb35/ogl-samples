@@ -10,7 +10,10 @@ uniform transform
 } Transform;
 
 in vec3 Position;
-in vec4 Color;
+const vec4 Color[] = vec4[3](
+	vec4(1.0f, 0.0f, 0.0f, 1.0f),
+	vec4(0.0f, 1.0f, 0.0f, 1.0f),
+	vec4(0.0f, 0.0f, 1.0f, 1.0f));
 
 out block
 {
@@ -19,6 +22,6 @@ out block
 
 void main()
 {	
-	Out.Color = Color;
+	Out.Color = Color[gl_VertexID % 3];
 	gl_Position = Transform.MVP * vec4(Position, 1.0);
 }
