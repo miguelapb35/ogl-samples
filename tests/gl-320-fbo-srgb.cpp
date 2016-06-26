@@ -41,7 +41,7 @@ namespace
 		1, 2, 0
 	};
 
-	void subdivise(std::vector<glm::vec3>& VertexData, std::size_t& VertexIndex, std::vector<GLushort>& ElementData, glm::uint32 I0, glm::uint32 J0, glm::uint32 K0, std::size_t Subdivise)
+	void subdivise(std::vector<glm::vec3>& VertexData, std::size_t& VertexIndex, std::vector<GLushort>& ElementData, glm::uint32 I0, glm::uint32 J0, glm::uint32 K0, int Subdivise)
 	{
 		if(Subdivise == 0)
 		{
@@ -51,8 +51,8 @@ namespace
 		}
 		else
 		{
-			if(VertexData.capacity() < VertexData.size() + 3)
-				VertexData.resize(VertexIndex * 2);
+			if(VertexIndex + 3 >= VertexData.size())
+				VertexData.resize(VertexData.size() * 2);
 
 			glm::vec3 const& A0 = VertexData[I0];
 			glm::vec3 const& B0 = VertexData[J0];
@@ -62,20 +62,33 @@ namespace
 			glm::uint32 const J1 = VertexIndex++;
 			glm::uint32 const K1 = VertexIndex++;
 
-			VertexData[I1] = glm::normalize((B0 + C0) * 0.5f);
-			VertexData[J1] = glm::normalize((C0 + A0) * 0.5f);
-			VertexData[K1] = glm::normalize((B0 + A0) * 0.5f);
+			glm::vec3 U = (B0 + C0) * 0.5f;
+			glm::vec3 V = (C0 + A0) * 0.5f;
+			glm::vec3 W = (A0 + B0) * 0.5f;
+
+			if(glm::length(U) > 0.0f)
+				U = glm::normalize(U);
+			if(glm::length(V) > 0.0f)
+				V = glm::normalize(V);
+			if(glm::length(W) > 0.0f)
+				W = glm::normalize(W);
+
+			VertexData[I1] = U;
+			VertexData[J1] = V;
+			VertexData[K1] = W;
 
 			subdivise(VertexData, VertexIndex, ElementData, I0, J1, K1, Subdivise - 1);
 			subdivise(VertexData, VertexIndex, ElementData, J0, K1, I1, Subdivise - 1);
 			subdivise(VertexData, VertexIndex, ElementData, K0, I1, J1, Subdivise - 1);
-			subdivise(VertexData, VertexIndex, ElementData, I1, J1, K1, Subdivise - 1);
+			subdivise(VertexData, VertexIndex, ElementData, J1, I1, K1, Subdivise - 1);
 		}
 	}
 
-	void generate_sphere(std::vector<glm::vec3>& VertexData, std::vector<GLushort>& ElementData, std::size_t Subdivision)
+	//http://www.3dgep.com/forward-plus/#Forward
+	//http://blog.coredumping.com/subdivision-of-icosahedrons/
+	//http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
+	void generate_sphere(std::vector<glm::vec3>& VertexData, std::vector<GLushort>& ElementData, int Subdivision)
 	{
-		VertexData.resize(4);
 		VertexData[0] = glm::normalize(glm::vec3(+1.0f, 0.0f,-0.70710678118f));
 		VertexData[1] = glm::normalize(glm::vec3(-1.0f, 0.0f,-0.70710678118f));
 		VertexData[2] = glm::normalize(glm::vec3(+0.0f,+1.0f,+0.70710678118f));
@@ -84,8 +97,98 @@ namespace
 		std::size_t VertexIndex = 4;
 		subdivise(VertexData, VertexIndex, ElementData, 0, 2, 3, Subdivision);
 		subdivise(VertexData, VertexIndex, ElementData, 0, 3, 1, Subdivision);
-		subdivise(VertexData, VertexIndex, ElementData, 1, 2, 3, Subdivision);
+		subdivise(VertexData, VertexIndex, ElementData, 1, 3, 2, Subdivision);
 		subdivise(VertexData, VertexIndex, ElementData, 1, 2, 0, Subdivision);
+	}
+
+	void subdivise_array(std::vector<glm::vec3>& VertexData, glm::vec3 const& A0, glm::vec3 const& B0, glm::vec3 const& C0, int Subdivise)
+	{
+		if(Subdivise == 0)
+		{
+			VertexData.push_back(A0);
+			VertexData.push_back(B0);
+			VertexData.push_back(C0);
+		}
+		else
+		{
+			glm::vec3 A1 = (B0 + C0) * 0.5f;
+			glm::vec3 B1 = (C0 + A0) * 0.5f;
+			glm::vec3 C1 = (A0 + B0) * 0.5f;
+
+			if(glm::length(A1) > 0.0f)
+				A1 = glm::normalize(A1);
+			if(glm::length(B1) > 0.0f)
+				B1 = glm::normalize(B1);
+			if(glm::length(C1) > 0.0f)
+				C1 = glm::normalize(C1);
+
+			subdivise_array(VertexData, A0, B1, C1, Subdivise - 1);
+			subdivise_array(VertexData, B0, C1, A1, Subdivise - 1);
+			subdivise_array(VertexData, C0, A1, B1, Subdivise - 1);
+			subdivise_array(VertexData, B1, A1, C1, Subdivise - 1);
+		}
+	}
+
+	void generate_sphere_array(std::vector<glm::vec3>& VertexData, int Subdivision)
+	{
+/*
+		glm::vec3 const& A = glm::normalize(glm::vec3(+1.0f, 0.0f,-0.70710678118f));
+		glm::vec3 const& B = glm::normalize(glm::vec3(-1.0f, 0.0f,-0.70710678118f));
+		glm::vec3 const& C = glm::normalize(glm::vec3(+0.0f,+1.0f,+0.70710678118f));
+		glm::vec3 const& D = glm::normalize(glm::vec3(+0.0f,-1.0f,+0.70710678118f));
+
+		subdivise_array(VertexData, A, C, D, Subdivision);
+		subdivise_array(VertexData, A, D, B, Subdivision);
+		subdivise_array(VertexData, B, D, C, Subdivision);
+		subdivise_array(VertexData, B, C, A, Subdivision);
+*/
+
+		//The golden ratio
+		float t = (1 +sqrt(5))/ 2;
+		float size = 1.0f;
+
+		glm::vec3 const A = glm::normalize(glm::vec3(-size, t * size, 0.0f));	// 0
+		glm::vec3 const B = glm::normalize(glm::vec3(+size, t * size, 0.0f));	// 1
+		glm::vec3 const C = glm::normalize(glm::vec3(-size,-t * size, 0.0f));	// 2
+		glm::vec3 const D = glm::normalize(glm::vec3(+size,-t * size, 0.0f));	// 3
+
+		glm::vec3 const E = glm::normalize(glm::vec3(0.0f,-size, t * size));	// 4
+		glm::vec3 const F = glm::normalize(glm::vec3(0.0f, size, t * size));	// 5
+		glm::vec3 const G = glm::normalize(glm::vec3(0.0f,-size,-t * size));	// 6
+		glm::vec3 const H = glm::normalize(glm::vec3(0.0f, size,-t * size));	// 7
+
+		glm::vec3 const I = glm::normalize(glm::vec3( t * size, 0.0f,-size));	// 8
+		glm::vec3 const J = glm::normalize(glm::vec3( t * size, 0.0f, size));	// 9
+		glm::vec3 const K = glm::normalize(glm::vec3(-t * size, 0.0f,-size));	// 10
+		glm::vec3 const L = glm::normalize(glm::vec3(-t * size, 0.0f, size));	// 11
+
+		// 5 faces around point 0
+		subdivise_array(VertexData, A, L, F, Subdivision);
+		subdivise_array(VertexData, A, F, B, Subdivision);
+		subdivise_array(VertexData, A, B, H, Subdivision);
+		subdivise_array(VertexData, A, H, K, Subdivision);
+		subdivise_array(VertexData, A, K, L, Subdivision);
+
+		// 5 adjacent faces
+		subdivise_array(VertexData, B, F, J, Subdivision);
+		subdivise_array(VertexData, F, L, E, Subdivision);
+		subdivise_array(VertexData, L, K, C, Subdivision);
+		subdivise_array(VertexData, K, H, G, Subdivision);
+		subdivise_array(VertexData, H, B, I, Subdivision);
+
+		// 5 faces around point 3
+		subdivise_array(VertexData, D, J, E, Subdivision);
+		subdivise_array(VertexData, D, E, C, Subdivision);
+		subdivise_array(VertexData, D, C, G, Subdivision);
+		subdivise_array(VertexData, D, G, I, Subdivision);
+		subdivise_array(VertexData, D, I, J, Subdivision);
+
+		// 5 adjacent faces
+		subdivise_array(VertexData, E, J, F, Subdivision);
+		subdivise_array(VertexData, C, E, L, Subdivision);
+		subdivise_array(VertexData, G, C, K, Subdivision);
+		subdivise_array(VertexData, I, G, H, Subdivision);
+		subdivise_array(VertexData, J, I, B, Subdivision);
 	}
 
 	namespace buffer
@@ -214,17 +317,28 @@ private:
 
 	bool initBuffer()
 	{
-		std::vector<glm::vec3> VertexData;
+/*
+		std::vector<glm::vec3> VertexData(1024);
 		std::vector<GLushort> ElementData;
-		generate_sphere(VertexData, ElementData, 0);
+		generate_sphere(VertexData, ElementData, 4);
 
 		this->ElementCount = ElementData.size();
 
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementData.size() * sizeof(GLushort), &g_ElementData[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementData.size() * sizeof(GLushort), &ElementData[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
+		glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec3), &VertexData[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+*/
+		std::vector<glm::vec3> VertexData;//(1024);
+		generate_sphere_array(VertexData, 4);
+		this->ElementCount = VertexData.size();
+
+		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec3), &VertexData[0], GL_STATIC_DRAW);
@@ -287,19 +401,20 @@ private:
 
 	bool initFramebuffer()
 	{
+		GLint const EncodingLinear = GL_LINEAR;
+		GLint const EncodingSRGB = GL_SRGB;
+
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		GLint FramebufferEncoding = 0;
+		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &FramebufferEncoding);
 
 		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		GLint const EncodingLinear = GL_LINEAR;
-		GLint const EncodingSRGB = GL_SRGB;
-
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
 
@@ -313,6 +428,8 @@ private:
 		// Explicitly convert linear pixel color to sRGB color space, as FramebufferName is a sRGB FBO
 		// Shader execution is done with linear color to get correct linear algebra working.
 		glEnable(GL_FRAMEBUFFER_SRGB);
+		glEnable(GL_CULL_FACE);
+		//glFrontFace(GL_CW);
 
 		if(Validated)
 			Validated = initProgram();
@@ -351,7 +468,7 @@ private:
 				0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
-			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 10.0f);
 		
 			*Pointer = Projection * this->view();
 
@@ -359,10 +476,11 @@ private:
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 
-		// Render a textured quad to a sRGB framebuffer object.
+		// Render to a sRGB framebuffer object.
 		{
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			glDepthFunc(GL_LEQUAL);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x) * this->FramebufferScale, static_cast<GLsizei>(WindowSize.y) * this->FramebufferScale);
 
@@ -373,24 +491,26 @@ private:
 
 			float Depth(1.0f);
 			glClearBufferfv(GL_DEPTH, 0, &Depth);
-			glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+			glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 			glUseProgram(ProgramName[program::RENDER]);
 
 			glBindVertexArray(VertexArrayName[program::RENDER]);
 			glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
-			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, this->ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+			glDrawArraysInstanced(GL_TRIANGLES, 0, this->ElementCount, 1);
+			//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, this->ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 		}
 
 		// Blit the sRGB framebuffer to the default framebuffer back buffer.
 		{
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glDisable(GL_DEPTH_TEST);
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			// glDisable(GL_FRAMEBUFFER_SRGB); // Uncomment to avoid the extra linear to sRGB conversion and hence get correct display
+			//glDisable(GL_FRAMEBUFFER_SRGB); // Uncomment to avoid the extra linear to sRGB conversion and hence get correct display
 
 			glUseProgram(ProgramName[program::SPLASH]);
 			glBindVertexArray(VertexArrayName[program::SPLASH]);

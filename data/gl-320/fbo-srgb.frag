@@ -6,7 +6,7 @@ layout(std140, column_major) uniform;
 
 in block
 {
-	vec4 Color;
+	flat vec4 Color;
 } In;
 
 out vec4 Color;

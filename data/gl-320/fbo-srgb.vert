@@ -17,11 +17,11 @@ const vec4 Color[] = vec4[3](
 
 out block
 {
-	vec4 Color;
+	flat vec4 Color;
 } Out;
 
 void main()
 {	
-	Out.Color = Color[gl_VertexID % 3];
+	Out.Color = abs(vec4(Position, 1.0));//Color[gl_VertexID % 3];
 	gl_Position = Transform.MVP * vec4(Position, 1.0);
 }

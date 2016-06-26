@@ -272,19 +272,20 @@ private:
 
 	bool initFramebuffer()
 	{
+		GLint const SRGB = GL_SRGB;
+		GLint const Linear = GL_LINEAR;
+
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER], 0);
+		GLint FramebufferEncoding = 0;
+		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &FramebufferEncoding);
 
 		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		
-		GLint const SRGB = GL_SRGB;
-		GLint const Linear = GL_LINEAR;
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
 		//if (Encoding != GL_SRGB)
@@ -366,7 +367,7 @@ private:
 
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			glEnable(GL_FRAMEBUFFER_SRGB);
+			//glEnable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 
