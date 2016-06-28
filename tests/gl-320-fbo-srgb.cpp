@@ -401,6 +401,8 @@ private:
 
 	bool initFramebuffer()
 	{
+		glDisable(GL_FRAMEBUFFER_SRGB);
+
 		GLint const EncodingLinear = GL_LINEAR;
 		GLint const EncodingSRGB = GL_SRGB;
 
@@ -408,15 +410,26 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+
 		GLint FramebufferEncoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &FramebufferEncoding);
+		if(FramebufferEncoding != GL_SRGB)
+			return false;
+
+		GLint FramebufferCapable = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &FramebufferCapable);
 
 		if(!this->checkFramebuffer(FramebufferName))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+/*
 		GLint Encoding = 0;
 		glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_BACK_LEFT, GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING, &Encoding);
+		GLint Capable = 0;
+		glGetIntegerv(GL_FRAMEBUFFER_SRGB_CAPABLE_EXT, &Capable);
+*/
 
 		return true;
 	}
@@ -510,7 +523,7 @@ private:
 			glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//glDisable(GL_FRAMEBUFFER_SRGB); // Uncomment to avoid the extra linear to sRGB conversion and hence get correct display
+			glDisable(GL_FRAMEBUFFER_SRGB);
 
 			glUseProgram(ProgramName[program::SPLASH]);
 			glBindVertexArray(VertexArrayName[program::SPLASH]);
