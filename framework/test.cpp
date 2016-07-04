@@ -533,6 +533,38 @@ namespace
 		}
 	};
 
+	struct heuristic_mipmaps_absolute_difference_max_four
+	{
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture2d TextureA(A);
+			gli::texture2d TextureB(B);
+			gli::texture2d MipmapsA(TextureA.format(), TextureA.extent());
+			gli::texture2d MipmapsB(TextureB.format(), TextureB.extent());
+			memcpy(MipmapsA.data(), TextureA.data(), TextureA.size());
+			memcpy(MipmapsB.data(), TextureB.data(), TextureB.size());
+			gli::texture2d GeneratedA = gli::generate_mipmaps(MipmapsA, gli::FILTER_LINEAR);
+			gli::texture2d GeneratedB = gli::generate_mipmaps(MipmapsB, gli::FILTER_LINEAR);
+			gli::texture ViewA = gli::view(GeneratedA, 3, 3);
+			gli::texture ViewB = gli::view(GeneratedB, 3, 3);
+			gli::texture Texture = absolute_difference(ViewA, ViewB, 1);
+			glm::u8vec3 AbsDiffMax(0);
+			glm::u32vec3 AbsDiffCount(0);
+			for(std::size_t TexelIndex = 0, TexelCount = Texture.size<glm::u8vec3>(); TexelIndex < TexelCount; ++TexelIndex)
+			{
+				glm::u8vec3 AbsDiff = *(Texture.data<glm::u8vec3>() + TexelIndex);
+				if(AbsDiff.x > 0)
+					++AbsDiffCount.x;
+				if(AbsDiff.y > 0)
+					++AbsDiffCount.y;
+				if(AbsDiff.z > 0)
+					++AbsDiffCount.z;
+				AbsDiffMax = glm::max(AbsDiff, AbsDiffMax);
+			}
+			return glm::all(glm::lessThanEqual(AbsDiffMax, glm::u8vec3(4)));
+		}
+	};
+
 	template <typename heuristic>
 	bool compare(gli::texture const& A, gli::texture const& B, heuristic const& Euristic)
 	{
@@ -602,6 +634,8 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_large_kernel());
 			if(!Heuristic)
 				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
+			if(!Heuristic)
+				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_four());
 			Success = Heuristic;
 		}
 
@@ -615,7 +649,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 			}
 
 			save_png(Template, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
-			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + "-generated.png").c_str());
+			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + ".png").c_str());
 		}
 	}
 
