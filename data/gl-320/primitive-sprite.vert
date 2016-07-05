@@ -12,12 +12,12 @@ in vec4 Color;
 
 out block
 {
-	vec4 Color;
+	vec3 Color;
 } Out;
 
 void main()
 {
-	Out.Color = Color;
+	Out.Color = Color.rgb;
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
 	gl_PointSize = 256.0 / -(MV * vec4(Position, 0.0, 1.0)).z;
 }

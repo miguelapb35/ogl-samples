@@ -648,7 +648,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 				save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 			}
 
-			save_png(Template, (getBinaryDirectory() + "/" + Title + "-template.png").c_str());
+			save_png(Template, (getBinaryDirectory() + "/" + Title + "-correct.png").c_str());
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + ".png").c_str());
 		}
 	}

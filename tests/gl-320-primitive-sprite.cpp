@@ -176,8 +176,12 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		//glEnable(GL_DEPTH_TEST);
+		//glDepthFunc(GL_LESS);
+
 		glEnable(GL_PROGRAM_POINT_SIZE);
 		//glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
 		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);

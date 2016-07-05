@@ -10,16 +10,18 @@ in vec2 gl_PointCoord;
 
 in block
 {
-	vec4 Color;
+	vec3 Color;
 } In;
 
 out vec4 Color;
 
 void main()
 {
-	if(length(gl_PointCoord - 0.5) > 0.5)
+	float Size = length(gl_PointCoord - 0.5);
+	if(Size > 0.5)
 		discard;
 
-	Color = In.Color * texture(Diffuse, gl_PointCoord);
+	Color.rgb = In.Color * texture(Diffuse, gl_PointCoord).rgb;
+	Color.a = smoothstep(0.0, 1.0, 1.0 - Size * 2.0);
 }
 

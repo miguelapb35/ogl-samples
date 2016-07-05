@@ -407,7 +407,37 @@ private:
 
 	bool initTexture()
 	{
-		TextureName[texture::TEXTURE] = glu::createTexture((getDataDirectory() + TEXTURE_DIFFUSE).c_str());
+		gli::texture2d Texture(gli::load(getDataDirectory() + TEXTURE_DIFFUSE));
+		if(Texture.empty())
+			return 0;
+
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+		GLenum const Target = GL.translate(Texture.target());
+		glm::tvec2<GLsizei> const Dimensions(Texture.extent());
+
+		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+		glTextureStorage2D(TextureName[texture::TEXTURE],
+			static_cast<GLint>(Texture.levels()), Format.Internal,
+			Dimensions.x, Texture.target() == gli::TARGET_2D ? Dimensions.y : static_cast<GLsizei>(Texture.layers() * Texture.faces()));
+
+		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
+		{
+			glTextureSubImage2D(TextureName[texture::TEXTURE], static_cast<GLint>(Level),
+				0, 0,
+				static_cast<GLsizei>(Texture[Level].extent().x), static_cast<GLsizei>(Texture[Level].extent().y),
+				Format.External, Format.Type,
+				Texture[Level].data());
+		}
+
 
 		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &TextureName[texture::MULTISAMPLE]);
 		glTextureParameteri(TextureName[texture::MULTISAMPLE], GL_TEXTURE_BASE_LEVEL, 0);
