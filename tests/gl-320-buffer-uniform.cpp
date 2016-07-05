@@ -187,7 +187,7 @@ private:
 
 			glUniformBlockBinding(ProgramName, this->UniformPerDraw, uniform::PER_DRAW);
 			glUniformBlockBinding(ProgramName, this->UniformPerPass, uniform::PER_PASS);
-			glUniformBlockBinding(ProgramName, this->UniformPerPass, uniform::PER_SCENE);
+			glUniformBlockBinding(ProgramName, this->UniformPerScene, uniform::PER_SCENE);
 		}
 	
 		return Validated;
