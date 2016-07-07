@@ -1,26 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Samples Pack (ogl-samples.g-truc.net)
-///
-/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "test.hpp"
 
 namespace
@@ -31,13 +8,31 @@ namespace
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-430/fbo-invalidate-splash.frag");
 
 	glm::uvec2 const FRAMEBUFFER_SIZE(80, 60);
-	std::vector<glm::vec2> VertexData;
+
+	GLsizei const VertexCount(4);
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
+	glf::vertex_v2fv2f const VertexData[VertexCount] =
+	{
+		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+	};
+
+	GLsizei const ElementCount(6);
+	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
+	GLushort const ElementData[ElementCount] =
+	{
+		0, 1, 2,
+		2, 3, 0
+	};
 
 	namespace buffer
 	{
 		enum type
 		{
 			VERTEX,
+			ELEMENT,
 			TRANSFORM,
 			MAX
 		};
@@ -137,17 +132,14 @@ private:
 
 	bool initBuffer()
 	{
-		std::size_t const Count(360);
-		float const Step(360.f / float(Count));
-
-		VertexData.resize(Count);
-		for(std::size_t i = 0; i < Count; ++i)
-			VertexData[i] = glm::vec2(glm::sin(glm::radians(Step * float(i))), glm::cos(glm::radians(Step * float(i))));
-
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexData.size() * sizeof(glm::vec2), &VertexData[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
@@ -167,10 +159,12 @@ private:
 
 		glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
 			glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), BUFFER_OFFSET(0));
+			glVertexAttribPointer(semantic::attr::POSITION, 2, GL_FLOAT, GL_FALSE, sizeof(glf::vertex_v2fv2f), BUFFER_OFFSET(0));
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glEnableVertexAttribArray(semantic::attr::POSITION);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
@@ -272,7 +266,7 @@ private:
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, WindowSize.x, WindowSize.y, 0.1f, 100.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 Model = glm::rotate(glm::mat4(1.0f), glm::radians(10.f), glm::vec3(0.0f, 0.0f, 1.0f));
 		
 			*Pointer = Projection * this->view() * Model;
 
@@ -286,14 +280,14 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::MULTISAMPLE]);
 
 		glViewportIndexedf(0, 0, 0, GLfloat(FRAMEBUFFER_SIZE.x), GLfloat(FRAMEBUFFER_SIZE.y));
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f)[0]);
 
 		glBindProgramPipeline(PipelineName[pipeline::MULTISAMPLE]);
 		glBindVertexArray(VertexArrayName[pipeline::MULTISAMPLE]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 
 		glEnable(GL_MULTISAMPLE);
-			glDrawArraysInstancedBaseInstance(GL_LINE_LOOP, 0, GLsizei(VertexData.size()), 3, 0);
+			glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0, 0);
 		glDisable(GL_MULTISAMPLE);
 
 		//////////////////////////
@@ -315,9 +309,7 @@ private:
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glDisable(GL_MULTISAMPLE);
 		glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, TextureName[texture::MULTISAMPLE]);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLOR]);
 		glBindVertexArray(VertexArrayName[pipeline::SPLASH]);
 		glBindProgramPipeline(PipelineName[pipeline::SPLASH]);

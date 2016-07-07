@@ -447,6 +447,8 @@ private:
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::COLORBUFFER]);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y));
 
 		return true;
@@ -464,9 +466,9 @@ private:
 			return false;
 
 		GLint Samples = 0;
-		glGetNamedFramebufferParameteriv(FramebufferName[framebuffer::RENDER], GL_SAMPLES, &Samples);
-		if (Samples != 4)
-			return false;
+		//glGetNamedFramebufferParameteriv(FramebufferName[framebuffer::RENDER], GL_SAMPLES, &Samples);
+//		if (Samples != 4)
+//			return false;
 
 		return true;
 	}
@@ -539,7 +541,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
-		glBindSamplers(0, 1, &SamplerName);
+		//glBindSamplers(0, 1, &SamplerName);
 		glBindTextureUnit(0, TextureName[texture::TEXTURE]);
 		glBindVertexArray(VertexArrayName);
 
@@ -558,7 +560,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
-		glBindSamplers(0, 1, &SamplerName);
+		//glBindSamplers(0, 1, &SamplerName);
 		glBindTextureUnit(0, TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 
@@ -577,7 +579,7 @@ private:
 			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::scale(glm::mat4(1), glm::vec3(2));
 		}
 
-		glBindSampler(0, this->SamplerName);
+		//glBindSampler(0, this->SamplerName);
 
 		// Step 1, render the scene in a multisampled framebuffer
 		glBindProgramPipeline(PipelineName);

@@ -30,21 +30,13 @@ namespace
 	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
-	glf::vertex_v2fv2f const VertexData[VertexCount] =
+	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
+	glm::vec2 const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
-	};
-
-	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
-	{
-		0, 1, 2, 
-		2, 3, 0
+		glm::vec2(-1.0f,-1.0f),
+		glm::vec2( 1.0f,-1.0f),
+		glm::vec2( 1.0f, 1.0f),
+		glm::vec2(-1.0f, 1.0f)
 	};
 
 	namespace buffer
@@ -52,9 +44,7 @@ namespace
 		enum type
 		{
 			TRANSFORM,
-			ELEMENT,
 			VERTEX,
-			INDIRECT,
 			MAX
 		};
 	}//namespace buffer
@@ -84,10 +74,6 @@ private:
 	{
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferStorage(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::VERTEX]);
 		glBufferStorage(GL_SHADER_STORAGE_BUFFER, VertexSize, VertexData, 0);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -97,14 +83,9 @@ private:
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+		glBufferStorage(GL_UNIFORM_BUFFER, UniformBlockSize * 2, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 		this->UniformPointer = reinterpret_cast<glm::mat4*>(glMapBufferRange(GL_UNIFORM_BUFFER,
-			0, sizeof(glm::mat4), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT));
-
-		DrawElementsIndirectCommand Command(ElementCount, 1, 0, 0, 0);
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, this->BufferName[buffer::INDIRECT]);
-		glBufferStorage(GL_DRAW_INDIRECT_BUFFER, sizeof(Command), &Command, 0);
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
+			0, sizeof(glm::mat4) * 2, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT));
 
 		return true;
 	}
@@ -179,7 +160,6 @@ private:
 	{
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
 		glBindVertexArray(0);
 
 		return true;
@@ -199,6 +179,12 @@ private:
 		if(Validated)
 			Validated = initTexture();
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glEnable(GL_PROGRAM_POINT_SIZE);
+		glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_UPPER_LEFT);
+
 		return Validated;
 	}
 
@@ -217,10 +203,14 @@ private:
 		glm::vec2 WindowSize(this->getWindowSize());
 
 		{
-			glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, WindowSize.x, WindowSize.y, 0.1f, 100.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+			glm::mat4 View = this->view();
+			glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+			glm::mat4 MVP = Projection * View * Model;
+			glm::mat4 MV = View * Model;
 		
-			*this->UniformPointer = Projection * this->view() * Model;
+			*(this->UniformPointer + 0) = MVP;
+			*(this->UniformPointer + 1) = MV;
 		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
@@ -229,13 +219,10 @@ private:
 		glBindProgramPipeline(PipelineName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::VERTEX]);
-		
 		glBindTextures(semantic::sampler::DIFFUSE, 1, &TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
 
-		glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0), 1, sizeof(DrawElementsIndirectCommand));
-		//glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 6, 1, 0);
+		glDrawArraysInstanced(GL_POINTS, 0, VertexCount, 1);
 
 		return true;
 	}
