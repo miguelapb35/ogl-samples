@@ -152,7 +152,7 @@ private:
 		glSamplerParameterfv(SamplerAName, GL_TEXTURE_BORDER_COLOR, &glm::vec4(0.0f)[0]);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MIN_LOD, -1000.f);
 		glSamplerParameterf(SamplerAName, GL_TEXTURE_MAX_LOD, 1000.f);
-		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 2.0f);
+		glSamplerParameterf(SamplerAName, GL_TEXTURE_LOD_BIAS, 0.0f);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		glSamplerParameteri(SamplerAName, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 

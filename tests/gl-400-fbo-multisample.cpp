@@ -312,7 +312,7 @@ private:
 		// Pass 1, render the scene in a multisampled framebuffer
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_SAMPLE_SHADING);
-		glMinSampleShading(2.0f);
+		glMinSampleShading(1.0f);
 
 		//glEnable(GL_SAMPLE_MASK);
 		//glSampleMaski(0, 0xFF);
