@@ -188,6 +188,8 @@ private:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, static_cast<GLint>(Texture.levels()),
 			Format.Internal,
@@ -253,88 +255,10 @@ private:
 
 		return Validated;
 	}
-/*
-	void rand_vector(std::vector<GLenum>& v)
-	{
-		for(std::size_t i = 0; i < v.size(); ++i)
-			v[i] = glm::linearRand<GLenum>(0, 65536);
-	}
 
-	std::vector<GLenum> intersect_vector(std::vector<GLenum>& A, std::vector<GLenum>& B)
-	{
-		std::sort(A.begin(), A.end());
-		std::sort(B.begin(), B.end());
-
-		std::vector<GLenum> result(A.size());
-
-		std::vector<GLenum>::iterator it = std::set_intersection(A.begin(), A.end(), B.begin(), B.end(), result.begin());
-
-		result.resize(it - result.begin()); 
-
-		return result;
-	}
-
-	void test_intersect_vector()
-	{
-		std::size_t const Count = 10000;
-		std::vector<GLenum> A(Count);
-		rand_vector(A);
-		std::vector<GLenum> B(Count);
-		rand_vector(B);
-
-		std::clock_t TimeStart = std::clock();
-
-		for(std::size_t i = 0; i < 10000; ++i)
-			std::vector<GLenum> result = intersect_vector(A, B);
-
-		std::clock_t TimeEnd = std::clock();
-
-		printf("test_intersect_vector: %d\n", TimeEnd - TimeStart);
-	}
-
-	std::vector<GLenum> intersect_set(std::vector<GLenum>& A, std::vector<GLenum>& B)
-	{
-		std::set<GLenum> R;
-		std::set<GLenum> S;
-
-		for(std::size_t i = 0; i < A.size(); ++i)
-			R.insert(A[i]);
-		for(std::size_t i = 0; i < B.size(); ++i)
-			S.insert(B[i]);
-
-		std::vector<GLenum> result(A.size());
-
-		std::vector<GLenum>::iterator it = std::set_intersection(A.begin(), A.end(), B.begin(), B.end(), result.begin());
-
-		result.resize(it - result.begin()); 
-
-		return result;
-	}
-
-	void test_intersect_set()
-	{
-		std::size_t const Count = 10000;
-		std::vector<GLenum> A(Count);
-		rand_vector(A);
-		std::vector<GLenum> B(Count);
-		rand_vector(B);
-
-		std::clock_t TimeStart = std::clock();
-
-		for(std::size_t i = 0; i < 10000; ++i)
-			std::vector<GLenum> result = intersect_set(A, B);
-
-		std::clock_t TimeEnd = std::clock();
-
-		printf("test_intersect_set: %d\n", TimeEnd - TimeStart);
-	}
-*/
 	bool begin()
 	{
-		bool Validated = this->checkExtension("GL_ARB_query_statistics_arb");
-
-//		test_intersect_vector();
-//		test_intersect_set();
+		bool Validated = this->checkExtension("GL_ARB_pipeline_statistics_query");
 
 		if(Validated)
 			Validated = initQuery();
