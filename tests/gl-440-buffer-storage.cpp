@@ -222,7 +222,7 @@ private:
 
 	bool end()
 	{
-		if(!UniformPointer)
+		if(UniformPointer)
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
