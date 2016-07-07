@@ -37,10 +37,10 @@ namespace
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
 	glf::vertex_v2fv2f const VertexData[VertexCount] =
 	{
-		glf::vertex_v2fv2f(glm::vec2(-1.0f,-1.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f,-1.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-1.0f, 1.0f), glm::vec2(0.0f, 0.0f))
+		glf::vertex_v2fv2f(glm::vec2(-2.0f,-2.0f), glm::vec2(0.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 2.0f,-2.0f), glm::vec2(1.0f, 1.0f)),
+		glf::vertex_v2fv2f(glm::vec2( 2.0f, 2.0f), glm::vec2(1.0f, 0.0f)),
+		glf::vertex_v2fv2f(glm::vec2(-2.0f, 2.0f), glm::vec2(0.0f, 0.0f))
 	};
 
 	GLsizei const ElementCount(6);
@@ -111,7 +111,7 @@ class gl_400_texture_derivative : public test
 {
 public:
 	gl_400_texture_derivative(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-texture-derivative", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.45f))
+		test(argc, argv, "gl-400-texture-derivative", test::CORE, 4, 0, glm::vec2(glm::pi<float>(), -glm::pi<float>() * 0.45f))
 	{}
 
 private:
@@ -204,14 +204,14 @@ private:
 
 		std::size_t TextureSize(128);
 		gli::texture2d Texture(gli::FORMAT_RGBA8_UNORM_PACK8, gli::texture2d::extent_type(TextureSize));
-		Texture[0].clear(glm::u8vec4(255, 0, 0, 255));
-		Texture[1].clear(glm::u8vec4(255, 128, 0, 255));
-		Texture[2].clear(glm::u8vec4(255, 255, 0, 255));
-		Texture[3].clear(glm::u8vec4(0, 255, 0, 255));
-		Texture[4].clear(glm::u8vec4(0, 255, 255, 255));
-		Texture[5].clear(glm::u8vec4(0, 0, 255, 255));
-		Texture[6].clear(glm::u8vec4(255, 0, 255, 255));
-		Texture[7].clear(glm::u8vec4(255, 255, 255, 255));
+		Texture[0].clear(glm::u8vec4(255, 255, 255, 255));
+		Texture[1].clear(glm::u8vec4(224, 224, 224, 255));
+		Texture[2].clear(glm::u8vec4(192, 192, 192, 255));
+		Texture[3].clear(glm::u8vec4(160, 160, 160, 255));
+		Texture[4].clear(glm::u8vec4(128, 128, 128, 255));
+		Texture[5].clear(glm::u8vec4( 96,  96,  96, 255));
+		Texture[6].clear(glm::u8vec4( 64,  64,  64, 255));
+		Texture[7].clear(glm::u8vec4( 32,  32,  32, 255));
 
 		assert(!Texture.empty());
 
@@ -352,7 +352,7 @@ private:
 				GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.2f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
 
 			*Pointer = Projection * this->view() * Model;
@@ -368,7 +368,7 @@ private:
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
-		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
+		glClearBufferfv(GL_COLOR, 0, &glm::vec4(1.0f, 0.5f, 0.0f, 1.0f)[0]);
 
 		glUseProgram(ProgramName[program::TEXTURE]);
 		glUniform1i(UniformDiffuse[program::TEXTURE], 0);

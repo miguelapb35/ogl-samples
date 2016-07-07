@@ -28,54 +28,6 @@
 #include <gli/generate_mipmaps.hpp>
 #include <fstream>
 
-namespace
-{
-	inline std::string vendor()
-	{
-		std::string String(reinterpret_cast<char const *>(glGetString(GL_VENDOR)));
-
-#		ifdef __APPLE__
-		std::string os("apple-");
-#		elif __linux__
-		std::string os("linux-");
-#		else
-		std::string os;
-#		endif
-		
-		if(String.find("NVIDIA") != std::string::npos)
-			return os + "nvidia/";
-		else if(String.find("ATI") != std::string::npos || String.find("AMD") != std::string::npos)
-			return os + "amd/";
-		else if(String.find("Intel") != std::string::npos)
-			return os + "intel/";
-		else
-			return os + "unknown/";
-	}
-
-	inline GLFWmonitor* GetMonitor(test::vendor const & Vendor)
-	{
-		if(Vendor == test::DEFAULT)
-		{
-			return glfwGetPrimaryMonitor();
-		}
-		else
-		{
-			int MonitorCount = 0;
-			GLFWmonitor** Monitors = glfwGetMonitors(&MonitorCount);
-
-			for(int MonitorIndex = 0; MonitorIndex < MonitorCount; ++MonitorIndex)
-			{
-				const char* MonitorName = glfwGetMonitorName(Monitors[MonitorIndex]);
-
-				if(1)
-					continue;
-
-				return Monitors[MonitorIndex];
-			}
-		}
-	}
-}//namespace
-
 std::string getDataDirectory()
 {
 	return std::string(OGL_SAMPLES_SOURCE_DIR) + "/data/";
@@ -644,7 +596,7 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		{
 			if(SameSize && !Template.empty())
 			{
-				gli::texture Diff = ::absolute_difference(Template, TextureRGB, 8);
+				gli::texture Diff = ::absolute_difference(Template, TextureRGB, 2);
 				save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 			}
 
