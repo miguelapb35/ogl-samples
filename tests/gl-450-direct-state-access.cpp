@@ -22,112 +22,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "test.hpp"
-//#include "dsa.hpp"
-
-namespace glu
-{
-	GLuint createTexture(char const* Filename)
-	{
-		gli::texture Texture(gli::load(Filename));
-		if(Texture.empty())
-			return 0;
-
-		gli::gl GL(gli::gl::PROFILE_GL33);
-		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
-		GLenum Target = GL.translate(Texture.target());
-
-		GLuint TextureName = 0;
-		glGenTextures(1, &TextureName);
-		glBindTexture(Target, TextureName);
-		glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
-		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
-		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
-		glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
-
-		glm::tvec3<GLsizei> const Dimensions(Texture.extent());
-
-		switch(Texture.target())
-		{
-		case gli::TARGET_1D:
-			glTexStorage1D(
-				Target, static_cast<GLint>(Texture.levels()), Format.Internal, Dimensions.x);
-			break;
-		case gli::TARGET_1D_ARRAY:
-		case gli::TARGET_2D:
-		case gli::TARGET_CUBE:
-			glTexStorage2D(
-				Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-				Dimensions.x, Texture.target() == gli::TARGET_2D ? Dimensions.y : static_cast<GLsizei>(Texture.layers() * Texture.faces()));
-			break;
-		case gli::TARGET_2D_ARRAY:
-		case gli::TARGET_3D:
-		case gli::TARGET_CUBE_ARRAY:
-			glTexStorage3D(
-				Target, static_cast<GLint>(Texture.levels()), Format.Internal,
-				Dimensions.x, Dimensions.y, Texture.target() == gli::TARGET_3D ? Dimensions.z : static_cast<GLsizei>(Texture.layers() * Texture.faces()));
-			break;
-		default:
-			assert(0);
-			break;
-		}
-
-		for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
-		for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-		{
-			glm::tvec3<GLsizei> Dimensions(Texture.extent(Level));
-			Target = gli::is_target_cube(Texture.target()) ? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face) : Target;
-
-			switch(Texture.target())
-			{
-			case gli::TARGET_1D:
-				if(gli::is_compressed(Texture.format()))
-					glCompressedTexSubImage1D(
-						Target, static_cast<GLint>(Level), 0, Dimensions.x,
-						Format.Internal, static_cast<GLsizei>(Texture.size(Level)), Texture.data(Layer, Face, Level));
-				else
-					glTexSubImage1D(
-						Target, static_cast<GLint>(Level), 0, Dimensions.x,
-						Format.External, Format.Type, Texture.data(Layer, Face, Level));
-				break;
-			case gli::TARGET_1D_ARRAY:
-			case gli::TARGET_2D:
-			case gli::TARGET_CUBE:
-				if(gli::is_compressed(Texture.format()))
-					glCompressedTexSubImage2D(
-						Target, static_cast<GLint>(Level),
-						0, 0, Dimensions.x, Texture.target() == gli::TARGET_1D_ARRAY ? static_cast<GLsizei>(Layer) : Dimensions.y,
-						Format.Internal, static_cast<GLsizei>(Texture.size(Level)), Texture.data(Layer, Face, Level));
-				else
-					glTexSubImage2D(
-						Target, static_cast<GLint>(Level),
-						0, 0, Dimensions.x, Texture.target() == gli::TARGET_1D_ARRAY ? static_cast<GLsizei>(Layer) : Dimensions.y,
-						Format.External, Format.Type, Texture.data(Layer, Face, Level));
-				break;
-			case gli::TARGET_2D_ARRAY:
-			case gli::TARGET_3D:
-			case gli::TARGET_CUBE_ARRAY:
-				if(gli::is_compressed(Texture.format()))
-					glCompressedTexSubImage3D(
-						Target, static_cast<GLint>(Level),
-						0, 0, 0, Dimensions.x, Dimensions.y, Texture.target() == gli::TARGET_3D ? Dimensions.z : static_cast<GLsizei>(Layer),
-						Format.Internal, static_cast<GLsizei>(Texture.size(Level)), Texture.data(Layer, Face, Level));
-				else
-					glTexSubImage3D(
-						Target, static_cast<GLint>(Level),
-						0, 0, 0, Dimensions.x, Dimensions.y, Texture.target() == gli::TARGET_3D ? Dimensions.z : static_cast<GLsizei>(Layer),
-						Format.External, Format.Type, Texture.data(Layer, Face, Level));
-				break;
-			default: assert(0); break;
-			}
-		}
-		return TextureName;
-	}
-}//namespace glu
 
 namespace
 {
@@ -196,126 +90,6 @@ namespace
 		};
 	}//namespace texture
 }//namespace
-
-GLuint CreateFramebuffer(GLsizei layers, GLsizei width, GLsizei height, GLsizei samples, GLboolean fixedsamplelocations)
-{
-	GLuint framebuffer = 0;
-	glCreateFramebuffers(1, &framebuffer);
-	glNamedFramebufferParameteri(framebuffer, GL_FRAMEBUFFER_DEFAULT_LAYERS, layers);
-	glNamedFramebufferParameteri(framebuffer, GL_FRAMEBUFFER_DEFAULT_WIDTH, width);
-	glNamedFramebufferParameteri(framebuffer, GL_FRAMEBUFFER_DEFAULT_HEIGHT, height);
-	glNamedFramebufferParameteri(framebuffer, GL_FRAMEBUFFER_DEFAULT_SAMPLES, samples);
-	glNamedFramebufferParameteri(framebuffer, GL_FRAMEBUFFER_DEFAULT_FIXED_SAMPLE_LOCATIONS, fixedsamplelocations);
-	return framebuffer;
-}
-
-void FramebufferAttachment(GLuint framebuffer, GLenum attachment, GLuint texture, GLint level)
-{
-	glNamedFramebufferTexture(framebuffer, attachment, texture, level);
-}
-
-GLuint glCreateTextureGTC(GLenum target, GLsizei layers, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLsizei samples, GLboolean fixedsamplelocations)
-{
-	GLuint texture = 0;
-	glCreateTextures(target, 1, &texture);
-	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	switch (target)
-	{
-	case GL_TEXTURE_2D:
-		assert(layers == 1 && width >= 1 && height >= 1 && depth == 1 && samples == 1 && fixedsamplelocations == GL_TRUE);
-		glTextureStorage2D(texture, levels, internalformat, width, height);
-		break;
-	case GL_TEXTURE_2D_ARRAY:
-		assert(layers >= 1 && width >= 1 && height >= 1 && depth == 1 && samples == 1 && fixedsamplelocations == GL_TRUE);
-		glTextureStorage3D(texture, levels, internalformat, width, height, layers);
-		break;
-	case GL_TEXTURE_2D_MULTISAMPLE:
-		assert(layers == 1 && width >= 1 && height >= 1 && depth == 1 && samples >= 1);
-		glTextureStorage2DMultisample(texture, samples, internalformat, width, height, fixedsamplelocations);
-		break;
-	case GL_TEXTURE_2D_MULTISAMPLE_ARRAY:
-		assert(layers >= 1 && width >= 1 && height >= 1 && depth == 1 && samples >= 1);
-		glTextureStorage3DMultisample(texture, samples, internalformat, width, height, layers, fixedsamplelocations);
-		break;
-	case GL_TEXTURE_3D:
-		assert(layers == 1 && width >= 1 && height >= 1 && depth >= 1 && samples == 1 && fixedsamplelocations == GL_TRUE);
-		glTextureStorage3D(texture, levels, internalformat, width, height, depth);
-		break;
-	case GL_TEXTURE_CUBE_MAP:
-		assert(layers == 1 && width >= 1 && height >= 1 && depth == 1 && samples == 1 && fixedsamplelocations == GL_TRUE);
-		glTextureStorage2D(texture, levels, internalformat, width, height);
-		break;
-	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		assert(layers >= 1 && width >= 1 && height >= 1 && depth == 1 && samples == 1 && fixedsamplelocations == GL_TRUE);
-		glTextureStorage3D(texture, levels, internalformat, width, height, layers * 6);
-		break;
-	}
-
-	return texture;
-}
-
-void glTextureLevelsGTC(GLuint texture, GLint baseLevel, GLint maxLevel)
-{
-	glTextureParameteri(texture, GL_TEXTURE_BASE_LEVEL, baseLevel);
-	glTextureParameteri(texture, GL_TEXTURE_MAX_LEVEL, maxLevel);
-}
-
-void glTextureSwizzleGTC(GLuint texture, GLint red, GLint green, GLint blue, GLint alpha)
-{
-	glTextureParameteri(texture, GL_TEXTURE_SWIZZLE_R, red);
-	glTextureParameteri(texture, GL_TEXTURE_SWIZZLE_G, green);
-	glTextureParameteri(texture, GL_TEXTURE_SWIZZLE_B, blue);
-	glTextureParameteri(texture, GL_TEXTURE_SWIZZLE_A, alpha);
-}
-
-GLuint glCreateSamplerGTC(GLenum mag, GLenum min, GLenum mip, GLenum wrap, GLfloat borderColor[4], GLenum compare)
-{
-	assert(mag == GL_LINEAR || mag == GL_NEAREST);
-	assert(min == GL_LINEAR || min == GL_NEAREST);
-	assert(mip == GL_LINEAR || mip == GL_NEAREST);
-
-	GLuint sampler = 0;
-	glCreateSamplers(1, &sampler);
-
-	GLint minFilter = GL_NONE;
-	if (min == GL_LINEAR)
-		minFilter = mip == GL_LINEAR ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR_MIPMAP_NEAREST;
-	else
-		minFilter = mip == GL_LINEAR ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST;
-
-	glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, minFilter);
-	glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, mag);
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, wrap);
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, wrap);
-	glSamplerParameteri(sampler, GL_TEXTURE_WRAP_R, wrap);
-	glSamplerParameterfv(sampler, GL_TEXTURE_BORDER_COLOR, borderColor);
-	glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_MODE, compare == GL_NONE ? GL_NONE : GL_COMPARE_R_TO_TEXTURE);
-	glSamplerParameteri(sampler, GL_TEXTURE_COMPARE_FUNC, compare != GL_NONE ? compare : GL_LEQUAL);
-
-	return sampler;
-}
-
-GLuint glCreateVertexFormatGTC()
-{
-	GLuint vertexFormat = 0;
-	glCreateVertexArrays(1, &vertexFormat);
-	return vertexFormat;
-}
-
-void glVertexFormatAttribGTC(GLuint vertexFormat, GLuint attribindex, GLuint bindingindex, GLint size, GLenum internalType, GLenum externalType, GLboolean normalized, GLuint relativeoffset)
-{
-	assert((internalType == GL_INT && normalized == GL_FALSE) || internalType == GL_FLOAT || (internalType == GL_DOUBLE && normalized == GL_FALSE));
-	glEnableVertexArrayAttrib(vertexFormat, attribindex);
-	glVertexArrayAttribBinding(vertexFormat, attribindex, bindingindex);
-	if (internalType == GL_INT)
-		glVertexArrayAttribIFormat(vertexFormat, attribindex, size, externalType, relativeoffset);
-	else if (internalType == GL_DOUBLE)
-		glVertexArrayAttribLFormat(vertexFormat, attribindex, size, externalType, relativeoffset);
-	else
-		glVertexArrayAttribFormat(vertexFormat, attribindex, size, externalType, normalized, relativeoffset);
-}
 
 class instance : public test
 {
@@ -419,8 +193,6 @@ private:
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::TEXTURE]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MIN_FILTER, Texture.levels() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
 		glTextureParameteri(TextureName[texture::TEXTURE], GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
@@ -447,8 +219,6 @@ private:
 		glCreateTextures(GL_TEXTURE_2D, 1, &TextureName[texture::COLORBUFFER]);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_BASE_LEVEL, 0);
 		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAX_LEVEL, 0);
-		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(TextureName[texture::COLORBUFFER], GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTextureStorage2D(TextureName[texture::COLORBUFFER], 1, GL_RGBA8, GLsizei(FRAMEBUFFER_SIZE.x), GLsizei(FRAMEBUFFER_SIZE.y));
 
 		return true;
@@ -541,7 +311,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], 0, this->UniformBlockSize);
-		//glBindSamplers(0, 1, &SamplerName);
+		glBindSamplers(0, 1, &SamplerName);
 		glBindTextureUnit(0, TextureName[texture::TEXTURE]);
 		glBindVertexArray(VertexArrayName);
 
@@ -560,7 +330,7 @@ private:
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindBufferRange(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM], this->UniformBlockSize, this->UniformBlockSize);
-		//glBindSamplers(0, 1, &SamplerName);
+		glBindSamplers(0, 1, &SamplerName);
 		glBindTextureUnit(0, TextureName[texture::COLORBUFFER]);
 		glBindVertexArray(VertexArrayName);
 
@@ -578,8 +348,6 @@ private:
 			glm::mat4 ProjectionB = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
 			*reinterpret_cast<glm::mat4*>(this->UniformPointer + this->UniformBlockSize) = ProjectionB * this->view() * glm::scale(glm::mat4(1), glm::vec3(2));
 		}
-
-		//glBindSampler(0, this->SamplerName);
 
 		// Step 1, render the scene in a multisampled framebuffer
 		glBindProgramPipeline(PipelineName);

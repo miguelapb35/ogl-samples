@@ -640,15 +640,17 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 		}
 
 		// Save abs diff
-		if(!Success && !Template.empty())
+		if(!Success)
 		{
-			if(SameSize)
+			if(SameSize && !Template.empty())
 			{
 				gli::texture Diff = ::absolute_difference(Template, TextureRGB, 8);
 				save_png(gli::texture2d(Diff), (getBinaryDirectory() + "/" + Title + "-diff.png").c_str());
 			}
 
-			save_png(Template, (getBinaryDirectory() + "/" + Title + "-correct.png").c_str());
+			if(!Template.empty())
+				save_png(Template, (getBinaryDirectory() + "/" + Title + "-correct.png").c_str());
+
 			save_png(TextureRGB, (getBinaryDirectory() + "/" + Title + ".png").c_str());
 		}
 	}
