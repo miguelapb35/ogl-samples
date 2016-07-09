@@ -26,6 +26,8 @@
 #include <glm/vector_relational.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <gli/generate_mipmaps.hpp>
+#include <gli/copy.hpp>
+#include <gli/duplicate.hpp>
 #include <fstream>
 
 std::string getDataDirectory()
@@ -382,6 +384,9 @@ namespace
 			{
 				gli::texture2d::extent_type const TexelCoordA(TexelIndexX, TexelIndexY);
 				glm::u8vec3 const TexelA = TextureA.load<glm::u8vec3>(TexelCoordA, 0);
+				glm::u8vec3 const TexelB = TextureB.load<glm::u8vec3>(TexelCoordA, 0);
+				if (TexelA == TexelB)
+					continue;
 
 				bool const ValidTexel = this->kernel(TexelCoordA, TexelA, TextureB);
 				if(!ValidTexel)
@@ -518,6 +523,70 @@ namespace
 		}
 	};
 
+	struct heuristic_mipmaps_absolute_difference_max_channel
+	{
+		bool kernel(gli::texture2d::extent_type const& TexelCoordA, glm::u8vec3 const& TexelA, gli::texture2d const& TextureB) const
+		{
+			int const KernelSize = 1;
+
+			glm::u8vec3 TexelB[KernelSize * KernelSize];
+
+			for(int KernelIndexY = 0; KernelIndexY < KernelSize; ++KernelIndexY)
+			for(int KernelIndexX = 0; KernelIndexX < KernelSize; ++KernelIndexX)
+			{
+				gli::texture2d::extent_type const KernelCoordB(KernelIndexX - KernelSize / 2, KernelIndexY - KernelSize / 2);
+				gli::texture2d::extent_type const TexelCoordB = TexelCoordA + KernelCoordB;
+
+				gli::texture2d::extent_type ClampedTexelCoord = glm::clamp(TexelCoordB, glm::ivec2(0), glm::ivec2(TextureB.extent()) - glm::ivec2(1));
+				TexelB[KernelIndexY * KernelSize + KernelIndexX] = TextureB.load<glm::u8vec3>(ClampedTexelCoord, 0);
+			}
+
+			glm::vec3 TexelDiff[KernelSize * KernelSize];
+			for(int KernelIndex = 0; KernelIndex < KernelSize * KernelSize; ++KernelIndex)
+			{
+				TexelDiff[KernelIndex] = glm::abs(glm::vec3(TexelB[KernelIndex]) - glm::vec3(TexelA));
+
+				float MaxComponent = glm::max(glm::max(TexelDiff[KernelIndex].r, TexelDiff[KernelIndex].g), TexelDiff[KernelIndex].b);
+				float MinComponent = glm::min(glm::min(TexelDiff[KernelIndex].r, TexelDiff[KernelIndex].g), TexelDiff[KernelIndex].b);
+				if(MaxComponent < 17.f && MinComponent < 6.f)
+					return true;
+				continue;
+			}
+
+			return false;
+		}
+
+		bool test(gli::texture const& A, gli::texture const& B) const
+		{
+			gli::texture2d TextureA(A);
+			gli::texture2d TextureB(B);
+			gli::texture2d MipmapsA(TextureA.format(), TextureA.extent());
+			gli::texture2d MipmapsB(TextureB.format(), TextureB.extent());
+			memcpy(MipmapsA.data(), TextureA.data(), TextureA.size());
+			memcpy(MipmapsB.data(), TextureB.data(), TextureB.size());
+			gli::texture2d GeneratedA = gli::generate_mipmaps(MipmapsA, gli::FILTER_LINEAR);
+			gli::texture2d GeneratedB = gli::generate_mipmaps(MipmapsB, gli::FILTER_LINEAR);
+			gli::texture2d ViewA(gli::view(GeneratedA, 3, 3));
+			gli::texture2d ViewB(gli::view(GeneratedB, 3, 3));
+
+			for(std::size_t TexelIndexY = 0, TexelCountY = ViewA.extent().y; TexelIndexY < TexelCountY; ++TexelIndexY)
+			for(std::size_t TexelIndexX = 0, TexelCountX = ViewA.extent().x; TexelIndexX < TexelCountX; ++TexelIndexX)
+			{
+				gli::texture2d::extent_type const TexelCoordA(TexelIndexX, TexelIndexY);
+				glm::u8vec3 const TexelA = ViewA.load<glm::u8vec3>(TexelCoordA, 0);
+				glm::u8vec3 const TexelB = ViewB.load<glm::u8vec3>(TexelCoordA, 0);
+				if (TexelA == TexelB)
+					continue;
+
+				bool const ValidTexel = this->kernel(TexelCoordA, TexelA, ViewB);
+				if(!ValidTexel)
+					return false;
+			}
+
+			return true;
+		}
+	};
+
 	template <typename heuristic>
 	bool compare(gli::texture const& A, gli::texture const& B, heuristic const& Euristic)
 	{
@@ -589,6 +658,8 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 				Pass = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
 			if(!Pass && (this->Heuristic & HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT))
 				Pass = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_four());
+			if(!Pass && (this->Heuristic & HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_CHANNEL_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_channel());
 			Success = Pass;
 		}
 

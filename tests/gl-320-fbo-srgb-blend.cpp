@@ -1,26 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Samples Pack (ogl-samples.g-truc.net)
-///
-/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "test.hpp"
 
 namespace
@@ -31,30 +8,10 @@ namespace
 	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit-blend.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
-	GLsizei const VertexCount(4);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
-	glf::vertex_v2fv2f const VertexData[VertexCount] =
-	{
-		glf::vertex_v2fv2f(glm::vec2(-10.0f,-10.0f), glm::vec2(0.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 10.0f,-10.0f), glm::vec2(1.0f, 1.0f)),
-		glf::vertex_v2fv2f(glm::vec2( 10.0f, 10.0f), glm::vec2(1.0f, 0.0f)),
-		glf::vertex_v2fv2f(glm::vec2(-10.0f, 10.0f), glm::vec2(0.0f, 0.0f))
-	};
-
-	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
-	{
-		0, 1, 2,
-		2, 3, 0
-	};
-
 	namespace buffer
 	{
 		enum type
 		{
-			VERTEX,
-			ELEMENT,
 			TRANSFORM,
 			MAX
 		};
@@ -98,7 +55,7 @@ class gl_320_fbo_srgb_blend : public test
 {
 public:
 	gl_320_fbo_srgb_blend(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2, HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT),
+		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2, HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_CHANNEL_BIT),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -177,14 +134,6 @@ private:
 	bool initBuffer()
 	{
 		glGenBuffers(buffer::MAX, &BufferName[0]);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, BufferName[buffer::ELEMENT]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ElementSize, ElementData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::VERTEX]);
-		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
