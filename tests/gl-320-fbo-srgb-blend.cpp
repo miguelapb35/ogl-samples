@@ -98,7 +98,7 @@ class gl_320_fbo_srgb_blend : public test
 {
 public:
 	gl_320_fbo_srgb_blend(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2),
+		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2, HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)

@@ -75,8 +75,17 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
+	heuristic Heuristic
+) :
+	test(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4), 2, MATCH_TEMPLATE, Heuristic)
+{}
+
+test::test
+(
+	int argc, char* argv[], char const * Title,
+	profile Profile, int Major, int Minor,
 	glm::uvec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
-	std::size_t FrameCount, success Success
+	std::size_t FrameCount, success Success, heuristic Heuristic
 ) :
 	Window(nullptr),
 	Success(Success),
@@ -97,7 +106,7 @@ test::test
 	RotationCurrent(Orientation),
 	MouseButtonFlags(0),
 	Error(false),
-	Heuristic(HEURISTIC_ALL)
+	Heuristic(Heuristic)
 {
 	assert(WindowSize.x > 0 && WindowSize.y > 0);
 

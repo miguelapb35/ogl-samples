@@ -139,7 +139,7 @@ std::string getBinaryDirectory();
 class test
 {
 public:
-	enum
+	enum heuristic
 	{
 		HEURISTIC_EQUAL_BIT = (1 << 0),
 		HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT = (1 << 1),
@@ -246,7 +246,8 @@ protected:
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
 		std::size_t FrameCount = 2,
-		success Success = MATCH_TEMPLATE);
+		success Success = MATCH_TEMPLATE,
+		heuristic Heuristic = HEURISTIC_ALL);
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
@@ -265,6 +266,10 @@ protected:
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
+	test(
+		int argc, char* argv[], char const * Title,
+		profile Profile, int Major, int Minor,
+		heuristic Heuristic);
 	virtual ~test();
 
 	virtual bool begin() = 0;
