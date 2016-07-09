@@ -75,17 +75,8 @@ test::test
 (
 	int argc, char* argv[], char const * Title,
 	profile Profile, int Major, int Minor,
-	bool sRGB
-) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4), 2, MATCH_TEMPLATE, true)
-{}
-
-test::test
-(
-	int argc, char* argv[], char const * Title,
-	profile Profile, int Major, int Minor,
 	glm::uvec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
-	std::size_t FrameCount, success Success, bool sRGB
+	std::size_t FrameCount, success Success
 ) :
 	Window(nullptr),
 	Success(Success),
@@ -105,7 +96,8 @@ test::test
 	RotationOrigin(Orientation), 
 	RotationCurrent(Orientation),
 	MouseButtonFlags(0),
-	Error(false)
+	Error(false),
+	Heuristic(HEURISTIC_ALL)
 {
 	assert(WindowSize.x > 0 && WindowSize.y > 0);
 
@@ -575,20 +567,20 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
 
 		if(Success)
 		{
-			bool Heuristic = false;
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_equal());
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one());
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_kernel());
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_large_kernel());
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
-			if(!Heuristic)
-				Heuristic = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_four());
-			Success = Heuristic;
+			bool Pass = false;
+			if(!Pass && this->Heuristic & HEURISTIC_EQUAL_BIT)
+				Pass = compare(Template, TextureRGB, heuristic_equal());
+			if(!Pass && (this->Heuristic & HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_absolute_difference_max_one());
+			if(!Pass && (this->Heuristic & HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_KERNEL_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_kernel());
+			if(!Pass && (this->Heuristic & HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_LARGE_KERNEL_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_absolute_difference_max_one_large_kernel());
+			if(!Pass && (this->Heuristic & HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_one());
+			if(!Pass && (this->Heuristic & HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT))
+				Pass = compare(Template, TextureRGB, heuristic_mipmaps_absolute_difference_max_four());
+			Success = Pass;
 		}
 
 		// Save abs diff

@@ -139,6 +139,17 @@ std::string getBinaryDirectory();
 class test
 {
 public:
+	enum
+	{
+		HEURISTIC_EQUAL_BIT = (1 << 0),
+		HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT = (1 << 1),
+		HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_KERNEL_BIT = (1 << 2),
+		HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_LARGE_KERNEL_BIT = (1 << 3),
+		HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT = (1 << 4),
+		HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT = (1 << 5),
+		HEURISTIC_ALL = HEURISTIC_EQUAL_BIT | HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT | HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_KERNEL_BIT | HEURISTIC_ABSOLUTE_DIFFERENCE_MAX_ONE_LARGE_KERNEL_BIT | HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_ONE_BIT | HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_FOUR_BIT
+	};
+
 	enum vendor
 	{
 		DEFAULT,
@@ -235,8 +246,7 @@ protected:
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4),
 		std::size_t FrameCount = 2,
-		success Success = MATCH_TEMPLATE,
-		bool sRGB = false);
+		success Success = MATCH_TEMPLATE);
 	test(
 		int argc, char* argv[], char const * Title,
 		profile Profile, int Major, int Minor,
@@ -255,10 +265,6 @@ protected:
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
-	test(
-		int argc, char* argv[], char const * Title,
-		profile Profile, int Major, int Minor,
-		bool sRGB);
 	virtual ~test();
 
 	virtual bool begin() = 0;
@@ -306,6 +312,7 @@ private:
 	int MouseButtonFlags;
 	std::array<bool, 512> KeyPressed;
 	bool Error;
+	std::size_t Heuristic;
 
 private:
 	double TimeSum, TimeMin, TimeMax;
