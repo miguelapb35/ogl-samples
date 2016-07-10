@@ -1,5 +1,4 @@
-#ifndef BUFFER_INCLUDED
-#define BUFFER_INCLUDED
+#pragma once
 
 #include <vector>
 #include <cstddef>
@@ -114,5 +113,3 @@ namespace gl
 	};
 */
 }//namespace gl
-
-#endif//BUFFER_INCLUDED
