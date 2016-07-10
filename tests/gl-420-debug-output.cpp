@@ -220,6 +220,8 @@ private:
 		}
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
+
+		// Error added to test debug output
 		glClearBufferfv(GL_UNIFORM_BUFFER, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);
