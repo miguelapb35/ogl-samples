@@ -73,7 +73,6 @@ namespace
 	struct transfer
 	{
 		GLuint Buffer;
-		GLuint Stagging;
 		GLsync Fence;
 	};
 }//namespace
@@ -309,15 +308,9 @@ private:
 		transfer* Transfer = new transfer;
 		if(ReadPixelBufferFree.empty())
 		{
-			glGenBuffers(1, &Transfer->Stagging);
-			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Stagging);
-			//glBufferData(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_STREAM_COPY);
-			glBufferStorage(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
-
 			glGenBuffers(1, &Transfer->Buffer);
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
-			//glBufferData(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_STATIC_COPY);
-			glBufferStorage(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, 0);
+			glBufferStorage(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
 
 			Transfer->Fence = NULL;
 		}
@@ -344,7 +337,7 @@ private:
 
 			if(Status == GL_SIGNALED)
 			{
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Stagging);
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
 				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 640 * 480 * 4, GL_MAP_READ_BIT);
 				memcpy(&ReadPixelData[0], Data, 640 * 480 * 4);
 				glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
@@ -406,9 +399,6 @@ private:
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, TransferFBO->Buffer);
 			glReadBuffer(GL_COLOR_ATTACHMENT0);
 			glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-			glBindBuffer(GL_COPY_READ_BUFFER, TransferFBO->Buffer);
-			glBindBuffer(GL_COPY_WRITE_BUFFER, TransferFBO->Stagging);
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 640 * 480 * 4);
 			TransferFBO->Fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 		}
 
@@ -430,9 +420,6 @@ private:
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, TransferFB->Buffer);
 			glReadBuffer(GL_BACK);
 			glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-			glBindBuffer(GL_COPY_READ_BUFFER, TransferFB->Buffer);
-			glBindBuffer(GL_COPY_WRITE_BUFFER, TransferFB->Stagging);
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 640 * 480 * 4);
 			TransferFB->Fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 		}
 
