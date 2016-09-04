@@ -83,7 +83,112 @@ namespace
 }//namespace
 
 /// Filename can be KTX or DDS files
-GLuint create_texture(char const* Filename)
+/*
+GLuint create_texture_image(char const* Filename)
+{
+	gli::texture Texture = gli::load(Filename);
+	if(Texture.empty())
+		return 0;
+
+	gli::gl GL(gli::gl::PROFILE_GL33);
+	gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+	GLenum Target = GL.translate(Texture.target());
+
+	GLuint TextureName = 0;
+	glGenTextures(1, &TextureName);
+	glBindTexture(Target, TextureName);
+	// Base and max level are not supported by OpenGL ES 2.0
+	glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+	//Texture swizzle is not supported by OpenGL ES 2.0 and OpenGL 3.2
+	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+
+	glm::tvec3<GLsizei> const Extent(Texture.extent());
+	GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
+
+	for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+	for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
+	{
+		GLsizei const LayerGL = static_cast<GLsizei>(Layer);
+		glm::tvec3<GLsizei> Extent(Texture.extent(Level));
+		Target = gli::is_target_cube(Texture.target())
+			? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
+			: Target;
+
+		switch(Texture.target())
+		{
+		case gli::TARGET_1D:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTexImage1D(
+					Target,
+					Format.Internal,
+					static_cast<GLint>(Level), 0, Extent.x,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTexImage1D(
+					Target, static_cast<GLint>(Level),
+					Format.Internal,
+					Extent.x,
+					0,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		case gli::TARGET_1D_ARRAY:
+		case gli::TARGET_2D:
+		case gli::TARGET_CUBE:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTexImage2D(
+					Target, static_cast<GLint>(Level),
+					Format.Internal,
+					Extent.x,
+					Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+					0,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTexImage2D(
+					Target, static_cast<GLint>(Level),
+					Format.Internal,
+					Extent.x,
+					Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+					0,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		case gli::TARGET_2D_ARRAY:
+		case gli::TARGET_3D:
+		case gli::TARGET_CUBE_ARRAY:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTexImage3D(
+					Target, static_cast<GLint>(Level),
+					Format.Internal,
+					Extent.x, Extent.y,
+					Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+					0,
+					static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTexImage3D(
+					Target, static_cast<GLint>(Level),
+					Format.Internal,
+					Extent.x, Extent.y,
+					Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+					0,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		default: assert(0); break;
+		}
+	}
+	return TextureName;
+}
+
+GLuint create_texture_storage(char const* Filename)
 {
 	gli::texture Texture = gli::load(Filename);
 	if(Texture.empty())
@@ -133,8 +238,8 @@ GLuint create_texture(char const* Filename)
 	}
 
 	for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
-	for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
 	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+	for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
 	{
 		GLsizei const LayerGL = static_cast<GLsizei>(Layer);
 		glm::tvec3<GLsizei> Extent(Texture.extent(Level));
@@ -202,6 +307,157 @@ GLuint create_texture(char const* Filename)
 	return TextureName;
 }
 
+enum GLdevice
+{
+
+};
+
+enum GLtarget
+{
+
+};
+
+enum GLformat
+{
+
+};
+
+enum GLmemoryFlag
+{
+
+};
+
+struct GLtexture
+{
+
+};
+
+GLtexture glCreateTexture(GLdevice device, GLtarget Target, GLsizei Layers, GLsizei Levels, GLuint Width, GLuint Height, GLuint Depth, GLformat Format, GLmemoryFlag Flag);
+GLtexture glCreateTextureView(GLtexture Texture, GLtarget Target, GLsizei BaseLayer, GLsizei MaxLayer, GLsizei BaseLevel, GLsizei MaxLevel, GLformat Format);
+void glDeleteTexture(GLtexture Texture);
+
+GLbuffer glCreateBuffer(GLdevice device, GLuint Size, GLmemoryFlag Flag);
+GLbuffer glCreateBuffer(GLbuffer Buffer, GLuint Offset, GLuint Size);
+void glDeleteBuffer(GLbuffer Buffer);
+
+GLuint create_texture_dsa(char const* Filename)
+{
+	gli::texture Texture = gli::load(Filename);
+	if(Texture.empty())
+		return 0;
+
+	gli::gl GL(gli::gl::PROFILE_GL33);
+	gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+	GLenum Target = GL.translate(Texture.target());
+
+	GLuint TextureName = 0;
+	glCreateTextures(Target, 1, &TextureName);
+	glTextureParameteri(TextureName, GL_TEXTURE_BASE_LEVEL, 0);
+	glTextureParameteri(TextureName, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+	glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_R, Format.Swizzles[0]);
+	glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
+	glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
+	glTextureParameteri(TextureName, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
+
+	glm::tvec3<GLsizei> const Extent(Texture.extent());
+	GLsizei const FaceTotal = static_cast<GLsizei>(Texture.layers() * Texture.faces());
+
+	switch(Texture.target())
+	{
+	case gli::TARGET_1D:
+		glTextureStorage1D(
+			TextureName, static_cast<GLint>(Texture.levels()), Format.Internal, Extent.x);
+		break;
+	case gli::TARGET_1D_ARRAY:
+	case gli::TARGET_2D:
+	case gli::TARGET_CUBE:
+		glTextureStorage2D(
+			TextureName, static_cast<GLint>(Texture.levels()), Format.Internal,
+			Extent.x, Texture.target() == gli::TARGET_2D ? Extent.y : FaceTotal);
+		break;
+	case gli::TARGET_2D_ARRAY:
+	case gli::TARGET_3D:
+	case gli::TARGET_CUBE_ARRAY:
+		glTextureStorage3D(
+			TextureName, static_cast<GLint>(Texture.levels()), Format.Internal,
+			Extent.x, Extent.y,
+			Texture.target() == gli::TARGET_3D ? Extent.z : FaceTotal);
+		break;
+	default:
+		assert(0);
+		break;
+	}
+
+	for(std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
+	for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
+	for(std::size_t Face = 0; Face < Texture.faces(); ++Face)
+	{
+		GLsizei const LayerGL = static_cast<GLsizei>(Layer);
+		glm::tvec3<GLsizei> Extent(Texture.extent(Level));
+		Target = gli::is_target_cube(Texture.target())
+			? static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
+			: Target;
+
+		switch(Texture.target())
+		{
+		case gli::TARGET_1D:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTextureSubImage1D(
+					TextureName, static_cast<GLint>(Level), 0, Extent.x,
+					Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTextureSubImage1D(
+					TextureName, static_cast<GLint>(Level), 0, Extent.x,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		case gli::TARGET_1D_ARRAY:
+		case gli::TARGET_2D:
+		case gli::TARGET_CUBE:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTextureSubImage2D(
+					TextureName, static_cast<GLint>(Level),
+					0, 0,
+					Extent.x,
+					Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+					Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTextureSubImage2D(
+					TextureName, static_cast<GLint>(Level),
+					0, 0,
+					Extent.x,
+					Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		case gli::TARGET_2D_ARRAY:
+		case gli::TARGET_3D:
+		case gli::TARGET_CUBE_ARRAY:
+			if(gli::is_compressed(Texture.format()))
+				glCompressedTextureSubImage3D(
+					TextureName, static_cast<GLint>(Level),
+					0, 0, 0,
+					Extent.x, Extent.y,
+					Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+					Format.Internal, static_cast<GLsizei>(Texture.size(Level)),
+					Texture.data(Layer, Face, Level));
+			else
+				glTextureSubImage3D(
+					TextureName, static_cast<GLint>(Level),
+					0, 0, 0,
+					Extent.x, Extent.y,
+					Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+					Format.External, Format.Type,
+					Texture.data(Layer, Face, Level));
+			break;
+		default: assert(0); break;
+		}
+	}
+	return TextureName;
+}
+*/
 #include <gli/convert.hpp>
 #include <gli/generate_mipmaps.hpp>
 
@@ -275,26 +531,51 @@ private:
 
 	bool initTexture()
 	{
+		//Texture2DName = create_texture_dsa((getDataDirectory() + TEXTURE_DIFFUSE).c_str());
+
+		SwizzleR[viewport::V00] = GL_RED;
+		SwizzleG[viewport::V00] = GL_GREEN;
+		SwizzleB[viewport::V00] = GL_BLUE;
+		SwizzleA[viewport::V00] = GL_ALPHA;
+
+		SwizzleR[viewport::V10] = GL_BLUE;
+		SwizzleG[viewport::V10] = GL_GREEN;
+		SwizzleB[viewport::V10] = GL_RED;
+		SwizzleA[viewport::V10] = GL_ALPHA;
+
+		SwizzleR[viewport::V11] = GL_ONE;
+		SwizzleG[viewport::V11] = GL_GREEN;
+		SwizzleB[viewport::V11] = GL_BLUE;
+		SwizzleA[viewport::V11] = GL_ALPHA;
+
+		SwizzleR[viewport::V01] = GL_ZERO;
+		SwizzleG[viewport::V01] = GL_GREEN;
+		SwizzleB[viewport::V01] = GL_BLUE;
+		SwizzleA[viewport::V01] = GL_ALPHA;
+
 		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::gl GL(gli::gl::PROFILE_GL33);
+		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
+		GLenum const Target = static_cast<GLenum>(GL.translate(Texture.target()));
 
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &Texture2DName);
-		glBindTexture(GL_TEXTURE_2D, Texture2DName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(Target, Texture2DName);
+		glTexParameteri(Target, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(Target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint>(Texture.levels() - 1));
+		glTexParameteri(Target, GL_TEXTURE_MIN_FILTER, Texture.levels() == 1 ? GL_LINEAR : GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
-				GL_TEXTURE_2D,
+				Target,
 				GLint(Level),
-				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
-				GLsizei(Texture[Level].extent().x), 
-				GLsizei(Texture[Level].extent().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
+				Format.Internal,
+				GLsizei(Texture[Level].extent().x),
+				GLsizei(Texture[Level].extent().y),
+				0,
+				GLsizei(Texture[Level].size()),
 				Texture[Level].data());
 		}
 
@@ -319,7 +600,7 @@ private:
 		SwizzleA[viewport::V01] = GL_ALPHA;
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(Target, 0);
 
 		return this->checkError("initTexture");
 	}

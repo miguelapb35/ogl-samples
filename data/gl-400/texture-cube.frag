@@ -6,7 +6,7 @@ precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform samplerCubeArray Environment;
+uniform samplerCube Environment;
 
 in block
 {
@@ -17,5 +17,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Environment, vec4(In.Reflect, 0.0));
+	Color = texture(Environment, vec3(In.Reflect));
 }
