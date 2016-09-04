@@ -337,6 +337,7 @@ private:
 
 			if(Status == GL_SIGNALED)
 			{
+				glDeleteSync(Transfer->Fence);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
 				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 640 * 480 * 4, GL_MAP_READ_BIT);
 				memcpy(&ReadPixelData[0], Data, 640 * 480 * 4);
@@ -397,7 +398,6 @@ private:
 			glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, TransferFBO->Buffer);
-			//glBindBuffer(GL_PIXEL_PACK_BUFFER, BufferName[buffer::READPIXELS_FBO]);
 			glReadBuffer(GL_COLOR_ATTACHMENT0);
 			glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			TransferFBO->Fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -419,7 +419,6 @@ private:
 			glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, TransferFB->Buffer);
-			//glBindBuffer(GL_PIXEL_PACK_BUFFER, BufferName[buffer::READPIXELS_FB]);
 			glReadBuffer(GL_BACK);
 			glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			TransferFB->Fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);

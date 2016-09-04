@@ -342,6 +342,7 @@ private:
 
 			if(Status == GL_SIGNALED)
 			{
+				glDeleteSync(Transfer->Fence);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Stagging);
 				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 640 * 480 * 4, GL_MAP_READ_BIT);
 				memcpy(&ReadPixelData[0], Data, 640 * 480 * 4);
