@@ -312,11 +312,17 @@ private:
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
 			glBufferData(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, NULL, GL_DYNAMIC_DRAW);
 
-			Transfer->Fence = NULL;
+			Transfer->Fence = nullptr;
 		}
 		else
 		{
 			Transfer = ReadPixelBufferFree.back();
+			if (Transfer->Fence)
+			{
+				glDeleteSync(Transfer->Fence);
+				Transfer->Fence = nullptr;
+			}
+
 			ReadPixelBufferFree.pop();
 		}
 
@@ -337,7 +343,6 @@ private:
 
 			if(Status == GL_SIGNALED)
 			{
-				glDeleteSync(Transfer->Fence);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
 				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 640 * 480 * 4, GL_MAP_READ_BIT);
 				memcpy(&ReadPixelData[0], Data, 640 * 480 * 4);

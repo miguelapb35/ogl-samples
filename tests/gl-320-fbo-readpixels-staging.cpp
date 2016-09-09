@@ -317,11 +317,17 @@ private:
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
 			glBufferData(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_STATIC_COPY);
 
-			Transfer->Fence = NULL;
+			Transfer->Fence = nullptr;
 		}
 		else
 		{
 			Transfer = ReadPixelBufferFree.back();
+			if (Transfer->Fence)
+			{
+				glDeleteSync(Transfer->Fence);
+				Transfer->Fence = nullptr;
+			}
+
 			ReadPixelBufferFree.pop();
 		}
 

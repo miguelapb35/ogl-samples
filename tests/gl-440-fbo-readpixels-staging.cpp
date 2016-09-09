@@ -82,7 +82,7 @@ class gl_440_fbo_readpixels_async : public test
 {
 public:
 	gl_440_fbo_readpixels_async(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo-readpixels-async", test::CORE, 4, 3),
+		test(argc, argv, "gl-440-fbo-readpixels-async", test::CORE, 4, 3, glm::uvec2(640, 480)),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -275,7 +275,8 @@ private:
 	{
 		bool Validated = this->checkExtension("GL_ARB_buffer_storage");
 
-		this->ReadPixelData.resize(640 * 480);
+		glm::uvec2 const WindowSize(this->getWindowSize());
+		this->ReadPixelData.resize(WindowSize.x * WindowSize.y);
 
 		if(Validated)
 			Validated = initProgram();
@@ -306,22 +307,30 @@ private:
 
 	transfer* reserveTransfer()
 	{
+		glm::uvec2 const WindowSize(this->getWindowSize());
+
 		transfer* Transfer = new transfer;
 		if(ReadPixelBufferFree.empty())
 		{
 			glGenBuffers(1, &Transfer->Stagging);
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Stagging);
-			glBufferStorage(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
+			glBufferStorage(GL_PIXEL_PACK_BUFFER, WindowSize.x * WindowSize.y * 4, nullptr, GL_MAP_READ_BIT | GL_CLIENT_STORAGE_BIT);
 
 			glGenBuffers(1, &Transfer->Buffer);
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Buffer);
-			glBufferStorage(GL_PIXEL_PACK_BUFFER, 640 * 480 * 4, nullptr, 0);
+			glBufferStorage(GL_PIXEL_PACK_BUFFER, WindowSize.x * WindowSize.y * 4, nullptr, 0);
 
-			Transfer->Fence = NULL;
+			Transfer->Fence = nullptr;
 		}
 		else
 		{
 			Transfer = ReadPixelBufferFree.back();
+			if (Transfer->Fence)
+			{
+				glDeleteSync(Transfer->Fence);
+				Transfer->Fence = nullptr;
+			}
+
 			ReadPixelBufferFree.pop();
 		}
 
@@ -332,6 +341,8 @@ private:
 
 	void queryTranfer()
 	{
+		glm::uvec2 const WindowSize(this->getWindowSize());
+
 		while(!ReadPixelBufferLive.empty())
 		{
 			transfer* Transfer = ReadPixelBufferLive.front();
@@ -342,10 +353,9 @@ private:
 
 			if(Status == GL_SIGNALED)
 			{
-				glDeleteSync(Transfer->Fence);
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, Transfer->Stagging);
-				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 640 * 480 * 4, GL_MAP_READ_BIT);
-				memcpy(&ReadPixelData[0], Data, 640 * 480 * 4);
+				void* Data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, WindowSize.x * WindowSize.y * 4, GL_MAP_READ_BIT);
+				memcpy(&ReadPixelData[0], Data, WindowSize.x * WindowSize.y * 4);
 				glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
 				ReadPixelBufferFree.push(Transfer);
@@ -360,7 +370,8 @@ private:
 
 	bool render()
 	{
-		glm::vec2 WindowSize(this->getWindowSize());
+		glm::uvec2 const WindowSize(this->getWindowSize());
+		glm::vec2 const WindowAspect(WindowSize);
 
 		transfer* TransferFBO = reserveTransfer();
 		transfer* TransferFB = reserveTransfer();
@@ -372,7 +383,7 @@ private:
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			//glm::mat4 Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, 640.f, 480.f, 0.1f, 100.0f);
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
+			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowAspect.x / WindowAspect.y, 0.1f, 100.0f);
 			glm::mat4 Model = glm::mat4(1.0f);
 		
 			*Pointer = Projection * this->view() * Model;
@@ -431,7 +442,7 @@ private:
 			glReadPixels(0, 0, 640, 480, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 			glBindBuffer(GL_COPY_READ_BUFFER, TransferFB->Buffer);
 			glBindBuffer(GL_COPY_WRITE_BUFFER, TransferFB->Stagging);
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 640 * 480 * 4);
+			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, WindowSize.x * WindowSize.y * 4);
 			TransferFB->Fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 		}
 
