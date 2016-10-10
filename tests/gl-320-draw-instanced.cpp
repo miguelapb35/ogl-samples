@@ -103,13 +103,15 @@ private:
 		glBufferData(GL_UNIFORM_BUFFER, UniformTransformBlockSize, NULL, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		GLint UniformMaterialBlockSize = glm::max(GLint(sizeof(glm::vec4) * 2), UniformBufferOffset);
+		GLint UniformMaterialBlockSize = glm::max(GLint(sizeof(glm::vec4) * 4), UniformBufferOffset);
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
 		glBufferData(GL_UNIFORM_BUFFER, UniformMaterialBlockSize, nullptr, GL_STATIC_DRAW);
 
-		glm::vec4* Pointer = reinterpret_cast<glm::vec4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4) * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
-		*(Pointer + 0) = glm::vec4(1.0, 0.5, 0.0, 1.0);
-		*(Pointer + 1) = glm::vec4(0.0, 0.5, 1.0, 1.0);
+		glm::vec4* Pointer = reinterpret_cast<glm::vec4*>(glMapBufferRange(GL_UNIFORM_BUFFER, 0, sizeof(glm::vec4) * 4, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		*(Pointer + 0) = glm::vec4(1.0, 0.0, 0.0, 1.0);
+		*(Pointer + 1) = glm::vec4(0.0, 0.5, 0.0, 0.0);
+		*(Pointer + 2) = glm::vec4(0.0, 0.0, 1.0, 1.0);
+		*(Pointer + 3) = glm::vec4(0.0, 0.5, 0.0, 0.0);
 
 		glUnmapBuffer(GL_UNIFORM_BUFFER);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);

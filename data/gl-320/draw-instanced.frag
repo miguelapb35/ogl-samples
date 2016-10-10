@@ -4,9 +4,15 @@ precision highp float;
 precision highp int;
 layout(std140) uniform;
 
+struct diffuse
+{
+	vec4 ColorA;
+	vec4 ColorB;
+};
+
 uniform material
 {
-	vec4 Diffuse[2];
+	diffuse Diffuse[2];
 } Material;
 
 in block
@@ -18,5 +24,5 @@ out vec4 Color;
 
 void main()
 {
-	Color = Material.Diffuse[In.Instance];
+	Color = Material.Diffuse[In.Instance].ColorA + Material.Diffuse[In.Instance].ColorB;
 }
