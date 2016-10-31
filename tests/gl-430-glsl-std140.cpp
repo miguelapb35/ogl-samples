@@ -2,7 +2,7 @@
 
 namespace
 {
-	char const * CS_SOURCE("gl-430/glsl-std430.comp");
+	char const * CS_SOURCE("gl-430/glsl-std140.comp");
 
 	namespace semantics
 	{
@@ -17,11 +17,11 @@ namespace
 	GLsizei const DataSize = 16;
 }//namespace
 
-class gl_430_glsl_std430 : public test
+class gl_430_glsl_std140 : public test
 {
 public:
-	gl_430_glsl_std430(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-glsl-std430", test::CORE, 4, 3)
+	gl_430_glsl_std140(int argc, char* argv[]) :
+		test(argc, argv, "gl-430-glsl-std140", test::CORE, 4, 3)
 	{}
 
 private:
@@ -133,11 +133,14 @@ private:
 		memcpy(&Results[0], Pointer, Results.size() * sizeof(glm::uint));
 		glUnmapBuffer(GL_COPY_READ_BUFFER);
 
-		std::array<glm::uint, 14> const Expect{0u,  2u,  3u,  4u,  6u,  7u,  8u};
+		std::array<glm::uint, 14> const Expect{0u,  4u,  5u,  6u,  8u,  9u,  10u};
 
 		for(std::size_t i = 0, n = Expect.size(); i < n; ++i)
+		{
 			if(Expect[i] != Results[i])
 				return false;
+		}
+
 		return true;
 	}
 };
@@ -146,7 +149,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_glsl_std430 Test(argc, argv);
+	gl_430_glsl_std140 Test(argc, argv);
 	Error += Test();
 
 	return Error;
