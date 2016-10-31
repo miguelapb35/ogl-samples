@@ -375,6 +375,8 @@ set(GL_SHADER_GTC fbo-srgb-decode.vert fbo-srgb-decode.frag fbo-srgb-decode-blit
 glCreateSampleGTC(fbo-srgb-decode)
 set(GL_SHADER_GTC fbo-render.vert fbo-render.frag fbo-splash.vert fbo-splash.frag)
 glCreateSampleGTC(fbo-without-attachment)
+set(GL_SHADER_GTC glsl-std430.comp)
+glCreateSampleGTC(glsl-std430)
 set(GL_SHADER_GTC image-sampling.vert image-sampling.frag)
 glCreateSampleGTC(image-sampling)
 set(GL_SHADER_GTC image-store-write.vert image-store-write.frag image-store-read.vert image-store-read.frag)

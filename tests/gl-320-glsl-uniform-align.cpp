@@ -87,10 +87,7 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest0, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest0, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			assert(BlockDataSize == 32);
+			// D3D returns 32, GL returns 32
 			Validated = Validated && BlockDataSize == 32;
 		}
 
@@ -101,12 +98,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest1, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest1, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			//GL returns 40, Different than D3D I think
-			//assert(BlockDataSize == 48);
-			//Validated = Validated && BlockDataSize == 48;
+			// D3D returns 40, GL returns 48
+			Validated = Validated && BlockDataSize == 48;
 		}
 
 		if (Validated)
@@ -116,10 +109,7 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest1, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest1, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			assert(BlockDataSize == 32);
+			// D3D returns 32, GL returns 32
 			Validated = Validated && BlockDataSize == 32;
 		}
 
@@ -129,9 +119,6 @@ private:
 
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
-
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
 
 			assert(BlockDataSize == 16);
 			Validated = Validated && BlockDataSize == 16;
@@ -144,12 +131,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			// GL returns 20
-			//assert(BlockDataSize == 16);
-			//Validated = Validated && BlockDataSize == 16;
+			// D3D returns 16, GL returns 32
+			Validated = Validated && BlockDataSize == 32;
 		}
 
 		if (Validated)
@@ -159,12 +142,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			// GL returns 24, might be similar alignment than D3D
-			//assert(BlockDataSize == 32);
-			//Validated = Validated && BlockDataSize == 32;
+			// D3D returns 32, GL returns 32
+			Validated = Validated && BlockDataSize == 32;
 		}
 
 		if (Validated)
@@ -173,9 +152,6 @@ private:
 
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
-
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
 
 			assert(BlockDataSize == 16);
 			Validated = Validated && BlockDataSize == 16;
@@ -188,15 +164,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			// float a;
-			// vec3 b;
-			// 'a' is aligned to 16 bytes with GL, packed with 'b'
-			// GL returns 28, definitely different from D3D
-			//assert(BlockDataSize == 16);
-			//Validated = Validated && BlockDataSize == 16;
+			// D3D returns 16, GL returns 32
+			Validated = Validated && BlockDataSize == 32;
 		}
 
 		if (Validated)
@@ -206,16 +175,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			// float a;
-			// float b;
-			// vec3 c; // starts a new vector
-			// Aligned on c, both GL and D3D are the same.
-			// GL returns 28, actually identical to D3D
-			//assert(BlockDataSize == 32);
-			//Validated = Validated && BlockDataSize == 32;
+			// D3D returns 32, GL returns 32
+			Validated = Validated && BlockDataSize == 32;
 		}
 
 		if (Validated)
@@ -225,17 +186,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			//float a;
-			//struct {
-			//	vec4 b; // starts a new vector
-			//	float c; // starts a new vector
-			//} d;
-			// GL returns 36, actually identical to D3D
-			//assert(BlockDataSize == 48);
-			//Validated = Validated && BlockDataSize == 48;
+			// D3D returns 48, GL returns 48
+			Validated = Validated && BlockDataSize == 48;
 		}
 
 		if (Validated)
@@ -245,16 +197,7 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			//float a;
-			//struct {
-			//	float b; // starts a new vector
-			//	vec4 c; // starts a new vector
-			//} d;
-
-			assert(BlockDataSize == 48);
+			// D3D returns 48, GL returns 48
 			Validated = Validated && BlockDataSize == 48;
 		}
 
@@ -265,17 +208,8 @@ private:
 			GLint BlockDataSize = 0;
 			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_DATA_SIZE, &BlockDataSize);
 
-			GLint BlockBinding = 0;
-			glGetActiveUniformBlockiv(ProgramName, UniformTest, GL_UNIFORM_BLOCK_BINDING, &BlockBinding);
-
-			//float a;
-			//struct {
-			//	vec4 b; // starts a new vector
-			//	float c; // starts a new vector
-			//} d;
-			// GL returns 36, actually identical to D3D
-			//assert(BlockDataSize == 48);
-			//Validated = Validated && BlockDataSize == 48;
+			// D3D returns 48, GL returns 48
+			Validated = Validated && BlockDataSize == 48;
 		}
 
 		return Validated && this->checkError("initProgram");
