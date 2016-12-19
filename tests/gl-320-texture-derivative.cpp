@@ -185,9 +185,6 @@ private:
 		if(Validated)
 			Validated = initVertexArray();
 
-		glEnable(GL_SAMPLE_SHADING);
-		glMinSampleShading(4.0f);
-
 		return Validated;
 	}
 
