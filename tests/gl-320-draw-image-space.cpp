@@ -10,21 +10,17 @@ namespace
 class gl_320_draw_image_space : public test
 {
 public:
-	gl_320_draw_image_space(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-image-space", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f)),
-		ProgramName(0),
-		VertexArrayName(0),
-		TextureName(0),
-		BufferName(0),
-		UniformTransform(-1)
+	gl_320_draw_image_space(int argc, char* argv[])
+		: test(argc, argv, "gl-320-draw-image-space", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		, ProgramName(0)
+		, VertexArrayName(0)
+		, TextureName(0)
 	{}
 
 private:
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
-	GLuint BufferName;
-	GLint UniformTransform;
 
 	bool initProgram()
 	{
@@ -126,7 +122,6 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 
