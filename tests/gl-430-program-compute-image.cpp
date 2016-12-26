@@ -159,7 +159,7 @@ class instance : public test
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-program-compute-image", test::CORE, 4, 2),
+		test(argc, argv, "gl-430-program-compute-image", test::CORE, 4, 3),
 		VertexArrayName(0)
 	{}
 
@@ -179,9 +179,9 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VS_SOURCE, "--version 420 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FS_SOURCE, "--version 420 --profile core");
-			GLuint CompShaderName = Compiler.create(GL_COMPUTE_SHADER, getDataDirectory() + CS_SOURCE, "--version 420 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VS_SOURCE, "--version 430 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FS_SOURCE, "--version 430 --profile core");
+			GLuint CompShaderName = Compiler.create(GL_COMPUTE_SHADER, getDataDirectory() + CS_SOURCE, "--version 430 --profile core");
 			Validated = Validated && Compiler.check();
 
 			if(Validated)
@@ -223,28 +223,28 @@ private:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_INPUT]);
-		glBufferData(GL_ARRAY_BUFFER, PositionSize * 2, NULL, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, PositionSize, nullptr, GL_STATIC_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, PositionSize, PositionData);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_INPUT]);
-		glBufferData(GL_ARRAY_BUFFER, TexcoordSize * 2, TexcoordData, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, TexcoordSize, TexcoordData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_INPUT]);
-		glBufferData(GL_ARRAY_BUFFER, ColorSize * 2, ColorData, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, ColorSize, ColorData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::POSITION_OUTPUT]);
-		glBufferData(GL_ARRAY_BUFFER, PositionSize * 2, NULL, GL_STATIC_COPY);
+		glBufferData(GL_ARRAY_BUFFER, PositionSize, nullptr, GL_STATIC_COPY);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::TEXCOORD_OUTPUT]);
-		glBufferData(GL_ARRAY_BUFFER, TexcoordSize * 2, NULL, GL_STATIC_COPY);
+		glBufferData(GL_ARRAY_BUFFER, TexcoordSize, nullptr, GL_STATIC_COPY);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, BufferName[buffer::COLOR_OUTPUT]);
-		glBufferData(GL_ARRAY_BUFFER, ColorSize * 2, NULL, GL_STATIC_COPY);
+		glBufferData(GL_ARRAY_BUFFER, ColorSize, nullptr, GL_STATIC_COPY);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		GLint UniformBufferOffset(0);
