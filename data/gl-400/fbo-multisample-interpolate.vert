@@ -1,4 +1,4 @@
-#version 150 core
+#version 400 core
 
 precision highp float;
 precision highp int;
@@ -12,10 +12,10 @@ in vec2 Texcoord;
 out block
 {
 	vec2 Texcoord;
-} Out;
+} Vert;
 
 void main()
 {
-	Out.Texcoord = Texcoord;
+	Vert.Texcoord = Texcoord;
 	gl_Position = MVP * vec4(Position, 0.0, 1.0);
 }

@@ -253,9 +253,6 @@ private:
 	{
 		bool Validated = this->checkExtension("GL_AMD_sample_positions");
 
-		//glEnable(GL_SAMPLE_MASK);
-		//glSampleMaski(0, 0xFF);
-
 		if(Validated)
 			Validated = initProgram();
 		if(Validated)
@@ -367,11 +364,6 @@ private:
 
 		// Pass 1, render the scene in a multisampled framebuffer
 		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_SAMPLE_SHADING);
-		glMinSampleShading(4.0f);
-
-		//glEnable(GL_SAMPLE_MASK);
-		//glSampleMaski(0, 0xFF);
 
 		renderFBO();
 		glDisable(GL_MULTISAMPLE);

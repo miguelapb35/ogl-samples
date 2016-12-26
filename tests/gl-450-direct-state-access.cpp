@@ -278,9 +278,6 @@ private:
 		if(Validated)
 			Validated = initFramebuffer();
 
-		//glEnable(GL_SAMPLE_MASK);
-		//glSampleMaski(0, 0xFF);
-
 		return Validated;
 	}
 
@@ -302,8 +299,6 @@ private:
 	void renderFBO()
 	{
 		glEnable(GL_MULTISAMPLE);
-		glEnable(GL_SAMPLE_SHADING);
-		glMinSampleShading(4.0f);
 
 		glClipControl(GL_LOWER_LEFT, GL_NEGATIVE_ONE_TO_ONE);
 		glViewportIndexedf(0, 0, 0, static_cast<float>(FRAMEBUFFER_SIZE.x), static_cast<float>(FRAMEBUFFER_SIZE.y));

@@ -8,9 +8,9 @@ layout(std140, column_major) uniform;
 
 uniform sampler2D Diffuse;
 
-//in int gl_SampleID;
+in int gl_SampleID;
 //in vec2 gl_SamplePosition;
-out int gl_SampleMask[];
+//out int gl_SampleMask[];
 
 uniform int gl_NumSamples;
 
@@ -23,6 +23,5 @@ layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	gl_SampleMask[0] = 0x3f;
-	Color = texture(Diffuse, interpolateAtSample(Vert.Texcoord, gl_SampleID));
+	Color = vec4(vec3(float(gl_SampleID + 1) / float(gl_NumSamples)), 1.0f);
 }

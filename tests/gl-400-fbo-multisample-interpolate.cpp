@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/fbo-multisample.frag");
+	char const * VERT_SHADER_SOURCE("gl-400/fbo-multisample-interpolate.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/fbo-multisample-interpolate.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
@@ -52,11 +52,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo_multisample : public test
+class gl_400_fbo_multisample : public test
 {
 public:
-	gl_320_fbo_multisample(int argc, char* argv[])
-		: test(argc, argv, "gl-320-fbo-multisample", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+	gl_400_fbo_multisample(int argc, char* argv[])
+		: test(argc, argv, "gl-400-fbo-multisample-interpolate", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.2f))
 		, VertexArrayName(0)
 		, BufferName(0)
 		, ProgramName(0)
@@ -81,8 +81,8 @@ private:
 
 		if(Validated)
 		{
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo_multisample Test(argc, argv);
+	gl_400_fbo_multisample Test(argc, argv);
 	Error += Test();
 
 	return Error;

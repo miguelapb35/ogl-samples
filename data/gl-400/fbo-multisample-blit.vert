@@ -1,4 +1,4 @@
-#version 150 core
+#version 400 core
 
 layout(std140) uniform;
 

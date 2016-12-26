@@ -15,12 +15,14 @@ public:
 		, ProgramName(0)
 		, VertexArrayName(0)
 		, TextureName(0)
+		, UniformDiffuse(0)
 	{}
 
 private:
 	GLuint ProgramName;
 	GLuint VertexArrayName;
 	GLuint TextureName;
+	GLint UniformDiffuse;
 
 	bool initProgram()
 	{
@@ -33,15 +35,17 @@ private:
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
 			Validated = Validated && Compiler.check();
 
-			ProgramName = glCreateProgram();
-			glAttachShader(ProgramName, VertShaderName);
-			glAttachShader(ProgramName, FragShaderName);
+			this->ProgramName = glCreateProgram();
+			glAttachShader(this->ProgramName, VertShaderName);
+			glAttachShader(this->ProgramName, FragShaderName);
 
-			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
-			glLinkProgram(ProgramName);
+			glBindFragDataLocation(this->ProgramName, semantic::frag::COLOR, "Color");
+			glLinkProgram(this->ProgramName);
+
+			this->UniformDiffuse = glGetUniformLocation(ProgramName, "Diffuse");
 
 			Validated = Validated && Compiler.check();
-			Validated = Validated && Compiler.check_program(ProgramName);
+			Validated = Validated && Compiler.check_program(this->ProgramName);
 		}
 
 		return Validated;
@@ -105,23 +109,24 @@ private:
 
 	bool end()
 	{
-		glDeleteProgram(ProgramName);
-		glDeleteTextures(1, &TextureName);
-		glDeleteVertexArrays(1, &VertexArrayName);
+		glDeleteProgram(this->ProgramName);
+		glDeleteTextures(1, &this->TextureName);
+		glDeleteVertexArrays(1, &this->VertexArrayName);
 
 		return true;
 	}
 
 	bool render()
 	{
-		glm::vec2 WindowSize(this->getWindowSize());
+		glm::vec2 const WindowSize(this->getWindowSize());
 		glViewport(0, 0, static_cast<GLsizei>(WindowSize.x), static_cast<GLsizei>(WindowSize.y));
 
-		glUseProgram(ProgramName);
+		glUseProgram(this->ProgramName);
+		glUniform1i(this->UniformDiffuse, 0);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName);
-		glBindVertexArray(VertexArrayName);
+		glBindTexture(GL_TEXTURE_2D, this->TextureName);
+		glBindVertexArray(this->VertexArrayName);
 
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, 1);
 

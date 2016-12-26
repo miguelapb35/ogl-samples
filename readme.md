@@ -70,6 +70,8 @@ OpenGL Samples Pack 4.5.4.0: 2017-0X-XX
 - Added gl-320-fbo-readpixels-staging sample
 - Added gl-320-fbo-readpixels-async sample
 - Added gl-320-fbo-readpixels-client sample
+- Added gl-400-fbo-multisample-interpolate sample
+- Added gl-400-fbo-multisample-mask sample
 
 ================================================================================
 OpenGL Samples Pack 4.5.3.0: 2016-07-10
