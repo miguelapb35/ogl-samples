@@ -61,6 +61,17 @@ MacOS instructions
 The OpenGL Samples Pack requires at least Clang 3.0.
 
 ================================================================================
+OpenGL Samples Pack 4.5.4.0: 2017-0X-XX
+--------------------------------------------------------------------------------
+- Added gl-320-fbo-multisample-mask sample
+- Added gl-430-glsl-std430 sample
+- Added gl-430-glsl-std140 sample
+- Added gl-320-glsl-uniform-align sample
+- Added gl-320-fbo-readpixels-staging sample
+- Added gl-320-fbo-readpixels-async sample
+- Added gl-320-fbo-readpixels-client sample
+
+================================================================================
 OpenGL Samples Pack 4.5.3.0: 2016-07-10
 --------------------------------------------------------------------------------
 - Improved test automation: A single template image per test with heuristics
