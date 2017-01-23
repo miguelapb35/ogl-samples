@@ -24,6 +24,8 @@ set(GL_PROFILE_GTC es)
 set(GL_VERSION_GTC 200)
 set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
+set(GL_SHADER_GTC fbo-shadow-depth.vert fbo-shadow-depth.frag fbo-shadow-render.vert fbo-shadow-render.frag)
+glCreateSampleGTC(fbo-shadow)
 
 # OpenGL ES 3.0 samples
 set(GL_VERSION_GTC 300)
@@ -31,6 +33,8 @@ set(GL_SHADER_GTC flat-color.vert flat-color.frag)
 glCreateSampleGTC(draw-elements)
 set(GL_SHADER_GTC fbo-srgb.vert fbo-srgb.frag fbo-srgb-blit.vert fbo-srgb-blit.frag)
 glCreateSampleGTC(fbo-srgb)
+set(GL_SHADER_GTC fbo-shadow-depth.vert fbo-shadow-depth.frag fbo-shadow-render.vert fbo-shadow-render.frag)
+glCreateSampleGTC(fbo-shadow)
 
 # OpenGL 3.0 samples
 set(GL_PROFILE_GTC gl)

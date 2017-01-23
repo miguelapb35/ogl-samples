@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_DEPTH("gl-320/fbo-shadow-depth.vert");
-	char const * VERT_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.vert");
-	char const * FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
+	char const* VERT_SHADER_SOURCE_DEPTH("es-200/fbo-shadow-depth.vert");
+	char const* FRAG_SHADER_SOURCE_DEPTH("es-200/fbo-shadow-depth.frag");
+	char const* VERT_SHADER_SOURCE_RENDER("es-200/fbo-shadow-render.vert");
+	char const* FRAG_SHADER_SOURCE_RENDER("es-200/fbo-shadow-render.frag");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);
@@ -46,9 +46,8 @@ namespace
 	{
 		enum type
 		{
-			DIFFUSE,
 			COLORBUFFER,
-			RENDERBUFFER,
+			DEPTHBUFFER,
 			SHADOWMAP,
 			MAX
 		};
@@ -81,28 +80,32 @@ namespace
 			VERT_RENDER,
 			FRAG_RENDER,
 			VERT_DEPTH,
+			FRAG_DEPTH,
 			MAX
 		};
 	}//namespace shader
 
-	std::vector<GLuint> FramebufferName(framebuffer::MAX);
-	std::vector<GLuint> ProgramName(program::MAX);
-	std::vector<GLuint> VertexArrayName(program::MAX);
-	std::vector<GLuint> BufferName(buffer::MAX);
-	std::vector<GLuint> TextureName(texture::MAX);
-	std::vector<GLint> UniformTransform(program::MAX);
-	GLint UniformShadow(0);
 	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
-class gl_320_fbo_shadow : public test
+class instance : public test
 {
 public:
-	gl_320_fbo_shadow(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-shadow", test::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
+	instance(int argc, char* argv[]) :
+		test(argc, argv, "es-300-fbo-shadow", test::ES, 3, 0, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
 	{}
 
 private:
+	std::array<GLuint, framebuffer::MAX> FramebufferName;
+	std::array<GLuint, program::MAX> ProgramName;
+	std::array<GLuint, program::MAX> VertexArrayName;
+	std::array<GLuint, buffer::MAX> BufferName;
+	std::array<GLuint, texture::MAX> TextureName;
+	GLint UniformRenderMVP;
+	GLint UniformRenderDepthBiasMVP;
+	GLint UniformRenderShadow;
+	GLint UniformDepthMVP;
+
 	bool initProgram()
 	{
 		bool Validated(true);
@@ -112,8 +115,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER, "--version 150 --profile core");
-			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER, "--version 150 --profile core");
+			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER);
+			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER);
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::RENDER] = glCreateProgram();
@@ -121,7 +124,6 @@ private:
 			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG_RENDER]);
 			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::POSITION, "Position");
 			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::COLOR, "Color");
-			glBindFragDataLocation(ProgramName[program::RENDER], semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName[program::RENDER]);
 
 			Validated = Validated && Compiler.check_program(ProgramName[program::RENDER]);
@@ -129,18 +131,21 @@ private:
 
 		if(Validated)
 		{
-			UniformTransform[program::RENDER] = glGetUniformBlockIndex(ProgramName[program::RENDER], "transform");
-			UniformShadow = glGetUniformLocation(ProgramName[program::RENDER], "Shadow");
+			UniformRenderShadow = glGetUniformLocation(ProgramName[program::RENDER], "Shadow");
+			UniformRenderMVP = glGetUniformLocation(ProgramName[program::RENDER], "MVP");
+			UniformRenderDepthBiasMVP = glGetUniformLocation(ProgramName[program::RENDER], "DepthBiasMVP");
 		}
 
 		if(Validated)
 		{
 			compiler Compiler;
-			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH, "--version 150 --profile core");
+			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH);
+			ShaderName[shader::FRAG_DEPTH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_DEPTH);
 			Validated = Validated && Compiler.check();
 
 			ProgramName[program::DEPTH] = glCreateProgram();
 			glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::VERT_DEPTH]);
+			glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::FRAG_DEPTH]);
 			glBindAttribLocation(ProgramName[program::DEPTH], semantic::attr::POSITION, "Position");
 			glLinkProgram(ProgramName[program::DEPTH]);
 
@@ -148,7 +153,7 @@ private:
 		}
 
 		if(Validated)
-			UniformTransform[program::DEPTH] = glGetUniformBlockIndex(ProgramName[program::DEPTH], "transform");
+			UniformDepthMVP = glGetUniformLocation(ProgramName[program::DEPTH], "MVP");
 
 		return Validated;
 	}
@@ -165,48 +170,12 @@ private:
 		glBufferData(GL_ARRAY_BUFFER, VertexSize, VertexData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		GLint UniformBufferOffset(0);
-		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
-		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4) * 3), UniformBufferOffset);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glBufferData(GL_UNIFORM_BUFFER, UniformBlockSize, NULL, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
 		return true;
 	}
 
 	bool initTexture()
 	{
-		bool Validated(true);
-
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
-		assert(!Texture.empty());
-
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
 		glGenTextures(texture::MAX, &TextureName[0]);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DIFFUSE]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
-		{
-			glCompressedTexImage2D(GL_TEXTURE_2D,
-				GLint(Level),
-				GL_COMPRESSED_RGB_S3TC_DXT1_EXT,
-				GLsizei(Texture[Level].extent().x), 
-				GLsizei(Texture[Level].extent().y), 
-				0, 
-				GLsizei(Texture[Level].size()), 
-				Texture[Level].data());
-		}
 
 		glm::ivec2 WindowSize(this->getWindowSize());
 
@@ -214,13 +183,13 @@ private:
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::COLORBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_RGBA8, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::RENDERBUFFER]);
+		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DEPTHBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH_COMPONENT24, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::SHADOWMAP]);
@@ -232,11 +201,9 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		glTexImage2D(GL_TEXTURE_2D, GLint(0), GL_DEPTH_COMPONENT24, ShadowSize.x, ShadowSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		glTexStorage2D(GL_TEXTURE_2D, GLint(1), GL_DEPTH_COMPONENT24, GLsizei(ShadowSize.x), GLsizei(ShadowSize.y));
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
@@ -264,19 +231,17 @@ private:
 		GLenum const BuffersRender = GL_COLOR_ATTACHMENT0;
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, TextureName[texture::COLORBUFFER], 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::RENDERBUFFER], 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::DEPTHBUFFER], 0);
 		glDrawBuffers(1, &BuffersRender);
 		if(!this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, TextureName[texture::SHADOWMAP], 0);
-		glDrawBuffer(GL_NONE);
 		if(!this->checkFramebuffer(FramebufferName[framebuffer::SHADOW]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDrawBuffer(GL_BACK);
 		if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			return false;
 
@@ -285,7 +250,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
+		bool Validated = true;
 
 		if(Validated)
 			Validated = initProgram();
@@ -325,20 +290,11 @@ private:
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
 
-		// Bind rendering objects
-		glUseProgram(ProgramName[program::DEPTH]);
-		glUniformBlockBinding(ProgramName[program::DEPTH], UniformTransform[program::DEPTH], semantic::uniform::TRANSFORM0);
-
 		glBindVertexArray(VertexArrayName[program::RENDER]);
-		
-		this->checkError("renderShadow 0");
-		
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr);
 
-		this->checkError("renderShadow 1");
-		
 		glDisable(GL_DEPTH_TEST);
-		
+
 		this->checkError("renderShadow");
 	}
 
@@ -355,15 +311,11 @@ private:
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
-		glUseProgram(ProgramName[program::RENDER]);
-		glUniform1i(UniformShadow, 0);
-		glUniformBlockBinding(ProgramName[program::RENDER], UniformTransform[program::RENDER], semantic::uniform::TRANSFORM0);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::SHADOWMAP]);
 
 		glBindVertexArray(VertexArrayName[program::RENDER]);
-		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr);
 
 		glDisable(GL_DEPTH_TEST);
 		
@@ -374,40 +326,33 @@ private:
 	{
 		glm::ivec2 WindowSize(this->getWindowSize());
 
-		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-		glm::mat4* Pointer = (glm::mat4*)glMapBufferRange(
-			GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4) * 3,
-			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+		glm::mat4 Model = glm::mat4(1.0f);
 
-		// Update of the MVP matrix for the render pass
-		{
-			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 10.0f);
-			glm::mat4 Model = glm::mat4(1.0f);
-			*(Pointer + 0) = Projection * this->view() * Model;
-		}
+		glm::mat4 DepthProjection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
+		glm::mat4 DepthView = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
+		glm::mat4 DepthMVP = DepthProjection * DepthView * Model;
 
-		// Update of the MVP matrix for the depth pass
-		{
-			glm::mat4 Projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
-			glm::mat4 View = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
-			glm::mat4 Model = glm::mat4(1.0f);
-			glm::mat4 DepthMVP = Projection * View * Model;
-			*(Pointer + 1) = DepthMVP;
+		glm::mat4 BiasMatrix(
+			0.5, 0.0, 0.0, 0.0,
+			0.0, 0.5, 0.0, 0.0,
+			0.0, 0.0, 0.5, 0.0,
+			0.5, 0.5, 0.5, 1.0);
 
-			glm::mat4 BiasMatrix(
-				0.5, 0.0, 0.0, 0.0, 
-				0.0, 0.5, 0.0, 0.0,
-				0.0, 0.0, 0.5, 0.0,
-				0.5, 0.5, 0.5, 1.0);
+		glm::mat4 DepthMVPBias = BiasMatrix * DepthMVP;
 
-			*(Pointer + 2) = BiasMatrix * DepthMVP;
-		}
+		glm::mat4 RenderProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 10.0f);
+		glm::mat4 RenderMVP = RenderProjection * this->view() * Model;
 
-		glUnmapBuffer(GL_UNIFORM_BUFFER);
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
+		glUseProgram(ProgramName[program::DEPTH]);
+		glUniformMatrix4fv(this->UniformDepthMVP, 1, GL_FALSE, &DepthMVP[0][0]);
 
 		renderShadow();
+
+		glUseProgram(ProgramName[program::RENDER]);
+		glUniform1i(this->UniformRenderShadow, 0);
+		glUniformMatrix4fv(this->UniformRenderMVP, 1, GL_FALSE, &RenderMVP[0][0]);
+		glUniformMatrix4fv(this->UniformRenderDepthBiasMVP, 1, GL_FALSE, &DepthMVPBias[0][0]);
+
 		renderFramebuffer();
 
 		return this->checkError("render");
@@ -418,7 +363,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_320_fbo_shadow Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;
