@@ -42,7 +42,7 @@ namespace
 		};
 	}//namespace buffer
 
-	namespace texture
+	namespace attachment
 	{
 		enum type
 		{
@@ -50,24 +50,14 @@ namespace
 			DEPTHBUFFER,
 			MAX
 		};
-	}//namespace texture
+	}//namespace attachment
 	
-	namespace program
-	{
-		enum type
-		{
-			DEPTH,
-			RENDER,
-			MAX
-		};
-	}//namespace program
-
 	namespace framebuffer
 	{
 		enum type
 		{
-			FRAMEBUFFER,
-			SHADOW,
+			RENDER,
+			DEPTH,
 			MAX
 		};
 	}//namespace framebuffer
@@ -96,14 +86,23 @@ public:
 
 private:
 	std::array<GLuint, framebuffer::MAX> FramebufferName;
-	std::array<GLuint, program::MAX> ProgramName;
+	std::array<GLuint, framebuffer::MAX> ProgramName;
 	std::array<GLuint, buffer::MAX> BufferName;
-	std::array<GLuint, texture::MAX> TextureName;
-	GLint UniformRenderMVP;
-	GLint UniformRenderDepthBiasMVP;
+	std::array<GLuint, attachment::MAX> TextureName;
+	std::array<GLuint, attachment::MAX> RenderbufferName;
+	GLint UniformLightProj;
+	GLint UniformLightView;
+	GLint UniformLightWorld;
+	GLint UniformLightPointLightPosition;
+	GLint UniformLightClipNearFar;
+
+	GLint UniformRenderP;
+	GLint UniformRenderV;
+	GLint UniformRenderW;
 	GLint UniformRenderShadow;
-	GLint UniformDepthMVP;
-	GLuint RenderbufferName;
+	GLint UniformRenderPointLightPosition;
+	GLint UniformRenderClipNearFar;
+	GLint UniformRenderBias;
 
 	bool initProgram()
 	{
@@ -114,45 +113,55 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER);
-			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER);
+			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH);
+			ShaderName[shader::FRAG_DEPTH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_DEPTH);
 			Validated = Validated && Compiler.check();
 
-			ProgramName[program::RENDER] = glCreateProgram();
-			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::VERT_RENDER]);
-			glAttachShader(ProgramName[program::RENDER], ShaderName[shader::FRAG_RENDER]);
-			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName[program::RENDER], semantic::attr::COLOR, "Color");
-			glLinkProgram(ProgramName[program::RENDER]);
+			ProgramName[framebuffer::DEPTH] = glCreateProgram();
+			glAttachShader(ProgramName[framebuffer::DEPTH], ShaderName[shader::VERT_DEPTH]);
+			glAttachShader(ProgramName[framebuffer::DEPTH], ShaderName[shader::FRAG_DEPTH]);
+			glBindAttribLocation(ProgramName[framebuffer::DEPTH], semantic::attr::POSITION, "Position");
+			glLinkProgram(ProgramName[framebuffer::DEPTH]);
 
-			Validated = Validated && Compiler.check_program(ProgramName[program::RENDER]);
+			Validated = Validated && Compiler.check_program(ProgramName[framebuffer::DEPTH]);
 		}
 
 		if(Validated)
 		{
-			UniformRenderShadow = glGetUniformLocation(ProgramName[program::RENDER], "Shadow");
-			UniformRenderMVP = glGetUniformLocation(ProgramName[program::RENDER], "MVP");
-			UniformRenderDepthBiasMVP = glGetUniformLocation(ProgramName[program::RENDER], "DepthBiasMVP");
+			this->UniformLightProj = glGetUniformLocation(ProgramName[framebuffer::DEPTH], "LightProj");
+			this->UniformLightView = glGetUniformLocation(ProgramName[framebuffer::DEPTH], "LightView");
+			this->UniformLightWorld = glGetUniformLocation(ProgramName[framebuffer::DEPTH], "LightWorld");
+			this->UniformLightPointLightPosition = glGetUniformLocation(ProgramName[framebuffer::DEPTH], "PointLightPosition");
+			this->UniformLightClipNearFar = glGetUniformLocation(ProgramName[framebuffer::DEPTH], "ShadowClipNearFar");
 		}
 
 		if(Validated)
 		{
 			compiler Compiler;
-			ShaderName[shader::VERT_DEPTH] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_DEPTH);
-			ShaderName[shader::FRAG_DEPTH] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_DEPTH);
+			ShaderName[shader::VERT_RENDER] = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_RENDER);
+			ShaderName[shader::FRAG_RENDER] = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_RENDER);
 			Validated = Validated && Compiler.check();
 
-			ProgramName[program::DEPTH] = glCreateProgram();
-			glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::VERT_DEPTH]);
-			glAttachShader(ProgramName[program::DEPTH], ShaderName[shader::FRAG_DEPTH]);
-			glBindAttribLocation(ProgramName[program::DEPTH], semantic::attr::POSITION, "Position");
-			glLinkProgram(ProgramName[program::DEPTH]);
+			ProgramName[framebuffer::RENDER] = glCreateProgram();
+			glAttachShader(ProgramName[framebuffer::RENDER], ShaderName[shader::VERT_RENDER]);
+			glAttachShader(ProgramName[framebuffer::RENDER], ShaderName[shader::FRAG_RENDER]);
+			glBindAttribLocation(ProgramName[framebuffer::RENDER], semantic::attr::POSITION, "Position");
+			glBindAttribLocation(ProgramName[framebuffer::RENDER], semantic::attr::COLOR, "Color");
+			glLinkProgram(ProgramName[framebuffer::RENDER]);
 
-			Validated = Validated && Compiler.check_program(ProgramName[program::DEPTH]);
+			Validated = Validated && Compiler.check_program(ProgramName[framebuffer::RENDER]);
 		}
 
 		if(Validated)
-			UniformDepthMVP = glGetUniformLocation(ProgramName[program::DEPTH], "MVP");
+		{
+			UniformRenderP = glGetUniformLocation(ProgramName[framebuffer::RENDER], "P");
+			UniformRenderV = glGetUniformLocation(ProgramName[framebuffer::RENDER], "V");
+			UniformRenderW = glGetUniformLocation(ProgramName[framebuffer::RENDER], "W");
+			UniformRenderShadow = glGetUniformLocation(ProgramName[framebuffer::RENDER], "Shadow");
+			UniformRenderPointLightPosition = glGetUniformLocation(ProgramName[framebuffer::RENDER], "PointLightPosition");
+			UniformRenderClipNearFar = glGetUniformLocation(ProgramName[framebuffer::RENDER], "ShadowClipNearFar");
+			UniformRenderBias = glGetUniformLocation(ProgramName[framebuffer::RENDER], "Bias");
+		}
 
 		return Validated;
 	}
@@ -176,25 +185,27 @@ private:
 	{
 		glm::ivec2 const WindowSize(this->getWindowSize());
 
-		glGenRenderbuffers(texture::MAX, &this->RenderbufferName);
-		glBindRenderbuffer(GL_RENDERBUFFER, this->RenderbufferName);
+		glGenRenderbuffers(attachment::MAX, &this->RenderbufferName[0]);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, this->RenderbufferName[attachment::COLORBUFFER]);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, GLsizei(WindowSize.x), GLsizei(WindowSize.y));
 
-		glGenTextures(texture::MAX, &this->TextureName[0]);
+		glBindRenderbuffer(GL_RENDERBUFFER, this->RenderbufferName[attachment::DEPTHBUFFER]);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, GLsizei(ShadowSize.x), GLsizei(ShadowSize.y));
+
+		glGenTextures(attachment::MAX, &this->TextureName[0]);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->TextureName[texture::COLORBUFFER]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[attachment::COLORBUFFER]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, GLsizei(WindowSize.x), GLsizei(WindowSize.y), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->TextureName[texture::DEPTHBUFFER]);
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[attachment::DEPTHBUFFER]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, ShadowSize.x, ShadowSize.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, ShadowSize.x, ShadowSize.y, 0, GL_RGBA, GL_FLOAT, nullptr);
 
 		return true;
 	}
@@ -203,17 +214,16 @@ private:
 	{
 		glGenFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 
-		GLenum const BuffersRender = GL_COLOR_ATTACHMENT0;
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::FRAMEBUFFER]);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->TextureName[texture::COLORBUFFER], 0);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->RenderbufferName);
-		glDrawBuffers(1, &BuffersRender);
-		if(!this->checkFramebuffer(FramebufferName[framebuffer::FRAMEBUFFER]))
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::DEPTH]);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->TextureName[framebuffer::DEPTH], 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->RenderbufferName[framebuffer::DEPTH]);
+		if(!this->checkFramebuffer(FramebufferName[framebuffer::DEPTH]))
 			return false;
 
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, this->TextureName[texture::DEPTHBUFFER], 0);
-		if(!this->checkFramebuffer(FramebufferName[framebuffer::SHADOW]))
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::RENDER]);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->TextureName[framebuffer::RENDER], 0);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, this->RenderbufferName[framebuffer::RENDER]);
+		if(!this->checkFramebuffer(FramebufferName[framebuffer::RENDER]))
 			return false;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -254,12 +264,12 @@ private:
 
 	bool end()
 	{
-		for(std::size_t i = 0; i < program::MAX; ++i)
+		for(std::size_t i = 0; i < framebuffer::MAX; ++i)
 			glDeleteProgram(ProgramName[i]);
 
 		glDeleteFramebuffers(framebuffer::MAX, &FramebufferName[0]);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
-		glDeleteTextures(texture::MAX, &TextureName[0]);
+		glDeleteTextures(framebuffer::MAX, &TextureName[0]);
 
 		return this->checkError("end");
 	}
@@ -268,7 +278,7 @@ private:
 	{
 		glViewport(0, 0, ShadowSize.x, ShadowSize.y);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::SHADOW]);
+		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName[framebuffer::DEPTH]);
 		float Depth(1.0f);
 		glClearBufferfv(GL_DEPTH , 0, &Depth);
 
@@ -288,7 +298,7 @@ private:
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, TextureName[texture::DEPTHBUFFER]);
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[framebuffer::DEPTH]);
 
 		glDrawElements(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr);
 
@@ -297,36 +307,39 @@ private:
 
 	bool render()
 	{
-		glm::ivec2 WindowSize(this->getWindowSize());
+		glm::ivec2 const WindowSize(this->getWindowSize());
 
-		glm::mat4 Model = glm::mat4(1.0f);
+		{
+			glm::mat4 const LightP = glm::perspective(glm::pi<float>() * 0.25f, 1.0f, 0.1f, 10.0f);
+			glm::mat4 const LightV = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
+			glm::mat4 const LightW(1.0f);
 
-		glm::mat4 DepthProjection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f,-4.0f, 8.0f);
-		glm::mat4 DepthView = glm::lookAt(glm::vec3(0.5, 1.0, 2.0), glm::vec3(0), glm::vec3(0, 0, 1));
-		glm::mat4 DepthMVP = DepthProjection * DepthView * Model;
+			glUseProgram(ProgramName[framebuffer::DEPTH]);
+			glUniformMatrix4fv(this->UniformLightProj, 1, GL_FALSE, &LightP[0][0]);
+			glUniformMatrix4fv(this->UniformLightView, 1, GL_FALSE, &LightV[0][0]);
+			glUniformMatrix4fv(this->UniformLightWorld, 1, GL_FALSE, &LightW[0][0]);
+			glUniform3f(this->UniformLightPointLightPosition, 0.f, 0.f, 10.f);
+			glUniform2f(this->UniformLightClipNearFar, 0.01f, 10.0f);
 
-		glm::mat4 BiasMatrix(
-			0.5, 0.0, 0.0, 0.0,
-			0.0, 0.5, 0.0, 0.0,
-			0.0, 0.0, 0.5, 0.0,
-			0.5, 0.5, 0.5, 1.0);
+			renderShadow();
+		}
 
-		glm::mat4 DepthMVPBias = BiasMatrix * DepthMVP;
+		{
+			glm::mat4 const RenderP = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 10.0f);
+			glm::mat4 const RenderV = this->view();
+			glm::mat4 const RenderW(1.0f);
 
-		glm::mat4 RenderProjection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 10.0f);
-		glm::mat4 RenderMVP = RenderProjection * this->view() * Model;
+			glUseProgram(ProgramName[framebuffer::RENDER]);
+			glUniformMatrix4fv(this->UniformRenderP, 1, GL_FALSE, &RenderP[0][0]);
+			glUniformMatrix4fv(this->UniformRenderV, 1, GL_FALSE, &RenderV[0][0]);
+			glUniformMatrix4fv(this->UniformRenderW, 1, GL_FALSE, &RenderW[0][0]);
+			glUniform1i(this->UniformRenderShadow, 0);
+			glUniform3f(this->UniformRenderPointLightPosition, 0.f, 0.f, 10.f);
+			glUniform2f(this->UniformRenderClipNearFar, 0.01f, 10.0f);
+			glUniform1f(this->UniformRenderBias, 0.002f);
 
-		glUseProgram(ProgramName[program::DEPTH]);
-		glUniformMatrix4fv(this->UniformDepthMVP, 1, GL_FALSE, &DepthMVP[0][0]);
-
-		renderShadow();
-
-		glUseProgram(ProgramName[program::RENDER]);
-		glUniform1i(this->UniformRenderShadow, 0);
-		glUniformMatrix4fv(this->UniformRenderMVP, 1, GL_FALSE, &RenderMVP[0][0]);
-		glUniformMatrix4fv(this->UniformRenderDepthBiasMVP, 1, GL_FALSE, &DepthMVPBias[0][0]);
-
-		renderFramebuffer();
+			renderFramebuffer();
+		}
 
 		return this->checkError("render");
 	}

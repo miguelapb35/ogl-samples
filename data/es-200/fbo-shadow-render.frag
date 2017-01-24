@@ -1,16 +1,24 @@
 precision highp float;
-#extension GL_EXT_shadow_samplers : require
 
-uniform sampler2DShadow Shadow;
+uniform sampler2D Shadow;
+uniform vec3 PointLightPosition;
+uniform vec2 ShadowClipNearFar;
+uniform float Bias;
 
-varying vec4 VertexColor;
-varying vec4 ShadowCoord;
+varying vec3 VertexColor;
+varying vec4 VertexPosition;
 
 void main()
 {
-	vec3 Coord = ShadowCoord.xyz;
-	Coord.z -= 0.005;
+	vec3 LightNormal = normalize(PointLightPosition - VertexPosition.xyz);
 
-	float Visibility = mix(0.5, 1.0, shadow2DEXT(Shadow, Coord));
-	gl_FragColor = Visibility * VertexColor;
+	float FromLightToFrag = (length(VertexPosition.xyz - PointLightPosition) - ShadowClipNearFar.x) / (ShadowClipNearFar.y - ShadowClipNearFar.x);
+
+	float Depth = texture2DProj(Shadow, -LightNormal).x;
+
+	float LightIntensity = 0.5;
+	if (Depth + Bias >= FromLightToFrag)
+		LightIntensity = 1.0;
+
+	gl_FragColor = vec4(VertexColor * LightIntensity, 1.0);
 }

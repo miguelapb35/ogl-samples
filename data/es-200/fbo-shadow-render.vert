@@ -1,17 +1,19 @@
 precision highp float;
 
-uniform mat4 MVP;
-uniform mat4 DepthBiasMVP;
+uniform mat4 P;
+uniform mat4 V;
+uniform mat4 W;
 
 attribute vec3 Position;
 attribute vec4 Color;
 
-varying vec4 VertexColor;
-varying vec4 ShadowCoord;
+varying vec3 VertexColor;
+varying vec3 VertexPosition;
 
 void main()
 {
-	gl_Position = MVP * vec4(Position, 1.0);
-	ShadowCoord = DepthBiasMVP * vec4(Position, 1.0);
-	VertexColor = Color;
+	VertexPosition = (W * vec4(Position, 1.0)).xyz;
+	VertexColor = Color.rgb;
+
+	gl_Position = P * V * vec4(Position, 1.0);
 }
