@@ -86,7 +86,11 @@ void caps::initVersion()
 			else if(Version == std::string("440 compatibility"))
 				VersionData.GLSL440Comp = true;
 			else if(Version == std::string("440 core"))
-				VersionData.GLSL440Core = true;
+				VersionData.GLSL440Core = true;			
+			else if(Version == std::string("450 compatibility"))
+				VersionData.GLSL450Comp = true;
+			else if(Version == std::string("450 core"))
+				VersionData.GLSL450Core = true;
 		}
 	}
 }
