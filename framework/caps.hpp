@@ -53,7 +53,9 @@ private:
 		bool GLSL430Core;
 		bool GLSL430Comp;
 		bool GLSL440Core;
-		bool GLSL440Comp;
+		bool GLSL440Comp;		
+		bool GLSL450Core;
+		bool GLSL450Comp;
 	} VersionData;
 
 	void initVersion();
