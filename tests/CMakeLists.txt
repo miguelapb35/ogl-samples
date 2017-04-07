@@ -179,6 +179,8 @@ set(GL_SHADER_GTC texture-offset.vert texture-offset.frag texture-offset-bicubic
 glCreateSampleGTC(texture-offset)
 set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-pixel-store)
+set(GL_SHADER_GTC texture-type.vert texture-type.frag)
+glCreateSampleGTC(texture-type)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback-interleaved)
 glCreateSampleGTC(transform-feedback-separated)
