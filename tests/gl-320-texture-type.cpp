@@ -33,7 +33,19 @@ namespace
 			MAX
 		};
 	}//namespace buffer
-	
+
+	namespace texture
+	{
+		enum type
+		{
+			TEXTURE0,
+			TEXTURE1,
+			TEXTURE2,
+			TEXTURE3,
+			MAX
+		};
+	}//namespace texture
+
 	namespace shader
 	{
 		enum type
@@ -58,7 +70,7 @@ private:
 	std::array<GLuint, buffer::MAX> BufferName;
 	GLuint VertexArrayName;
 	GLuint ProgramName;
-	GLuint TextureName;
+	std::array<GLuint, texture::MAX> TextureName;
 
 	bool initProgram()
 	{
@@ -122,27 +134,62 @@ private:
 
 	bool initTexture()
 	{
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glGenTextures(texture::MAX, &this->TextureName[0]);
 
-		glGenTextures(1, &this->TextureName);
+		{
+			glBindTexture(GL_TEXTURE_2D, this->TextureName[0]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->TextureName);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+			std::uint32_t const Color = 0xFF007FFF;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, &Color);
+		}
 
-		//glm::u8vec4 const Color(255, 127, 0, 255);
-		std::uint32_t const Color = 0xFF007FFF;
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, &Color);
-	
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		{
+			glBindTexture(GL_TEXTURE_2D, this->TextureName[1]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			std::uint32_t const Color = 0xFF7F00FF;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, &Color);
+		}
+
+		{
+			glBindTexture(GL_TEXTURE_2D, this->TextureName[2]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			std::uint32_t const Color = 0xFF007FFF;
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &Color);
+		}
+
+		{
+			glBindTexture(GL_TEXTURE_2D, this->TextureName[3]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+			//std::uint8_t const Color = glm::packUnorm2x3_1x2(glm::vec3(1.0f, 0.5f, 0.0f));
+			//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE_2_3_3_REV, &Color);
+
+			std::uint16_t const Color = glm::packUnorm3x5_1x1(glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB5_A1, 1, 1, 0, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, &Color);
+		}
 
 		return true;
 	}
@@ -185,7 +232,7 @@ private:
 	{
 		glDeleteProgram(ProgramName);
 		glDeleteBuffers(buffer::MAX, &BufferName[0]);
-		glDeleteTextures(1, &this->TextureName);
+		glDeleteTextures(texture::MAX, &this->TextureName[0]);
 		glDeleteVertexArrays(1, &VertexArrayName);
 
 		return true;
@@ -208,9 +255,8 @@ private:
 
 		glDrawBuffer(GL_BACK);
 
-		glm::uvec2 WindowSize = this->getWindowSize();
+		glm::uvec2 ViewportSize = this->getWindowSize() / 2u;
 
-		glViewport(0, 0, WindowSize.x, WindowSize.y);
 		glDisable(GL_FRAMEBUFFER_SRGB);
 		glClearBufferfv(GL_COLOR, 0, &glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)[0]);
 
@@ -218,10 +264,23 @@ private:
 
 		glDisable(GL_FRAMEBUFFER_SRGB);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, this->TextureName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[0]);
+		glViewport(0, 0, ViewportSize.x, ViewportSize.y);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[1]);
+		glViewport(ViewportSize.x, 0, ViewportSize.x, ViewportSize.y);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[2]);
+		glViewport(ViewportSize.x, ViewportSize.y, ViewportSize.x, ViewportSize.y);
+		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
+
+		glBindTexture(GL_TEXTURE_2D, this->TextureName[3]);
+		glViewport(0, ViewportSize.y, ViewportSize.x, ViewportSize.y);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 
 		return true;

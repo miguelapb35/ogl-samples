@@ -739,7 +739,7 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER uint16 packUnorm3x5_1x1(vec4 const & v)
 	{
-		u32vec4 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec4(15.f, 15.f, 15.f, 1.f)));
+		u32vec4 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec4(31.f, 31.f, 31.f, 1.f)));
 		detail::u5u5u5u1 Result;
 		Result.data.x = Unpack.x;
 		Result.data.y = Unpack.y;
