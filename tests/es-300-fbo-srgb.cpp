@@ -6,7 +6,6 @@ namespace
 	char const * FRAG_SHADER_SOURCE_RENDER("es-300/fbo-srgb.frag");
 	char const * VERT_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.vert");
 	char const * FRAG_SHADER_SOURCE_SPLASH("es-300/fbo-srgb-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	namespace buffer
 	{
