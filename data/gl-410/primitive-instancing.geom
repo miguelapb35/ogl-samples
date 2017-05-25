@@ -14,19 +14,14 @@ layout(triangle_strip, max_vertices = 4) out;
 in gl_PerVertex
 {
 	vec4 gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[];
 } gl_in[];
-
-layout(location = COLOR) in vec4 Color[];
 
 out gl_PerVertex 
 {
 	vec4 gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[];
 };
 
+layout(location = COLOR) in vec4 Color[];
 layout(location = COLOR) out vec4 GeomColor;
 
 uniform mat4 MVP;
