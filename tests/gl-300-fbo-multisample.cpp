@@ -119,12 +119,34 @@ private:
 		return this->checkError("initTexture");
 	}
 
+	bool validateRenderbuffer(GLuint Name, GLint ExpectedWidth, GLint ExpectedHeight, GLint ExpectedSamples, GLint ExpectedFormat)
+	{
+		GLint QueriedWidth = 0, QueriedHeight = 0, QueriedSamples = 0, QueriedFormat = 0;
+		glBindRenderbuffer(GL_RENDERBUFFER, Name);
+		glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &QueriedWidth);
+		glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &QueriedHeight);
+		glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_SAMPLES, &QueriedSamples);
+		glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_INTERNAL_FORMAT, &QueriedFormat);
+
+		if (QueriedWidth != ExpectedWidth || QueriedHeight != ExpectedHeight)
+			return false;
+		if (QueriedSamples != ExpectedSamples)
+			return false;
+		if (QueriedFormat != ExpectedFormat)
+			return false;
+
+		return true;
+	}
+
 	bool initFramebuffer()
 	{
 		glGenRenderbuffers(1, &ColorRenderbufferName);
 		glBindRenderbuffer(GL_RENDERBUFFER, ColorRenderbufferName);
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER, 8, GL_RGBA8, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y);
 		// The second parameter is the number of samples.
+
+		if (!validateRenderbuffer(ColorRenderbufferName, FRAMEBUFFER_SIZE.x, FRAMEBUFFER_SIZE.y, 8, GL_RGBA8))
+			return false;
 
 		glGenFramebuffers(1, &FramebufferRenderName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferRenderName);
