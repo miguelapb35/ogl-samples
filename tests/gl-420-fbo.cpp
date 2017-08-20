@@ -248,9 +248,35 @@ private:
 		return true;
 	}
 
+	bool validateTextureImage(GLuint Name, GLint Level, GLint ExpectedWidth, GLint ExpectedHeight, GLint ExpectedSamples, GLint ExpectedFormat, GLint ExpectedImmutable)
+	{
+		GLint QueriedWidth = 0, QueriedHeight = 0, QueriedSamples = 0, QueriedFormat = 0, QueriedImmutable = -1;
+		glGetTextureLevelParameteriv(Name, Level, GL_TEXTURE_WIDTH, &QueriedWidth);
+		glGetTextureLevelParameteriv(Name, Level, GL_TEXTURE_HEIGHT, &QueriedHeight);
+		glGetTextureLevelParameteriv(Name, Level, GL_TEXTURE_SAMPLES, &QueriedSamples);
+		glGetTextureLevelParameteriv(Name, Level, GL_TEXTURE_INTERNAL_FORMAT, &QueriedFormat);
+		glGetTextureParameteriv(Name, GL_TEXTURE_IMMUTABLE_FORMAT, &QueriedImmutable);
+
+		if (QueriedWidth != ExpectedWidth || QueriedHeight != ExpectedHeight)
+			return false;
+		if (QueriedSamples != ExpectedSamples)
+			return false;
+		if (QueriedFormat != ExpectedFormat)
+			return false;
+		if (QueriedImmutable != ExpectedImmutable)
+			return false;
+
+		return true;
+	}
+
 	bool initFramebuffer()
 	{
-		bool Validated(true);
+		glm::uvec2 const WindowSize(this->getWindowSize());
+
+		if (!validateTextureImage(TextureName[texture::COLORBUFFER], 0, WindowSize.x, WindowSize.y, 0, GL_RGBA8, GL_TRUE))
+			return false;
+		if (!validateTextureImage(TextureName[texture::RENDERBUFFER], 0, WindowSize.x, WindowSize.y, 0, GL_DEPTH_COMPONENT24, GL_TRUE))
+			return false;
 
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
