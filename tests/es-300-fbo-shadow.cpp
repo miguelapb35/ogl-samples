@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE_DEPTH("es-200/fbo-shadow-depth.vert");
-	char const* FRAG_SHADER_SOURCE_DEPTH("es-200/fbo-shadow-depth.frag");
-	char const* VERT_SHADER_SOURCE_RENDER("es-200/fbo-shadow-render.vert");
-	char const* FRAG_SHADER_SOURCE_RENDER("es-200/fbo-shadow-render.frag");
+	char const* VERT_SHADER_SOURCE_DEPTH("es-300/fbo-shadow-depth.vert");
+	char const* FRAG_SHADER_SOURCE_DEPTH("es-300/fbo-shadow-depth.frag");
+	char const* VERT_SHADER_SOURCE_RENDER("es-300/fbo-shadow-render.vert");
+	char const* FRAG_SHADER_SOURCE_RENDER("es-300/fbo-shadow-render.frag");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);
