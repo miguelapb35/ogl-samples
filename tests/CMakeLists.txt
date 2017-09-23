@@ -487,6 +487,12 @@ glCreateSampleGTC(texture-derivative)
 set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
 glCreateSampleGTC(transform-feedback-arb)
 
+# OpenGL 4.6 samples
+set(GL_VERSION_GTC 460)
+
+set(GL_SHADER_GTC program-compile-khr.vert program-compile-khr.frag)
+glCreateSampleGTC(program-compile-khr)
+
 # OpenGL 5 hardware samples
 set(GL_VERSION_GTC 500)
 
