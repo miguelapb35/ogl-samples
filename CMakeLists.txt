@@ -92,25 +92,18 @@ endif()
 set(FREEIMAGE_BIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/${FREEIMAGE_DIRECTORY}/${FREEIMAGE_BINARY_DIRECTORY}/${FREEIMAGE_BINARY_FILE})
 
 ################################
-# Add GLM 
+# Add external library
 
-set(GLM_DIRECTORY glm)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLM_DIRECTORY})
-
-################################
-# Add GLI 
-
-set(GLI_DIRECTORY gli)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLI_DIRECTORY})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external)
 
 ################################
-# Add GLO 
+# Add GLO
 
 set(GLO_DIRECTORY glo-0.1.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLO_DIRECTORY})
 
 ################################
-# Add GLU 
+# Add GLU
 
 set(GLU_DIRECTORY glu-0.1.0.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${GLU_DIRECTORY})
