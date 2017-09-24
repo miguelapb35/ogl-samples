@@ -340,8 +340,50 @@ private:
 		return Data;
 	}
 
+	void initSimplex(std::size_t Set[64], glm::vec2 const& Offset, glm::vec2 const& Scale)
+	{
+		float Samples[64];
+
+		for(std::size_t i = 0; i < 64; ++i)
+		{
+			glm::vec2 const Coord = glm::vec2(i % 8, i / 8) / glm::vec2(8);
+			Samples[i] = glm::simplex(Coord * Scale + Offset) + 1.0f;
+		}
+
+		float Min = 10.f;
+		for(std::size_t i = 0; i < 64; ++i)
+			Min = glm::min(Min, Samples[i]);
+
+		float Max = -10.f;
+		for(std::size_t i = 0; i < 64; ++i)
+			Max = glm::max(Max, Samples[i]);
+
+		float Normalized[64];
+
+		for(std::size_t i = 0; i < 64; ++i)
+		{
+			Normalized[i] = (Samples[i] - Min) / (Max - Min);
+			assert(Normalized[i] >= 0.f && Normalized[i] <= 1.0f);
+		}
+
+		for(std::size_t i = 0; i < 64; ++i)
+			Set[i] = static_cast<std::size_t>(glm::clamp(Normalized[i] * 8.0f, 0.f, 7.0f));
+
+/*
+		for (std::size_t i = 0; i < 64; ++i)
+		{
+			glm::vec2 const Coord = glm::vec2(i % 8, i / 8) / glm::vec2(8) + glm::vec2(0);
+			float const Noise = glm::clamp(glm::simplex(Coord * Scale + Offset) * 0.6f + 0.6f, 0.0f, 1.0f);
+			int const wrap = static_cast<int>(Noise * 7.f);
+			assert(wrap >= 0 && wrap < 8);
+			Set[i] = static_cast<std::size_t>(wrap);
+		}
+*/
+	}
+
 	bool initTexture()
 	{
+
 		std::size_t const Size(8);
 
 		static glm::u8vec3 const ColorSRGB[] =
@@ -463,7 +505,11 @@ private:
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
 				GL_RGB, GL_UNSIGNED_BYTE, &Data2[0]);
 
-			colorChart const Data3 = buildColorChart(Color, Set1[2]);
+			std::size_t Set[64];
+			memset(Set, 0, sizeof(Set));
+			initSimplex(Set, glm::vec2(2.0), glm::vec2(1.5));
+
+			colorChart const Data3 = buildColorChart(Color, Set);
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				0, 0, 2,
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
@@ -490,7 +536,11 @@ private:
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
 				GL_RGB, GL_UNSIGNED_BYTE, &Data2[0]);
 
-			colorChart const Data3 = buildColorChart(Color, Set2[2]);
+			std::size_t Set[64];
+			memset(Set, 0, sizeof(Set));
+			initSimplex(Set, glm::vec2(0), glm::vec2(2));
+
+			colorChart const Data3 = buildColorChart(Color, Set);
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				0, 0, 6,
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
@@ -517,7 +567,11 @@ private:
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
 				GL_RGB, GL_UNSIGNED_BYTE, &Data2[0]);
 
-			colorChart const Data3 = buildColorChart(Color, Set3[2]);
+			std::size_t Set[64];
+			memset(Set, 0, sizeof(Set));
+			initSimplex(Set, glm::vec2(-1.5), glm::vec2(1.5));
+
+			colorChart const Data3 = buildColorChart(Color, Set);
 			glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0,
 				0, 0, 10,
 				static_cast<GLsizei>(Size), static_cast<GLsizei>(Size), 1,
