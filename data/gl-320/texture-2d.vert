@@ -20,5 +20,5 @@ out block
 void main()
 {
 	Out.Texcoord = Texcoord;
-	gl_Position = vec4(Position, 0.0, 1.0) * transpose(Transform.MVP);
+	gl_Position = Transform.MVP * vec4(Position, 0.0, 1.0);
 }
