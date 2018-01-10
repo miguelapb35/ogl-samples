@@ -27,9 +27,6 @@ namespace
 		glm::vec3(-1.5f, 1.0f,-0.5f)
 	};
 
-	GLsizei const Count[2] = {ElementCount, ElementCount};
-	GLint const BaseVertex[2] = {0, 4};
-	
 	namespace buffer
 	{
 		enum type
@@ -183,22 +180,18 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindVertexArray(VertexArrayName);
 
-		// Bug fix for cross platform build...
-#		if defined(WIN32)// || defined(__APPLE__)
-#			define CONV(x)		x
-#		else
-#			define CONV(x)		(GLvoid **)x
-#		endif
-
-		GLvoid const * Indexes[2] = {0, 0};
+		GLsizei PrimCount = 2;
+		GLsizei Count[] = { ElementCount, ElementCount };
+		GLvoid* Indexes[] = {0, 0};
+		GLint BaseVertex[] = { 0, 4 };
 
 		glMultiDrawElementsBaseVertex(
 			GL_TRIANGLES,
-			Count,
+			&Count[0],
 			GL_UNSIGNED_INT,
-			Indexes,//CONV(Indexes),
-			2,
-			BaseVertex);
+			(GLvoid**)Indexes,
+			countof(Count),
+			&BaseVertex[0]);
 		
 		return true;
 	}

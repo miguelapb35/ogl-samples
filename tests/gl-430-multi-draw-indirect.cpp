@@ -71,10 +71,10 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_430_multi_draw_indirect : public test
+class instance : public test
 {
 public:
-	gl_430_multi_draw_indirect(int argc, char* argv[]) :
+	instance(int argc, char* argv[]) :
 		test(argc, argv, "gl-430-multi-draw-indirect", test::CORE, 4, 2, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
@@ -401,9 +401,6 @@ private:
 			glViewportIndexedfv(0, &this->Viewport[i][0]);
 			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
 				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]), this->DrawCount[i], sizeof(DrawElementsIndirectCommand));
-
-			//for(int d = 0; d < this->DrawCount[i]; ++d)
-			//	glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * (this->DrawOffset[i] + d)));
 		}
 
 		return true;
@@ -414,7 +411,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_multi_draw_indirect Test(argc, argv);
+	instance Test(argc, argv);
 	Error += Test();
 
 	return Error;
