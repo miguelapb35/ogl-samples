@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-430/multi-draw-indirect.vert");
-	char const * FRAG_SHADER_SOURCE("gl-430/multi-draw-indirect.frag");
+	char const * VERT_SHADER_SOURCE("gl-400/multi-draw-indirect.vert");
+	char const * FRAG_SHADER_SOURCE("gl-400/multi-draw-indirect.frag");
 	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const ElementCount(15);
@@ -71,11 +71,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_430_multi_draw_indirect : public test
+class gl_400_multi_draw_indirect : public test
 {
 public:
-	gl_430_multi_draw_indirect(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-multi-draw-indirect", test::CORE, 4, 2, glm::uvec2(640, 480),
+	gl_400_multi_draw_indirect(int argc, char* argv[]) :
+		test(argc, argv, "gl-400-multi-draw-indirect", test::CORE, 4, 2, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -95,18 +95,19 @@ private:
 	GLuint ProgramName;
 	GLint UniformArrayStrideMat;
 	GLint UniformArrayStrideInt;
+	GLint UniformTransform;
+	GLint UniformIndirection;
 
 	bool initProgram()
 	{
 		bool Validated(true);
 	
 		compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 420 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 420 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 400 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 400 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
-		glProgramParameteri(ProgramName, GL_PROGRAM_SEPARABLE, GL_TRUE);
 		glAttachShader(ProgramName, VertShaderName);
 		glAttachShader(ProgramName, FragShaderName);
 		glLinkProgram(ProgramName);
@@ -114,6 +115,19 @@ private:
 
 		GLint ActiveUniform(0);
 		glGetProgramiv(ProgramName, GL_ACTIVE_UNIFORMS, &ActiveUniform);
+
+		if (Validated)
+		{
+			this->UniformTransform = glGetUniformBlockIndex(ProgramName, "transform");
+			glUniformBlockBinding(ProgramName, this->UniformTransform, semantic::uniform::TRANSFORM0);
+			this->UniformIndirection = glGetUniformBlockIndex(ProgramName, "indirection");
+			glUniformBlockBinding(ProgramName, this->UniformIndirection, semantic::uniform::INDIRECTION);
+
+			glUseProgram(ProgramName);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse[0]"), 0);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse[1]"), 1);
+			glUniform1i(glGetUniformLocation(ProgramName, "Diffuse[2]"), 2);
+		}
 
 		for (GLuint i = 0; i < static_cast<GLuint>(ActiveUniform); ++i)
 		{
@@ -130,12 +144,6 @@ private:
 
 			if(StringName == std::string("indirection.Transform[0]"))
 				glGetActiveUniformsiv(ProgramName, 1, &i, GL_UNIFORM_ARRAY_STRIDE, &UniformArrayStrideInt);
-		}
-	
-		if(Validated)
-		{
-			glGenProgramPipelines(1, &PipelineName);
-			glUseProgramStages(PipelineName, GL_VERTEX_SHADER_BIT | GL_FRAGMENT_SHADER_BIT, ProgramName);
 		}
 
 		return Validated;
@@ -232,8 +240,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -246,8 +253,6 @@ private:
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}
-	
-		///////////////////////////////////////////
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_B]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_NONE);
@@ -255,8 +260,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
@@ -268,8 +272,6 @@ private:
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}
-	
-		///////////////////////////////////////////
 
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_C]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_R, GL_NONE);
@@ -277,8 +279,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
@@ -300,17 +301,17 @@ private:
 	void validate()
 	{
 		GLint Status(0);
-		glValidateProgramPipeline(PipelineName);
-		glGetProgramPipelineiv(PipelineName, GL_VALIDATE_STATUS, &Status);
+		glValidateProgram(ProgramName);
+		glGetProgramiv(ProgramName, GL_VALIDATE_STATUS, &Status);
 
 		if(Status != GL_TRUE)
 		{
-			GLint LengthMax(0);
-			glGetProgramPipelineiv(PipelineName, GL_INFO_LOG_LENGTH, &LengthMax);
+			GLint MaxLength = 0;
+			glGetProgramiv(ProgramName, GL_INFO_LOG_LENGTH, &MaxLength);
 			
 			GLsizei LengthQuery(0);
-			std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
-			glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
+			std::vector<GLchar> InfoLog(MaxLength + 1, '\0');
+			glGetProgramInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
 
 			glDebugMessageInsertARB(
 				GL_DEBUG_SOURCE_APPLICATION_ARB, 
@@ -323,7 +324,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = this->checkExtension("GL_ARB_multi_draw_indirect");
+		bool Validated = true;
 
 		if(Validated)
 			Validated = initProgram();
@@ -387,7 +388,7 @@ private:
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, TextureName[texture::TEXTURE_C]);
 
-		glBindProgramPipeline(PipelineName);
+		glUseProgram(ProgramName);
 		glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
@@ -398,12 +399,10 @@ private:
 
 		for(std::size_t i = 0; i < IndirectBufferCount; ++i)
 		{
-			glViewportIndexedfv(0, &this->Viewport[i][0]);
-			glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT,
-				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]), this->DrawCount[i], sizeof(DrawElementsIndirectCommand));
+			glViewport(GLint(Viewport[i].x), GLint(Viewport[i].y), GLsizei(Viewport[i].z), GLsizei(Viewport[i].w));
 
-			//for(int d = 0; d < this->DrawCount[i]; ++d)
-			//	glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * (this->DrawOffset[i] + d)));
+			for(int d = 0; d < this->DrawCount[i]; ++d)
+				glDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * (this->DrawOffset[i] + d)));
 		}
 
 		return true;
@@ -414,7 +413,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	gl_430_multi_draw_indirect Test(argc, argv);
+	gl_400_multi_draw_indirect Test(argc, argv);
 	Error += Test();
 
 	return Error;
