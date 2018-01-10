@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
-	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
-	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.frag");
+	char const* VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
+	char const* FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
+	char const* VERT_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.vert");
+	char const* FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-single-output.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 
 	GLsizei const VertexCount(4);

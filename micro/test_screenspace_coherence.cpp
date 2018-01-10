@@ -12,8 +12,8 @@ namespace
 	};
 
 	GLsizei const VertexCount(6);
-	char const * VERT_SHADER_SOURCE = "hz-430/screenspace_coherence.vert";
-	char const * FRAG_SHADER_SOURCE = "hz-430/screenspace_coherence.frag";
+	char const* VERT_SHADER_SOURCE = "hz-430/screenspace_coherence.vert";
+	char const* FRAG_SHADER_SOURCE = "hz-430/screenspace_coherence.frag";
 }//namespace
 
 testScreenspaceCoherence::testScreenspaceCoherence(

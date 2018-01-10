@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_RENDER("gl-320/fbo-srgb.vert");
-	char const * FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-srgb.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE_RENDER("gl-320/fbo-srgb.vert");
+	char const* FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-srgb.frag");
+	char const* VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.vert");
+	char const* FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-srgb-blit.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	namespace buffer
 	{

@@ -17,12 +17,12 @@ std::string format(const char * Message, ...)
 	return Text;
 }
 
-void csv::log(char const * String, double Convergent, double Min, double Max)
+void csv::log(char const* String, double Convergent, double Min, double Max)
 {
 	this->Data.push_back(data(String, Convergent, Min, Max));
 }
 
-void csv::save(char const * Filename)
+void csv::save(char const* Filename)
 {
 	FILE* File(fopen(Filename, "a+"));
 	assert(File);

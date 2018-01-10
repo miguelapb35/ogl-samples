@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-320/fbo-layered.vert");
-	char const * GEOM_SHADER_SOURCE1("gl-320/fbo-layered.geom");
-	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-layered.frag");
-	char const * VERT_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.frag");
+	char const* VERT_SHADER_SOURCE1("gl-320/fbo-layered.vert");
+	char const* GEOM_SHADER_SOURCE1("gl-320/fbo-layered.geom");
+	char const* FRAG_SHADER_SOURCE1("gl-320/fbo-layered.frag");
+	char const* VERT_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.vert");
+	char const* FRAG_SHADER_SOURCE2("gl-320/fbo-layered-rtt-array.frag");
 	glm::ivec2 const FRAMEBUFFER_SIZE(320, 240);
 
 	GLsizei const VertexCount(4);

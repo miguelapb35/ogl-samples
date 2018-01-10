@@ -25,8 +25,8 @@ class csv
 	};
 
 public:
-	void log(char const * String, double Average, double Min, double Max);
-	void save(char const * Filename);
+	void log(char const* String, double Average, double Min, double Max);
+	void save(char const* Filename);
 	void print();
 
 private:

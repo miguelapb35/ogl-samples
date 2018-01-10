@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/texture-fetch.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-fetch.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba_dxt5_srgb.dds");
+	char const* VERT_SHADER_SOURCE("gl-320/texture-fetch.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/texture-fetch.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba_dxt5_srgb.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -111,7 +111,7 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

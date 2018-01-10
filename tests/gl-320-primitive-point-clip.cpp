@@ -3,8 +3,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/primitive-point-clip.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/primitive-point-clip.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/primitive-point-clip.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/primitive-point-clip.frag");
 
 	GLuint VertexArrayName(0);
 	GLuint ProgramName(0);

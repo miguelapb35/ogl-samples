@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-400/multi-draw-indirect.vert");
-	char const * FRAG_SHADER_SOURCE("gl-400/multi-draw-indirect.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE("gl-400/multi-draw-indirect.vert");
+	char const* FRAG_SHADER_SOURCE("gl-400/multi-draw-indirect.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const ElementCount(15);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);
@@ -225,7 +225,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

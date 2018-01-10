@@ -29,8 +29,8 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
-	char const * FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
+	char const* VERT_SHADER_SOURCE("hz-430/vertex-array-object.vert");
+	char const* FRAG_SHADER_SOURCE("hz-430/vertex-array-object.frag");
 }//namespace
 
 testDrawElements::testDrawElements(

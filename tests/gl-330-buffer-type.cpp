@@ -3,8 +3,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-330/flat-color.vert");
-	char const * FRAG_SHADER_SOURCE("gl-330/flat-color.frag");
+	char const* VERT_SHADER_SOURCE("gl-330/flat-color.vert");
+	char const* FRAG_SHADER_SOURCE("gl-330/flat-color.frag");
 
 	GLsizei const VertexCount(6);
 

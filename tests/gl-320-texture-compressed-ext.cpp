@@ -4,10 +4,10 @@ namespace
 {
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-compressed.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-compressed.frag");
-	char const * TEXTURE_DIFFUSE_BC1("kueken7_rgb_dxt1_srgb.dds");
-	char const * TEXTURE_DIFFUSE_BC3("kueken7_rgba_dxt5_srgb.dds");
-	char const * TEXTURE_DIFFUSE_BC4("kueken7_r_ati1n_unorm.dds");
-	char const * TEXTURE_DIFFUSE_BC5("kueken7_rg_ati2n_unorm.dds");
+	char const* TEXTURE_DIFFUSE_BC1("kueken7_rgb_dxt1_srgb.dds");
+	char const* TEXTURE_DIFFUSE_BC3("kueken7_rgba_dxt5_srgb.dds");
+	char const* TEXTURE_DIFFUSE_BC4("kueken7_r_ati1n_unorm.dds");
+	char const* TEXTURE_DIFFUSE_BC5("kueken7_rg_ati2n_unorm.dds");
 
 	struct vertex
 	{

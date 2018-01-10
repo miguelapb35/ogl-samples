@@ -1,32 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Samples Pack (ogl-samples.g-truc.net)
-///
-/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "test.hpp"
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-410/double.vert");
-	char const * FRAG_SHADER_SOURCE("gl-410/double.frag");
+	char const* VERT_SHADER_SOURCE("gl-410/double.vert");
+	char const* FRAG_SHADER_SOURCE("gl-410/double.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::dvec3);
@@ -89,14 +66,14 @@ private:
 		if(Validated)
 		{
 			std::string VertexSourceContent = this->loadFile(getDataDirectory() + VERT_SHADER_SOURCE);
-			char const * VertexSourcePointer = VertexSourceContent.c_str();
+			char const* VertexSourcePointer = VertexSourceContent.c_str();
 			ProgramName[program::VERT] = glCreateShaderProgramv(GL_VERTEX_SHADER, 1, &VertexSourcePointer);
 		}
 
 		if(Validated)
 		{
 			std::string FragmentSourceContent = this->loadFile(getDataDirectory() + FRAG_SHADER_SOURCE);
-			char const * FragmentSourcePointer = FragmentSourceContent.c_str();
+			char const* FragmentSourcePointer = FragmentSourceContent.c_str();
 			ProgramName[program::FRAG] = glCreateShaderProgramv(GL_FRAGMENT_SHADER, 1, &FragmentSourcePointer);
 		}
 

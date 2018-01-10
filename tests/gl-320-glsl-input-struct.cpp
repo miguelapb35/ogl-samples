@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/glsl-input-struct.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/glsl-input-struct.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE("gl-320/glsl-input-struct.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/glsl-input-struct.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -115,7 +115,7 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

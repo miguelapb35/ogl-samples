@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/texture-type.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-type.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/texture-type.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/texture-type.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);

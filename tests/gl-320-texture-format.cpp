@@ -2,13 +2,13 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/texture-format.vert");
-	char const * FRAG_SHADER_SOURCE[3] =
+	char const* VERT_SHADER_SOURCE("gl-320/texture-format.vert");
+	char const* FRAG_SHADER_SOURCE[3] =
 	{
 		"gl-320/texture-format-normalized.frag",
 		"gl-320/texture-format-uint.frag"
 	};
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);
@@ -159,7 +159,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * SAMPLE_VERT_SHADER("gl-320/primitive-shading.vert");
-	char const * SAMPLE_GEOM_SHADER("gl-320/primitive-shading.geom");
-	char const * SAMPLE_FRAG_SHADER("gl-320/primitive-shading.frag");
+	char const* SAMPLE_VERT_SHADER("gl-320/primitive-shading.vert");
+	char const* SAMPLE_GEOM_SHADER("gl-320/primitive-shading.geom");
+	char const* SAMPLE_FRAG_SHADER("gl-320/primitive-shading.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4ub);

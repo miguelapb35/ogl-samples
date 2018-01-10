@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("es-200/flat-color.vert");
-	char const * FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
+	char const* VERTEX_SHADER_SOURCE("es-200/flat-color.vert");
+	char const* FRAGMENT_SHADER_SOURCE("es-200/flat-color.frag");
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);
@@ -111,13 +111,13 @@ private:
 	{
 		bool Validated(true);
 
-		char const * Vendor = (char const *)glGetString(GL_VENDOR);
+		char const* Vendor = (char const *)glGetString(GL_VENDOR);
 		printf(Vendor);
-		char const * Renderer = (char const *)glGetString(GL_RENDERER);
+		char const* Renderer = (char const *)glGetString(GL_RENDERER);
 		printf(Renderer);
-		char const * Version = (char const *)glGetString(GL_VERSION);
+		char const* Version = (char const *)glGetString(GL_VERSION);
 		printf(Version);
-		char const * Extensions = (char const *)glGetString(GL_EXTENSIONS);
+		char const* Extensions = (char const *)glGetString(GL_EXTENSIONS);
 		printf(Extensions);
 
 		if(Validated)

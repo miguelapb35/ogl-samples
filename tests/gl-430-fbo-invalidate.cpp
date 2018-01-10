@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_AA("gl-430/fbo-invalidate-render.vert");
-	char const * FRAG_SHADER_SOURCE_AA("gl-430/fbo-invalidate-render.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-430/fbo-invalidate-splash.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-430/fbo-invalidate-splash.frag");
+	char const* VERT_SHADER_SOURCE_AA("gl-430/fbo-invalidate-render.vert");
+	char const* FRAG_SHADER_SOURCE_AA("gl-430/fbo-invalidate-render.frag");
+	char const* VERT_SHADER_SOURCE_SPLASH("gl-430/fbo-invalidate-splash.vert");
+	char const* FRAG_SHADER_SOURCE_SPLASH("gl-430/fbo-invalidate-splash.frag");
 
 	glm::uvec2 const FRAMEBUFFER_SIZE(80, 60);
 

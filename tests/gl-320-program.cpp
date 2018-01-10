@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/program.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/program.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/program.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/program.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);

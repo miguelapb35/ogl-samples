@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/primitive-point.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/primitive-point.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/primitive-point.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/primitive-point.frag");
 
 	std::size_t const VertexCount(4096);
 	

@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TEXTURE("gl-440/fbo-readpixels-sample.vert");
-	char const * FRAG_SHADER_SOURCE_TEXTURE("gl-440/fbo-readpixels-sample.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-440/fbo-readpixels-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-440/fbo-readpixels-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE_TEXTURE("gl-440/fbo-readpixels-sample.vert");
+	char const* FRAG_SHADER_SOURCE_TEXTURE("gl-440/fbo-readpixels-sample.frag");
+	char const* VERT_SHADER_SOURCE_SPLASH("gl-440/fbo-readpixels-blit.vert");
+	char const* FRAG_SHADER_SOURCE_SPLASH("gl-440/fbo-readpixels-blit.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -189,7 +189,7 @@ private:
 		bool Validated(true);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

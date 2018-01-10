@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/query-conditional.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/query-conditional.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/query-conditional.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/query-conditional.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec2);

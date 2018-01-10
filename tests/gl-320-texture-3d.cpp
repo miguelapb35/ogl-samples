@@ -4,9 +4,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/texture-3d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-3d.frag");
-	char const * TEXTURE_DIFFUSE("3dTexture.dds");
+	char const* VERT_SHADER_SOURCE("gl-320/texture-3d.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/texture-3d.frag");
+	char const* TEXTURE_DIFFUSE("3dTexture.dds");
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
 	GLsizei const VertexCount(6);

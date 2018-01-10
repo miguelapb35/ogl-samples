@@ -3,9 +3,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/primitive-point-quad.vert");
-	char const * GEOM_SHADER_SOURCE("gl-320/primitive-point-quad.geom");
-	char const * FRAG_SHADER_SOURCE("gl-320/primitive-point-quad.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/primitive-point-quad.vert");
+	char const* GEOM_SHADER_SOURCE("gl-320/primitive-point-quad.geom");
+	char const* FRAG_SHADER_SOURCE("gl-320/primitive-point-quad.frag");
 }//namespace
 
 class gl_320_primitive_point_quad : public test

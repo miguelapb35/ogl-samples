@@ -185,7 +185,7 @@ GLuint compiler::create(GLenum Type, std::string const & Filename, std::string c
 
 	std::string PreprocessedSource = parser()(CommandLine, Filename);
 	assert(!PreprocessedSource.empty());
-	char const * PreprocessedSourcePointer = PreprocessedSource.c_str();
+	char const* PreprocessedSourcePointer = PreprocessedSource.c_str();
 
 	fprintf(stdout, "%s\n", PreprocessedSource.c_str());
 

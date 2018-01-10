@@ -1,32 +1,9 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Samples Pack (ogl-samples.g-truc.net)
-///
-/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////
-
 #include "test.hpp"
 
 namespace
 {
-	char const * VERTEX_SHADER_SOURCE("gl-400/texture-buffer.vert");
-	char const * FRAGMENT_SHADER_SOURCE("gl-400/texture-buffer.frag");
+	char const* VERTEX_SHADER_SOURCE("gl-400/texture-buffer.vert");
+	char const* FRAGMENT_SHADER_SOURCE("gl-400/texture-buffer.frag");
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);
@@ -58,7 +35,7 @@ namespace
 	enum texture_type
 	{
 		TEXTURE_DISPLACEMENT,
-		TEXTURE_DIFFUSE,
+		,
 		TEXTURE_MAX
 	};
 
@@ -165,7 +142,7 @@ private:
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DISPLACEMENT]);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE]);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);	
 
@@ -238,7 +215,7 @@ private:
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DISPLACEMENT]);
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 5, 0);

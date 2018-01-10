@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/buffer-uniform.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/buffer-uniform.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/buffer-uniform.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/buffer-uniform.frag");
 
 	struct vertex_v3fn3fc4f
 	{

@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-400/layer.vert");
-	char const * GEOM_SHADER_SOURCE1("gl-400/layer.geom");
-	char const * FRAG_SHADER_SOURCE1("gl-400/layer.frag");
-	char const * VERT_SHADER_SOURCE2("gl-400/rtt-array.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-400/rtt-array.frag");
+	char const* VERT_SHADER_SOURCE1("gl-400/layer.vert");
+	char const* GEOM_SHADER_SOURCE1("gl-400/layer.geom");
+	char const* FRAG_SHADER_SOURCE1("gl-400/layer.frag");
+	char const* VERT_SHADER_SOURCE2("gl-400/rtt-array.vert");
+	char const* FRAG_SHADER_SOURCE2("gl-400/rtt-array.frag");
 	int const FRAMEBUFFER_SIZE(2);
 
 	GLsizei const VertexCount = 4;

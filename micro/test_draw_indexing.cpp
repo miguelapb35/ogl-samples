@@ -22,8 +22,8 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.vert", "hz-430/draw-indexing-uniform.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-id.vert"};
-	char const * FRAG_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.frag", "hz-430/draw-indexing-uniform.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-id.frag"};
+	char const* VERT_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.vert", "hz-430/draw-indexing-uniform.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-attrib.vert", "hz-430/draw-indexing-id.vert"};
+	char const* FRAG_SHADER_SOURCE[testDrawIndexing::INDEXING_MAX] = {"hz-430/draw.frag", "hz-430/draw-indexing-uniform.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-attrib.frag", "hz-430/draw-indexing-id.frag"};
 
 	GLint UniformDrawIndex(-1);
 }//namespace

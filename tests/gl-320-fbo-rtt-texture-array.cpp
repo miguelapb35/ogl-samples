@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
-	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
-	char const * VERT_SHADER_SOURCE2("gl-320/fbo-rtt-layer.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-layer.frag");
+	char const* VERT_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.vert");
+	char const* FRAG_SHADER_SOURCE1("gl-320/fbo-rtt-multiple-output.frag");
+	char const* VERT_SHADER_SOURCE2("gl-320/fbo-rtt-layer.vert");
+	char const* FRAG_SHADER_SOURCE2("gl-320/fbo-rtt-layer.frag");
 	int const FRAMEBUFFER_SIZE(2);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom

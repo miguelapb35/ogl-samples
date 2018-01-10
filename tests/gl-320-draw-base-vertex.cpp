@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/draw-base-vertex.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/draw-base-vertex.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/draw-base-vertex.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/draw-base-vertex.frag");
 
 	GLsizei const ElementCount(6);
 	GLsizeiptr const ElementSize = ElementCount * sizeof(glm::uint16);

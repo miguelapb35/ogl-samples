@@ -2,7 +2,7 @@
 
 namespace
 {
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -42,8 +42,8 @@ namespace
 		};
 	}//namespace program
 
-	char const * SHADER_VERT("gl-320/texture-offset.vert");
-	char const * SHADER_FRAG[program::MAX] = 
+	char const* SHADER_VERT("gl-320/texture-offset.vert");
+	char const* SHADER_FRAG[program::MAX] = 
 	{
 		"gl-320/texture-offset.frag",
 		"gl-320/texture-offset-bicubic.frag",

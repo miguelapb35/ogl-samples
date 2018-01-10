@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_DEPTH("gl-320/fbo-shadow-depth.vert");
-	char const * VERT_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.vert");
-	char const * FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
+	char const* VERT_SHADER_SOURCE_DEPTH("gl-320/fbo-shadow-depth.vert");
+	char const* VERT_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.vert");
+	char const* FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-shadow-render.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgb_dxt1_unorm.dds");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v3fv4u8);
@@ -180,7 +180,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

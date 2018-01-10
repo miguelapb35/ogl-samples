@@ -22,8 +22,8 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE[3] = {"hz-430/draw-range.vert", "hz-430/draw-uniform.vert", "hz-430/draw-uniform2.vert"};
-	char const * FRAG_SHADER_SOURCE[3] = {"hz-430/draw-range.frag", "hz-430/draw-uniform.frag", "hz-430/draw-uniform2.frag"};
+	char const* VERT_SHADER_SOURCE[3] = {"hz-430/draw-range.vert", "hz-430/draw-uniform.vert", "hz-430/draw-uniform2.vert"};
+	char const* FRAG_SHADER_SOURCE[3] = {"hz-430/draw-range.frag", "hz-430/draw-uniform.frag", "hz-430/draw-uniform2.frag"};
 
 	GLint UniformDiffuse0(-1);
 	GLint UniformDiffuse1(-1);

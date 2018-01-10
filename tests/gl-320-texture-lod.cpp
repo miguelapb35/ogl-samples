@@ -4,7 +4,7 @@ namespace
 {
 	std::string const VERT_SHADER_SOURCE("gl-320/texture-lod.vert");
 	std::string const FRAG_SHADER_SOURCE("gl-320/texture-lod.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	struct vertex
 	{
@@ -121,7 +121,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		{

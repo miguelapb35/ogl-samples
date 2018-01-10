@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
 }//namespace
 
 class gl_320_draw_without_vertex_attrib : public test

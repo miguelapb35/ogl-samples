@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/primitive-front-face.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/primitive-front-face.frag");
+	char const* VERT_SHADER_SOURCE("gl-320/primitive-front-face.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/primitive-front-face.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glm::vec2);

@@ -2,7 +2,7 @@
 
 namespace
 {
-	char const * CS_SOURCE("gl-430/glsl-std140.comp");
+	char const* CS_SOURCE("gl-430/glsl-std140.comp");
 
 	namespace semantics
 	{

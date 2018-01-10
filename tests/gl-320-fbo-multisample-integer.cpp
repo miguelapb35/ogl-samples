@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE1("gl-320/fbo-multisample-integer.vert");
-	char const * FRAG_SHADER_SOURCE1("gl-320/fbo-multisample-integer.frag");
-	char const * VERT_SHADER_SOURCE2("gl-320/texture-integer.vert");
-	char const * FRAG_SHADER_SOURCE2("gl-320/texture-integer.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const* VERT_SHADER_SOURCE1("gl-320/fbo-multisample-integer.vert");
+	char const* FRAG_SHADER_SOURCE1("gl-320/fbo-multisample-integer.frag");
+	char const* VERT_SHADER_SOURCE2("gl-320/texture-integer.vert");
+	char const* FRAG_SHADER_SOURCE2("gl-320/texture-integer.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 	int const FRAMEBUFFER_SIZE(4);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -160,7 +160,7 @@ private:
 		glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
 		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);

@@ -2,7 +2,7 @@
 
 namespace
 {
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(160, 120);
 
 	// With DDS textures, v texture coordinate are reversed, from top to bottom
@@ -53,8 +53,8 @@ namespace
 		};
 	}//namespace shader
 
-	char const * VERT_SHADER_SOURCE("gl-320/fbo-multisample-explicit.vert");
-	char const * FRAG_SHADER_SOURCE[program::MAX] = 
+	char const* VERT_SHADER_SOURCE("gl-320/fbo-multisample-explicit.vert");
+	char const* FRAG_SHADER_SOURCE[program::MAX] = 
 	{
 		"gl-320/fbo-multisample-explicit-texture.frag",
 		"gl-320/fbo-multisample-explicit-box.frag",
@@ -142,7 +142,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

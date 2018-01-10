@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_TRANSFORM("gl-320/transform-feedback-transform.vert");
-	char const * VERT_SHADER_SOURCE_FEEDBACK("gl-320/transform-feedback-feedback.vert");
-	char const * FRAG_SHADER_SOURCE_FEEDBACK("gl-320/transform-feedback-feedback.frag");
+	char const* VERT_SHADER_SOURCE_TRANSFORM("gl-320/transform-feedback-transform.vert");
+	char const* VERT_SHADER_SOURCE_FEEDBACK("gl-320/transform-feedback-feedback.vert");
+	char const* FRAG_SHADER_SOURCE_FEEDBACK("gl-320/transform-feedback-feedback.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec4);

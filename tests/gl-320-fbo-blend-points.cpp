@@ -2,11 +2,11 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_RENDER("gl-320/fbo-blend-points.vert");
-	char const * FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-blend-points.frag");
-	char const * VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-points-blit.vert");
-	char const * FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-points-blit.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
+	char const* VERT_SHADER_SOURCE_RENDER("gl-320/fbo-blend-points.vert");
+	char const* FRAG_SHADER_SOURCE_RENDER("gl-320/fbo-blend-points.frag");
+	char const* VERT_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-points-blit.vert");
+	char const* FRAG_SHADER_SOURCE_SPLASH("gl-320/fbo-blend-points-blit.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgb8_unorm.dds");
 
 	GLsizei const VertexCount(8);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v4fc4f);

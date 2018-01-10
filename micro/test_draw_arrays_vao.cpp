@@ -22,8 +22,8 @@ namespace
 		GLuint baseInstance;
 	};
 
-	char const * VERT_SHADER_SOURCE("hz-430/draw-range.vert");
-	char const * FRAG_SHADER_SOURCE("hz-430/draw-range.frag");
+	char const* VERT_SHADER_SOURCE("hz-430/draw-range.vert");
+	char const* FRAG_SHADER_SOURCE("hz-430/draw-range.frag");
 
 	GLint UniformDiffuse(-1);
 	std::vector<GLuint> VertexArrayName;

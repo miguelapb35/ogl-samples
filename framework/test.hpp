@@ -153,7 +153,7 @@ public:
 	};
 
 	int operator()();
-	void log(csv & CSV, char const * String);
+	void log(csv & CSV, char const* String);
 
 protected:
 	struct DrawArraysIndirectCommand
@@ -219,7 +219,7 @@ protected:
 	};
 
 	test(
-		int argc, char* argv[], char const * Title,
+		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
@@ -228,25 +228,25 @@ protected:
 		success Success = MATCH_TEMPLATE,
 		heuristic Heuristic = HEURISTIC_ALL);
 	test(
-		int argc, char* argv[], char const * Title,
+		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		std::size_t FrameCount,
 		success Success,
 		glm::uvec2 const & WindowSize);
 	test(
-		int argc, char* argv[], char const * Title,
+		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		std::size_t FrameCount,
 		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4));
 	test(
-		int argc, char* argv[], char const * Title,
+		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
 	test(
-		int argc, char* argv[], char const * Title,
+		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		heuristic Heuristic);
 	virtual ~test();
@@ -259,13 +259,13 @@ protected:
 	void sync(sync_mode const & Sync);
 	void stop();
 
-	bool isExtensionSupported(char const * String);
+	bool isExtensionSupported(char const* String);
 	glm::uvec2 getWindowSize() const;
 	bool isKeyPressed(int Key) const;
 	glm::mat4 view() const;
 	float cameraDistance() const {return this->TranlationCurrent.y;}
 	glm::vec3 cameraPosition() const;
-	bool checkTemplate(GLFWwindow* pWindow, char const * Title);
+	bool checkTemplate(GLFWwindow* pWindow, char const* Title);
 
 protected:
 	void beginTimer();
@@ -276,7 +276,7 @@ protected:
 	bool validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const;
 	bool checkError(const char* Title) const;
 	bool checkFramebuffer(GLuint FramebufferName) const;
-	bool checkExtension(char const * ExtensionName) const;
+	bool checkExtension(char const* ExtensionName) const;
 
 private:
 	GLFWwindow* Window;

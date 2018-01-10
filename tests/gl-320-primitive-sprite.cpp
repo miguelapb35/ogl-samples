@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE("gl-320/primitive-sprite.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/primitive-sprite.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fc4f);
@@ -119,7 +119,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		assert(!Texture.empty());
 
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

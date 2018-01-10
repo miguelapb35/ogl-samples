@@ -1,27 +1,4 @@
-﻿///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Samples Pack (ogl-samples.g-truc.net)
-///
-/// Copyright (c) 2004 - 2014 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////
-
-#include "test.hpp"
+﻿#include "test.hpp"
 #include "png.hpp"
 #include <glm/vector_relational.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -42,7 +19,7 @@ std::string getBinaryDirectory()
 
 test::test
 (
-	int argc, char* argv[], char const * Title,
+	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	std::size_t FrameCount,
 	success Success,
@@ -53,7 +30,7 @@ test::test
 
 test::test
 (
-	int argc, char* argv[], char const * Title,
+	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	glm::vec2 const & Orientation,
 	success Success
@@ -63,7 +40,7 @@ test::test
 
 test::test
 (
-	int argc, char* argv[], char const * Title,
+	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	std::size_t FrameCount,
 	glm::uvec2 const & WindowSize,
@@ -75,7 +52,7 @@ test::test
 
 test::test
 (
-	int argc, char* argv[], char const * Title,
+	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	heuristic Heuristic
 ) :
@@ -84,7 +61,7 @@ test::test
 
 test::test
 (
-	int argc, char* argv[], char const * Title,
+	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	glm::uvec2 const & WindowSize, glm::vec2 const & Orientation, glm::vec2 const & Position,
 	std::size_t FrameCount, success Success, heuristic Heuristic
@@ -273,12 +250,12 @@ void test::stop()
 	glfwSetWindowShouldClose(this->Window, GL_TRUE);
 }
 
-void test::log(csv & CSV, char const * String)
+void test::log(csv & CSV, char const* String)
 {
 	CSV.log(String, this->TimeSum / this->FrameCount, this->TimeMin, this->TimeMax);
 }
 
-bool test::isExtensionSupported(char const * String)
+bool test::isExtensionSupported(char const* String)
 {
 	GLint ExtensionCount(0);
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
@@ -594,7 +571,7 @@ namespace
 	}
 }//namespace
 
-bool test::checkTemplate(GLFWwindow* pWindow, char const * Title)
+bool test::checkTemplate(GLFWwindow* pWindow, char const* Title)
 {
 	GLint ColorType = GL_UNSIGNED_BYTE;
 	GLint ColorFormat = GL_RGBA;
@@ -831,7 +808,7 @@ bool test::checkFramebuffer(GLuint FramebufferName) const
 	return Status == GL_FRAMEBUFFER_COMPLETE;
 }
 
-bool test::checkExtension(char const * ExtensionName) const
+bool test::checkExtension(char const* ExtensionName) const
 {
 	GLint ExtensionCount = 0;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);

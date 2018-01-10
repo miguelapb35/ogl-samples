@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
-	char const * FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
-	char const * TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
+	char const* VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
+	char const* FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	struct vertex
 	{
@@ -122,7 +122,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

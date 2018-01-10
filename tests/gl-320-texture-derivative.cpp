@@ -2,10 +2,10 @@
 
 namespace
 {
-	char const * VERT_SHADER_SOURCE_X("gl-320/texture-derivative-x.vert");
-	char const * FRAG_SHADER_SOURCE_X("gl-320/texture-derivative-x.frag");
-	char const * VERT_SHADER_SOURCE_Y("gl-320/texture-derivative-y.vert");
-	char const * FRAG_SHADER_SOURCE_Y("gl-320/texture-derivative-y.frag");
+	char const* VERT_SHADER_SOURCE_X("gl-320/texture-derivative-x.vert");
+	char const* FRAG_SHADER_SOURCE_X("gl-320/texture-derivative-x.frag");
+	char const* VERT_SHADER_SOURCE_Y("gl-320/texture-derivative-y.vert");
+	char const* FRAG_SHADER_SOURCE_Y("gl-320/texture-derivative-y.frag");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
