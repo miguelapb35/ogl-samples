@@ -4,7 +4,7 @@
 
 namespace
 {
-	void subdivise(std::vector<glm::vec3>& VertexData, std::size_t& VertexIndex, std::vector<GLushort>& ElementData, glm::uint32 I0, glm::uint32 J0, glm::uint32 K0, int Subdivise)
+	void subdivise(std::vector<glm::vec3>& VertexData, std::size_t& VertexIndex, std::vector<GLushort>& ElementData, std::size_t I0, std::size_t J0, std::size_t K0, int Subdivise)
 	{
 		if(Subdivise == 0)
 		{
@@ -21,9 +21,9 @@ namespace
 			glm::vec3 const& B0 = VertexData[J0];
 			glm::vec3 const& C0 = VertexData[K0];
 
-			glm::uint32 const I1 = VertexIndex++;
-			glm::uint32 const J1 = VertexIndex++;
-			glm::uint32 const K1 = VertexIndex++;
+			std::size_t const I1 = VertexIndex++;
+			std::size_t const J1 = VertexIndex++;
+			std::size_t const K1 = VertexIndex++;
 
 			glm::vec3 U = (B0 + C0) * 0.5f;
 			glm::vec3 V = (C0 + A0) * 0.5f;

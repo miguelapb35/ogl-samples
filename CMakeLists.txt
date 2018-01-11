@@ -203,7 +203,7 @@ add_subdirectory(framework)
 if(MSVC)
 	set(COPY_BINARY copy-binary)
 	add_custom_target(${COPY_BINARY}
-		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/tests/${FREEIMAGE_BINARY_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/samples/${FREEIMAGE_BINARY_FILE}
 		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Debug/${FREEIMAGE_BINARY_FILE}
 		COMMAND ${CMAKE_COMMAND} -E copy ${FREEIMAGE_BIN_PATH} ${CMAKE_CURRENT_BINARY_DIR}/build/Release/${FREEIMAGE_BINARY_FILE})
 endif()
@@ -211,7 +211,7 @@ endif()
 ################################
 # Add subdirectory
 
-add_subdirectory(tests)
+add_subdirectory(samples)
 
 ################################
 # Add install
