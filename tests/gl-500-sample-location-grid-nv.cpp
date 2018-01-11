@@ -82,10 +82,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_500_sample_location_grid_nv : public framework
+class sample : public framework
 {
 public:
-	gl_500_sample_location_grid_nv(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-sample-location-grid-nv", framework::CORE, 4, 5),
 		FramebufferScale(3),
 		UniformTransform(-1),
@@ -379,7 +379,7 @@ int main(int argc, char* argv[])
 {
 	int Error = 0;
 
-	gl_500_sample_location_grid_nv Sample(argc, argv);
+	sample Sample(argc, argv);
 	Error += Sample();
 
 	return Error;

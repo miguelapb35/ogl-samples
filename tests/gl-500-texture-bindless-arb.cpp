@@ -38,10 +38,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_bindless_arb : public framework
+class sample : public framework
 {
 public:
-	gl_500_texture_bindless_arb(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-texture-bindless-arb", framework::CORE, 4, 5),
 		PipelineName(0),
 		ProgramName(0),
@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
 {
 	int Error = 0;
 
-	gl_500_texture_bindless_arb Sample(argc, argv);
+	sample Sample(argc, argv);
 	Error += Sample();
 
 	return Error;

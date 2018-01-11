@@ -35,10 +35,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_sparse_arb : public framework
+class sample : public framework
 {
 public:
-	gl_500_texture_sparse_arb(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-texture-sparse-arb", framework::CORE, 4, 4, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
 		PipelineName(0),
 		ProgramName(0),
@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
 {
 	int Error = 0;
 
-	gl_500_texture_sparse_arb Sample(argc, argv);
+	sample Sample(argc, argv);
 	Error += Sample();
 
 	return Error;
