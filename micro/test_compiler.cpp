@@ -17,7 +17,7 @@ namespace
 testCompiler::testCompiler(
 	int argc, char* argv[], profile Profile, std::size_t FrameCount, mode Mode
 ) :
-	test(argc, argv, "testCompiler", Profile, 4, 2),
+	framework(argc, argv, "testCompiler", Profile, 4, 2),
 	Mode(Mode)
 {}
 

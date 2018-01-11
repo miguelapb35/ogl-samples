@@ -70,11 +70,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-multi-draw-indirect-arb", test::CORE, 4, 4, glm::uvec2(640, 480),
+		framework(argc, argv, "gl-500-multi-draw-indirect-arb", framework::CORE, 4, 4, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),

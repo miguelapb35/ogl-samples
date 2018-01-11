@@ -63,11 +63,11 @@ namespace
 	GLint UniformMVPMultiple = 0;
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-400-blend-rtt", test::CORE, 4, 0)
+		: framework(argc, argv, "gl-400-blend-rtt", framework::CORE, 4, 0)
 		, FramebufferName(0)
 		, VertexArrayName(0)
 	{}

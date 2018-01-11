@@ -65,11 +65,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-blend-points", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-fbo-blend-points", framework::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1),

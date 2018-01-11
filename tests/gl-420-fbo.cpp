@@ -66,11 +66,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_420_fbo : public test
+class gl_420_fbo : public framework
 {
 public:
 	gl_420_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-fbo", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		framework(argc, argv, "gl-420-fbo", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:
@@ -156,7 +156,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

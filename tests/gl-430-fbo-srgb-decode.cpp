@@ -72,11 +72,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_430_fbo_srgb_decode : public test
+class gl_430_fbo_srgb_decode : public framework
 {
 public:
 	gl_430_fbo_srgb_decode(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-fbo-srgb-decode", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-fbo-srgb-decode", framework::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -171,7 +171,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

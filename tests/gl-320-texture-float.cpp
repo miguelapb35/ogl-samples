@@ -46,11 +46,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-320-texture-float", test::CORE, 3, 2)
+		: framework(argc, argv, "gl-320-texture-float", framework::CORE, 3, 2)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, TextureName(0)

@@ -46,11 +46,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_texture2d : public test
+class gl_320_texture2d : public framework
 {
 public:
 	gl_320_texture2d(int argc, char* argv[])
-		: test(argc, argv, "gl-320-texture-2d", test::CORE, 3, 2)
+		: framework(argc, argv, "gl-320-texture-2d", framework::CORE, 3, 2)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, TextureName(0)

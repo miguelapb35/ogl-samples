@@ -41,11 +41,11 @@ namespace
 	GLuint TextureName(0);
 }//namespace
 
-class gl_420_texture_pixel_store : public test
+class gl_420_texture_pixel_store : public framework
 {
 public:
 	gl_420_texture_pixel_store(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-pixel-store", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-texture-pixel-store", framework::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

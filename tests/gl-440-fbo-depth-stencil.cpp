@@ -72,11 +72,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_440_fbo_depth_stencil : public test
+class gl_440_fbo_depth_stencil : public framework
 {
 public:
 	gl_440_fbo_depth_stencil(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo-depth-stencil", test::CORE, 4, 3),
+		framework(argc, argv, "gl-440-fbo-depth-stencil", framework::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -179,7 +179,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

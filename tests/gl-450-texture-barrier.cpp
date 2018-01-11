@@ -66,11 +66,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_450_texture_barrier : public test
+class gl_450_texture_barrier : public framework
 {
 public:
 	gl_450_texture_barrier(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-texture-barrier", test::CORE, 4, 2, glm::vec2(0.0f))
+		framework(argc, argv, "gl-450-texture-barrier", framework::CORE, 4, 2, glm::vec2(0.0f))
 	{}
 
 private:

@@ -37,11 +37,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_buffer_sparse_arb : public test
+class gl_500_buffer_sparse_arb : public framework
 {
 public:
 	gl_500_buffer_sparse_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-buffer-sparse-arb", test::CORE, 4, 5),
+		framework(argc, argv, "gl-500-buffer-sparse-arb", framework::CORE, 4, 5),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -215,7 +215,7 @@ private:
 
 		{
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-			glm::mat4 MVP = Projection * this->test::view() * glm::mat4(1.0f);
+			glm::mat4 MVP = Projection * this->framework::view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}

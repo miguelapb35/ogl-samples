@@ -45,11 +45,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_buffer_uniform_shared : public test
+class gl_320_buffer_uniform_shared : public framework
 {
 public:
 	gl_320_buffer_uniform_shared(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-buffer-uniform-shared", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-buffer-uniform-shared", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformTransform(0),

@@ -78,11 +78,11 @@ namespace
 	};
 }//namespace
 
-class gl_440_fbo_readpixels_async : public test
+class gl_440_fbo_readpixels_async : public framework
 {
 public:
 	gl_440_fbo_readpixels_async(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo-readpixels-async", test::CORE, 4, 3),
+		framework(argc, argv, "gl-440-fbo-readpixels-async", framework::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -189,7 +189,7 @@ private:
 		bool Validated(true);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

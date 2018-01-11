@@ -35,11 +35,11 @@ namespace
 	};
 }//namespace
 
-class es_300_texture_format_packed : public test
+class es_300_texture_format_packed : public framework
 {
 public:
 	es_300_texture_format_packed(int argc, char* argv[])
-		: test(argc, argv, "es-300-texture-format-packed", test::ES, 3, 0)
+		: framework(argc, argv, "es-300-texture-format-packed", framework::ES, 3, 0)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, BufferName(0)

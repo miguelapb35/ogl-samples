@@ -4,7 +4,7 @@ namespace
 {
 	char const* VERT_SHADER_SOURCE("gl-330/texture-2d.vert");
 	char const* FRAG_SHADER_SOURCE("gl-330/texture-2d.frag");
-	char const* ( "kueken7_rgba_dxt5_unorm.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba_dxt5_unorm.dds");
 
 	struct vertex
 	{
@@ -460,11 +460,11 @@ bool convert_rgb32f_rgb9e5(const char* FilenameSrc, const char* FilenameDst)
 	return true;
 }
 
-class gl_330_texture_swizzle : public test
+class gl_330_texture_swizzle : public framework
 {
 public:
 	gl_330_texture_swizzle(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-texture-swizzle", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-texture-swizzle", framework::CORE, 3, 3)
 	{}
 
 private:
@@ -508,7 +508,7 @@ private:
 
 	bool initTexture()
 	{
-		//Texture2DName = create_texture_dsa((getDataDirectory() + ).c_str());
+		//Texture2DName = create_texture_dsa((getDataDirectory() + TEXTURE_DIFFUSE).c_str());
 
 		SwizzleR[viewport::V00] = GL_RED;
 		SwizzleG[viewport::V00] = GL_GREEN;
@@ -530,7 +530,7 @@ private:
 		SwizzleB[viewport::V01] = GL_BLUE;
 		SwizzleA[viewport::V01] = GL_ALPHA;
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		GLenum const Target = static_cast<GLenum>(GL.translate(Texture.target()));

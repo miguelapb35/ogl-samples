@@ -40,11 +40,11 @@ namespace
 	glm::ivec4 Viewport;
 }//namespace
 
-class gl_320_texture_cube : public test
+class gl_320_texture_cube : public framework
 {
 public:
 	gl_320_texture_cube(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-cube", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.1f))
+		framework(argc, argv, "gl-320-texture-cube", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.1f))
 	{}
 
 private:

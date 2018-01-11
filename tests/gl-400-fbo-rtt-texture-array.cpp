@@ -24,11 +24,11 @@ namespace
 	glm::vec4 Viewport[TEXTURE_MAX];
 }//namespace
 
-class gl_400_fbo_rtt_texture_array : public test
+class gl_400_fbo_rtt_texture_array : public framework
 {
 public:
 	gl_400_fbo_rtt_texture_array(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-fbo-rtt-texture-array", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-fbo-rtt-texture-array", framework::CORE, 4, 0)
 	{}
 
 private:

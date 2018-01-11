@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_sampler_wrap_ext : public test
+class gl_440_sampler_wrap_ext : public framework
 {
 public:
 	gl_440_sampler_wrap_ext(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-sampler-wrap-ext", test::CORE, 4, 3),
+		framework(argc, argv, "gl-440-sampler-wrap-ext", framework::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

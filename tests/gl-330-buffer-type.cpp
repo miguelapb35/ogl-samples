@@ -84,11 +84,11 @@ namespace
 	std::vector<glm::ivec4> Viewport(buffer::MAX);
 }//namespace
 
-class gl_330_buffer_type : public test
+class gl_330_buffer_type : public framework
 {
 public:
 	gl_330_buffer_type(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-buffer-type", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-buffer-type", framework::CORE, 3, 3)
 	{}
 
 private:

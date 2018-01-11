@@ -57,7 +57,7 @@ int drawArrays(int argc, char* argv[], csv & CSV)
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
-		testDrawArrays Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+		testDrawArrays Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -104,7 +104,7 @@ int drawElements(int argc, char* argv[], csv & CSV)
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
-		testDrawElements Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+		testDrawElements Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -152,7 +152,7 @@ int drawArraysUniform(int argc, char* argv[], csv & CSV)
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
-		testDrawArrays Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+		testDrawArrays Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -197,7 +197,7 @@ int drawArraysDSA(int argc, char* argv[], csv & CSV)
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
-		testDrawArrays Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+		testDrawArrays Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].DrawType, Entries[EntryIndex].VertexDataType, Entries[EntryIndex].UniformUpdate, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -241,7 +241,7 @@ int drawArraysVAOs(int argc, char* argv[], csv & CSV)
 	for(std::size_t EntryIndex(0); EntryIndex < Entries.size(); ++EntryIndex)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
-		testDrawArraysVAO Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+		testDrawArraysVAO Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].DrawType, Entries[EntryIndex].VAOMode, Entries[EntryIndex].DrawCount);
 		Error += Test();
 		Test.log(CSV, Entries[EntryIndex].String.c_str());
@@ -386,7 +386,7 @@ int drawScreenspaceCoherence(int argc, char* argv[], csv & CSV)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
 		testScreenspaceCoherence Test(
-			argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+			argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].WindowSize, Entries[EntryIndex].TileSize, Entries[EntryIndex].ViewportDrawCount, Entries[EntryIndex].TileDrawCount);
 
 		Error += Test();
@@ -401,19 +401,19 @@ int compiler(int argc, char* argv[], csv & CSV)
 	int Error(0);
 
 	{
-		testCompiler Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN, testCompiler::MULTITHREADED);
+		testCompiler Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN, testCompiler::MULTITHREADED);
 		Error += Test();
 		Test.log(CSV, "Multithreaded GLSL compiler");
 	}
 
 	{
-		testCompiler Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN, testCompiler::DUALTHREADED);
+		testCompiler Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN, testCompiler::DUALTHREADED);
 		Error += Test();
 		Test.log(CSV, "Dualthreaded GLSL compiler");
 	}
 
 	{
-		testCompiler Test(argc, argv, test::CORE, TEST_FRAME_PER_RUN, testCompiler::SINGLETHREADED);
+		testCompiler Test(argc, argv, framework::CORE, TEST_FRAME_PER_RUN, testCompiler::SINGLETHREADED);
 		Error += Test();
 		Test.log(CSV, "Singlethreaded GLSL compiler");
 	}
@@ -455,7 +455,7 @@ int drawIndexing(int argc, char* argv[], csv & CSV)
 	for(std::size_t TestIndex(0); TestIndex < TEST_DUPLICATE_COUNT; ++TestIndex)
 	{
 		testDrawIndexing Test(
-			argc, argv, test::CORE, TEST_FRAME_PER_RUN,
+			argc, argv, framework::CORE, TEST_FRAME_PER_RUN,
 			Entries[EntryIndex].Indexing, Entries[EntryIndex].DrawCount);
 
 		Error += Test();

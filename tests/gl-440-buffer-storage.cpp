@@ -37,11 +37,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_buffer_storage : public test
+class gl_440_buffer_storage : public framework
 {
 public:
 	gl_440_buffer_storage(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-storage", test::CORE, 4, 2),
+		framework(argc, argv, "gl-440-buffer-storage", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -124,7 +124,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
@@ -221,7 +221,7 @@ private:
 
 		{
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, WindowSize.x / WindowSize.y, 0.1f, 100.0f);
-			glm::mat4 MVP = Projection * this->test::view() * glm::mat4(1.0f);
+			glm::mat4 MVP = Projection * this->framework::view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}

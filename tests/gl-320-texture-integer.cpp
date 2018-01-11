@@ -27,11 +27,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_texture_integer : public test
+class gl_320_texture_integer : public framework
 {
 public:
 	gl_320_texture_integer(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-integer", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-integer", framework::CORE, 3, 2)
 	{}
 
 private:

@@ -69,11 +69,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_shader_blend_intel : public test
+class gl_500_shader_blend_intel : public framework
 {
 public:
 	gl_500_shader_blend_intel(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-shader-blend-intel", test::CORE, 4, 3),
+		framework(argc, argv, "gl-500-shader-blend-intel", framework::CORE, 4, 3),
 		Supersampling(2)
 	{}
 

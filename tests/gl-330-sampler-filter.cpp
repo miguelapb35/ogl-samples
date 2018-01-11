@@ -56,11 +56,11 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_330_sampler_filter : public test
+class gl_330_sampler_filter : public framework
 {
 public:
 	gl_330_sampler_filter(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-sampler-filter", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-sampler-filter", framework::CORE, 3, 3)
 	{}
 
 private:

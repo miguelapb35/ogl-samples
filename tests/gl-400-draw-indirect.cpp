@@ -49,11 +49,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_400_draw_indirect : public test
+class gl_400_draw_indirect : public framework
 {
 public:
 	gl_400_draw_indirect(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-draw-indirect", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-draw-indirect", framework::CORE, 4, 0)
 	{}
 
 private:

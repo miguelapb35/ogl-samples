@@ -35,11 +35,11 @@ namespace
 	};
 }//namespace
 
-class gl_300_test_alpha : public test
+class gl_300_test_alpha : public framework
 {
 public:
 	gl_300_test_alpha(int argc, char* argv[]) :
-		test(argc, argv, "gl-300-test-alpha", test::COMPATIBILITY, 3, 0),
+		framework(argc, argv, "gl-300-test-alpha", framework::COMPATIBILITY, 3, 0),
 		VertexArrayName(0),
 		ProgramName(0),
 		BufferName(0),
@@ -108,7 +108,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
@@ -144,7 +144,7 @@ private:
 		glEnable(GL_ALPHA_TEST);
 		glAlphaFunc(GL_GREATER, 0.2f);
 
-		//To test alpha blending:
+		//To framework alpha blending:
 		//glEnable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

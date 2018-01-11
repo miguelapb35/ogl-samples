@@ -21,11 +21,11 @@ namespace
 	};
 }//namespace
 
-class gl_300_fbo_multisample : public test
+class gl_300_fbo_multisample : public framework
 {
 public:
 	gl_300_fbo_multisample(int argc, char* argv[]) :
-		test(argc, argv, "gl-300-fbo-multisample", test::COMPATIBILITY, 3, 0),
+		framework(argc, argv, "gl-300-fbo-multisample", framework::COMPATIBILITY, 3, 0),
 		ProgramName(0),
 		VertexArrayName(0),
 		BufferName(0),
@@ -94,7 +94,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glGenTextures(1, &TextureName);

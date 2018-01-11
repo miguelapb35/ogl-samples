@@ -70,11 +70,11 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-330-sampler-object", test::CORE, 3, 3)
+		: framework(argc, argv, "gl-330-sampler-object", framework::CORE, 3, 3)
 	{}
 
 private:

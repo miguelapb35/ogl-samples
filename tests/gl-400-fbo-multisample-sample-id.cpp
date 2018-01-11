@@ -6,7 +6,7 @@ namespace
 	char const* FRAG_SHADER_SOURCE_RENDER("gl-400/fbo-multisample-render.frag");
 	char const* VERT_SHADER_SOURCE_BLIT("gl-400/fbo-multisample-blit.vert");
 	char const* FRAG_SHADER_SOURCE_BLIT("gl-400/fbo-multisample-blit.frag");
-	char const* ("kueken7_rgba8_srgb.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 	glm::ivec2 const FRAMEBUFFER_SIZE(80, 60);
 
 	GLsizei const VertexCount(6);
@@ -62,11 +62,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-400-fbo-multisample-sample-id", test::CORE, 4, 0)
+		: framework(argc, argv, "gl-400-fbo-multisample-sample-id", framework::CORE, 4, 0)
 	{}
 
 private:
@@ -138,7 +138,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		gli::gl GL(gli::gl::PROFILE_GL33);

@@ -3,7 +3,7 @@
 
 #include "test.hpp"
 
-class testCompiler : public test
+class testCompiler : public framework
 {
 public:
 	enum mode

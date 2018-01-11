@@ -24,11 +24,11 @@ namespace
 	GLint UniformMVP(0);
 }//namespace
 
-class gl_400_primitive_tessellation : public test
+class gl_400_primitive_tessellation : public framework
 {
 public:
 	gl_400_primitive_tessellation(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-primitive-tessellation", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-primitive-tessellation", framework::CORE, 4, 0)
 	{}
 
 private:

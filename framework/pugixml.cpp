@@ -8973,11 +8973,11 @@ PUGI__NS_BEGIN
 
 					if (cur[0] == ':')
 					{
-						if (cur[1] == '*') // namespace test ncname:*
+						if (cur[1] == '*') // namespace framework ncname:*
 						{
 							cur += 2; // :*
 						}
-						else if (PUGI__IS_CHARTYPEX(cur[1], ctx_symbol)) // namespace test qname
+						else if (PUGI__IS_CHARTYPEX(cur[1], ctx_symbol)) // namespace framework qname
 						{
 							cur++; // :
 
@@ -9159,7 +9159,7 @@ PUGI__NS_BEGIN
 			double number;
 			// variable for ast_variable
 			xpath_variable* variable;
-			// node test for ast_step (node name/namespace/node type/pi target)
+			// node framework for ast_step (node name/namespace/node type/pi target)
 			const char_t* nodetest;
 			// table for ast_opt_translate_table
 			const unsigned char* table;
@@ -9753,7 +9753,7 @@ PUGI__NS_BEGIN
 			case axis_ancestor:
 			case axis_ancestor_or_self:
 			{
-				if (axis == axis_ancestor_or_self && _test == nodetest_type_node) // reject attributes based on principal node type test
+				if (axis == axis_ancestor_or_self && _test == nodetest_type_node) // reject attributes based on principal node type framework
 					if (step_push(ns, a, p, alloc) & once)
 						return;
 
@@ -9773,7 +9773,7 @@ PUGI__NS_BEGIN
 			case axis_descendant_or_self:
 			case axis_self:
 			{
-				if (_test == nodetest_type_node) // reject attributes based on principal node type test
+				if (_test == nodetest_type_node) // reject attributes based on principal node type framework
 					step_push(ns, a, p, alloc);
 
 				break;
@@ -10650,7 +10650,7 @@ PUGI__NS_BEGIN
 			}
 
 			// Rewrite descendant-or-self::node()/child::foo with descendant::foo
-			// The former is a full form of //foo, the latter is much faster since it executes the node test immediately
+			// The former is a full form of //foo, the latter is much faster since it executes the node framework immediately
 			// Do a similar kind of rewrite for self/descendant/descendant-or-self axes
 			// Note that we only rewrite positionally invariant steps (//foo[1] != /descendant::foo[1])
 			if (_type == ast_step && (_axis == axis_child || _axis == axis_self || _axis == axis_descendant || _axis == axis_descendant_or_self) && _left &&
@@ -11196,7 +11196,7 @@ PUGI__NS_BEGIN
 			
 			if (_lexer.current() == lex_string)
 			{
-				// node name test
+				// node name framework
 				nt_name = _lexer.contents();
 				_lexer.next();
 
@@ -11210,7 +11210,7 @@ PUGI__NS_BEGIN
 
 					if (!axis_specified) throw_error("Unknown axis");
 
-					// read actual node test
+					// read actual node framework
 					_lexer.next();
 
 					if (_lexer.current() == lex_multiply)
@@ -11229,7 +11229,7 @@ PUGI__NS_BEGIN
 				
 				if (nt_type == nodetest_none)
 				{
-					// node type test or processing-instruction
+					// node type framework or processing-instruction
 					if (_lexer.current() == lex_open_brace)
 					{
 						_lexer.next();
@@ -11385,7 +11385,7 @@ PUGI__NS_BEGIN
 					
 					if (*state != '(') return parse_location_path();
 
-					// This looks like a function call; however this still can be a node-test. Check it.
+					// This looks like a function call; however this still can be a node-framework. Check it.
 					if (parse_node_test_type(_lexer.contents()) != nodetest_none) return parse_location_path();
 				}
 				

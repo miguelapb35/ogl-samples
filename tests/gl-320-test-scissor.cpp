@@ -37,11 +37,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_test_scissor : public test
+class gl_320_test_scissor : public framework
 {
 public:
 	gl_320_test_scissor(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-test-scissor", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		framework(argc, argv, "gl-320-test-scissor", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:
@@ -98,7 +98,7 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
 

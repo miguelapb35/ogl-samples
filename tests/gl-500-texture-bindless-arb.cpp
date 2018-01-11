@@ -38,11 +38,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_bindless_arb : public test
+class gl_500_texture_bindless_arb : public framework
 {
 public:
 	gl_500_texture_bindless_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-texture-bindless-arb", test::CORE, 4, 5),
+		framework(argc, argv, "gl-500-texture-bindless-arb", framework::CORE, 4, 5),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -186,7 +186,7 @@ private:
 		bool Validated(true);
 		Validated = Validated && this->checkExtension("GL_ARB_bindless_texture");
 
-		this->sync(test::ASYNC);
+		this->sync(framework::ASYNC);
 
 		if(Validated)
 			Validated = initProgram();

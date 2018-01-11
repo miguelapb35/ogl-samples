@@ -66,11 +66,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-conservative-raster-nv", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.25f))
+		framework(argc, argv, "gl-500-conservative-raster-nv", framework::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.25f))
 	{}
 
 private:

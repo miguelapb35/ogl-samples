@@ -49,11 +49,11 @@ namespace
 	glm::mat4* UniformPointer(nullptr);
 }//namespace
 
-class gl_440_transform_feedback : public test
+class gl_440_transform_feedback : public framework
 {
 public:
 	gl_440_transform_feedback(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-transform-feedback", test::CORE, 4, 3)
+		framework(argc, argv, "gl-440-transform-feedback", framework::CORE, 4, 3)
 	{}
 
 private:

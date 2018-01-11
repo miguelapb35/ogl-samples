@@ -87,11 +87,11 @@ namespace
 
 }//namespace
 
-class gl_430_perf_query : public test
+class gl_430_perf_query : public framework
 {
 public:
 	gl_430_perf_query(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-perf-query", test::CORE, 4, 2),
+		framework(argc, argv, "gl-430-perf-query", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -242,7 +242,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

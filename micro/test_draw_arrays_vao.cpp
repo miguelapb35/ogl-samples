@@ -37,7 +37,7 @@ testDrawArraysVAO::testDrawArraysVAO(
 	vaoMode const VAOMode,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawArraysVAO", Profile, 4, 2, FrameCount),
+	framework(argc, argv, "testDrawArraysVAO", Profile, 4, 2, FrameCount),
 	DrawType(DrawType),
 	VAOMode(VAOMode),
 	DrawCount(DrawCount),

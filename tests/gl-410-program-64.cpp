@@ -51,11 +51,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_410_program_64 : public test
+class gl_410_program_64 : public framework
 {
 public:
 	gl_410_program_64(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-program-64", test::CORE, 4, 1)
+		framework(argc, argv, "gl-410-program-64", framework::CORE, 4, 1)
 	{}
 
 private:

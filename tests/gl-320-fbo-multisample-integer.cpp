@@ -75,11 +75,11 @@ namespace
 	std::vector<GLuint> UniformDiffuse(program::MAX);
 }//namespace
 
-class gl_320_fbo_multisample_integer : public test
+class gl_320_fbo_multisample_integer : public framework
 {
 public:
 	gl_320_fbo_multisample_integer(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-multisample-integer", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-fbo-multisample-integer", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -160,7 +160,7 @@ private:
 		glGetIntegerv(GL_MAX_DEPTH_TEXTURE_SAMPLES, &MaxDepthTextureSamples); 
 		glGetIntegerv(GL_MAX_INTEGER_SAMPLES, &MaxIntegerSamples); 
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 		glActiveTexture(GL_TEXTURE0);

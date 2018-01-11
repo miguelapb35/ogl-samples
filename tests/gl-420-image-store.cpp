@@ -30,11 +30,11 @@ namespace
 	}//namespace pipeline
 }//namespace
 
-class gl_420_image_store : public test
+class gl_420_image_store : public framework
 {
 public:
 	gl_420_image_store(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-image-store", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-image-store", framework::CORE, 4, 2),
 		VertexArrayName(0),
 		TextureName(0)
 	{}

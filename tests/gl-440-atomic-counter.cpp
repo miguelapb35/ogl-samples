@@ -15,11 +15,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_atomic_counter : public test
+class gl_440_atomic_counter : public framework
 {
 public:
 	gl_440_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-atomic-counter", test::CORE, 4, 3, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+		framework(argc, argv, "gl-440-atomic-counter", framework::CORE, 4, 3, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, framework::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

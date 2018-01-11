@@ -24,11 +24,11 @@ namespace
 	GLint UniformMVP = 0;
 }//namespace
 
-class gl_400_program_varying_blocks : public test
+class gl_400_program_varying_blocks : public framework
 {
 public:
 	gl_400_program_varying_blocks(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-program-varying-blocks", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-program-varying-blocks", framework::CORE, 4, 0)
 	{}
 
 private:

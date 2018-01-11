@@ -41,11 +41,11 @@ namespace
 	};
 }//namespace
 
-class test_uniform_caching : public test
+class test_uniform_caching : public framework
 {
 public:
 	test_uniform_caching(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, uniformMode UniformMode) :
-		test(argc, argv, "test_uniform_caching", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
+		framework(argc, argv, "test_uniform_caching", framework::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),

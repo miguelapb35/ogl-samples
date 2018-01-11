@@ -50,11 +50,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class es_300_fbo_srgb : public test
+class es_300_fbo_srgb : public framework
 {
 public:
 	es_300_fbo_srgb(int argc, char* argv[]) :
-		test(argc, argv, "es-300-fbo-srgb", test::ES, 3, 0),
+		framework(argc, argv, "es-300-fbo-srgb", framework::ES, 3, 0),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)

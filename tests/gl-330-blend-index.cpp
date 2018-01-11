@@ -42,11 +42,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_330_blend_index : public test
+class gl_330_blend_index : public framework
 {
 public:
 	gl_330_blend_index(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-blend-index", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-blend-index", framework::CORE, 3, 3)
 	{}
 
 private:
@@ -90,7 +90,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());
 

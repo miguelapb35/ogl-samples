@@ -6,11 +6,11 @@ namespace
 	char const* FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
 }//namespace
 
-class gl_320_draw_without_vertex_attrib : public test
+class gl_320_draw_without_vertex_attrib : public framework
 {
 public:
 	gl_320_draw_without_vertex_attrib(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-without-vertex-attrib", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-draw-without-vertex-attrib", framework::CORE, 3, 2),
 		ProgramName(0),
 		VertexArrayName(0),
 		BufferName(0)

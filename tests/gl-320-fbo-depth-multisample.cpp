@@ -86,11 +86,11 @@ namespace
 	GLint UniformTransform(0);
 }//namespace
 
-class gl_320_fbo_depth_multisample : public test
+class gl_320_fbo_depth_multisample : public framework
 {
 public:
 	gl_320_fbo_depth_multisample(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-depth-multisample", test::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.48f))
+		framework(argc, argv, "gl-320-fbo-depth-multisample", framework::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.48f))
 	{}
 
 private:
@@ -167,7 +167,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

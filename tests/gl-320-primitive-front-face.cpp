@@ -40,11 +40,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_primitive_front_face : public test
+class gl_320_primitive_front_face : public framework
 {
 public:
 	gl_320_primitive_front_face(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-front-face", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-primitive-front-face", framework::CORE, 3, 2)
 	{}
 
 private:

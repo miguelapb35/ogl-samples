@@ -68,11 +68,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_primitive_line_msaa : public test
+class gl_320_primitive_line_msaa : public framework
 {
 public:
 	gl_320_primitive_line_msaa(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-line-msaa", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-primitive-line-msaa", framework::CORE, 3, 2),
 		FramebufferScale(3),
 		UniformTransform(-1),
 		VertexCount(0)

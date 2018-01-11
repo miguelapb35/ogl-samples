@@ -46,11 +46,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_debug : public test
+class gl_430_debug : public framework
 {
 public:
 	gl_430_debug(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-debug", test::CORE, 4, 2, glm::vec2(0), test::GENERATE_ERROR),
+		framework(argc, argv, "gl-430-debug", framework::CORE, 4, 2, glm::vec2(0), framework::GENERATE_ERROR),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)
@@ -141,7 +141,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -211,7 +211,7 @@ private:
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallback(&test::debugOutput, this);
+		glDebugMessageCallback(&framework::debugOutput, this);
 
 		glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Message test: Begin");
 

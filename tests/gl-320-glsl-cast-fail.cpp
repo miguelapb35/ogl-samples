@@ -44,11 +44,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_glsl_precision : public test
+class gl_320_glsl_precision : public framework
 {
 public:
 	gl_320_glsl_precision(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-glsl-cast-fail", test::CORE, 3, 2, glm::vec2(0), test::GENERATE_ERROR)
+		framework(argc, argv, "gl-320-glsl-cast-fail", framework::CORE, 3, 2, glm::vec2(0), framework::GENERATE_ERROR)
 	{}
 
 private:

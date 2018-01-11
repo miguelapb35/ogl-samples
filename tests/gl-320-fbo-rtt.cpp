@@ -79,11 +79,11 @@ namespace
 	std::vector<glm::ivec4> Viewport(texture::MAX);
 }//namespace
 
-class gl_320_fbo_rtt : public test
+class gl_320_fbo_rtt : public framework
 {
 public:
 	gl_320_fbo_rtt(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-rtt", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-fbo-rtt", framework::CORE, 3, 2)
 	{}
 
 private:

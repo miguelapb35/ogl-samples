@@ -59,11 +59,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-shader-blend-nv", test::CORE, 4, 5),
+		framework(argc, argv, "gl-500-shader-blend-nv", framework::CORE, 4, 5),
 		FramebufferName(0),
 		Supersampling(2)
 	{}

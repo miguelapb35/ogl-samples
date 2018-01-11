@@ -28,11 +28,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_query_occlusion : public test
+class gl_430_query_occlusion : public framework
 {
 public:
 	gl_430_query_occlusion(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-occlusion", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-query-occlusion", framework::CORE, 4, 3),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

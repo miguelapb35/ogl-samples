@@ -114,7 +114,7 @@ inline bool operator!= (vertexattrib const & A, vertexattrib const & B)
 std::string getDataDirectory();
 std::string getBinaryDirectory();
 
-class test
+class framework
 {
 public:
 	enum heuristic
@@ -218,7 +218,7 @@ protected:
 		KEY_REPEAT = GLFW_REPEAT
 	};
 
-	test(
+	framework(
 		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
@@ -227,29 +227,29 @@ protected:
 		std::size_t FrameCount = 2,
 		success Success = MATCH_TEMPLATE,
 		heuristic Heuristic = HEURISTIC_ALL);
-	test(
+	framework(
 		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		std::size_t FrameCount,
 		success Success,
 		glm::uvec2 const & WindowSize);
-	test(
+	framework(
 		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		std::size_t FrameCount,
 		glm::uvec2 const & WindowSize = glm::uvec2(640, 480),
 		glm::vec2 const & Orientation = glm::vec2(0, 0),
 		glm::vec2 const & Position = glm::vec2(0, 4));
-	test(
+	framework(
 		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		glm::vec2 const & Orientation,
 		success Success = MATCH_TEMPLATE);
-	test(
+	framework(
 		int argc, char* argv[], char const* Title,
 		profile Profile, int Major, int Minor,
 		heuristic Heuristic);
-	virtual ~test();
+	virtual ~framework();
 
 	virtual bool begin() = 0;
 	virtual bool end() = 0;

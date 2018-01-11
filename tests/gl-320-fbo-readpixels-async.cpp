@@ -77,11 +77,11 @@ namespace
 	};
 }//namespace
 
-class gl_320_fbo : public test
+class gl_320_fbo : public framework
 {
 public:
 	gl_320_fbo(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-readpixels-async", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-fbo-readpixels-async", framework::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -188,7 +188,7 @@ private:
 		bool Validated(true);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

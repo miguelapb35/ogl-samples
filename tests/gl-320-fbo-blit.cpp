@@ -56,11 +56,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_320_fbo_blit : public test
+class gl_320_fbo_blit : public framework
 {
 public:
 	gl_320_fbo_blit(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-blit", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-fbo-blit", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		BufferName(0),
 		ColorRenderbufferName(0),
@@ -126,7 +126,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glGenTextures(texture::MAX, &TextureName[0]);

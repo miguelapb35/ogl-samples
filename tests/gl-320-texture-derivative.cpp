@@ -44,11 +44,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-derivative", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.49f))
+		framework(argc, argv, "gl-320-texture-derivative", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.49f))
 	{}
 
 private:

@@ -36,16 +36,16 @@ namespace
 	enum texture_type
 	{
 		TEXTURE_DISPLACEMENT,
-		,
+		TEXTURE_DIFFUSE,
 		TEXTURE_MAX
 	};
 }//namespace
 
-class gl_430_texture_buffer : public test
+class gl_430_texture_buffer : public framework
 {
 public:
 	gl_430_texture_buffer(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-buffer", test::CORE, 4, 2, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-430-texture-buffer", framework::CORE, 4, 2, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformMVP(0)
@@ -170,7 +170,7 @@ private:
 		glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DISPLACEMENT], TextureBufferOffsetAlignment, sizeof(glm::vec3) * 5);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
 		glTexBufferRange(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE], TextureBufferOffsetAlignment, sizeof(glm::vec3) * 5);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);	
 
@@ -249,7 +249,7 @@ private:
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DISPLACEMENT]);
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[BUFFER_TRANSFORM]);
 

@@ -42,11 +42,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_glsl_discard : public test
+class gl_320_glsl_discard : public framework
 {
 public:
 	gl_320_glsl_discard(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-glsl-discard", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-glsl-discard", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -94,7 +94,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 
 		glGenTextures(1, &Texture2DName);

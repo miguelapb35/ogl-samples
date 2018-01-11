@@ -46,11 +46,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_400_sampler_array : public test
+class gl_400_sampler_array : public framework
 {
 public:
 	gl_400_sampler_array(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-sampler-array", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.3f)),
+		framework(argc, argv, "gl-400-sampler-array", framework::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.3f)),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),

@@ -51,11 +51,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo_srgb_blend : public test
+class gl_320_fbo_srgb_blend : public framework
 {
 public:
 	gl_320_fbo_srgb_blend(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb-blend", test::CORE, 3, 2, HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_CHANNEL_BIT),
+		framework(argc, argv, "gl-320-fbo-srgb-blend", framework::CORE, 3, 2, HEURISTIC_MIPMAPS_ABSOLUTE_DIFFERENCE_MAX_CHANNEL_BIT),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -151,7 +151,7 @@ private:
 		bool Validated(true);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

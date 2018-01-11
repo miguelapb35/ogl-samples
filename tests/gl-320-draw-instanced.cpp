@@ -29,11 +29,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_draw_instanced : public test
+class gl_320_draw_instanced : public framework
 {
 public:
 	gl_320_draw_instanced(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-instanced", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-draw-instanced", framework::CORE, 3, 2),
 		ProgramName(0),
 		VertexArrayName(0),
 		UniformTransform(-1)

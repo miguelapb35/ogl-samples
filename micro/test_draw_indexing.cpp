@@ -33,7 +33,7 @@ testDrawIndexing::testDrawIndexing(
 	indexing const Indexing,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawIndexing", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0, 0), glm::vec2(0, 512)),
+	framework(argc, argv, "testDrawIndexing", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0, 0), glm::vec2(0, 512)),
 	Indexing(Indexing),
 	DrawCount(DrawCount),
 	VertexArrayName(0),

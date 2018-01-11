@@ -58,11 +58,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_fbo_without_attachment : public test
+class gl_440_fbo_without_attachment : public framework
 {
 public:
 	gl_440_fbo_without_attachment(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-fbo-without-attachment", test::CORE, 4, 2),
+		framework(argc, argv, "gl-440-fbo-without-attachment", framework::CORE, 4, 2),
 		FramebufferName(0),
 		Supersampling(2)
 	{}
@@ -179,7 +179,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

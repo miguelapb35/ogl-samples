@@ -45,11 +45,11 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 }//namespace
 
-class gl_320_draw_range_elements : public test
+class gl_320_draw_range_elements : public framework
 {
 public:
 	gl_320_draw_range_elements(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-range-elements", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-draw-range-elements", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformTransform(-1)

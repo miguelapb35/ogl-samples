@@ -36,7 +36,7 @@ testDrawArrays::testDrawArrays(
 	uniformUpdate const UniformUpdate,
 	std::size_t const DrawCount
 ) :
-	test(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4)),
+	framework(argc, argv, "testDrawArrays", Profile, 4, 2, FrameCount, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4)),
 	DrawType(DrawType),
 	VertexDataType(VertexDataType),
 	UniformUpdate(UniformUpdate),

@@ -69,11 +69,11 @@ namespace
 	}//namespace pipeline
 }//namespace
 
-class gl_430_fbo_invalidate : public test
+class gl_430_fbo_invalidate : public framework
 {
 public:
 	gl_430_fbo_invalidate(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-fbo-invalidate", test::CORE, 4, 2)
+		framework(argc, argv, "gl-430-fbo-invalidate", framework::CORE, 4, 2)
 	{}
 
 private:

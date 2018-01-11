@@ -27,11 +27,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_330_texture_interger_rgb10a2ui : public test
+class gl_330_texture_interger_rgb10a2ui : public framework
 {
 public:
 	gl_330_texture_interger_rgb10a2ui(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-texture-interger-rgb10a2ui", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-texture-interger-rgb10a2ui", framework::CORE, 3, 3)
 	{}
 
 private:

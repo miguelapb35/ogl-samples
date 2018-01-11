@@ -37,11 +37,11 @@ namespace
 	GLuint BufferName[buffer::MAX] = {0, 0, 0};
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-420-debug-output", test::COMPATIBILITY, 4, 2, glm::vec2(0.25f, 0.25f), GENERATE_ERROR)
+		: framework(argc, argv, "gl-420-debug-output", framework::COMPATIBILITY, 4, 2, glm::vec2(0.25f, 0.25f), GENERATE_ERROR)
 		, PipelineName(0)
 		, ProgramName(0)
 		, VertexArrayName(0)
@@ -119,7 +119,7 @@ private:
 	bool initDebugOutput()
 	{
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
-		glDebugMessageCallbackARB(&test::debugOutput, this);
+		glDebugMessageCallbackARB(&framework::debugOutput, this);
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
 		GLuint MessageId(4);
@@ -198,7 +198,7 @@ private:
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
-		// Error added to test debug output
+		// Error added to framework debug output
 		glClearBufferfv(GL_UNIFORM_BUFFER, 0, &glm::vec4(0.0f, 0.5f, 1.0f, 1.0f)[0]);
 
 		glBindProgramPipeline(PipelineName);

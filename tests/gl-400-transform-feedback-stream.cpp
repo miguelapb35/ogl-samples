@@ -37,11 +37,11 @@ namespace
 	GLuint Query(0);
 }//namespace
 
-class gl_400_transform_feadback_stream : public test
+class gl_400_transform_feadback_stream : public framework
 {
 public:
 	gl_400_transform_feadback_stream(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-transform-feadback-stream", test::CORE, 4, 0)
+		framework(argc, argv, "gl-410-transform-feadback-stream", framework::CORE, 4, 0)
 	{}
 
 private:

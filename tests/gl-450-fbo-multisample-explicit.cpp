@@ -82,11 +82,11 @@ namespace
 	};
 }//namespace
 
-class gl_450_fbo_multisample_explicit : public test
+class gl_450_fbo_multisample_explicit : public framework
 {
 public:
 	gl_450_fbo_multisample_explicit(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-fbo-multisample-explicit", test::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-450-fbo-multisample-explicit", framework::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		UniformBlockSize(0),
 		UniformPointer(nullptr)

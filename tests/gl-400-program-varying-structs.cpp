@@ -24,11 +24,11 @@ namespace
 	GLint UniformMVP(0);
 }//namespace
 
-class gl_400_program_varying_structs : public test
+class gl_400_program_varying_structs : public framework
 {
 public:
 	gl_400_program_varying_structs(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-program-varying-structs", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-program-varying-structs", framework::CORE, 4, 0)
 	{}
 
 private:

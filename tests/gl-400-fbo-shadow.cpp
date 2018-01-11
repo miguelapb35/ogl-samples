@@ -84,11 +84,11 @@ namespace
 	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
-class gl_400_fbo_shadow : public test
+class gl_400_fbo_shadow : public framework
 {
 public:
 	gl_400_fbo_shadow(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-fbo-shadow", test::CORE, 4, 0, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
+		framework(argc, argv, "gl-400-fbo-shadow", framework::CORE, 4, 0, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
 	{}
 
 private:

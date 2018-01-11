@@ -51,11 +51,11 @@ namespace
 	}//namespace pipeline
 }//namespace
 
-class gl_420_primitive_line_aa : public test
+class gl_420_primitive_line_aa : public framework
 {
 public:
 	gl_420_primitive_line_aa(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-primitive-line-aa", test::CORE, 4, 2)
+		framework(argc, argv, "gl-420-primitive-line-aa", framework::CORE, 4, 2)
 	{}
 
 private:

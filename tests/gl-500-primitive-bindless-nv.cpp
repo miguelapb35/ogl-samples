@@ -30,11 +30,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-primitive-bindless-nv", test::CORE, 4, 5),
+		framework(argc, argv, "gl-500-primitive-bindless-nv", framework::CORE, 4, 5),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

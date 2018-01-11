@@ -25,11 +25,11 @@ namespace
 	GLint UniformColor = 0;
 }//namespace
 
-class gl_330_query_timer : public test
+class gl_330_query_timer : public framework
 {
 public:
 	gl_330_query_timer(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-query-timer", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-query-timer", framework::CORE, 3, 3)
 	{}
 
 private:

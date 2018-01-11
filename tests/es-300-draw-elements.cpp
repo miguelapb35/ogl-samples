@@ -32,11 +32,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class es_300_draw_elements : public test
+class es_300_draw_elements : public framework
 {
 public:
 	es_300_draw_elements(int argc, char* argv[]) :
-		test(argc, argv, "es-300-draw-elements", test::ES, 3, 0)
+		framework(argc, argv, "es-300-draw-elements", framework::ES, 3, 0)
 	{}
 
 private:

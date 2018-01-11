@@ -39,11 +39,11 @@ namespace
 	GLuint Query(0);
 }//namespace
 
-class gl_400_transform_feadback_object : public test
+class gl_400_transform_feadback_object : public framework
 {
 public:
 	gl_400_transform_feadback_object(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-transform-feadback-object", test::CORE, 4, 0)
+		framework(argc, argv, "gl-410-transform-feadback-object", framework::CORE, 4, 0)
 	{}
 
 private:

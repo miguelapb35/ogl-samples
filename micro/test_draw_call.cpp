@@ -48,11 +48,11 @@ namespace
 	};
 }//namespace
 
-class test_draw_call : public test
+class test_draw_call : public framework
 {
 public:
 	test_draw_call(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t TrianglePairPerTile, std::size_t DrawPerTile, layout Layout, drawMode DrawMode) :
-		test(argc, argv, "test_draw_call", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
+		framework(argc, argv, "test_draw_call", framework::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),

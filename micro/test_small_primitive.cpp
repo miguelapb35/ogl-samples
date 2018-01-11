@@ -42,11 +42,11 @@ namespace
 	};
 }//namespace
 
-class test_small_primitive : public test
+class test_small_primitive : public framework
 {
 public:
 	test_small_primitive(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize, glm::vec2 const & TileSize, std::size_t DrawCount, layout Layout) :
-		test(argc, argv, "test_small_primitive", test::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
+		framework(argc, argv, "test_small_primitive", framework::CORE, 4, 2, FrameCount, RUN_ONLY, WindowSize),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),

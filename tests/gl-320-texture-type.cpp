@@ -57,11 +57,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_texture_type : public test
+class gl_320_texture_type : public framework
 {
 public:
 	gl_320_texture_type(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-type", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-texture-type", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0)
 	{}

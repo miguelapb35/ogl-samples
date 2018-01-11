@@ -77,11 +77,11 @@ namespace
 	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "es-200-fbo-shadow", test::ES, 2, 0, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
+		framework(argc, argv, "es-200-fbo-shadow", framework::ES, 2, 0, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
 	{}
 
 private:

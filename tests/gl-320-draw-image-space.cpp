@@ -7,11 +7,11 @@ namespace
 	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 }//namespace
 
-class gl_320_draw_image_space : public test
+class gl_320_draw_image_space : public framework
 {
 public:
 	gl_320_draw_image_space(int argc, char* argv[])
-		: test(argc, argv, "gl-320-draw-image-space", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		: framework(argc, argv, "gl-320-draw-image-space", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 		, ProgramName(0)
 		, VertexArrayName(0)
 		, TextureName(0)
@@ -54,7 +54,7 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

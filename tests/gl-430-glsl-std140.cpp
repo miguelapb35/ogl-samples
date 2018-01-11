@@ -17,11 +17,11 @@ namespace
 	GLsizei const DataSize = 16;
 }//namespace
 
-class gl_430_glsl_std140 : public test
+class gl_430_glsl_std140 : public framework
 {
 public:
 	gl_430_glsl_std140(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-glsl-std140", test::CORE, 4, 3)
+		framework(argc, argv, "gl-430-glsl-std140", framework::CORE, 4, 3)
 	{}
 
 private:

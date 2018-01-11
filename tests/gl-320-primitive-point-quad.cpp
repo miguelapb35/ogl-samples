@@ -8,11 +8,11 @@ namespace
 	char const* FRAG_SHADER_SOURCE("gl-320/primitive-point-quad.frag");
 }//namespace
 
-class gl_320_primitive_point_quad : public test
+class gl_320_primitive_point_quad : public framework
 {
 public:
 	gl_320_primitive_point_quad(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-point-quad", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-primitive-point-quad", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		BufferName(0),

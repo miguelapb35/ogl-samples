@@ -68,11 +68,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-direct-state-access", test::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-450-direct-state-access", framework::CORE, 4, 5, glm::uvec2(640, 480), glm::vec2(glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

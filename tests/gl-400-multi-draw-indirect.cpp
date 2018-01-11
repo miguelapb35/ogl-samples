@@ -71,11 +71,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-multi-draw-indirect", test::CORE, 4, 2, glm::uvec2(640, 480),
+		framework(argc, argv, "gl-400-multi-draw-indirect", framework::CORE, 4, 2, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -225,7 +225,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

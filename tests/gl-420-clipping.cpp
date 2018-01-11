@@ -42,11 +42,11 @@ namespace
 	GLuint TextureName(0);
 }//namespace
 
-class gl_420_clipping : public test
+class gl_420_clipping : public framework
 {
 public:
 	gl_420_clipping(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-clipping", test::CORE, 4, 2)
+		framework(argc, argv, "gl-420-clipping", framework::CORE, 4, 2)
 	{}
 
 private:
@@ -104,7 +104,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

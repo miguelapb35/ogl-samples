@@ -29,11 +29,11 @@ namespace
 	std::size_t const QuadOverlapCount = 1;
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-shader-invocation-nv", test::CORE, 4, 4, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, test::RUN_ONLY),
+		framework(argc, argv, "gl-500-shader-invocation-nv", framework::CORE, 4, 4, glm::uvec2(1280, 720), glm::vec2(0), glm::vec2(0), 2, framework::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

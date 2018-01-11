@@ -14,11 +14,11 @@ namespace
 	GLint UniformMV(0);
 }//namespace
 
-class gl_320_primitive_point : public test
+class gl_320_primitive_point : public framework
 {
 public:
 	gl_320_primitive_point(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-point", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-primitive-point", framework::CORE, 3, 2)
 	{}
 
 private:

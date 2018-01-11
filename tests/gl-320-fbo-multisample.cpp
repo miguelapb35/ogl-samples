@@ -52,11 +52,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo_multisample : public test
+class gl_320_fbo_multisample : public framework
 {
 public:
 	gl_320_fbo_multisample(int argc, char* argv[])
-		: test(argc, argv, "gl-320-fbo-multisample", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		: framework(argc, argv, "gl-320-fbo-multisample", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 		, VertexArrayName(0)
 		, BufferName(0)
 		, ProgramName(0)
@@ -123,7 +123,7 @@ private:
 	{
 		glGenTextures(texture::MAX, &TextureName[0]);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

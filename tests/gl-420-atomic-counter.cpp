@@ -41,11 +41,11 @@ namespace
 	GLuint BufferName[buffer::MAX] = {0, 0, 0, 0};
 }//namespace
 
-class gl_420_atomic_counter : public test
+class gl_420_atomic_counter : public framework
 {
 public:
 	gl_420_atomic_counter(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-atomic-counter", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.0f), test::RUN_ONLY)
+		framework(argc, argv, "gl-420-atomic-counter", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.0f), framework::RUN_ONLY)
 	{}
 
 private:

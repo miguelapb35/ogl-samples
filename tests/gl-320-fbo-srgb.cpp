@@ -51,11 +51,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_fbo_srgb : public test
+class gl_320_fbo_srgb : public framework
 {
 public:
 	gl_320_fbo_srgb(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-srgb", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-fbo-srgb", framework::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1),

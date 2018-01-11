@@ -35,11 +35,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_sparse_arb : public test
+class gl_500_texture_sparse_arb : public framework
 {
 public:
 	gl_500_texture_sparse_arb(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-texture-sparse-arb", test::CORE, 4, 4, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
+		framework(argc, argv, "gl-500-texture-sparse-arb", framework::CORE, 4, 4, glm::uvec2(640, 480), glm::vec2(0.0f, -glm::pi<float>() * 0.4f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

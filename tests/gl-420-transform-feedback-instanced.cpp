@@ -47,11 +47,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_transform_feedback_instanced : public test
+class gl_420_transform_feedback_instanced : public framework
 {
 public:
 	gl_420_transform_feedback_instanced(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-transform-feedback-instanced", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-420-transform-feedback-instanced", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		FeedbackName(0),
 		Query(0),
 		TransformUniformMVP(0),

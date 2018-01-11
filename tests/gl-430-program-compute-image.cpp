@@ -132,11 +132,11 @@ namespace
 	}//namespace semantics
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-program-compute-image", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-program-compute-image", framework::CORE, 4, 3),
 		VertexArrayName(0)
 	{}
 
@@ -237,7 +237,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const& Format = GL.translate(Texture.format(), Texture.swizzles());

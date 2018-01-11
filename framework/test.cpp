@@ -17,7 +17,7 @@ std::string getBinaryDirectory()
 	return std::string(OGL_SAMPLES_BINARY_DIR) + "/";
 }
 
-test::test
+framework::framework
 (
 	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
@@ -25,20 +25,20 @@ test::test
 	success Success,
 	glm::uvec2 const & WindowSize
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, WindowSize, glm::vec2(0), glm::vec2(0), FrameCount, Success)
+	framework(argc, argv, Title, Profile, Major, Minor, WindowSize, glm::vec2(0), glm::vec2(0), FrameCount, Success)
 {}
 
-test::test
+framework::framework
 (
 	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	glm::vec2 const & Orientation,
 	success Success
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), Orientation, glm::vec2(0, 4), 2, Success)
+	framework(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), Orientation, glm::vec2(0, 4), 2, Success)
 {}
 
-test::test
+framework::framework
 (
 	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
@@ -47,19 +47,19 @@ test::test
 	glm::vec2 const & Orientation,
 	glm::vec2 const & Position
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, WindowSize, Orientation, Position, FrameCount, RUN_ONLY)
+	framework(argc, argv, Title, Profile, Major, Minor, WindowSize, Orientation, Position, FrameCount, RUN_ONLY)
 {}
 
-test::test
+framework::framework
 (
 	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
 	heuristic Heuristic
 ) :
-	test(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4), 2, MATCH_TEMPLATE, Heuristic)
+	framework(argc, argv, Title, Profile, Major, Minor, glm::uvec2(640, 480), glm::vec2(0), glm::vec2(0, 4), 2, MATCH_TEMPLATE, Heuristic)
 {}
 
-test::test
+framework::framework
 (
 	int argc, char* argv[], char const* Title,
 	profile Profile, int Major, int Minor,
@@ -132,9 +132,9 @@ test::test
 	{
 		glfwSetWindowPos(this->Window, 64, 64);
 		glfwSetWindowUserPointer(this->Window, this);
-		glfwSetMouseButtonCallback(this->Window, test::mouseButtonCallback);
-		glfwSetCursorPosCallback(this->Window, test::cursorPositionCallback);
-		glfwSetKeyCallback(this->Window, test::keyCallback);
+		glfwSetMouseButtonCallback(this->Window, framework::mouseButtonCallback);
+		glfwSetCursorPosCallback(this->Window, framework::cursorPositionCallback);
+		glfwSetKeyCallback(this->Window, framework::keyCallback);
 		glfwMakeContextCurrent(this->Window);
 
 		glewExperimental = GL_TRUE;
@@ -147,7 +147,7 @@ test::test
 				glEnable(GL_DEBUG_OUTPUT);
 				glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-				glDebugMessageCallback(&test::debugOutput, this);
+				glDebugMessageCallback(&framework::debugOutput, this);
 			}
 #		endif
 
@@ -155,7 +155,7 @@ test::test
 	}
 }
 
-test::~test()
+framework::~framework()
 {
 	if(this->TimerQueryName)
 		glDeleteQueries(1, &this->TimerQueryName);
@@ -169,7 +169,7 @@ test::~test()
 	glfwTerminate();
 }
 
-int test::operator()()
+int framework::operator()()
 {
 	if(this->Window == 0)
 		return EXIT_FAILURE;
@@ -222,12 +222,12 @@ int test::operator()()
 		return (Result == EXIT_SUCCESS && !this->Error) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-void test::swap()
+void framework::swap()
 {
 	glfwSwapBuffers(this->Window);
 }
 
-void test::sync(sync_mode const & Sync)
+void framework::sync(sync_mode const & Sync)
 {
 	switch(Sync)
 	{
@@ -245,17 +245,17 @@ void test::sync(sync_mode const & Sync)
 	}
 }
 
-void test::stop()
+void framework::stop()
 {
 	glfwSetWindowShouldClose(this->Window, GL_TRUE);
 }
 
-void test::log(csv & CSV, char const* String)
+void framework::log(csv & CSV, char const* String)
 {
 	CSV.log(String, this->TimeSum / this->FrameCount, this->TimeMin, this->TimeMax);
 }
 
-bool test::isExtensionSupported(char const* String)
+bool framework::isExtensionSupported(char const* String)
 {
 	GLint ExtensionCount(0);
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
@@ -266,19 +266,19 @@ bool test::isExtensionSupported(char const* String)
 	return false;
 }
 
-glm::uvec2 test::getWindowSize() const
+glm::uvec2 framework::getWindowSize() const
 {
 	glm::ivec2 WindowSize(0);
 	glfwGetFramebufferSize(this->Window, &WindowSize.x, &WindowSize.y);
 	return glm::uvec2(WindowSize);
 }
 
-bool test::isKeyPressed(int Key) const
+bool framework::isKeyPressed(int Key) const
 {
 	return this->KeyPressed[Key];
 }
 
-glm::mat4 test::view() const
+glm::mat4 framework::view() const
 {
 	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
 	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
@@ -286,7 +286,7 @@ glm::mat4 test::view() const
 	return View;
 }
 
-glm::vec3 test::cameraPosition() const
+glm::vec3 framework::cameraPosition() const
 {
 	return glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y);
 }
@@ -571,7 +571,7 @@ namespace
 	}
 }//namespace
 
-bool test::checkTemplate(GLFWwindow* pWindow, char const* Title)
+bool framework::checkTemplate(GLFWwindow* pWindow, char const* Title)
 {
 	GLint ColorType = GL_UNSIGNED_BYTE;
 	GLint ColorFormat = GL_RGBA;
@@ -659,12 +659,12 @@ bool test::checkTemplate(GLFWwindow* pWindow, char const* Title)
 	return Success;
 }
 
-void test::beginTimer()
+void framework::beginTimer()
 {
 	glBeginQuery(GL_TIME_ELAPSED, this->TimerQueryName);
 }
 
-void test::endTimer()
+void framework::endTimer()
 {
 	glEndQuery(GL_TIME_ELAPSED);
 
@@ -680,7 +680,7 @@ void test::endTimer()
 	fprintf(stdout, "\rTime: %2.4f ms    ", InstantTime / 1000.0);
 }
 
-std::string test::loadFile(std::string const & Filename) const
+std::string framework::loadFile(std::string const & Filename) const
 {
 	std::string Result;
 
@@ -699,7 +699,7 @@ std::string test::loadFile(std::string const & Filename) const
 	return Result;
 }
 
-void test::logImplementationDependentLimit(GLenum Value, std::string const & String) const
+void framework::logImplementationDependentLimit(GLenum Value, std::string const & String) const
 {
 	GLint Result(0);
 	glGetIntegerv(Value, &Result);
@@ -709,7 +709,7 @@ void test::logImplementationDependentLimit(GLenum Value, std::string const & Str
 #	endif
 }
 
-bool test::validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const
+bool framework::validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Expected) const
 {
 	bool Success = true;
 #if !defined(__APPLE__)
@@ -741,7 +741,7 @@ bool test::validate(GLuint VertexArrayName, std::vector<vertexattrib> const & Ex
 	return Success;
 }
 
-bool test::checkError(const char* Title) const
+bool framework::checkError(const char* Title) const
 {
 	int Error;
 	if((Error = glGetError()) != GL_NO_ERROR)
@@ -774,7 +774,7 @@ bool test::checkError(const char* Title) const
 	return Error == GL_NO_ERROR;
 }
 
-bool test::checkFramebuffer(GLuint FramebufferName) const
+bool framework::checkFramebuffer(GLuint FramebufferName) const
 {
 	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	switch(Status)
@@ -808,7 +808,7 @@ bool test::checkFramebuffer(GLuint FramebufferName) const
 	return Status == GL_FRAMEBUFFER_COMPLETE;
 }
 
-bool test::checkExtension(char const* ExtensionName) const
+bool framework::checkExtension(char const* ExtensionName) const
 {
 	GLint ExtensionCount = 0;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
@@ -819,7 +819,7 @@ bool test::checkExtension(char const* ExtensionName) const
 	return false;
 }
 
-bool test::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) const
+bool framework::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) const
 {
 	GLint MajorVersionContext = 0;
 	GLint MinorVersionContext = 0;
@@ -832,19 +832,19 @@ bool test::checkGLVersion(GLint MajorVersionRequire, GLint MinorVersionRequire) 
 		>= version(MajorVersionRequire, MinorVersionRequire);
 }
 
-void test::cursorPositionCallback(GLFWwindow* Window, double x, double y)
+void framework::cursorPositionCallback(GLFWwindow* Window, double x, double y)
 {
-	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
+	framework * Test = static_cast<framework*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	Test->MouseCurrent = glm::ivec2(x, y);
-	Test->TranlationCurrent = Test->MouseButtonFlags & test::MOUSE_BUTTON_LEFT ? Test->TranlationOrigin + (Test->MouseCurrent - Test->MouseOrigin) / 10.f : Test->TranlationOrigin;
-	Test->RotationCurrent = Test->MouseButtonFlags & test::MOUSE_BUTTON_RIGHT ? Test->RotationOrigin + glm::radians(Test->MouseCurrent - Test->MouseOrigin) : Test->RotationOrigin;
+	Test->TranlationCurrent = Test->MouseButtonFlags & framework::MOUSE_BUTTON_LEFT ? Test->TranlationOrigin + (Test->MouseCurrent - Test->MouseOrigin) / 10.f : Test->TranlationOrigin;
+	Test->RotationCurrent = Test->MouseButtonFlags & framework::MOUSE_BUTTON_RIGHT ? Test->RotationOrigin + glm::radians(Test->MouseCurrent - Test->MouseOrigin) : Test->RotationOrigin;
 }
 
-void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int mods)
+void framework::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int mods)
 {
-	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
+	framework * Test = static_cast<framework*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	switch(Action)
@@ -856,18 +856,18 @@ void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int m
 			{
 				case GLFW_MOUSE_BUTTON_LEFT:
 				{
-					Test->MouseButtonFlags |= test::MOUSE_BUTTON_LEFT;
+					Test->MouseButtonFlags |= framework::MOUSE_BUTTON_LEFT;
 					Test->TranlationOrigin = Test->TranlationCurrent;
 				}
 				break;
 				case GLFW_MOUSE_BUTTON_MIDDLE:
 				{
-					Test->MouseButtonFlags |= test::MOUSE_BUTTON_MIDDLE;
+					Test->MouseButtonFlags |= framework::MOUSE_BUTTON_MIDDLE;
 				}
 				break;
 				case GLFW_MOUSE_BUTTON_RIGHT:
 				{
-					Test->MouseButtonFlags |= test::MOUSE_BUTTON_RIGHT;
+					Test->MouseButtonFlags |= framework::MOUSE_BUTTON_RIGHT;
 					Test->RotationOrigin = Test->RotationCurrent;
 				}
 				break;
@@ -881,18 +881,18 @@ void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int m
 				case GLFW_MOUSE_BUTTON_LEFT:
 				{
 					Test->TranlationOrigin += (Test->MouseCurrent - Test->MouseOrigin) / 10.f;
-					Test->MouseButtonFlags &= ~test::MOUSE_BUTTON_LEFT;
+					Test->MouseButtonFlags &= ~framework::MOUSE_BUTTON_LEFT;
 				}
 				break;
 				case GLFW_MOUSE_BUTTON_MIDDLE:
 				{
-					Test->MouseButtonFlags &= ~test::MOUSE_BUTTON_MIDDLE;
+					Test->MouseButtonFlags &= ~framework::MOUSE_BUTTON_MIDDLE;
 				}
 				break;
 				case GLFW_MOUSE_BUTTON_RIGHT:
 				{
 					Test->RotationOrigin += glm::radians(Test->MouseCurrent - Test->MouseOrigin);
-					Test->MouseButtonFlags &= ~test::MOUSE_BUTTON_RIGHT;
+					Test->MouseButtonFlags &= ~framework::MOUSE_BUTTON_RIGHT;
 				}
 				break;
 			}
@@ -901,12 +901,12 @@ void test::mouseButtonCallback(GLFWwindow* Window, int Button, int Action, int m
 	}
 }
 
-void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
+void framework::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
 {
 	if (Key < 0)
 		return;
 
-	test * Test = static_cast<test*>(glfwGetWindowUserPointer(Window));
+	framework * Test = static_cast<framework*>(glfwGetWindowUserPointer(Window));
 	assert(Test);
 
 	Test->KeyPressed[Key] = Action == KEY_PRESS;
@@ -915,7 +915,7 @@ void test::keyCallback(GLFWwindow* Window, int Key, int Scancode, int Action, in
 		Test->stop();
 }
 
-void APIENTRY test::debugOutput
+void APIENTRY framework::debugOutput
 (
 	GLenum source,
 	GLenum type,
@@ -927,7 +927,7 @@ void APIENTRY test::debugOutput
 )
 {
 	assert(userParam);
-	test* Test = static_cast<test*>(const_cast<GLvoid*>(userParam));
+	framework* Test = static_cast<framework*>(const_cast<GLvoid*>(userParam));
 	
 	char debSource[32], debType[32], debSev[32];
 

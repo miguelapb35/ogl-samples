@@ -3,7 +3,7 @@
 
 #include "test.hpp"
 
-class testScreenspaceCoherence : public test
+class testScreenspaceCoherence : public framework
 {
 private:
 	enum buffer

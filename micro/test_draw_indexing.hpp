@@ -3,7 +3,7 @@
 
 #include "test.hpp"
 
-class testDrawIndexing : public test
+class testDrawIndexing : public framework
 {
 public:
 	enum indexing

@@ -63,11 +63,11 @@ namespace
 	glm::ivec4 Viewport[TEXTURE_MAX] = {glm::ivec4(0), glm::ivec4(0), glm::ivec4(0), glm::ivec4(0)};
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-lod", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-lod", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -121,7 +121,7 @@ private:
 		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(TEXTURE_MAX, TextureName);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 
 		{

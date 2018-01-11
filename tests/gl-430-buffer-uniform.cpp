@@ -110,11 +110,11 @@ namespace
 	};
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-buffer-uniform", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-buffer-uniform", framework::CORE, 4, 3),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformPerDraw(0),

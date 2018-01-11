@@ -18,11 +18,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-fetch-dependent", test::CORE, 4, 3, glm::uvec2(1280, 720)),
+		framework(argc, argv, "gl-430-texture-fetch-dependent", framework::CORE, 4, 3, glm::uvec2(1280, 720)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

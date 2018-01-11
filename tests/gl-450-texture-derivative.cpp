@@ -37,11 +37,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_450_texture_derivative : public test
+class gl_450_texture_derivative : public framework
 {
 public:
 	gl_450_texture_derivative(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-texture-derivative", test::CORE, 4, 3, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.49f)),
+		framework(argc, argv, "gl-450-texture-derivative", framework::CORE, 4, 3, glm::vec2(glm::pi<float>() * 0.05f, -glm::pi<float>() * 0.49f)),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),

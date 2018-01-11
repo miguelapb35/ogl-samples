@@ -58,11 +58,11 @@ namespace
 	GLuint IndexRGB8 = 0;
 }//namespace
 
-class gl_400_program_subroutine : public test
+class gl_400_program_subroutine : public framework
 {
 public:
 	gl_400_program_subroutine(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-program-subroutine", test::CORE, 4, 0, glm::vec2(0.0f))
+		framework(argc, argv, "gl-400-program-subroutine", framework::CORE, 4, 0, glm::vec2(0.0f))
 	{}
 
 private:

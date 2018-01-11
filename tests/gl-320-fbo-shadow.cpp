@@ -95,11 +95,11 @@ namespace
 	glm::ivec2 const ShadowSize(64, 64);
 }//namespace
 
-class gl_320_fbo_shadow : public test
+class gl_320_fbo_shadow : public framework
 {
 public:
 	gl_320_fbo_shadow(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-shadow", test::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
+		framework(argc, argv, "gl-320-fbo-shadow", framework::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.3f))
 	{}
 
 private:
@@ -180,7 +180,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

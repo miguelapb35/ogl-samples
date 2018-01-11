@@ -35,11 +35,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_test_depth_conservative : public test
+class gl_420_test_depth_conservative : public framework
 {
 public:
 	gl_420_test_depth_conservative(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-test-depth-conservative", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-420-test-depth-conservative", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

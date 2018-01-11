@@ -41,11 +41,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-texture-rect", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-texture-rect", framework::CORE, 3, 3)
 	{}
 
 private:

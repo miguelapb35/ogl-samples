@@ -50,11 +50,11 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 }//namespace
 
-class gl_320_primitive_shading : public test
+class gl_320_primitive_shading : public framework
 {
 public:
 	gl_320_primitive_shading(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-primitive-shading", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-primitive-shading", framework::CORE, 3, 2),
 		QueryName(0)
 	{}
 

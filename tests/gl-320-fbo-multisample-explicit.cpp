@@ -71,11 +71,11 @@ namespace
 	std::vector<GLint> UniformDiffuse(program::MAX);
 }//namespace
 
-class gl_320_fbo_multisample_explicit : public test
+class gl_320_fbo_multisample_explicit : public framework
 {
 public:
 	gl_320_fbo_multisample_explicit(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-fbo-multisample-explicit", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
+		framework(argc, argv, "gl-320-fbo-multisample-explicit", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:
@@ -142,7 +142,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)

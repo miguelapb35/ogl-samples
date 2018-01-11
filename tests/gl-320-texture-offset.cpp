@@ -70,11 +70,11 @@ namespace
 	std::vector<glm::vec4> Viewport(program::MAX);
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-offset", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-offset", framework::CORE, 3, 2)
 	{}
 
 private:

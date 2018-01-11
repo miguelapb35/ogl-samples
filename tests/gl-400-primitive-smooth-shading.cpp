@@ -45,11 +45,11 @@ namespace
 	GLint UniformDiffuse[2] = {0, 0};
 }//namespace
 
-class gl_400_primitive_smooth_shading : public test
+class gl_400_primitive_smooth_shading : public framework
 {
 public:
 	gl_400_primitive_smooth_shading(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-primitive-smooth-shading", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-primitive-smooth-shading", framework::CORE, 4, 0)
 	{}
 
 private:

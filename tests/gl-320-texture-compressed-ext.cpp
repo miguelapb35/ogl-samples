@@ -66,11 +66,11 @@ namespace
 	glm::ivec4 Viewport[TEXTURE_MAX] = {glm::ivec4(0), glm::ivec4(0), glm::ivec4(0), glm::ivec4(0)};
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-compressed-ext", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-compressed-ext", framework::CORE, 3, 2)
 	{}
 
 private:

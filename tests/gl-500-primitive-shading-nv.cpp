@@ -41,11 +41,11 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-500-primitive-shading-nv", test::CORE, 4, 5)
+		: framework(argc, argv, "gl-500-primitive-shading-nv", framework::CORE, 4, 5)
 		, QueryName(0)
 		, PipelineName(0)
 	{}

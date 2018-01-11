@@ -46,11 +46,11 @@ namespace
 	};
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-texture-cube-arb", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.1f)),
+		framework(argc, argv, "gl-500-texture-cube-arb", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.1f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

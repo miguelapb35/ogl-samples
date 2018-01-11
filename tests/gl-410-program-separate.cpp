@@ -59,11 +59,11 @@ namespace
 	GLuint TextureName(0);
 }//namespace
 
-class gl_410_program_separate : public test
+class gl_410_program_separate : public framework
 {
 public:
 	gl_410_program_separate(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-program-separate", test::CORE, 4, 1)
+		framework(argc, argv, "gl-410-program-separate", framework::CORE, 4, 1)
 	{}
 
 private:
@@ -139,7 +139,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
 

@@ -61,11 +61,11 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_420_draw_image_space_rendering : public test
+class gl_420_draw_image_space_rendering : public framework
 {
 public:
 	gl_420_draw_image_space_rendering(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-draw-image-space-rendering", test::CORE, 4, 2)
+		framework(argc, argv, "gl-420-draw-image-space-rendering", framework::CORE, 4, 2)
 	{}
 
 private:
@@ -145,7 +145,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

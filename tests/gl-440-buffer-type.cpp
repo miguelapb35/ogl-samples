@@ -112,11 +112,11 @@ namespace
 	}//namespace viewport
 }//namespace
 
-class gl_440_buffer_type : public test
+class gl_440_buffer_type : public framework
 {
 public:
 	gl_440_buffer_type(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-buffer-type", test::CORE, 4, 3),
+		framework(argc, argv, "gl-440-buffer-type", framework::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		UniformPointer(nullptr)
@@ -306,7 +306,7 @@ private:
 			// Compute the MVP (Model View Projection matrix)
 			float Aspect = (WindowSize.x * 0.33f) / (WindowSize.y * 0.50f);
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, Aspect, 0.1f, 100.0f);
-			glm::mat4 MVP = Projection * this->test::view() * glm::mat4(1.0f);
+			glm::mat4 MVP = Projection * this->framework::view() * glm::mat4(1.0f);
 
 			*UniformPointer = MVP;
 		}

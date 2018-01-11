@@ -36,11 +36,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_fill_rectangle : public test
+class gl_500_fill_rectangle : public framework
 {
 public:
 	gl_500_fill_rectangle(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-fill-rectangle-nv", test::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.2f), test::RUN_ONLY),
+		framework(argc, argv, "gl-500-fill-rectangle-nv", framework::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.2f), framework::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

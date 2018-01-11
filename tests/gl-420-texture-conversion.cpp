@@ -86,11 +86,11 @@ namespace
 	};
 }//namespace
 
-class gl_420_texture_conversion : public test
+class gl_420_texture_conversion : public framework
 {
 public:
 	gl_420_texture_conversion(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-conversion", test::CORE, 4, 2, glm::uvec2(512)),
+		framework(argc, argv, "gl-420-texture-conversion", framework::CORE, 4, 2, glm::uvec2(512)),
 		VertexArrayName(0)
 	{}
 
@@ -169,7 +169,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

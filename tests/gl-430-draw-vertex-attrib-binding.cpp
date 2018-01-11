@@ -46,11 +46,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-draw-vertex-attrib-binding", test::CORE, 4, 2),
+		framework(argc, argv, "gl-430-draw-vertex-attrib-binding", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0)

@@ -35,11 +35,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_test_depth_clamp_separate_amd : public test
+class gl_500_test_depth_clamp_separate_amd : public framework
 {
 public:
 	gl_500_test_depth_clamp_separate_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-test-depth-clamp-separate-amd", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-500-test-depth-clamp-separate-amd", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)

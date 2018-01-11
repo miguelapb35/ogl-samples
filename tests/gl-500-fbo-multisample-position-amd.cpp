@@ -37,11 +37,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[])
-		: test(argc, argv, "gl-500-fbo-multisample-position-amd", test::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f))
+		: framework(argc, argv, "gl-500-fbo-multisample-position-amd", framework::CORE, 4, 4, glm::vec2(glm::pi<float>() * 0.2f))
 		, VertexArrayName(0)
 		, PipelineName(0)
 		, ProgramName(0)

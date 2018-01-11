@@ -36,11 +36,11 @@ namespace
 	};
 }//namespace
 
-class gl_420_texture_cube : public test
+class gl_420_texture_cube : public framework
 {
 public:
 	gl_420_texture_cube(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-cube", test::CORE, 4, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.45f)),
+		framework(argc, argv, "gl-420-texture-cube", framework::CORE, 4, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.45f)),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

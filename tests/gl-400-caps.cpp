@@ -1,10 +1,10 @@
 #include "test.hpp"
 
-class gl_400_caps : public test
+class gl_400_caps : public framework
 {
 public:
 	gl_400_caps(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-caps", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-caps", framework::CORE, 4, 0)
 	{}
 
 private:

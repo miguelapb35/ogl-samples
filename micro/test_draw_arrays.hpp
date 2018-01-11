@@ -3,7 +3,7 @@
 
 #include "test.hpp"
 
-class testDrawArrays : public test
+class testDrawArrays : public framework
 {
 public:
 	enum drawType

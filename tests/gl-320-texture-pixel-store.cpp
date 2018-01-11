@@ -52,11 +52,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_texture_pixel_store : public test
+class gl_320_texture_pixel_store : public framework
 {
 public:
 	gl_320_texture_pixel_store(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-pixel-store", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-pixel-store", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -126,7 +126,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		gli::gl GL(gli::gl::PROFILE_GL32);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
 

@@ -105,11 +105,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_texture_format : public test
+class gl_320_texture_format : public framework
 {
 public:
 	gl_320_texture_format(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-texture-format", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-texture-format", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -159,7 +159,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

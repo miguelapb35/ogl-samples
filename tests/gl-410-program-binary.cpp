@@ -8,7 +8,7 @@ namespace
 	char const* VERT_PROGRAM_BINARY("gl-410/binary.vert.bin");
 	char const* GEOM_PROGRAM_BINARY("gl-410/binary.geom.bin");
 	char const* FRAG_PROGRAM_BINARY("gl-410/binary.frag.bin");
-	char const* ( "kueken7_rgba_dxt5_unorm.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba_dxt5_unorm.dds");
 
 	GLsizei const VertexCount(4);
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -60,11 +60,11 @@ namespace
 
 static const GLenum GL_PROGRAM_BINARY_SPIR_V = 0xFFFF;
 
-class gl_410_program_binary : public test
+class gl_410_program_binary : public framework
 {
 public:
 	gl_410_program_binary(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-program-binary", test::CORE, 4, 1)
+		framework(argc, argv, "gl-410-program-binary", framework::CORE, 4, 1)
 	{}
 
 private:
@@ -228,7 +228,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		for(std::size_t Level = 0; Level < Texture.levels(); ++Level)
 		{
 			glCompressedTexImage2D(
@@ -343,7 +343,7 @@ int main(int argc, char* argv[])
 {
 	int Error(0);
 
-	// Execute the test twice to test the generated binary
+	// Execute the framework twice to framework the generated binary
 	for(std::size_t i = 0; i < 2; ++i)
 	{
 		gl_410_program_binary Test(argc, argv);

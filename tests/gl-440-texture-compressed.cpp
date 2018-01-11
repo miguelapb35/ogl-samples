@@ -51,11 +51,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-440-texture-compressed", test::CORE, 4, 3),
+		framework(argc, argv, "gl-440-texture-compressed", framework::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

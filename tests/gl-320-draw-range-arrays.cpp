@@ -34,11 +34,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_draw_range_arrays : public test
+class gl_320_draw_range_arrays : public framework
 {
 public:
 	gl_320_draw_range_arrays(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-range-arrays", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-draw-range-arrays", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformTransform(-1)

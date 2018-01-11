@@ -36,11 +36,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public test
+class instance : public framework
 {
 public:
 	instance(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-buffer-uniform-array", test::CORE, 4, 0),
+		framework(argc, argv, "gl-400-buffer-uniform-array", framework::CORE, 4, 0),
 		VertexArrayName(0),
 		ProgramName(0)
 	{}

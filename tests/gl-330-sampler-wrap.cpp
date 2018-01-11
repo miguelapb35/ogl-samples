@@ -56,11 +56,11 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_330_sampler_wrap : public test
+class gl_330_sampler_wrap : public framework
 {
 public:
 	gl_330_sampler_wrap(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-sampler-wrap", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-sampler-wrap", framework::CORE, 3, 3)
 	{}
 
 private:

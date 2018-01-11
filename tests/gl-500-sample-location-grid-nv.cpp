@@ -82,11 +82,11 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_500_sample_location_grid_nv : public test
+class gl_500_sample_location_grid_nv : public framework
 {
 public:
 	gl_500_sample_location_grid_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-sample-location-grid-nv", test::CORE, 4, 5),
+		framework(argc, argv, "gl-500-sample-location-grid-nv", framework::CORE, 4, 5),
 		FramebufferScale(3),
 		UniformTransform(-1),
 		VertexCount(0)

@@ -46,11 +46,11 @@ namespace
 	GLint FeedbackUniformDiffuse(0);
 }//namespace
 
-class gl_320_transform_feedback_interleaved : public test
+class gl_320_transform_feedback_interleaved : public framework
 {
 public:
 	gl_320_transform_feedback_interleaved(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-transform-feedback-interleaved", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-transform-feedback-interleaved", framework::CORE, 3, 2),
 		QueryName(0)
 	{}
 

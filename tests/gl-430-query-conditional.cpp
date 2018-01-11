@@ -29,11 +29,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_query_conditional : public test
+class gl_320_query_conditional : public framework
 {
 public:
 	gl_320_query_conditional(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-query-conditional", test::CORE, 4, 2),
+		framework(argc, argv, "gl-430-query-conditional", framework::CORE, 4, 2),
 		VertexArrayName(0),
 		PipelineName(0),
 		ProgramName(0),
@@ -200,7 +200,7 @@ private:
 
 		// Beginning of the samples count query
 		glBeginQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE, QueryName);
-			// To test the condional rendering, comment this line, the next draw call won't happen.
+			// To framework the condional rendering, comment this line, the next draw call won't happen.
 			glDrawArraysInstanced(GL_TRIANGLES, 0, VertexCount, 1);
 		// End of the samples count query
 		glEndQuery(GL_ANY_SAMPLES_PASSED_CONSERVATIVE);

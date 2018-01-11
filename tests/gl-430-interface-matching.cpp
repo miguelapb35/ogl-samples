@@ -40,11 +40,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_interface_matching : public test
+class gl_430_interface_matching : public framework
 {
 public:
 	gl_430_interface_matching(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-interface-matching", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-interface-matching", framework::CORE, 4, 3),
 		PipelineName(0),
 		VertexArrayName(0)
 	{}

@@ -27,11 +27,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_glsl_vote : public test
+class gl_500_glsl_vote : public framework
 {
 public:
 	gl_500_glsl_vote(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-glsl-vote-arb", test::CORE, 4, 4),
+		framework(argc, argv, "gl-500-glsl-vote-arb", framework::CORE, 4, 4),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

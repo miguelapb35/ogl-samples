@@ -53,11 +53,11 @@ namespace
 	GLint UniformDiffuse1(0);
 }//namespace
 
-class gl_320_program_uniform : public test
+class gl_320_program_uniform : public framework
 {
 public:
 	gl_320_program_uniform(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-program-uniform", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-program-uniform", framework::CORE, 3, 2)
 	{}
 
 private:

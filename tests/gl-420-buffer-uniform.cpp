@@ -44,11 +44,11 @@ namespace
 	GLint UniformInstance(0);
 }//namespace
 
-class gl_420_buffer_uniform : public test
+class gl_420_buffer_uniform : public framework
 {
 public:
 	gl_420_buffer_uniform(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-buffer-uniform", test::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.3f))
+		framework(argc, argv, "gl-420-buffer-uniform", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.3f))
 	{}
 
 private:

@@ -29,11 +29,11 @@ namespace
 	}//namespace program
 }//namespace
 
-class gl_420_interface_matching : public test
+class gl_420_interface_matching : public framework
 {
 public:
 	gl_420_interface_matching(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-interface-matching", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-interface-matching", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		BufferName(0),
@@ -113,7 +113,7 @@ private:
 		Valid[semantic::attr::POSITION + 0] = vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
 		Valid[semantic::attr::POSITION + 1] = vertexattrib(GL_TRUE, 0, 2, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, NULL);
 		Valid[semantic::attr::COLOR] = vertexattrib(GL_TRUE, 0, 4, sizeof(glf::vertex_v2fc4f), GL_FLOAT, GL_FALSE, GL_FALSE, GL_FALSE, 0, BUFFER_OFFSET(sizeof(glm::vec2)));
-		this->test::validate(VertexArrayName, Valid);
+		this->framework::validate(VertexArrayName, Valid);
 
 		return true;
 	}

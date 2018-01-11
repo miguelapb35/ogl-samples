@@ -36,11 +36,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_texture_sparse_amd : public test
+class gl_500_texture_sparse_amd : public framework
 {
 public:
 	gl_500_texture_sparse_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-texture-sparse-amd", test::CORE, 4, 2),
+		framework(argc, argv, "gl-500-texture-sparse-amd", framework::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

@@ -4,7 +4,7 @@ namespace
 {
 	char const* VERT_SHADER_SOURCE("gl-400/fetch.vert");
 	char const* FRAG_SHADER_SOURCE("gl-400/fetch.frag");
-	char const* ( "kueken7_rgba_dxt5_unorm.dds");
+	char const* TEXTURE_DIFFUSE("kueken7_rgba_dxt5_unorm.dds");
 
 	GLsizei const VertexCount = 4;
 	GLsizeiptr const VertexSize = VertexCount * sizeof(glf::vertex_v2fv2f);
@@ -36,11 +36,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_400_sampler_fetch : public test
+class gl_400_sampler_fetch : public framework
 {
 public:
 	gl_400_sampler_fetch(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-sampler-fetch", test::CORE, 4, 0),
+		framework(argc, argv, "gl-400-sampler-fetch", framework::CORE, 4, 0),
 		VertexArrayName(0),
 		ProgramName(0),
 		TextureName(0)
@@ -109,7 +109,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 
 		glGenTextures(1, &TextureName);
 

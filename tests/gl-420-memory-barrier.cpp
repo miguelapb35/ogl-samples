@@ -41,11 +41,11 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_420_memory_barrier : public test
+class gl_420_memory_barrier : public framework
 {
 public:
 	gl_420_memory_barrier(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-memory-barrier", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-memory-barrier", framework::CORE, 4, 2),
 		VertexArrayName(0),
 		FramebufferName(0),
 		SamplerName(0),
@@ -124,7 +124,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		this->FrameBufferSize = Texture.extent();
 
 		glGenTextures(texture::MAX, &TextureName[0]);

@@ -24,11 +24,11 @@ namespace
 	glm::vec4 Viewport[TEXTURE_MAX];
 }//namespace
 
-class gl_400_fbo_rtt : public test
+class gl_400_fbo_rtt : public framework
 {
 public:
 	gl_400_fbo_rtt(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-fbo-rtt", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-fbo-rtt", framework::CORE, 4, 0)
 	{}
 
 private:

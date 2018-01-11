@@ -42,11 +42,11 @@ namespace
 	GLuint TextureName(0);
 }//namespace
 
-class gl_450_culling : public test
+class gl_450_culling : public framework
 {
 public:
 	gl_450_culling(int argc, char* argv[]) :
-		test(argc, argv, "gl-450-culling", test::CORE, 4, 2)
+		framework(argc, argv, "gl-450-culling", framework::CORE, 4, 2)
 	{}
 
 private:

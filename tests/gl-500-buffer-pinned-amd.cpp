@@ -48,11 +48,11 @@ namespace
 	std::size_t const PAGE_SIZE = 4096;
 }//namespace
 
-class gl_500_buffer_pinned_amd : public test
+class gl_500_buffer_pinned_amd : public framework
 {
 public:
 	gl_500_buffer_pinned_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-buffer-pinned-amd", test::CORE, 4, 2),
+		framework(argc, argv, "gl-500-buffer-pinned-amd", framework::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),

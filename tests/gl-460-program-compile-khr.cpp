@@ -45,11 +45,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_460_program_compile_khr : public test
+class gl_460_program_compile_khr : public framework
 {
 public:
 	gl_460_program_compile_khr(int argc, char* argv[]) :
-		test(argc, argv, "gl-460-program-compile-khr", test::CORE, 4, 5),
+		framework(argc, argv, "gl-460-program-compile-khr", framework::CORE, 4, 5),
 		VertexArrayName(0),
 		UniformTransform(0),
 		UniformMaterial(0)

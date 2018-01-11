@@ -30,11 +30,11 @@ namespace
 	}//namespace program
 }//namespace
 
-class gl_320_buffer_update : public test
+class gl_320_buffer_update : public framework
 {
 public:
 	gl_320_buffer_update(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-buffer-update", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-buffer-update", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		UniformTransform(0),

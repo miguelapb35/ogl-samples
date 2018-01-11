@@ -56,11 +56,11 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_330_sampler_anisotropic_ext : public test
+class gl_330_sampler_anisotropic_ext : public framework
 {
 public:
 	gl_330_sampler_anisotropic_ext(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-sampler-anisotropic-ext", test::CORE, 3, 3)
+		framework(argc, argv, "gl-330-sampler-anisotropic-ext", framework::CORE, 3, 3)
 	{}
 
 private:

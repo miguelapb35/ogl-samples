@@ -54,11 +54,11 @@ namespace
 	GLint UniformMVP = 0;
 }//namespace
 
-class gl_330_draw_instanced_array : public test
+class gl_330_draw_instanced_array : public framework
 {
 public:
 	gl_330_draw_instanced_array(int argc, char* argv[]) :
-		test(argc, argv, "gl-330-draw-instanced-array", test::CORE, 3, 3, glm::vec2(glm::pi<float>() * 0.2f))
+		framework(argc, argv, "gl-330-draw-instanced-array", framework::CORE, 3, 3, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:

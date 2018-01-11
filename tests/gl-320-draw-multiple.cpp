@@ -39,11 +39,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_draw_multiple : public test
+class gl_320_draw_multiple : public framework
 {
 public:
 	gl_320_draw_multiple(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-draw-multiple", test::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f)),
+		framework(argc, argv, "gl-320-draw-multiple", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		ProgramName(0),
 		VertexArrayName(0),
 		UniformTransform(-1)

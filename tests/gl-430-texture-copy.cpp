@@ -40,11 +40,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_texture_copy : public test
+class gl_430_texture_copy : public framework
 {
 public:
 	gl_430_texture_copy(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-texture-copy", test::CORE, 4, 2),
+		framework(argc, argv, "gl-430-texture-copy", framework::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -108,7 +108,7 @@ private:
 
 		glGenTextures(texture::MAX, &TextureName[0]);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());

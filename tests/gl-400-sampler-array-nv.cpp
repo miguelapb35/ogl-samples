@@ -54,11 +54,11 @@ namespace
 	GLint UniformDiffuseBGR = 0;
 }//namespace
 
-class gl_400_sampler_array_nv : public test
+class gl_400_sampler_array_nv : public framework
 {
 public:
 	gl_400_sampler_array_nv(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-sampler-array-nv", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-sampler-array-nv", framework::CORE, 4, 0)
 	{}
 
 private:

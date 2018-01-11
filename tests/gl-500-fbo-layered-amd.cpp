@@ -41,11 +41,11 @@ namespace
 	GLuint TextureColorbufferName(0);
 }//namespace
 
-class gl_500_fbo_layered_amd : public test
+class gl_500_fbo_layered_amd : public framework
 {
 public:
 	gl_500_fbo_layered_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-500-fbo-layered-amd", test::CORE, 4, 3)
+		framework(argc, argv, "gl-500-fbo-layered-amd", framework::CORE, 4, 3)
 	{}
 
 private:

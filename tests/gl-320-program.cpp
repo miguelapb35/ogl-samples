@@ -45,11 +45,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_320_program : public test
+class gl_320_program : public framework
 {
 public:
 	gl_320_program(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-program", test::CORE, 3, 2),
+		framework(argc, argv, "gl-320-program", framework::CORE, 3, 2),
 		VertexArrayName(0),
 		UniformTransform(0),
 		UniformMaterial(0)

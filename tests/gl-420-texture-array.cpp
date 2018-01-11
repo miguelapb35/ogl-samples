@@ -28,11 +28,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_texture_array : public test
+class gl_420_texture_array : public framework
 {
 public:
 	gl_420_texture_array(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-texture-array", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-texture-array", framework::CORE, 4, 2),
 		VertexArrayName(0),
 		ProgramName(0),
 		SamplerName(0),

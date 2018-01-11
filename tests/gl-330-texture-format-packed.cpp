@@ -35,11 +35,11 @@ namespace
 	};
 }//namespace
 
-class gl_330_texture_format_packed : public test
+class gl_330_texture_format_packed : public framework
 {
 public:
 	gl_330_texture_format_packed(int argc, char* argv[])
-		: test(argc, argv, "gl-330-texture-format-packed", test::CORE, 3, 3)
+		: framework(argc, argv, "gl-330-texture-format-packed", framework::CORE, 3, 3)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, BufferName(0)

@@ -40,11 +40,11 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_400_program_64 : public test
+class gl_400_program_64 : public framework
 {
 public:
 	gl_400_program_64(int argc, char* argv[]) :
-		test(argc, argv, "gl-400-program-64", test::CORE, 4, 0)
+		framework(argc, argv, "gl-400-program-64", framework::CORE, 4, 0)
 	{}
 
 private:

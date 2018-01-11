@@ -23,7 +23,7 @@ testScreenspaceCoherence::testScreenspaceCoherence(
 	std::size_t const ViewportDrawCount,
 	std::size_t const TileDrawCount
 ) :
-	test(argc, argv, "testScreenspaceCoherence", Profile, 4, 2, FrameCount),
+	framework(argc, argv, "testScreenspaceCoherence", Profile, 4, 2, FrameCount),
 	WindowSize(WindowSize),
 	TileSize(TileSize),
 	ViewportDrawCount(ViewportDrawCount),

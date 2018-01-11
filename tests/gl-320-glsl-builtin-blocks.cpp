@@ -43,11 +43,11 @@ namespace
 	GLint UniformDiffuse(0);
 }//namespace
 
-class gl_320_glsl_builtin_blocks : public test
+class gl_320_glsl_builtin_blocks : public framework
 {
 public:
 	gl_320_glsl_builtin_blocks(int argc, char* argv[]) :
-		test(argc, argv, "gl-320-glsl-builtin-blocks", test::CORE, 3, 2)
+		framework(argc, argv, "gl-320-glsl-builtin-blocks", framework::CORE, 3, 2)
 	{}
 
 private:
@@ -109,7 +109,7 @@ private:
 	bool initTexture()
 	{
 		gli::gl GL(gli::gl::PROFILE_GL32);
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

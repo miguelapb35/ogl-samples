@@ -325,11 +325,11 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class test_buffer_separated : public test
+class test_buffer_separated : public framework
 {
 public:
 	test_buffer_separated(int argc, char* argv[], std::size_t FrameCount, glm::uvec2 const & WindowSize)
-		: test(argc, argv, "test_buffer_separated", test::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize)
+		: framework(argc, argv, "test_buffer_separated", framework::CORE, 3, 3, FrameCount, RUN_ONLY, WindowSize)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, ElementCount(0)

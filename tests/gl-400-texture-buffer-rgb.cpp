@@ -35,7 +35,7 @@ namespace
 	enum texture_type
 	{
 		TEXTURE_DISPLACEMENT,
-		,
+		TEXTURE_DIFFUSE,
 		TEXTURE_MAX
 	};
 
@@ -48,11 +48,11 @@ namespace
 	GLint UniformDisplacement = 0;
 }//namespace
 
-class gl_400_texture_buffer_rgb : public test
+class gl_400_texture_buffer_rgb : public framework
 {
 public:
 	gl_400_texture_buffer_rgb(int argc, char* argv[]) :
-		test(argc, argv, "gl-410-texture-buffer-rgb", test::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.2f))
+		framework(argc, argv, "gl-410-texture-buffer-rgb", framework::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
 private:
@@ -142,7 +142,7 @@ private:
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DISPLACEMENT]);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);
 
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
 		glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, BufferName[BUFFER_DIFFUSE]);
 		glBindTexture(GL_TEXTURE_BUFFER, 0);	
 
@@ -215,7 +215,7 @@ private:
 		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DISPLACEMENT]);
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_BUFFER, TextureName[]);
+		glBindTexture(GL_TEXTURE_BUFFER, TextureName[TEXTURE_DIFFUSE]);
 
 		glBindVertexArray(VertexArrayName);
 		glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, nullptr, 5, 0);

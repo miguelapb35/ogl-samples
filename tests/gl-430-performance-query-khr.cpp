@@ -247,11 +247,11 @@ namespace
 	};
 }//namespace
 
-class gl_430_perf_monitor_amd : public test
+class gl_430_perf_monitor_amd : public framework
 {
 public:
 	gl_430_perf_monitor_amd(int argc, char* argv[]) :
-		test(argc, argv, "gl-430-perf-monitor-amd", test::CORE, 4, 3),
+		framework(argc, argv, "gl-430-perf-monitor-amd", framework::CORE, 4, 3),
 		FramebufferName(0)
 	{}
 
@@ -339,7 +339,7 @@ private:
 	{
 		bool Validated(true);
 
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

@@ -62,11 +62,11 @@ namespace
 	}//namespace program
 }//namespace
 
-class gl_420_image_unpack : public test
+class gl_420_image_unpack : public framework
 {
 public:
 	gl_420_image_unpack(int argc, char* argv[]) :
-		test(argc, argv, "gl-420-image-unpack", test::CORE, 4, 2),
+		framework(argc, argv, "gl-420-image-unpack", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
 		TextureName(0),
@@ -117,7 +117,7 @@ private:
 
 	bool initTexture()
 	{
-		gli::texture2d Texture(gli::load_dds((getDataDirectory() + ).c_str()));
+		gli::texture2d Texture(gli::load_dds((getDataDirectory() + TEXTURE_DIFFUSE).c_str()));
 		assert(!Texture.empty());
 		gli::gl GL(gli::gl::PROFILE_GL33);
 		gli::gl::format const Format = GL.translate(Texture.format(), Texture.swizzles());
