@@ -41,10 +41,10 @@ namespace
 	}//namespace texture
 }//namespace
 
-class gl_420_memory_barrier : public framework
+class sample : public framework
 {
 public:
-	gl_420_memory_barrier(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-memory-barrier", framework::CORE, 4, 2),
 		VertexArrayName(0),
 		FramebufferName(0),
@@ -260,10 +260,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_memory_barrier Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

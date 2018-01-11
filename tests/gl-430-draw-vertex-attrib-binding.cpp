@@ -46,10 +46,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public framework
+class sample : public framework
 {
 public:
-	instance(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-430-draw-vertex-attrib-binding", framework::CORE, 4, 2),
 		PipelineName(0),
 		VertexArrayName(0),
@@ -244,10 +244,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	instance Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

@@ -56,10 +56,10 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_330_sampler_wrap : public framework
+class sample : public framework
 {
 public:
-	gl_330_sampler_wrap(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-330-sampler-wrap", framework::CORE, 3, 3)
 	{}
 
@@ -237,10 +237,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_330_sampler_wrap Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

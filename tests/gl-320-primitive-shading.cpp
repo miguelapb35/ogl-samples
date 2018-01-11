@@ -50,10 +50,10 @@ namespace
 	std::vector<GLuint> BufferName(buffer::MAX);
 }//namespace
 
-class gl_320_primitive_shading : public framework
+class sample : public framework
 {
 public:
-	gl_320_primitive_shading(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-primitive-shading", framework::CORE, 3, 2),
 		QueryName(0)
 	{}
@@ -229,10 +229,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_primitive_shading Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

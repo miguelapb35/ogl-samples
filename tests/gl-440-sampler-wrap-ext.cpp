@@ -59,10 +59,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_sampler_wrap_ext : public framework
+class sample : public framework
 {
 public:
-	gl_440_sampler_wrap_ext(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-440-sampler-wrap-ext", framework::CORE, 4, 3),
 		PipelineName(0),
 		ProgramName(0),
@@ -288,10 +288,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_440_sampler_wrap_ext Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

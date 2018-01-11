@@ -66,10 +66,10 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_420_fbo : public framework
+class sample : public framework
 {
 public:
-	gl_420_fbo(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-fbo", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
@@ -357,10 +357,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_fbo Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

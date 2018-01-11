@@ -37,10 +37,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_buffer_sparse_arb : public framework
+class sample : public framework
 {
 public:
-	gl_500_buffer_sparse_arb(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-buffer-sparse-arb", framework::CORE, 4, 5),
 		PipelineName(0),
 		VertexArrayName(0),
@@ -237,10 +237,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_buffer_sparse_arb Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

@@ -72,10 +72,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_430_fbo_srgb_decode : public framework
+class sample : public framework
 {
 public:
-	gl_430_fbo_srgb_decode(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-430-fbo-srgb-decode", framework::CORE, 4, 3),
 		FramebufferName(0),
 		FramebufferScale(2),
@@ -360,10 +360,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_430_fbo_srgb_decode Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

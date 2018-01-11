@@ -84,10 +84,10 @@ namespace
 	GLint UniformFramebufferSize(0);
 }//namespace
 
-class gl_400_texture_derivative : public framework
+class sample : public framework
 {
 public:
-	gl_400_texture_derivative(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-400-texture-derivative", framework::CORE, 4, 0, glm::vec2(glm::pi<float>(), -glm::pi<float>() * 0.45f))
 	{}
 
@@ -385,10 +385,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_400_texture_derivative Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

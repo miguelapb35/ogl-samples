@@ -44,10 +44,10 @@ namespace
 	GLint UniformInstance(0);
 }//namespace
 
-class gl_420_buffer_uniform : public framework
+class sample : public framework
 {
 public:
-	gl_420_buffer_uniform(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-buffer-uniform", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.3f))
 	{}
 
@@ -215,10 +215,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_buffer_uniform Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

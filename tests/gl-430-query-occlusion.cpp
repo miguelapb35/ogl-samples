@@ -28,10 +28,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_430_query_occlusion : public framework
+class sample : public framework
 {
 public:
-	gl_430_query_occlusion(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-430-query-occlusion", framework::CORE, 4, 3),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -192,10 +192,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_430_query_occlusion Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

@@ -60,10 +60,10 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class gl_420_sampler_gather : public framework
+class sample : public framework
 {
 public:
-	gl_420_sampler_gather(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-sampler-gather", framework::CORE, 4, 2)
 	{}
 
@@ -233,10 +233,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_sampler_gather Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

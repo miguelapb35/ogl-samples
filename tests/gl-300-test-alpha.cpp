@@ -35,10 +35,10 @@ namespace
 	};
 }//namespace
 
-class gl_300_test_alpha : public framework
+class sample : public framework
 {
 public:
-	gl_300_test_alpha(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-300-test-alpha", framework::COMPATIBILITY, 3, 0),
 		VertexArrayName(0),
 		ProgramName(0),
@@ -213,10 +213,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_300_test_alpha Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

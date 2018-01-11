@@ -60,10 +60,10 @@ namespace
 
 static const GLenum GL_PROGRAM_BINARY_SPIR_V = 0xFFFF;
 
-class gl_410_program_binary : public framework
+class sample : public framework
 {
 public:
-	gl_410_program_binary(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-410-program-binary", framework::CORE, 4, 1)
 	{}
 
@@ -341,13 +341,13 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
 	// Execute the framework twice to framework the generated binary
 	for(std::size_t i = 0; i < 2; ++i)
 	{
-		gl_410_program_binary Test(argc, argv);
-		Error += Test();
+		sample Sample(argc, argv);
+		Error += Sample();
 	}
 
 	return Error;

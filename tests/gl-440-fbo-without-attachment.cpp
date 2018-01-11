@@ -58,10 +58,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_440_fbo_without_attachment : public framework
+class sample : public framework
 {
 public:
-	gl_440_fbo_without_attachment(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-440-fbo-without-attachment", framework::CORE, 4, 2),
 		FramebufferName(0),
 		Supersampling(2)
@@ -344,10 +344,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_440_fbo_without_attachment Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

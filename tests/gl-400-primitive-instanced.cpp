@@ -41,10 +41,10 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_400_primitive_instanced : public framework
+class sample : public framework
 {
 public:
-	gl_400_primitive_instanced(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-400-primitive-instanced", framework::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
@@ -162,10 +162,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_400_primitive_instanced Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

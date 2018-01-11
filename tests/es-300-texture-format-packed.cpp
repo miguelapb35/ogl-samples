@@ -35,10 +35,10 @@ namespace
 	};
 }//namespace
 
-class es_300_texture_format_packed : public framework
+class sample : public framework
 {
 public:
-	es_300_texture_format_packed(int argc, char* argv[])
+	sample(int argc, char* argv[])
 		: framework(argc, argv, "es-300-texture-format-packed", framework::ES, 3, 0)
 		, VertexArrayName(0)
 		, ProgramName(0)
@@ -220,10 +220,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	es_300_texture_format_packed Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

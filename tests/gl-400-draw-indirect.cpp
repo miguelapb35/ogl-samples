@@ -49,10 +49,10 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class gl_400_draw_indirect : public framework
+class sample : public framework
 {
 public:
-	gl_400_draw_indirect(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-400-draw-indirect", framework::CORE, 4, 0)
 	{}
 
@@ -180,10 +180,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_400_draw_indirect Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

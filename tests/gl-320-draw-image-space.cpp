@@ -7,10 +7,10 @@ namespace
 	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 }//namespace
 
-class gl_320_draw_image_space : public framework
+class sample : public framework
 {
 public:
-	gl_320_draw_image_space(int argc, char* argv[])
+	sample(int argc, char* argv[])
 		: framework(argc, argv, "gl-320-draw-image-space", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 		, ProgramName(0)
 		, VertexArrayName(0)
@@ -136,10 +136,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_draw_image_space Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

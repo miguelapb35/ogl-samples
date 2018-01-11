@@ -41,28 +41,6 @@ namespace
 		2, 3, 0
 	};
 
-/*
-	GLsizei const VertexCount(4);
-	GLsizeiptr const VertexSize = VertexCount * sizeof(vertex_v3fn3fc4f);
-	vertex_v3fn3fc4f const VertexData[VertexCount] =
-	{
-		vertex_v3fn3fc4f(glm::vec3(-1.000f, -0.732f, -0.732f), glm::normalize(glm::vec3(-1.000f, -0.732f, -0.732f)), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)),
-		vertex_v3fn3fc4f(glm::vec3( 1.000f, -0.732f, -0.732f), glm::normalize(glm::vec3( 1.000f, -0.732f, -0.732f)), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)),
-		vertex_v3fn3fc4f(glm::vec3( 0.000f,  1.000f, -0.732f), glm::normalize(glm::vec3( 0.000f,  1.000f, -0.732f)), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)),
-		vertex_v3fn3fc4f(glm::vec3( 0.000f,  0.000f,  1.000f), glm::normalize(glm::vec3( 0.000f,  0.000f,  1.000f)), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f))
-	};
-
-	GLsizei const ElementCount(12);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
-	{
-		0, 2, 1,
-		0, 1, 3,
-		1, 2, 3,
-		2, 0, 3
-	};
-*/
-
 	namespace buffer
 	{
 		enum type
@@ -110,10 +88,10 @@ namespace
 	};
 }//namespace
 
-class instance : public framework
+class sample : public framework
 {
 public:
-	instance(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-430-buffer-uniform", framework::CORE, 4, 3),
 		VertexArrayName(0),
 		ProgramName(0),
@@ -494,10 +472,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	instance Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

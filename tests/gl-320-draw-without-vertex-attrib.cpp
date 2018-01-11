@@ -6,10 +6,10 @@ namespace
 	char const* FRAG_SHADER_SOURCE("gl-320/draw-without-vertex-attrib.frag");
 }//namespace
 
-class gl_320_draw_without_vertex_attrib : public framework
+class sample : public framework
 {
 public:
-	gl_320_draw_without_vertex_attrib(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-draw-without-vertex-attrib", framework::CORE, 3, 2),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -142,10 +142,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_draw_without_vertex_attrib Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

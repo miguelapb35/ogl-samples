@@ -51,10 +51,10 @@ namespace
 	}//namespace pipeline
 }//namespace
 
-class gl_420_primitive_line_aa : public framework
+class sample : public framework
 {
 public:
-	gl_420_primitive_line_aa(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-primitive-line-aa", framework::CORE, 4, 2)
 	{}
 
@@ -314,10 +314,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_primitive_line_aa Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

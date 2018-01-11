@@ -35,10 +35,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_420_test_depth_conservative : public framework
+class sample : public framework
 {
 public:
-	gl_420_test_depth_conservative(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-test-depth-conservative", framework::CORE, 4, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		PipelineName(0),
 		ProgramName(0),
@@ -185,10 +185,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_test_depth_conservative Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

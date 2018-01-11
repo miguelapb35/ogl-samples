@@ -61,10 +61,10 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_420_draw_image_space_rendering : public framework
+class sample : public framework
 {
 public:
-	gl_420_draw_image_space_rendering(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-draw-image-space-rendering", framework::CORE, 4, 2)
 	{}
 
@@ -259,10 +259,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_draw_image_space_rendering Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

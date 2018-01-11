@@ -38,10 +38,10 @@ namespace
 	GLint UniformDisplacement = 0;
 }//namespace
 
-class gl_320_texture_buffer : public framework
+class sample : public framework
 {
 public:
-	gl_320_texture_buffer(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-texture-buffer", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
@@ -224,10 +224,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_texture_buffer Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

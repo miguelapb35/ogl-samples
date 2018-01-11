@@ -39,10 +39,10 @@ namespace
 	GLint UniformDiffuse = 0;
 }//namespace
 
-class es_200_draw_elements : public framework
+class sample : public framework
 {
 public:
-	es_200_draw_elements(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "es-200-draw-elements", framework::ES, 2, 0)
 	{}
 
@@ -176,10 +176,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	es_200_draw_elements Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

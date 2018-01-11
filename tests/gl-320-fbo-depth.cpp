@@ -65,10 +65,10 @@ namespace
 	GLint UniformTransform(0);
 }//namespace
 
-class gl_320_fbo_depth : public framework
+class sample : public framework
 {
 public:
-	gl_320_fbo_depth(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-fbo-depth", framework::CORE, 3, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.48f))
 	{}
 
@@ -306,10 +306,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_fbo_depth Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

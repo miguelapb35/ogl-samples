@@ -191,10 +191,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_test_depth_clamp_separate_amd Test(argc, argv);
-	Error += Test();
+	gl_500_test_depth_clamp_separate_amd Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

@@ -59,10 +59,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class instance : public framework
+class sample : public framework
 {
 public:
-	instance(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-shader-blend-nv", framework::CORE, 4, 5),
 		FramebufferName(0),
 		Supersampling(2)
@@ -335,10 +335,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	instance Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

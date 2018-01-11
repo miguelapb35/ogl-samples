@@ -27,10 +27,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_glsl_vote : public framework
+class sample : public framework
 {
 public:
-	gl_500_glsl_vote(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-glsl-vote-arb", framework::CORE, 4, 4),
 		PipelineName(0),
 		ProgramName(0),
@@ -207,10 +207,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_glsl_vote Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

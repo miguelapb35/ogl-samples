@@ -38,10 +38,10 @@ namespace
 	};
 }//namespace
 
-class gl_400_texture_cube : public framework
+class sample : public framework
 {
 public:
-	gl_400_texture_cube(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-400-texture-cube", framework::CORE, 4, 0, glm::vec2(glm::pi<float>() * 0.1f)),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -236,10 +236,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_400_texture_cube Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

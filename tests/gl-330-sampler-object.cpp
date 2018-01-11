@@ -70,10 +70,10 @@ namespace
 	glm::ivec4 Viewport[viewport::MAX];
 }//namespace
 
-class instance : public framework
+class sample : public framework
 {
 public:
-	instance(int argc, char* argv[])
+	sample(int argc, char* argv[])
 		: framework(argc, argv, "gl-330-sampler-object", framework::CORE, 3, 3)
 	{}
 
@@ -278,10 +278,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	instance Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

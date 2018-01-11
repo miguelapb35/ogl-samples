@@ -48,10 +48,10 @@ namespace
 	std::size_t const PAGE_SIZE = 4096;
 }//namespace
 
-class gl_500_buffer_pinned_amd : public framework
+class sample : public framework
 {
 public:
-	gl_500_buffer_pinned_amd(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-buffer-pinned-amd", framework::CORE, 4, 2),
 		PipelineName(0),
 		ProgramName(0),
@@ -264,10 +264,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_buffer_pinned_amd Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

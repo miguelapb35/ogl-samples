@@ -66,10 +66,10 @@ namespace
 	std::vector<GLuint> PipelineName(pipeline::MAX);
 }//namespace
 
-class gl_450_texture_barrier : public framework
+class sample : public framework
 {
 public:
-	gl_450_texture_barrier(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-450-texture-barrier", framework::CORE, 4, 2, glm::vec2(0.0f))
 	{}
 
@@ -338,10 +338,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_450_texture_barrier Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

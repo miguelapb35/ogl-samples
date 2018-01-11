@@ -36,10 +36,10 @@ namespace
 	};
 }//namespace
 
-class gl_420_texture_cube : public framework
+class sample : public framework
 {
 public:
-	gl_420_texture_cube(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-texture-cube", framework::CORE, 4, 2, glm::vec2(0.0f, -glm::pi<float>() * 0.45f)),
 		PipelineName(0),
 		ProgramName(0),
@@ -282,10 +282,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_texture_cube Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

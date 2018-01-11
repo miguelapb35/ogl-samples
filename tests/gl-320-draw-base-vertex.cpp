@@ -63,10 +63,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_draw_base_vertex : public framework
+class sample : public framework
 {
 public:
-	gl_320_draw_base_vertex(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-draw-base-vertex", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f)),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -221,10 +221,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_draw_base_vertex Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

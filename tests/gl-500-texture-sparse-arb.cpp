@@ -252,10 +252,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_texture_sparse_arb Test(argc, argv);
-	Error += Test();
+	gl_500_texture_sparse_arb Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

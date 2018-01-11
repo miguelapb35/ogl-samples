@@ -71,10 +71,10 @@ namespace
 	std::vector<GLint> UniformDiffuse(program::MAX);
 }//namespace
 
-class gl_320_fbo_multisample_explicit : public framework
+class sample : public framework
 {
 public:
-	gl_320_fbo_multisample_explicit(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-fbo-multisample-explicit", framework::CORE, 3, 2, glm::vec2(glm::pi<float>() * 0.2f))
 	{}
 
@@ -335,10 +335,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_fbo_multisample_explicit Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

@@ -78,11 +78,11 @@ namespace
 	};
 }//namespace
 
-class gl_440_fbo_readpixels_async : public framework
+class sample : public framework
 {
 public:
-	gl_440_fbo_readpixels_async(int argc, char* argv[]) :
-		framework(argc, argv, "gl-440-fbo-readpixels-async", framework::CORE, 4, 3),
+	sample(int argc, char* argv[]) :
+		framework(argc, argv, "gl-320-fbo-readpixels-async", framework::CORE, 3, 2),
 		FramebufferName(0),
 		FramebufferScale(2),
 		UniformTransform(-1)
@@ -451,10 +451,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_440_fbo_readpixels_async Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

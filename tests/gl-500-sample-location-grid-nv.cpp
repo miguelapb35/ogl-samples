@@ -377,10 +377,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_sample_location_grid_nv Test(argc, argv);
-	Error += Test();
+	gl_500_sample_location_grid_nv Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

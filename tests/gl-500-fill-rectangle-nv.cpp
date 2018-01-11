@@ -36,10 +36,10 @@ namespace
 	}//namespace buffer
 }//namespace
 
-class gl_500_fill_rectangle : public framework
+class sample : public framework
 {
 public:
-	gl_500_fill_rectangle(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-500-fill-rectangle-nv", framework::CORE, 4, 5, glm::vec2(glm::pi<float>() * 0.2f), framework::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
@@ -189,10 +189,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_500_fill_rectangle Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

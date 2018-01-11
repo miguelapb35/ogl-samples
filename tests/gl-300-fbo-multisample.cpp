@@ -21,10 +21,10 @@ namespace
 	};
 }//namespace
 
-class gl_300_fbo_multisample : public framework
+class sample : public framework
 {
 public:
-	gl_300_fbo_multisample(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-300-fbo-multisample", framework::COMPATIBILITY, 3, 0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -298,10 +298,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_300_fbo_multisample Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

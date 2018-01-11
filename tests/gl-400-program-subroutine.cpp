@@ -58,10 +58,10 @@ namespace
 	GLuint IndexRGB8 = 0;
 }//namespace
 
-class gl_400_program_subroutine : public framework
+class sample : public framework
 {
 public:
-	gl_400_program_subroutine(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-400-program-subroutine", framework::CORE, 4, 0, glm::vec2(0.0f))
 	{}
 
@@ -281,10 +281,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_400_program_subroutine Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

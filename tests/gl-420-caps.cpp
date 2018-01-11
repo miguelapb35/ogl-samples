@@ -1,9 +1,9 @@
 #include "test.hpp"
 
-class gl_420_caps : public framework
+class sample : public framework
 {
 public:
-	gl_420_caps(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-420-caps", framework::CORE, 4, 2)
 	{}
 
@@ -38,10 +38,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_420_caps Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

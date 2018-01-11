@@ -50,10 +50,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class es_300_fbo_srgb : public framework
+class sample : public framework
 {
 public:
-	es_300_fbo_srgb(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "es-300-fbo-srgb", framework::ES, 3, 0),
 		FramebufferName(0),
 		FramebufferScale(2),
@@ -305,10 +305,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	es_300_fbo_srgb Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

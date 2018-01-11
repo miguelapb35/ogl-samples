@@ -72,10 +72,10 @@ namespace
 	glm::ivec4 Viewport[4];
 }//namespace
 
-class gl_320_fbo_layered : public framework
+class sample : public framework
 {
 public:
-	gl_320_fbo_layered(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-320-fbo-layered", framework::CORE, 3, 2)
 	{}
 
@@ -307,10 +307,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_320_fbo_layered Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

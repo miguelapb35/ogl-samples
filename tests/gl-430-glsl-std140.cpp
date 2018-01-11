@@ -17,10 +17,10 @@ namespace
 	GLsizei const DataSize = 16;
 }//namespace
 
-class gl_430_glsl_std140 : public framework
+class sample : public framework
 {
 public:
-	gl_430_glsl_std140(int argc, char* argv[]) :
+	sample(int argc, char* argv[]) :
 		framework(argc, argv, "gl-430-glsl-std140", framework::CORE, 4, 3)
 	{}
 
@@ -147,10 +147,10 @@ private:
 
 int main(int argc, char* argv[])
 {
-	int Error(0);
+	int Error = 0;
 
-	gl_430_glsl_std140 Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }

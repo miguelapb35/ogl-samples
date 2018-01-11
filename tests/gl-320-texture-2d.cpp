@@ -46,10 +46,10 @@ namespace
 	}//namespace shader
 }//namespace
 
-class gl_320_texture2d : public framework
+class sample : public framework
 {
 public:
-	gl_320_texture2d(int argc, char* argv[])
+	sample(int argc, char* argv[])
 		: framework(argc, argv, "gl-320-texture-2d", framework::CORE, 3, 2)
 		, VertexArrayName(0)
 		, ProgramName(0)
@@ -240,8 +240,8 @@ int main(int argc, char* argv[])
 {
 	int Error = 0;
 
-	gl_320_texture2d Test(argc, argv);
-	Error += Test();
+	sample Sample(argc, argv);
+	Error += Sample();
 
 	return Error;
 }
