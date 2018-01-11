@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE("gl-500/glsl-vote.vert");
-	char const* FRAG_SHADER_SOURCE("gl-500/glsl-vote.frag");
+	char const* VERT_SHADER_SOURCE("gl-460/glsl-vote.vert");
+	char const* FRAG_SHADER_SOURCE("gl-460/glsl-vote.frag");
 	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const VertexCount(4);
@@ -31,7 +31,7 @@ class sample : public framework
 {
 public:
 	sample(int argc, char* argv[]) :
-		framework(argc, argv, "gl-500-glsl-vote-arb", framework::CORE, 4, 4),
+		framework(argc, argv, "gl-460-glsl-vote", framework::CORE, 4, 6),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0),
@@ -75,8 +75,8 @@ private:
 		{
 			compiler Compiler;
 
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 460 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 460 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -144,8 +144,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_shader_group_vote");
+		bool Validated = true;
 
 		if(Validated)
 			Validated = initBuffer();

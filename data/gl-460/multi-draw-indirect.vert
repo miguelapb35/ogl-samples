@@ -1,5 +1,4 @@
-#version 430 core
-#extension GL_ARB_shader_draw_parameters : require
+#version 460 core
 
 #define POSITION		0
 #define TEXCOORD		4
@@ -39,7 +38,7 @@ out block
 
 void main()
 {
-	Out.DrawID = gl_DrawIDARB;
+	Out.DrawID = gl_DrawID;
 	Out.Texcoord = Texcoord.st;
-	gl_Position = Transform.MVP[Indirection.Transform[gl_DrawIDARB]] * vec4(Position, 0.0, 1.0);
+	gl_Position = Transform.MVP[Indirection.Transform[gl_DrawID]] * vec4(Position, 0.0, 1.0);
 }

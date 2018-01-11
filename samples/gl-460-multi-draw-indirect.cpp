@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE("gl-500/multi-draw-indirect.vert");
-	char const* FRAG_SHADER_SOURCE("gl-500/multi-draw-indirect.frag");
+	char const* VERT_SHADER_SOURCE("gl-460/multi-draw-indirect.vert");
+	char const* FRAG_SHADER_SOURCE("gl-460/multi-draw-indirect.frag");
 	char const* TEXTURE_DIFFUSE("kueken7_rgba8_srgb.dds");
 
 	GLsizei const ElementCount(15);
@@ -74,7 +74,7 @@ class sample : public framework
 {
 public:
 	sample(int argc, char* argv[]) :
-		framework(argc, argv, "gl-500-multi-draw-indirect-arb", framework::CORE, 4, 4, glm::uvec2(640, 480),
+		framework(argc, argv, "gl-460-multi-draw-indirect", framework::CORE, 4, 4, glm::uvec2(640, 480),
 			glm::vec2(-glm::pi<float>() * 0.2f, glm::pi<float>() * 0.2f)),
 		VertexArrayName(0),
 		PipelineName(0),
@@ -98,8 +98,8 @@ private:
 		bool Validated(true);
 	
 		compiler Compiler;
-		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
-		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
+		GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 460 --profile core");
+		GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 460 --profile core");
 		Validated = Validated && Compiler.check();
 
 		ProgramName = glCreateProgram();
@@ -302,8 +302,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated(true);
-		Validated = Validated && this->checkExtension("GL_ARB_indirect_parameters");
+		bool Validated = true;
 
 		if(Validated)
 			Validated = initProgram();
