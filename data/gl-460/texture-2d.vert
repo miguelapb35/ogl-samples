@@ -1,16 +1,22 @@
-#version 150 core
+#version 460 core
+
+#define POSITION		0
+#define TEXCOORD		4
+
+#define TRANSFORM0		1
+#define INDIRECTION		3
 
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
 
-uniform transform
+layout(binding = TRANSFORM0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-in vec2 Position;
-in vec2 Texcoord;
+layout(location = POSITION) in vec2 Position;
+layout(location = TEXCOORD) in vec2 Texcoord;
 
 out block
 {

@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE("gl-320/texture-2d.vert");
-	char const* FRAG_SHADER_SOURCE("gl-320/texture-2d.frag");
+	char const* VERT_SHADER_SOURCE("gl-460/texture-2d.vert");
+	char const* FRAG_SHADER_SOURCE("gl-460/texture-2d.frag");
 	char const* TEXTURE_DIFFUSE("kueken7_rgb8_unorm.ktx");
 
 	GLsizei const VertexCount(4);
@@ -50,7 +50,7 @@ class sample : public framework
 {
 public:
 	sample(int argc, char* argv[])
-		: framework(argc, argv, "gl-320-texture-2d", framework::CORE, 3, 2)
+		: framework(argc, argv, "gl-460-texture-2d", framework::CORE, 4, 6)
 		, VertexArrayName(0)
 		, ProgramName(0)
 		, TextureName(0)
@@ -69,17 +69,13 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 150 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 150 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 460 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 460 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
 			glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, FragShaderName);
-
-			glBindAttribLocation(ProgramName, semantic::attr::POSITION, "Position");
-			glBindAttribLocation(ProgramName, semantic::attr::TEXCOORD, "Texcoord");
-			glBindFragDataLocation(ProgramName, semantic::frag::COLOR, "Color");
 			glLinkProgram(ProgramName);
 			Validated = Validated && Compiler.check_program(ProgramName);
 		}
@@ -137,17 +133,15 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_LOD, -1000.f);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_LOD, 1000.f);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, 0.0f);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.f);
 
+		glTexStorage2D(GL_TEXTURE_2D, static_cast<GLint>(Texture.levels()), Format.Internal, static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y));
 		for(gli::texture2d::size_type Level = 0; Level < Texture.levels(); ++Level)
 		{
 			gli::texture2d::extent_type const Extent = Texture[Level].extent();
-			glTexImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
-				Format.Internal,
+			glTexSubImage2D(GL_TEXTURE_2D, static_cast<GLint>(Level),
+				0, 0,
 				static_cast<GLsizei>(Extent.x), static_cast<GLsizei>(Extent.y),
-				0,
 				Format.External, Format.Type,
 				Texture[Level].data());
 		}
