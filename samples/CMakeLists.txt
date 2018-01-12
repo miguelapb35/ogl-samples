@@ -486,12 +486,12 @@ set(GL_SHADER_GTC texture-barrier-blend.vert texture-barrier-blend.frag texture-
 glCreateSampleGTC(texture-barrier)
 set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-derivative-y.vert texture-derivative-y.frag)
 glCreateSampleGTC(texture-derivative)
-set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
-glCreateSampleGTC(transform-feedback-arb)
 
 # OpenGL 4.6 samples
 set(GL_VERSION_GTC 460)
 
+set(GL_SHADER_GTC atomic-counter.vert atomic-counter.frag)
+glCreateSampleGTC(atomic-counter)
 set(GL_SHADER_GTC glsl-vote.vert glsl-vote.frag)
 glCreateSampleGTC(glsl-vote)
 set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
@@ -502,20 +502,18 @@ set(GL_SHADER_GTC program-compile-khr.vert program-compile-khr.frag)
 glCreateSampleGTC(program-compile-khr)
 set(GL_SHADER_GTC texture-2d.vert texture-2d.frag)
 glCreateSampleGTC(texture-2d)
+set(GL_SHADER_GTC transform-feedback-transform.vert transform-feedback-feedback.vert transform-feedback-feedback.frag)
+glCreateSampleGTC(transform-feedback)
 
 # OpenGL 5 hardware samples
 set(GL_VERSION_GTC 500)
 
 set(GL_SHADER_GTC blend-op-amd.vert blend-op-amd.frag blend-texture-2d-amd.vert blend-texture-2d-amd.frag)
 glCreateSampleGTC(blend-op-amd)
-set(GL_SHADER_GTC buffer-pinned-amd.vert buffer-pinned-amd.frag)
-glCreateSampleGTC(buffer-pinned-amd)
 set(GL_SHADER_GTC buffer-sparse.vert buffer-sparse.frag)
 glCreateSampleGTC(buffer-sparse-arb)
 set(GL_SHADER_GTC conservative-raster.vert conservative-raster.frag conservative-raster-blit.vert conservative-raster-blit.frag)
 glCreateSampleGTC(conservative-raster-nv)
-set(GL_SHADER_GTC direct-state-access-gtc.frag direct-state-access-gtc.vert)
-glCreateSampleGTC(direct-state-access-gtc)
 set(GL_SHADER_GTC fbo-layered-viewport-nv.vert fbo-layered-viewport-nv.frag fbo-layered-layer-nv.vert fbo-layered-layer-nv.frag)
 glCreateSampleGTC(fbo-layered-nv)
 set(GL_SHADER_GTC fbo-layered-viewport-amd.vert fbo-layered-viewport-amd.frag fbo-layered-layer-amd.vert fbo-layered-layer-amd.frag)

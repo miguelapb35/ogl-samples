@@ -18,6 +18,11 @@ layout(binding = TRANSFORM0) uniform transform
 layout(location = POSITION) in vec2 Position;
 layout(location = TEXCOORD) in vec2 Texcoord;
 
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
+
 out block
 {
 	vec2 Texcoord;

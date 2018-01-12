@@ -2,9 +2,9 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE_TRANSFORM("gl-450/transform-feedback-transform.vert");
-	char const* VERT_SHADER_SOURCE_FEEDBACK("gl-450/transform-feedback-feedback.vert");
-	char const* FRAG_SHADER_SOURCE_FEEDBACK("gl-450/transform-feedback-feedback.frag");
+	char const* VERT_SHADER_SOURCE_TRANSFORM("gl-460/transform-feedback-transform.vert");
+	char const* VERT_SHADER_SOURCE_FEEDBACK("gl-460/transform-feedback-feedback.vert");
+	char const* FRAG_SHADER_SOURCE_FEEDBACK("gl-460/transform-feedback-feedback.frag");
 
 	GLsizei const VertexCount(6);
 	GLsizeiptr const PositionSize = VertexCount * sizeof(glm::vec4);
@@ -44,7 +44,7 @@ class sample : public framework
 {
 public:
 	sample(int argc, char* argv[]) :
-		framework(argc, argv, "gl-450-transform-feedback-arb", framework::CORE, 4, 4),
+		framework(argc, argv, "gl-460-transform-feedback", framework::CORE, 4, 6),
 		QueryName(0),
 		FeedbackName(0),
 		UniformPointer(nullptr)
@@ -64,9 +64,9 @@ private:
 		bool Validated = true;
 
 		compiler Compiler;
-		GLuint VertTransformShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 440 --profile core");
-		GLuint VertFeedbackShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
-		GLuint FragFeedbackShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 440 --profile core");
+		GLuint VertTransformShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_TRANSFORM, "--version 460 --profile core");
+		GLuint VertFeedbackShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE_FEEDBACK, "--version 460 --profile core");
+		GLuint FragFeedbackShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE_FEEDBACK, "--version 460 --profile core");
 
 		if(Validated)
 		{
@@ -130,7 +130,7 @@ private:
 		glGenQueries(1, &QueryName);
 
 		int QueryBits(0);
-		glGetQueryiv(GL_TRANSFORM_FEEDBACK_STREAM_OVERFLOW_ARB, GL_QUERY_COUNTER_BITS, &QueryBits);
+		glGetQueryiv(GL_TRANSFORM_FEEDBACK_STREAM_OVERFLOW, GL_QUERY_COUNTER_BITS, &QueryBits);
 
 		return QueryBits >= 1;
 	}
@@ -171,7 +171,7 @@ private:
 
 	bool begin()
 	{
-		bool Validated = this->checkExtension("GL_ARB_transform_feedback_overflow_query");
+		bool Validated = true;
 
 		if (Validated)
 			Validated = initQuery();
