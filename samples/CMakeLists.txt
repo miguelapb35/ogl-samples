@@ -494,6 +494,8 @@ set(GL_VERSION_GTC 460)
 
 set(GL_SHADER_GTC atomic-counter.vert atomic-counter.frag)
 glCreateSampleGTC(atomic-counter)
+set(GL_SHADER_GTC fbo-shadow-depth.vert fbo-shadow-render.vert fbo-shadow-render.frag)
+glCreateSampleGTC(fbo-shadow)
 set(GL_SHADER_GTC glsl-vote.vert glsl-vote.frag)
 glCreateSampleGTC(glsl-vote)
 set(GL_SHADER_GTC multi-draw-indirect.vert multi-draw-indirect.frag)
