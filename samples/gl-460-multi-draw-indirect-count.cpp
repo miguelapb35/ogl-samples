@@ -184,9 +184,9 @@ private:
 		glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(Commands), Commands, GL_STATIC_DRAW);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
 
-		glBindBuffer(GL_PARAMETER_BUFFER_ARB, this->BufferName[buffer::PARAMETER]);
-		glBufferData(GL_PARAMETER_BUFFER_ARB, sizeof(DrawCount), &DrawCount[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_PARAMETER_BUFFER_ARB, 0);
+		glBindBuffer(GL_PARAMETER_BUFFER, this->BufferName[buffer::PARAMETER]);
+		glBufferData(GL_PARAMETER_BUFFER, sizeof(DrawCount), &DrawCount[0], GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_PARAMETER_BUFFER, 0);
 
 		return true;
 	}
@@ -228,8 +228,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, static_cast<GLsizei>(Texture.extent().x), static_cast<GLsizei>(Texture.extent().y));
@@ -248,8 +247,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
@@ -268,8 +266,7 @@ private:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_B, GL_BLUE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ALPHA);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, GLint(Texture.levels() - 1));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexStorage2D(GL_TEXTURE_2D, GLint(Texture.levels()), Format.Internal, GLsizei(Texture.extent().x), GLsizei(Texture.extent().y));
@@ -303,11 +300,7 @@ private:
 			std::vector<GLchar> InfoLog(LengthMax + 1, '\0');
 			glGetProgramPipelineInfoLog(PipelineName, GLsizei(InfoLog.size()), &LengthQuery, &InfoLog[0]);
 
-			glDebugMessageInsertARB(
-				GL_DEBUG_SOURCE_APPLICATION_ARB, 
-				GL_DEBUG_TYPE_OTHER_ARB, 76,
-				GL_DEBUG_SEVERITY_LOW_ARB,
-				LengthQuery, &InfoLog[0]);
+			glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_OTHER, 76, GL_DEBUG_SEVERITY_LOW, LengthQuery, &InfoLog[0]);
 		}
 	}
 
@@ -383,7 +376,7 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::INDIRECTION, BufferName[buffer::VERTEX_INDIRECTION]);
 
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, BufferName[buffer::INDIRECT]);
-		glBindBuffer(GL_PARAMETER_BUFFER_ARB, BufferName[buffer::PARAMETER]);
+		glBindBuffer(GL_PARAMETER_BUFFER, BufferName[buffer::PARAMETER]);
 
 		this->validate();
 
@@ -391,9 +384,9 @@ private:
 		{
 			glViewportIndexedfv(0, &this->Viewport[i][0]);
 
-			glMultiDrawElementsIndirectCountARB(GL_TRIANGLES, GL_UNSIGNED_SHORT,
+			glMultiDrawElementsIndirectCount(GL_TRIANGLES, GL_UNSIGNED_SHORT,
 				BUFFER_OFFSET(sizeof(DrawElementsIndirectCommand) * this->DrawOffset[i]), // Offset in the indirect draw buffer
-				sizeof(GLsizei) * i, // Offset in the paramter buffer
+				sizeof(GLsizei) * i, // Offset in the parameter buffer
 				4, sizeof(DrawElementsIndirectCommand));
 
 		}
