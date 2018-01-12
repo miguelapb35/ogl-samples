@@ -2,8 +2,8 @@
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE("gl-440/atomic-counter.vert");
-	char const* FRAG_SHADER_SOURCE("gl-440/atomic-counter.frag");
+	char const* VERT_SHADER_SOURCE("gl-440/shader-storage-buffer.vert");
+	char const* FRAG_SHADER_SOURCE("gl-440/shader-storage-buffer.frag");
 
 	namespace buffer
 	{
@@ -19,7 +19,7 @@ class sample : public framework
 {
 public:
 	sample(int argc, char* argv[]) :
-		framework(argc, argv, "gl-440-atomic-counter", framework::CORE, 4, 3, glm::uvec2(2400, 1200), glm::vec2(0), glm::vec2(0), 2, framework::RUN_ONLY),
+		framework(argc, argv, "gl-440-shader-storage-buffer", framework::CORE, 4, 4, glm::uvec2(2400, 1200), glm::vec2(0), glm::vec2(0), 2, framework::RUN_ONLY),
 		PipelineName(0),
 		ProgramName(0),
 		VertexArrayName(0)
@@ -38,8 +38,8 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 430 --profile core");
-			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 430 --profile core");
+			GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 440 --profile core");
+			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 440 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
@@ -61,45 +61,27 @@ private:
 
 	bool initBuffer()
 	{
-		bool Validated(true);
-
-		GLint MaxVertexAtomicCounterBuffers(0);
-		GLint MaxControlAtomicCounterBuffers(0);
-		GLint MaxEvaluationAtomicCounterBuffers(0);
-		GLint MaxGeometryAtomicCounterBuffers(0);
-		GLint MaxFragmentAtomicCounterBuffers(0);
-		GLint MaxCombinedAtomicCounterBuffers(0);
-
-		glGetIntegerv(GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS, &MaxVertexAtomicCounterBuffers);
-		glGetIntegerv(GL_MAX_TESS_CONTROL_ATOMIC_COUNTER_BUFFERS, &MaxControlAtomicCounterBuffers);
-		glGetIntegerv(GL_MAX_TESS_EVALUATION_ATOMIC_COUNTER_BUFFERS, &MaxEvaluationAtomicCounterBuffers);
-		glGetIntegerv(GL_MAX_GEOMETRY_ATOMIC_COUNTER_BUFFERS, &MaxGeometryAtomicCounterBuffers);
-		glGetIntegerv(GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS, &MaxFragmentAtomicCounterBuffers);
-		glGetIntegerv(GL_MAX_COMBINED_ATOMIC_COUNTER_BUFFERS, &MaxCombinedAtomicCounterBuffers);
-
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
-		glBufferStorage(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), nullptr, GL_MAP_WRITE_BIT);
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, 0);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
+		glBufferStorage(GL_SHADER_STORAGE_BUFFER, sizeof(GLuint), nullptr, GL_MAP_WRITE_BIT);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-		return Validated;
+		return true;
 	}
 
 	bool initVertexArray()
 	{
-		bool Validated(true);
-
 		glGenVertexArrays(1, &VertexArrayName);
 		glBindVertexArray(VertexArrayName);
 		glBindVertexArray(0);
 
-		return Validated;
+		return true;
 	}
 
 	bool begin()
 	{
-		bool Validated = this->checkExtension("GL_ARB_clear_buffer_object");
+		bool Validated = true;
 
 		if(Validated)
 			Validated = initBuffer();
@@ -125,15 +107,15 @@ private:
 	{
 		glm::vec2 WindowSize(this->getWindowSize());
 
-		glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, BufferName[buffer::ATOMIC_COUNTER]);
 		glm::uint Data(0);
-		glClearBufferSubData(GL_ATOMIC_COUNTER_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
+		glClearBufferSubData(GL_SHADER_STORAGE_BUFFER, GL_R8UI, 0, sizeof(glm::uint), GL_RGBA, GL_UNSIGNED_INT, &Data);
 
 		glViewportIndexedf(0, 0, 0, WindowSize.x, WindowSize.y);
 
 		glBindProgramPipeline(PipelineName);
 		glBindVertexArray(VertexArrayName);
-		glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, BufferName[buffer::ATOMIC_COUNTER]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::ATOMIC_COUNTER]);
 
 		glDrawArraysInstancedBaseInstance(GL_TRIANGLES, 0, 3, 1, 0);
 
