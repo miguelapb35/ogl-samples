@@ -154,6 +154,7 @@ public:
 
 	int operator()();
 	void log(csv & CSV, char const* String);
+	void setupView(bool Translate, bool RotateX, bool RotateY);
 
 protected:
 	struct DrawArraysIndirectCommand
@@ -194,6 +195,13 @@ protected:
 		GLuint firstIndex;
 		GLint  baseVertex;
 		GLuint baseInstance;
+	};
+
+	enum view_setup_flag
+	{
+		VIEW_SETUP_TRANSLATE = (1 << 0),
+		VIEW_SETUP_ROTATE_X = (1 << 1),
+		VIEW_SETUP_ROTATE_Y = (1 << 2)
 	};
 
 	enum success
@@ -297,6 +305,7 @@ private:
 	std::array<bool, 512> KeyPressed;
 	bool Error;
 	std::size_t Heuristic;
+	int ViewSetupFlags;
 
 private:
 	double TimeSum, TimeMin, TimeMax;

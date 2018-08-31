@@ -488,6 +488,8 @@ set(GL_SHADER_GTC texture-barrier-blend.vert texture-barrier-blend.frag texture-
 glCreateSampleGTC(texture-barrier)
 set(GL_SHADER_GTC texture-derivative-x.vert texture-derivative-x.frag texture-derivative-y.vert texture-derivative-y.frag)
 glCreateSampleGTC(texture-derivative)
+set(GL_SHADER_GTC texture-lod-query.vert texture-lod-query.frag texture-lod-query-builtin.frag sampler-library.frag)
+glCreateSampleGTC(texture-lod-query)
 set(GL_SHADER_GTC primitive-tessellation-point-draw.frag primitive-tessellation-point-draw.eval primitive-tessellation-point-draw.cont primitive-tessellation-point-draw.vert)
 glCreateSampleGTC(primitive-tessellation-point-draw)
 set(GL_SHADER_GTC primitive-tessellation-eval.frag primitive-tessellation-eval.eval primitive-tessellation-eval.vert)

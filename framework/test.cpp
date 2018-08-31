@@ -85,7 +85,8 @@ framework::framework
 	RotationCurrent(Orientation),
 	MouseButtonFlags(0),
 	Error(false),
-	Heuristic(Heuristic)
+	Heuristic(Heuristic),
+	ViewSetupFlags(VIEW_SETUP_TRANSLATE | VIEW_SETUP_ROTATE_X | VIEW_SETUP_ROTATE_Y)
 {
 	assert(WindowSize.x > 0 && WindowSize.y > 0);
 
@@ -255,6 +256,14 @@ void framework::log(csv & CSV, char const* String)
 	CSV.log(String, this->TimeSum / this->FrameCount, this->TimeMin, this->TimeMax);
 }
 
+void framework::setupView(bool Translate, bool RotateX, bool RotateY)
+{
+	this->ViewSetupFlags =
+		(Translate ? VIEW_SETUP_TRANSLATE : 0) |
+		(RotateX ? VIEW_SETUP_ROTATE_X : 0) |
+		(RotateY ? VIEW_SETUP_ROTATE_Y : 0);
+}
+
 bool framework::isExtensionSupported(char const* String)
 {
 	GLint ExtensionCount(0);
@@ -280,9 +289,17 @@ bool framework::isKeyPressed(int Key) const
 
 glm::mat4 framework::view() const
 {
-	glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
-	glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
-	glm::mat4 View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
+	glm::mat4 ViewTranslate(1.0f);
+	if(this->ViewSetupFlags & VIEW_SETUP_TRANSLATE)
+		ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -this->TranlationCurrent.y));
+
+	glm::mat4 ViewRotateX = ViewTranslate;
+	if(this->ViewSetupFlags & VIEW_SETUP_ROTATE_X)
+		ViewRotateX = glm::rotate(ViewTranslate, this->RotationCurrent.y, glm::vec3(1.f, 0.f, 0.f));
+
+	glm::mat4 View = ViewRotateX;
+	if(this->ViewSetupFlags & VIEW_SETUP_ROTATE_Y)
+		View = glm::rotate(ViewRotateX, this->RotationCurrent.x, glm::vec3(0.f, 1.f, 0.f));
 	return View;
 }
 
