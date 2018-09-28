@@ -98,7 +98,7 @@ private:
 		glBindBuffer(GL_COPY_READ_BUFFER, BufferName[buffer::COPY]);
 		glBufferStorage(GL_COPY_READ_BUFFER, CopyBufferSize, nullptr, GL_MAP_WRITE_BIT);
 
-		glm::byte* CopyBufferPointer = reinterpret_cast<glm::byte*>(glMapBufferRange(GL_COPY_READ_BUFFER, 0, CopyBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		glm::uint8* CopyBufferPointer = reinterpret_cast<glm::uint8*>(glMapBufferRange(GL_COPY_READ_BUFFER, 0, CopyBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 		memcpy(CopyBufferPointer + 0, VertexData, VertexSize);
 		memcpy(CopyBufferPointer + glm::ceilMultiple<GLint>(VertexSize, Alignement), ElementData, ElementSize);
 		glUnmapBuffer(GL_COPY_READ_BUFFER);

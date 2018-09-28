@@ -13,8 +13,8 @@ namespace detail
 			size_t OffsetSrc = ImageSrc.size() - (LineSize * (y + 1));
 
 			memcpy(
-				ImageDst.data<glm::byte>() + OffsetDst,
-				ImageSrc.data<glm::byte>() + OffsetSrc,
+				ImageDst.data<gli::byte>() + OffsetDst,
+				ImageSrc.data<gli::byte>() + OffsetSrc,
 				LineSize);
 		}
 	}

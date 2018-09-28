@@ -41,8 +41,11 @@ namespace gli
 		/// Clear the sampler texture with a uniform texel
 		void clear(texel_type const& Texel);
 
-		/// Sample the sampler texture at a specific level
+		/// Sample a texture at a specific level
 		texel_type texture_lod(normalized_type const& SampleCoord, level_type Level) const;
+
+		/// Sample a texture using specified gradiants
+		texel_type texture_grad(normalized_type const& SampleCoord, normalized_type const& dPdx, normalized_type const& dPdy) const;
 
 		/// Generate all the mipmaps of the sampler texture from the texture base level
 		void generate_mipmaps(filter Minification);

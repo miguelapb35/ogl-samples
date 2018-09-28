@@ -186,7 +186,7 @@ private:
 			glm::vec4 Diffuse(1.0f, 0.5f, 0.0f, 1.0f);
 
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::UNIFORM]);
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(
+			glm::uint8* Pointer = (glm::uint8*)glMapBufferRange(
 				GL_UNIFORM_BUFFER, 0,	UniformBlockSizeTransform + sizeof(glm::vec4),
 				GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 

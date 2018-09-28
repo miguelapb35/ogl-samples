@@ -112,7 +112,7 @@ private:
 		glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::MATERIAL]);
 		glBufferData(GL_UNIFORM_BUFFER, this->UniformMaterialOffset * 2, nullptr, GL_STATIC_DRAW);
 
-			glm::byte* Pointer = reinterpret_cast<glm::byte*>(
+			glm::uint8* Pointer = reinterpret_cast<glm::uint8*>(
 				glMapBufferRange(GL_UNIFORM_BUFFER, 0, this->UniformMaterialOffset * 2, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
 			*reinterpret_cast<glm::vec4*>(Pointer + 0) = glm::vec4(0.0f, 0.5f, 1.0f, 1.0f);

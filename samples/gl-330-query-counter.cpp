@@ -178,7 +178,7 @@ private:
 		//glGetInteger64v(GL_TIMESTAMP, &TimeBegin);
 		//glGetInteger64v(GL_TIMESTAMP, &TimeEnd);
 
-		fprintf(stdout, "%d, %d / Time stamp: %f ms   \r", AvailableBegin, AvailableEnd, (TimeEnd - TimeBegin) / 1000.f / 1000.f);
+		fprintf(stdout, "%d, %d / Time stamp: %f ms   \r", int(AvailableBegin), int(AvailableEnd), (TimeEnd - TimeBegin) / 1000.f / 1000.f);
 
 		return TimeEnd - TimeBegin > 0;
 	}

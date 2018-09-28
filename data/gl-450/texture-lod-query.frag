@@ -18,12 +18,13 @@ in block
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 float textureLevel(in sampler2D Sampler, in vec2 Texcoord);
+float textureLevelArea(in sampler2D Sampler, in vec2 Texcoord);
 
 void main()
 {
 	ivec2 Size = textureSize(Diffuse, 0);
-	float LevelCount = log2(max(Size.x, Size.y));
-	float Level = textureLevel(Diffuse, In.Texcoord);
+	float LevelCount = log2(max(Size.x, Size.y)) + 1.0;
+	float Level = textureLevelArea(Diffuse, In.Texcoord);
 
 	Color = vec4(vec3(Level / LevelCount), 1.0);
 }

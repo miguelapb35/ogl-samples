@@ -79,7 +79,7 @@ namespace detail
 }//namespace detail
 
 	inline image::image()
-		: Format(static_cast<gli::format>(FORMAT_INVALID))
+		: Format(gli::FORMAT_UNDEFINED)
 		, BaseLevel(0)
 		, Data(nullptr)
 		, Size(0)
@@ -174,7 +174,7 @@ namespace detail
 	inline void const* image::data() const
 	{
 		GLI_ASSERT(!this->empty());
-		
+
 		return this->Data;
 	}
 
@@ -200,7 +200,7 @@ namespace detail
 	{
 		GLI_ASSERT(!this->empty());
 
-		memset(this->data<glm::byte>(), 0, this->size<glm::byte>());
+		memset(this->data<gli::byte>(), 0, this->size<gli::byte>());
 	}
 
 	template <typename genType>

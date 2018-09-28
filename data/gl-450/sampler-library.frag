@@ -64,16 +64,33 @@ vec2 mirrorRepeat(in vec2 Texcoord)
 float textureLevel(in sampler2D Sampler, in vec2 Texcoord)
 {
 	vec2 TextureSize = vec2(textureSize(Sampler, 0));
+	float LevelCount = log2(max(TextureSize.x, TextureSize.y)) + 1.0;
 
-	float LevelCount = log2(max(TextureSize.x, TextureSize.y));
-
-	vec2 dx = dFdx(Texcoord * TextureSize);
-	vec2 dy = dFdy(Texcoord * TextureSize);
+	vec2 dx = dFdxCoarse(Texcoord * TextureSize);
+	vec2 dy = dFdyCoarse(Texcoord * TextureSize);
 	float d = max(dot(dx, dx), dot(dy, dy));
 
 	d = clamp(d, 1.0, pow(2, (LevelCount - 1) * 2));
 
-	return 0.5 * log2(d);
+	return (0.5 * log2(d));
+}
+
+float textureLevelArea(in sampler2D Sampler, in vec2 Texcoord)
+{
+	vec2 TextureSize = vec2(textureSize(Sampler, 0));
+	float LevelCount = log2(max(TextureSize.x, TextureSize.y)) + 1.0;
+
+	vec2 dx = dFdxCoarse(Texcoord);
+	vec2 dy = dFdyCoarse(Texcoord);
+
+	float EllipseArea = 4.0 * abs(dx.x * dy.y - dx.y * dy.x);
+	//EllipseArea *= TextureSize.x;
+	//EllipseArea *= TextureSize.y;
+	float LOD = log(EllipseArea) / log(4.0);
+
+	float d = clamp(LOD, 1.0, pow(2, (LevelCount - 1) * 2));
+	return (0.5 * log2(d));
+	//return LOD;
 }
 
 vec4 fetchBilinear(

@@ -139,7 +139,7 @@ namespace gli
 				Alpha[4] = (2.0f / 5.0f) * Alpha[0] + (3.0f / 5.0f) * Alpha[1];
 				Alpha[5] = (1.0f / 5.0f) * Alpha[0] + (4.0f / 5.0f) * Alpha[1];
 				Alpha[6] = 0.0f;
-				Alpha[7] = 255.0f;
+				Alpha[7] = 1.0f;
 			}
 
 			uint64_t Bitmap;
@@ -183,7 +183,7 @@ namespace gli
 				Alpha[4] = (2.0f / 5.0f) * Alpha[0] + (3.0f / 5.0f) * Alpha[1];
 				Alpha[5] = (1.0f / 5.0f) * Alpha[0] + (4.0f / 5.0f) * Alpha[1];
 				Alpha[6] = 0.0f;
-				Alpha[7] = 255.0f;
+				Alpha[7] = 1.0f;
 			}
 
 			uint64_t Bitmap;

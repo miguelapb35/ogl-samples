@@ -180,7 +180,7 @@ private:
 		glGenBuffers(buffer::MAX, &BufferName[0]);
 
 		// Allocate and copy buffers memory
-		std::vector<glm::byte> Data(PositionSizeF32 + PositionSizeI8 + PositionSizeI32 + PositionSizeRGB10A2 + PositionSizeF16 + PositionSizeRG11FB10F);
+		std::vector<glm::uint8> Data(PositionSizeF32 + PositionSizeI8 + PositionSizeI32 + PositionSizeRGB10A2 + PositionSizeF16 + PositionSizeRG11FB10F);
 		
 		std::size_t CurrentOffset = 0;
 		memcpy(&Data[0] + CurrentOffset, PositionDataF32, PositionSizeF32);

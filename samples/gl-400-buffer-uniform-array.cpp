@@ -178,7 +178,7 @@ private:
 
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, UniformBufferRange, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+			glm::uint8* Pointer = (glm::uint8*)glMapBufferRange(GL_UNIFORM_BUFFER, 0, UniformBufferRange, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 const Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 			glm::mat4 const Model0 = glm::translate(glm::mat4(1.0f), glm::vec3( 1, 0, 0));

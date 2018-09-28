@@ -141,7 +141,7 @@ private:
 			Format.External, Format.Type,
 			nullptr);
 
-		GLsizei TextureSize = Texture[0].size();
+		GLsizei TextureSize = static_cast<GLsizei>(Texture[0].size());
 
 		GLuint PixelBuffer(0);
 		glGenBuffers(1, &PixelBuffer);

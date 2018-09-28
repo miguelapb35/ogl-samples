@@ -172,7 +172,7 @@ private:
 		{
 			glBindBuffer(GL_UNIFORM_BUFFER, BufferName[buffer::TRANSFORM]);
 
-			glm::byte* Pointer = (glm::byte*)glMapBufferRange(GL_UNIFORM_BUFFER,
+			glm::uint8* Pointer = (glm::uint8*)glMapBufferRange(GL_UNIFORM_BUFFER,
 				0, BufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
 
 			glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);

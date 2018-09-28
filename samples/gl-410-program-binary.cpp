@@ -90,7 +90,7 @@ private:
 		GLenum Format(0);
 
 		glGetProgramiv(ProgramName, GL_PROGRAM_BINARY_LENGTH, &Size);
-		std::vector<glm::byte> Data(Size);
+		std::vector<glm::uint8> Data(Size);
 		glGetProgramBinary(ProgramName, Size, nullptr, &Format, &Data[0]);
 		save_binary(String, Format, Data, Size);
 
@@ -119,7 +119,7 @@ private:
 		{
 			GLenum Format = 0;
 			GLint Size = 0;
-			std::vector<glm::byte> Data;
+			std::vector<glm::uint8> Data;
 			if(load_binary(getDataDirectory() + VERT_PROGRAM_BINARY, Format, Data, Size))
 			{
 				if(is_valid_binary_format(Format))
@@ -134,7 +134,7 @@ private:
 		{
 			GLenum Format = 0;
 			GLint Size = 0;
-			std::vector<glm::byte> Data;
+			std::vector<glm::uint8> Data;
 			if(load_binary(getDataDirectory() + GEOM_PROGRAM_BINARY, Format, Data, Size))
 			{
 				if(is_valid_binary_format(Format))
@@ -149,7 +149,7 @@ private:
 		{
 			GLenum Format = 0;
 			GLint Size = 0;
-			std::vector<glm::byte> Data;
+			std::vector<glm::uint8> Data;
 			if(load_binary(getDataDirectory() + FRAG_PROGRAM_BINARY, Format, Data, Size))
 			{
 				if(is_valid_binary_format(Format))

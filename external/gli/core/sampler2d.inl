@@ -1,4 +1,6 @@
 #include "clear.hpp"
+#include <glm/gtc/integer.hpp>
+#include <glm/exponential.hpp>
 #include <glm/vector_relational.hpp>
 
 namespace gli
@@ -57,6 +59,26 @@ namespace gli
 		GLI_ASSERT(this->Filter && this->Convert.Fetch);
 
 		normalized_type const SampleCoordWrap(this->Wrap(SampleCoord.x), this->Wrap(SampleCoord.y));
+		return this->Filter(this->Texture, this->Convert.Fetch, SampleCoordWrap, size_type(0), size_type(0), Level, this->BorderColor);
+	}
+
+	template <typename T, qualifier P>
+	inline typename sampler2d<T, P>::texel_type sampler2d<T, P>::texture_grad(normalized_type const & SampleCoord, normalized_type const& dPdx, normalized_type const& dPdy) const
+	{
+		GLI_ASSERT(!this->Texture.empty());
+		GLI_ASSERT(std::numeric_limits<T>::is_iec559);
+		GLI_ASSERT(this->Filter && this->Convert.Fetch);
+
+		normalized_type const SampleCoordWrap(this->Wrap(SampleCoord.x), this->Wrap(SampleCoord.y));
+
+		extent_type const TextureSize = this->Texture.extent(0);
+
+		int const LevelCount = glm::log2<int>(max(TextureSize.x, TextureSize.y));
+		T const d = max(dot(dPdx, dPdx), dot(dPdy, dPdy));
+		T const Clamped = clamp(d, static_cast<T>(1), static_cast<T>(pow(2, (LevelCount - 1) * 2)));
+
+		T const Level = static_cast<T>(0.5) * glm::log2<T>(Clamped);
+
 		return this->Filter(this->Texture, this->Convert.Fetch, SampleCoordWrap, size_type(0), size_type(0), Level, this->BorderColor);
 	}
 

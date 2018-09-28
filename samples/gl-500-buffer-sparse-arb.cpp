@@ -98,7 +98,7 @@ private:
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
 
 		glNamedBufferStorage(BufferName[buffer::COPY], CopyBufferSize, nullptr, GL_MAP_WRITE_BIT);
-		glm::byte* CopyBufferPointer = reinterpret_cast<glm::byte*>(glMapNamedBufferRange(BufferName[buffer::COPY], 0, CopyBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
+		glm::uint8* CopyBufferPointer = reinterpret_cast<glm::uint8*>(glMapNamedBufferRange(BufferName[buffer::COPY], 0, CopyBufferSize, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 		memcpy(CopyBufferPointer + 0, VertexData, VertexSize);
 		memcpy(CopyBufferPointer + glm::ceilMultiple<GLint>(VertexSize, Alignement), ElementData, ElementSize);
 		glUnmapNamedBuffer(BufferName[buffer::COPY]);
