@@ -1,0 +1,11 @@
+#version 460 core
+#extension GL_NV_mesh_shader : enable
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+
+void main()
+{
+	gl_TaskCountNV = 1;
+}

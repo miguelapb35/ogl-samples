@@ -1,0 +1,51 @@
+#version 460 core
+#extension GL_NV_mesh_shader : enable
+
+#define TRANSFORM0	1
+#define VERTEX		0
+
+precision highp float;
+precision highp int;
+layout(std140, column_major) uniform;
+layout(std430, column_major) buffer;
+
+layout(local_size_x=32) in;
+layout(triangles) out;
+layout(max_vertices=6, max_primitives=2) out;
+
+out uint gl_PrimitiveCountNV;
+out uint gl_PrimitiveIndicesNV[];
+
+out gl_MeshPerVertexNV {
+	vec4  gl_Position;
+	float gl_PointSize;
+	float gl_ClipDistance[];
+	float gl_CullDistance[];
+} gl_MeshVerticesNV[]; 
+
+layout(binding = TRANSFORM0) uniform transform
+{
+	mat4 MVP;
+} Transform;
+
+struct vertex
+{
+	vec2 Position;
+	vec2 Texcoord;
+};
+
+layout(std430, binding = VERTEX) buffer mesh
+{
+	vertex Vertex[];
+} Mesh;
+
+out block
+{
+	vec2 Texcoord;
+} Out[];
+
+void main()
+{
+	Out[gl_WorkGroupID.x].Texcoord = Mesh.Vertex[gl_WorkGroupID.x].Texcoord;
+	gl_MeshVerticesNV[gl_WorkGroupID.x].gl_Position = Transform.MVP * vec4(Mesh.Vertex[gl_WorkGroupID.x].Position, 0.0, 1.0);
+}
