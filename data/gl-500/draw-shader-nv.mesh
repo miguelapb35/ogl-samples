@@ -11,17 +11,10 @@ layout(std430, column_major) buffer;
 
 layout(local_size_x=32) in;
 layout(triangles) out;
-layout(max_vertices=6, max_primitives=2) out;
+layout(max_vertices=4, max_primitives=2) out;
 
 out uint gl_PrimitiveCountNV;
 out uint gl_PrimitiveIndicesNV[];
-
-out gl_MeshPerVertexNV {
-	vec4  gl_Position;
-	float gl_PointSize;
-	float gl_ClipDistance[];
-	float gl_CullDistance[];
-} gl_MeshVerticesNV[]; 
 
 layout(binding = TRANSFORM0) uniform transform
 {
@@ -39,6 +32,11 @@ layout(std430, binding = VERTEX) buffer mesh
 	vertex Vertex[];
 } Mesh;
 
+out gl_MeshPerVertexNV
+{
+	vec4  gl_Position;
+} gl_MeshVerticesNV[];
+
 out block
 {
 	vec2 Texcoord;
@@ -46,6 +44,14 @@ out block
 
 void main()
 {
-	Out[gl_WorkGroupID.x].Texcoord = Mesh.Vertex[gl_WorkGroupID.x].Texcoord;
-	gl_MeshVerticesNV[gl_WorkGroupID.x].gl_Position = Transform.MVP * vec4(Mesh.Vertex[gl_WorkGroupID.x].Position, 0.0, 1.0);
+	gl_PrimitiveIndicesNV[0] = 0;
+	gl_PrimitiveIndicesNV[1] = 1;
+	gl_PrimitiveIndicesNV[2] = 2;
+	gl_PrimitiveIndicesNV[3] = 2;
+	gl_PrimitiveIndicesNV[4] = 3;
+	gl_PrimitiveIndicesNV[5] = 0;
+	gl_PrimitiveCountNV = 2;
+
+	Out[gl_LocalInvocationID.x].Texcoord = Mesh.Vertex[gl_LocalInvocationID.x].Texcoord;
+	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = Transform.MVP * vec4(Mesh.Vertex[gl_LocalInvocationID.x].Position, 0.0, 1.0);
 }
