@@ -95,8 +95,8 @@ namespace
 	};
 
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLuint);
-	GLuint const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
+	GLushort const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		2, 3, 0
