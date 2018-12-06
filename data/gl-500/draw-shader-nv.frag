@@ -1,4 +1,5 @@
 #version 460 core
+#extension GL_NV_fragment_shader_barycentric : enable
 
 #define DIFFUSE			0
 #define FRAG_COLOR		0
@@ -9,14 +10,15 @@ layout(std140, column_major) uniform;
 
 layout(binding = DIFFUSE) uniform sampler2D Diffuse;
 
-in block
+pervertexNV in block
 {
 	vec2 Texcoord;
-} In;
+} In[];
 
 layout(location = FRAG_COLOR, index = 0) out vec4 Color;
 
 void main()
 {
-	Color = texture(Diffuse, In.Texcoord);
+	vec2 Texcoord = gl_BaryCoordNV.x * In[0].Texcoord + gl_BaryCoordNV.y * In[1].Texcoord + gl_BaryCoordNV.z * In[2].Texcoord;
+	Color = texture(Diffuse, Texcoord);
 }

@@ -95,8 +95,8 @@ namespace
 	};
 
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(GLubyte);
+	GLubyte const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		2, 3, 0
@@ -106,6 +106,7 @@ namespace
 	{
 		enum type
 		{
+			OBJECT,
 			VERTEX,
 			ELEMENT,
 			TRANSFORM,
@@ -218,6 +219,12 @@ private:
 
 	bool initBuffer()
 	{
+		GLsizei const ObjectCount(1);
+		GLsizeiptr const ObjectSize = ObjectCount * sizeof(glm::mat4);
+		glm::mat4 ObjectData[ObjectCount];
+
+		ObjectData[0] = glm::scale(glm::mat4(1), glm::vec3(1.5f));
+
 		GLint UniformBufferOffset = 0;
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
 		GLint UniformBlockSize = glm::max(GLint(sizeof(glm::mat4)), UniformBufferOffset);
@@ -225,6 +232,7 @@ private:
 		glCreateBuffers(buffer::MAX, &BufferName[0]);
 		glNamedBufferStorage(BufferName[buffer::ELEMENT], ElementSize, ElementData, 0);
 		glNamedBufferStorage(BufferName[buffer::VERTEX], VertexSize, VertexData, 0);
+		glNamedBufferStorage(BufferName[buffer::OBJECT], ObjectSize, ObjectData, 0);
 		glNamedBufferStorage(BufferName[buffer::TRANSFORM], UniformBlockSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
 
 		this->UniformPointer = static_cast<glm::uint8*>(glMapNamedBufferRange(
@@ -302,8 +310,7 @@ private:
 		glm::vec2 const WindowSize(this->getWindowSize());
 
 		glm::mat4 const Projection = glm::perspectiveFov(glm::pi<float>() * 0.25f, WindowSize.x, WindowSize.y, 0.1f, 100.0f);
-		glm::mat4 const Model = glm::mat4(1.0f);
-		*reinterpret_cast<glm::mat4*>(this->UniformPointer) = Projection * this->view() * Model;
+		*reinterpret_cast<glm::mat4*>(this->UniformPointer) = Projection * this->view();
 
 		glDrawBuffer(GL_BACK);
 		glDisable(GL_FRAMEBUFFER_SRGB);
@@ -316,6 +323,7 @@ private:
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, BufferName[buffer::TRANSFORM]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::ELEMENT]);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, BufferName[buffer::VERTEX]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, BufferName[buffer::OBJECT]);
 
 		glDrawMeshTasksNV(0, 1);
 

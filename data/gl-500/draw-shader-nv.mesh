@@ -16,12 +16,12 @@ out uint gl_PrimitiveIndicesNV[];
 
 layout(binding = 0) uniform transform
 {
-	mat4 MVP;
+	mat4 VP;
 } Transform;
 
 layout(std430, binding = 0) buffer element
 {
-	uint16_t Data[];
+	uint8_t Data[];
 } Element;
 
 struct attrib
@@ -34,6 +34,16 @@ layout(std430, binding = 1) buffer vertex
 {
 	attrib Data[];
 } Vertex;
+
+struct objectData
+{
+	mat4 M;
+};
+
+layout(std430, binding = 2) buffer object
+{
+	objectData Data[];
+} Object;
 
 out gl_MeshPerVertexNV
 {
@@ -53,6 +63,8 @@ void main()
 	for (uint i = 0; i < gl_PrimitiveIndicesNV.length(); i += gl_WorkGroupSize.x)
 		gl_PrimitiveIndicesNV[i + gl_LocalInvocationID.x] = (uint)Element.Data[i + gl_LocalInvocationID.x + gl_WorkGroupID.x * gl_PrimitiveIndicesNV.length()];
 
+	mat4 MVP = Transform.VP * Object.Data[0].M;
+
 	Out[gl_LocalInvocationID.x].Texcoord = Vertex.Data[gl_GlobalInvocationID.x].Texcoord;
-	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = Transform.MVP * vec4(Vertex.Data[gl_GlobalInvocationID.x].Position, 0.0, 1.0);
+	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = MVP * vec4(Vertex.Data[gl_GlobalInvocationID.x].Position, 0.0, 1.0);
 }
