@@ -525,7 +525,7 @@ glCreateSampleGTC(buffer-sparse-arb)
 set(GL_SHADER_GTC conservative-raster.vert conservative-raster.frag conservative-raster-blit.vert conservative-raster-blit.frag)
 glCreateSampleGTC(conservative-raster-nv)
 
-set(GL_SHADER_GTC draw-shader-nv.task draw-shader-nv.mesh draw-shader-nv.vert draw-shader-nv.frag)
+set(GL_SHADER_GTC draw-shader-nv.task draw-shader-nv.mesh draw-shader-nv.frag)
 glCreateSampleGTC(draw-shader-nv)
 
 set(GL_SHADER_GTC fbo-layered-viewport-nv.vert fbo-layered-viewport-nv.frag fbo-layered-layer-nv.vert fbo-layered-layer-nv.frag)

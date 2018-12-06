@@ -1,5 +1,5 @@
 ---
-# OpenGL Samples Pack 
+# OpenGL Samples Pack
 
 ogl-samples.g-truc.net
 ogl-samples@g-truc.net

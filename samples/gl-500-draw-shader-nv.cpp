@@ -79,7 +79,6 @@ PFNGLMULTIDRAWMESHTASKSINDIRECTCOUNTNVPROC glMultiDrawMeshTasksIndirectCountNV =
 
 namespace
 {
-	char const* VERT_SHADER_SOURCE("gl-500/draw-shader-nv.vert");
 	char const* TASK_SHADER_SOURCE("gl-500/draw-shader-nv.task");
 	char const* MESH_SHADER_SOURCE("gl-500/draw-shader-nv.mesh");
 	char const* FRAG_SHADER_SOURCE("gl-500/draw-shader-nv.frag");
@@ -201,14 +200,12 @@ private:
 		if(Validated)
 		{
 			compiler Compiler;
-			//GLuint VertShaderName = Compiler.create(GL_VERTEX_SHADER, getDataDirectory() + VERT_SHADER_SOURCE, "--version 460 --profile core");
 			GLuint TaskShaderName = Compiler.create(GL_TASK_SHADER_NV, getDataDirectory() + TASK_SHADER_SOURCE, "--version 460 --profile core");
 			GLuint MeshShaderName = Compiler.create(GL_MESH_SHADER_NV, getDataDirectory() + MESH_SHADER_SOURCE, "--version 460 --profile core");
 			GLuint FragShaderName = Compiler.create(GL_FRAGMENT_SHADER, getDataDirectory() + FRAG_SHADER_SOURCE, "--version 460 --profile core");
 			Validated = Validated && Compiler.check();
 
 			ProgramName = glCreateProgram();
-			//glAttachShader(ProgramName, VertShaderName);
 			glAttachShader(ProgramName, TaskShaderName);
 			glAttachShader(ProgramName, MeshShaderName);
 			glAttachShader(ProgramName, FragShaderName);
@@ -327,10 +324,8 @@ private:
 		glUseProgram(this->ProgramName);
 		glBindTextureUnit(0, this->TextureName);
 		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-		//glBindVertexArray(VertexArrayName);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::VERTEX]);
 
-		//glDrawElementsInstancedBaseVertex(GL_TRIANGLES, ElementCount, GL_UNSIGNED_SHORT, 0, 1, 0);
 		glDrawMeshTasksNV(0, 1);
 
 		return true;
