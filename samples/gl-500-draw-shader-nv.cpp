@@ -144,6 +144,9 @@ private:
 
 	bool initExtensions()
 	{
+		if(!this->checkExtension("GL_NV_mesh_shader"))
+			return false;
+
 		glDrawMeshTasksNV = (PFNGLDRAWMESHTASKSNVPROC)glfwGetProcAddress("glDrawMeshTasksNV");
 		glDrawMeshTasksIndirectNV = (PFNGLDRAWMESHTASKSINDIRECTNVPROC)glfwGetProcAddress("glDrawMeshTasksIndirectNV");
 		glMultiDrawMeshTasksIndirectNV = (PFNGLMULTIDRAWMESHTASKSINDIRECTNVPROC)glfwGetProcAddress("glMultiDrawMeshTasksIndirectNV");
