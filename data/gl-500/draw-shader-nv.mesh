@@ -1,9 +1,6 @@
 #version 460 core
 #extension GL_NV_mesh_shader : enable
 
-#define TRANSFORM0	1
-#define VERTEX		0
-
 precision highp float;
 precision highp int;
 layout(std140, column_major) uniform;
@@ -16,21 +13,26 @@ layout(max_vertices=4, max_primitives=2) out;
 out uint gl_PrimitiveCountNV;
 out uint gl_PrimitiveIndicesNV[];
 
-layout(binding = TRANSFORM0) uniform transform
+layout(binding = 0) uniform transform
 {
 	mat4 MVP;
 } Transform;
 
-struct vertex
+struct attrib
 {
 	vec2 Position;
 	vec2 Texcoord;
 };
 
-layout(std430, binding = VERTEX) buffer mesh
+layout(std430, binding = 0) buffer element
 {
-	vertex Vertex[];
-} Mesh;
+	uint Data[];
+} Element;
+
+layout(std430, binding = 1) buffer vertex
+{
+	attrib Data[];
+} Vertex;
 
 out gl_MeshPerVertexNV
 {
@@ -44,14 +46,12 @@ out block
 
 void main()
 {
-	gl_PrimitiveIndicesNV[0] = 0;
-	gl_PrimitiveIndicesNV[1] = 1;
-	gl_PrimitiveIndicesNV[2] = 2;
-	gl_PrimitiveIndicesNV[3] = 2;
-	gl_PrimitiveIndicesNV[4] = 3;
-	gl_PrimitiveIndicesNV[5] = 0;
-	gl_PrimitiveCountNV = 2;
+	if (gl_LocalInvocationID.x == 0)
+		gl_PrimitiveCountNV = 2;
 
-	Out[gl_LocalInvocationID.x].Texcoord = Mesh.Vertex[gl_LocalInvocationID.x].Texcoord;
-	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = Transform.MVP * vec4(Mesh.Vertex[gl_LocalInvocationID.x].Position, 0.0, 1.0);
+	for (uint i = 0; i < gl_PrimitiveIndicesNV.length(); i += gl_WorkGroupSize.x)
+		gl_PrimitiveIndicesNV[i + gl_LocalInvocationID.x] = Element.Data[i + gl_LocalInvocationID.x + gl_WorkGroupID.x * gl_PrimitiveIndicesNV.length()];
+
+	Out[gl_LocalInvocationID.x].Texcoord = Vertex.Data[gl_GlobalInvocationID.x].Texcoord;
+	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = Transform.MVP * vec4(Vertex.Data[gl_GlobalInvocationID.x].Position, 0.0, 1.0);
 }

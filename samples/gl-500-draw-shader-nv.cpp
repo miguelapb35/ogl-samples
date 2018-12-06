@@ -95,8 +95,8 @@ namespace
 	};
 
 	GLsizei const ElementCount(6);
-	GLsizeiptr const ElementSize = ElementCount * sizeof(GLushort);
-	GLushort const ElementData[ElementCount] =
+	GLsizeiptr const ElementSize = ElementCount * sizeof(GLuint);
+	GLuint const ElementData[ElementCount] =
 	{
 		0, 1, 2,
 		2, 3, 0
@@ -267,14 +267,6 @@ private:
 		return true;
 	}
 
-	bool initVertexArray()
-	{
-		glCreateVertexArrays(1, &VertexArrayName);
-		glVertexArrayElementBuffer(VertexArrayName, BufferName[buffer::ELEMENT]);
-
-		return true;
-	}
-
 	bool begin()
 	{
 		bool Validated = true;
@@ -289,8 +281,6 @@ private:
 			Validated = initTexture();
 		if(Validated)
 			Validated = initProgram();
-		if(Validated)
-			Validated = initVertexArray();
 
 		return Validated;
 	}
@@ -323,8 +313,9 @@ private:
 
 		glUseProgram(this->ProgramName);
 		glBindTextureUnit(0, this->TextureName);
-		glBindBufferBase(GL_UNIFORM_BUFFER, semantic::uniform::TRANSFORM0, BufferName[buffer::TRANSFORM]);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::VERTEX]);
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, BufferName[buffer::TRANSFORM]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, BufferName[buffer::ELEMENT]);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, BufferName[buffer::VERTEX]);
 
 		glDrawMeshTasksNV(0, 1);
 
