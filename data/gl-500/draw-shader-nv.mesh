@@ -7,9 +7,14 @@ precision highp int;
 layout(std140, column_major) uniform;
 layout(std430, column_major) buffer;
 
-layout(local_size_x=32) in;
+layout(local_size_x = 4) in;
 layout(triangles) out;
 layout(max_vertices=4, max_primitives=2) out;
+
+taskNV in task
+{
+	uint ObjectIndex;
+} In;
 
 out uint gl_PrimitiveCountNV;
 out uint gl_PrimitiveIndicesNV[];
@@ -60,11 +65,14 @@ void main()
 	if (gl_LocalInvocationID.x == 0)
 		gl_PrimitiveCountNV = 2;
 
-	for (uint i = 0; i < gl_PrimitiveIndicesNV.length(); i += gl_WorkGroupSize.x)
-		gl_PrimitiveIndicesNV[i + gl_LocalInvocationID.x] = (uint)Element.Data[i + gl_LocalInvocationID.x + gl_WorkGroupID.x * gl_PrimitiveIndicesNV.length()];
+//	for (uint i = 0; i < gl_PrimitiveIndicesNV.length(); i += gl_WorkGroupSize.x)
+//		gl_PrimitiveIndicesNV[i + gl_LocalInvocationID.x] = (uint)Element.Data[i + gl_LocalInvocationID.x + gl_WorkGroupID.x * gl_PrimitiveIndicesNV.length()];
 
-	mat4 MVP = Transform.VP * Object.Data[0].M;
+	for (uint i = 0; i < gl_PrimitiveIndicesNV.length(); ++i)
+		gl_PrimitiveIndicesNV[i] = (uint)Element.Data[i];
 
-	Out[gl_LocalInvocationID.x].Texcoord = Vertex.Data[gl_GlobalInvocationID.x].Texcoord;
-	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = MVP * vec4(Vertex.Data[gl_GlobalInvocationID.x].Position, 0.0, 1.0);
+	mat4 MVP = Transform.VP * Object.Data[gl_WorkGroupID.x].M;
+
+	Out[gl_LocalInvocationID.x].Texcoord = Vertex.Data[gl_LocalInvocationID.x].Texcoord;
+	gl_MeshVerticesNV[gl_LocalInvocationID.x].gl_Position = MVP * vec4(Vertex.Data[gl_LocalInvocationID.x].Position, 0.0, 1.0);
 }

@@ -219,11 +219,12 @@ private:
 
 	bool initBuffer()
 	{
-		GLsizei const ObjectCount(1);
+		GLsizei const ObjectCount(2);
 		GLsizeiptr const ObjectSize = ObjectCount * sizeof(glm::mat4);
 		glm::mat4 ObjectData[ObjectCount];
 
-		ObjectData[0] = glm::scale(glm::mat4(1), glm::vec3(1.5f));
+		ObjectData[0] = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(1, 0, 0)), glm::vec3(0.5f));
+		ObjectData[1] = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-1, 0, 0)), glm::vec3(0.5f));
 
 		GLint UniformBufferOffset = 0;
 		glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &UniformBufferOffset);
